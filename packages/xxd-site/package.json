@@ -25,7 +25,8 @@
     "@xxd/tokens": "workspace:*",
     "astro": "7.2.8",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "echarts": "6.0.0"
   },
   "devDependencies": {
     "@types/react": "catalog:",

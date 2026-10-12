@@ -96,3 +96,11 @@ export declare function rollText(el: HTMLElement, text: string): void;
 export declare function celebrate(anchor: Element, options?: { colors?: string[]; count?: number }): void;
 export declare function filterSettings(container: Element, query: string): number;
 export declare function bindSettingsSearch(input: HTMLInputElement, container: Element, options?: { hotkey?: boolean }): () => void;
+
+export interface XxdChartTokens { dark: boolean; ink: string; muted: string; line: string; paper: string; accent: string; success: string; danger: string; warning: string; font: string; mono: string }
+export declare function chartTokens(el?: Element): XxdChartTokens;
+export declare function chartPalette(tokens?: XxdChartTokens): string[];
+export declare function chartOptions<T extends Record<string, any>>(option?: T, options?: { el?: Element; tokens?: XxdChartTokens }): T & Record<string, any>;
+export declare function watchChartTheme(chart: { setOption(option: any, opts?: any): void }, build: () => any, options?: { el?: Element }): () => void;
+export declare function sparkline(values: (number | string)[], options?: { width?: number; height?: number; strokeWidth?: number; area?: boolean }): string;
+export declare function initSparklines(root?: ParentNode): void;

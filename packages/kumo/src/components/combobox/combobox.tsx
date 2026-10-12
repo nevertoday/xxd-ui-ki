@@ -19,6 +19,7 @@ import {
   usePortalContainer,
   type PortalContainer,
 } from "../../utils/portal-provider";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 /** Combobox variant definitions. */
 export const KUMO_COMBOBOX_VARIANTS = {
@@ -351,8 +352,8 @@ const triggerInputIconStyles: Record<
 };
 
 function TriggerInput({
-  clearLabel = "Clear selection",
-  showOptionsLabel = "Show options",
+  clearLabel: clearLabelProp,
+  showOptionsLabel: showOptionsLabelProp,
   ...props
 }: ComboboxBase.Input.Props & {
   /** Accessible label for the clear button. Pass a translated string for i18n.
@@ -364,6 +365,9 @@ function TriggerInput({
    */
   showOptionsLabel?: string;
 }) {
+  const { common } = useKumoLocale();
+  const clearLabel = clearLabelProp ?? common.clearSelection;
+  const showOptionsLabel = showOptionsLabelProp ?? common.showOptions;
   const { size, hasError } = useContext(ComboboxContext);
   const iconStyles = triggerInputIconStyles[size];
 
@@ -509,7 +513,7 @@ function Group(props: ComboboxBase.Group.Props) {
 }
 
 function Chip({
-  removeLabel = "Remove",
+  removeLabel: removeLabelProp,
   ...props
 }: ComboboxBase.Chip.Props & {
   /** Accessible label for the chip remove button. Pass a translated string for i18n.
@@ -517,6 +521,8 @@ function Chip({
    */
   removeLabel?: string;
 }) {
+  const { common } = useKumoLocale();
+  const removeLabel = removeLabelProp ?? common.remove;
   return (
     <ComboboxBase.Chip
       {...props}

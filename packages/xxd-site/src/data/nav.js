@@ -20,6 +20,7 @@ export const nav = [
       { label: "字体与层级", href: "/foundations/type" },
       { label: "间距与尺寸", href: "/foundations/spacing" },
       { label: "动效", href: "/foundations/motion" },
+      { label: "质感（平面 / 立体）", href: "/foundations/finish" },
       { label: "图标", href: "/foundations/icons" },
     ],
   },

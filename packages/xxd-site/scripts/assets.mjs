@@ -1,5 +1,6 @@
 // 展示站的静态资源：
 //   public/xxd/      @xxd/css 的构建产物（boot.js、xxd.css、xxd.js、icons.js）
+//   public/xxd/echarts.js  图表组件页用（echarts/dist/echarts.min.js）
 //   public/xxd/kumo.css  React 组件的预编译样式（@cloudflare/kumo standalone，Kumo 换皮版）
 //   public/xxd/forced-states.css  状态矩阵用：把组件 CSS 里的 :hover / :focus-visible / :active 复制成 [data-force~="…"] 版本，
 //                                 这样「悬停 / 聚焦 / 按下」可以静态并排展示，用的是真实的组件规则而不是手写的模仿。
@@ -16,6 +17,15 @@ mkdirSync(out, { recursive: true });
 const cssDist = join(pkgs, "xxd-css/dist");
 if (!existsSync(join(cssDist, "xxd.js"))) execFileSync("node", ["scripts/build.mjs"], { cwd: join(pkgs, "xxd-css"), stdio: "inherit" });
 for (const f of ["boot.js", "xxd.css", "xxd.js", "icons.js"]) copyFileSync(join(cssDist, f), join(out, f));
+
+// 图表组件页用的 ECharts（只在那一页加载）
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+try {
+  copyFileSync(join(dirname(require.resolve("echarts/package.json")), "dist/echarts.min.js"), join(out, "echarts.js"));
+} catch {
+  console.warn("！没有 echarts：图表组件页的原生演示会是空的");
+}
 
 const kumoCss = join(pkgs, "kumo/dist/styles/kumo-standalone.css");
 if (existsSync(kumoCss)) copyFileSync(kumoCss, join(out, "kumo.css"));

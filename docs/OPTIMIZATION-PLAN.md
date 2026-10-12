@@ -235,25 +235,27 @@ D6、D7 按建议（图标按钮跟随圆角开关；图表以后做）。
 - 把 xxd 独有组件做成 `@xxd/react` 组件（Dock、Sheet、SettingsGroup / Row、Appearance、Card / 瀑布流、Prose、Swatches、Chip、Search、Segmented、Rail）。
 - `XxdLocaleProvider`：Kumo 内置文案三语，默认简体；扫出所有写死的英文。
 - **验收**：React 与原生同名组件在展示站并排截图一致；`@xxd/react` 测试覆盖每个新组件。
+- **做了**：`@xxd/react` 新增 Dock、SheetHost / Sheet、Settings / SettingsGroup / SettingsRow、Chip、Search、Segmented、Rail、Swatches、AppearanceSettings、CardGrid / Card、Prose，以及 O4 的 StatusLine、ConfirmTwiceButton、DropTarget / DropZone、AccountCard（样式 `@xxd/react/xxd.css`）。`XxdLocaleProvider` 三语：Kumo 里写死的英文（复制、关闭、加载、分页、清空、日期翻页……）都接到了 `KumoLocaleProvider` 的 `common` / `pagination` 两组文案。D2 / D4 也套到 Kumo 上（kumo-binding.css：悬停立即变；菜单 / 弹出层缩放 0.96；对话框只淡入上移不缩放；关闭 100ms）。
 
 ### O6 · 展示站 `packages/xxd-site`
 - 第 5 节全部：架构、栏目、搜索、`.md` / `llms.txt` / registry API、截图回归门禁。
 - 原则页的「好 / 不好」对照（含第 6 节新增）。
 - **验收**：所有组件、模式、模板、基础页上线（本地）；截图回归跑通；手机宽度无横向滚动；零控制台错误。
 
-### O7 · 图表（以后）
+### O7 · 图表
 - ECharts 主题：色板从墨色 / 主色推出（亮暗都过对比度），遵守 dataviz 规范；先做折线与柱状、统计卡片。
+- **做了**：`Xxd.chartOptions()`（原生 ECharts 和 Kumo `<Chart options>` 都能用）、`watchChartTheme()`（切主题 / 主色自动重画）、`sparkline()`；`.xxd-chart-card`、`.xxd-stat`。
 
 ### 进度
 
 | 阶段 | 状态 | 日期 |
 | --- | --- | --- |
-| O1 交互与状态基础层 | ✅ 完成 | 2026-10-12 |
-| O2 补齐 P0 组件 | ✅ 完成 | 2026-10-12 |
-| O3 补齐 P1 / P2 组件 | ✅ 完成 | 2026-10-12 |
-| O4 小小东模式 | ✅ 完成 | 2026-10-12 |
-| O5 React 层对齐 | 未开始 | |
-| O6 展示站 | 未开始 | |
-| O7 图表 | 以后 | |
+| O1 交互与状态基础层 | ✅ 完成 | 2026-10-11 |
+| O2 补齐 P0 组件 | ✅ 完成 | 2026-10-11 |
+| O3 补齐 P1 / P2 组件 | ✅ 完成 | 2026-10-11 |
+| O4 小小东模式 | ✅ 完成 | 2026-10-11 |
+| O5 React 层对齐 | ✅ 完成 | 2026-10-11 |
+| O6 展示站 | ✅ 完成 | 2026-10-11 |
+| O7 图表 | ✅ 完成 | 2026-10-11 |
 
 建议顺序：先定 D1–D7 → O1（手感是一切的底）→ O6 的骨架（有地方看效果）→ O2 → O3 → O4 → O5 → O6 收尾。

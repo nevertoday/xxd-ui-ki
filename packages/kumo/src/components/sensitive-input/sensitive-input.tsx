@@ -18,6 +18,7 @@ import {
 } from "../input/input";
 import { Field, type FieldErrorMatch } from "../field/field";
 import { useCopyFeedback } from "../../utils/use-copy-feedback";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 export const KUMO_SENSITIVE_INPUT_VARIANTS = KUMO_INPUT_VARIANTS;
 
@@ -124,6 +125,7 @@ export const SensitiveInput = forwardRef<HTMLInputElement, SensitiveInputProps>(
     const ariaLabelFallback =
       typeof label === "string" ? label : "Sensitive value";
     const isControlled = controlledValue !== undefined;
+    const { common } = useKumoLocale();
     const [internalValue, setInternalValue] = useState(defaultValue);
     const value = isControlled ? controlledValue : internalValue;
     const hasValue = value.length > 0;
@@ -411,7 +413,7 @@ export const SensitiveInput = forwardRef<HTMLInputElement, SensitiveInputProps>(
           data-kumo-part="toggle-visibility"
           onClick={handleToggleVisibility}
           onKeyDown={(e) => e.stopPropagation()}
-          aria-label={mode === "revealed" ? "Hide value" : "Reveal value"}
+          aria-label={mode === "revealed" ? common.hideValue : common.revealValue}
           tabIndex={showEyeButton ? 0 : -1}
           className={cn(
             "absolute top-1/2 right-0 -translate-y-1/2 cursor-pointer text-kumo-subtle hover:text-kumo-default focus:text-kumo-default focus:ring-kumo-focus/50 focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-kumo-brand",
@@ -441,14 +443,14 @@ export const SensitiveInput = forwardRef<HTMLInputElement, SensitiveInputProps>(
             data-kumo-part="copy"
             onClick={copyToClipboard}
             onKeyDown={(e) => e.stopPropagation()}
-            aria-label={copied ? "Copied" : "Copy to clipboard"}
+            aria-label={copied ? common.copied : common.copyToClipboard}
             className={cn(
               "absolute -top-px right-2 -translate-y-full cursor-pointer rounded-t-md bg-kumo-brand px-2 py-0.5 text-xs text-white opacity-0 transition-opacity group-focus-within/container:opacity-100 group-hover/container:opacity-100 hover:brightness-120 focus:ring-kumo-focus/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-kumo-brand",
               // Defensive styles to prevent global CSS pollution
               "m-0 h-auto min-h-0 border-none shadow-none",
             )}
           >
-            {copied ? "Copied" : "Copy"}
+            {copied ? common.copied : common.copy}
           </button>
         )}
       </>
@@ -486,8 +488,8 @@ export const SensitiveInput = forwardRef<HTMLInputElement, SensitiveInputProps>(
           </span>
         )}
         <span id={liveRegionId} className="sr-only" aria-live="polite">
-          {mode === "masked" && hasValue && "Value hidden"}
-          {copied && "Copied to clipboard"}
+          {mode === "masked" && hasValue && common.valueHidden}
+          {copied && common.copiedToClipboard}
         </span>
       </div>
     );

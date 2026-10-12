@@ -1,4 +1,5 @@
 import { resolveVariant } from "../../utils/resolve-variant";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 /** Loader size variant definitions mapping sizes to their pixel values. */
 export const KUMO_LOADER_VARIANTS = {
@@ -87,8 +88,10 @@ export interface LoaderProps {
 export const Loader = ({
   className,
   size = KUMO_LOADER_DEFAULT_VARIANTS.size,
-  "aria-label": ariaLabel = "Loading",
+  "aria-label": ariaLabelProp,
 }: LoaderProps) => {
+  const { common } = useKumoLocale();
+  const ariaLabel = ariaLabelProp ?? common.loading;
   const sizeValue = loaderVariants({ size });
   return (
     <svg

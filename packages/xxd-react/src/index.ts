@@ -4,8 +4,32 @@
 //   import { Button, Dialog, DialogActions } from "@xxd/react";
 //   import "@xxd/react/styles.css";   // 需要 Tailwind v4：先 @import "tailwindcss"
 //   import "@xxd/react/standalone.css"; // 不用 Tailwind 时
+//   import "@xxd/react/xxd.css";        // 小小东独有组件（Dock、Sheet、Settings…）用 @xxd/css 的样式
 export * from "@cloudflare/kumo";
 export { DialogActions } from "./dialog-actions";
 export { XxdAppearanceProvider, useXxdAppearance } from "./appearance";
+export { XxdLocaleProvider, useXxdLocale, resolveLocale, KUMO_TRANSLATIONS, type XxdLocale, type XxdStrings } from "./locale";
+export {
+  Dock,
+  SheetHost,
+  Sheet,
+  Settings,
+  SettingsGroup,
+  SettingsRow,
+  Chip,
+  Search,
+  Segmented,
+  Rail,
+  Swatches,
+  AppearanceSettings,
+  CardGrid,
+  Card,
+  Prose,
+  StatusLine,
+  ConfirmTwiceButton,
+  DropTarget,
+  DropZone,
+  AccountCard,
+} from "./xxd";
 export { Icon, IconContext, createIcon, icons, ICON_NAMES } from "@xxd/icons/react";
 export { ACCENT_PRESETS, type XxdSettings } from "@xxd/tokens";

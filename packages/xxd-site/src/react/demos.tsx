@@ -1,6 +1,23 @@
 // React 版演示（@xxd/react）。函数名 = 原生组件名 + "Demo"；组件页会自动并排展示，源码也从这里抽取。
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { chartOptions, sparkline } from "@xxd/css";
 import {
+  Chart,
+  AppearanceSettings,
+  Card,
+  CardGrid,
+  Chip,
+  Dock,
+  Prose,
+  Rail,
+  Search,
+  Segmented,
+  Settings,
+  SettingsGroup,
+  SettingsRow,
+  Sheet,
+  SheetHost,
+  XxdAppearanceProvider,
   Badge,
   Grid,
   GridItem,
@@ -166,16 +183,8 @@ export function TabsDemo() {
 }
 
 export function SegmentedDemo() {
-  return (
-    <Tabs
-      variant="segmented"
-      tabs={[
-        { value: "text", label: "文本" },
-        { value: "image", label: "图片" },
-      ]}
-      selectedValue="text"
-    />
-  );
+  const [v, setV] = useState<"text" | "image">("text");
+  return <Segmented label="类型" value={v} onValueChange={setV} options={[{ value: "text", label: "文本" }, { value: "image", label: "图片" }]} />;
 }
 
 export function BreadcrumbsDemo() {
@@ -450,6 +459,136 @@ export function SidebarDemo() {
           </Sidebar.Content>
         </Sidebar>
       </Sidebar.Provider>
+    </div>
+  );
+}
+
+export function SearchDemo() {
+  const [q, setQ] = useState("");
+  return <Search value={q} onValueChange={setQ} placeholder="搜索设置" />;
+}
+
+export function ChipDemo() {
+  const [on, setOn] = useState<Record<string, boolean>>({ 海报: true, 封面: false });
+  return (
+    <div className="xxd-cluster">
+      {Object.keys(on).map((k) => (
+        <Chip key={k} pressed={on[k]} onPressedChange={(p) => setOn({ ...on, [k]: p })}>{k}</Chip>
+      ))}
+    </div>
+  );
+}
+
+export function RailDemo() {
+  return <Rail current="/" items={[{ href: "/", label: "首页", icon: "House" }, { href: "/saved", label: "收藏", icon: "Bookmark" }]} />;
+}
+
+export function DockDemo() {
+  return (
+    <Dock
+      style={{ position: "static", width: 380 }}
+      status="30 字符 · 已保存"
+      tools={<Button variant="ghost" shape="square" aria-label="封面" icon={<Icon name="Image" />} />}
+      primary={<Button variant="primary" size="sm">写入 X</Button>}
+    />
+  );
+}
+
+export function SheetDemo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <SheetHost style={{ position: "relative", width: 380, height: 320, border: "1px solid var(--line)", overflow: "hidden" }}>
+      <div style={{ padding: 14 }} className="xxd-text" data-variant="secondary">正文……</div>
+      <Sheet open={open} onOpenChange={setOpen} title="封面">
+        <p className="xxd-help">选一张图作为文章封面。</p>
+      </Sheet>
+      <Dock style={{ position: "absolute", left: 0, right: 0, bottom: 0 }} primary={<Button size="sm" onClick={() => setOpen(!open)}>封面</Button>} />
+    </SheetHost>
+  );
+}
+
+export function SettingsGroupDemo() {
+  const [on, setOn] = useState(true);
+  return (
+    <Settings style={{ maxWidth: 420 }}>
+      <SettingsGroup title="写入">
+        <SettingsRow title="写入标题" description="第一行 # 标题作为文章标题" control={<input type="checkbox" role="switch" className="xxd-switch" aria-label="写入标题" checked={on} onChange={(e) => setOn(e.target.checked)} />} />
+        <SettingsRow title="本地图片文件夹" description="未连接" href="#" />
+      </SettingsGroup>
+    </Settings>
+  );
+}
+
+export function AppearanceDemo() {
+  return (
+    <XxdAppearanceProvider storageKey="xxd-site">
+      <Settings style={{ maxWidth: 440 }}>
+        <AppearanceSettings showFinish />
+      </Settings>
+    </XxdAppearanceProvider>
+  );
+}
+
+export function CardDemo() {
+  return (
+    <CardGrid min={180}>
+      {["#d65f32", "#3b74b8", "#5a8a3c"].map((c, i) => (
+        <Card key={c} href="#" title={`编辑式海报 00${i + 1}`} meta={`xxd-panel-00${i + 1}`} media={<div style={{ position: "absolute", inset: 0, background: c }} />} />
+      ))}
+    </CardGrid>
+  );
+}
+
+export function ProseDemo() {
+  return (
+    <Prose style={{ maxWidth: 560 }}>
+      <h2>为什么是直角</h2>
+      <p>直角让内容先说话。所有颜色、圆角、阴影都来自 <code>tokens.css</code>。</p>
+      <blockquote>动效用来揭示层级和给反馈，不是装饰。</blockquote>
+    </Prose>
+  );
+}
+
+export function ChartDemo() {
+  const [echarts, setEcharts] = useState<typeof import("echarts") | null>(null);
+  const [, bump] = useState(0);
+  useEffect(() => {
+    import("echarts").then(setEcharts);
+    // 切主题 / 主色时重新取令牌
+    const mo = new MutationObserver(() => bump((n) => n + 1));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-accent", "style"] });
+    return () => mo.disconnect();
+  }, []);
+  if (!echarts) return <div className="xxd-chart" />;
+  const days = Array.from({ length: 14 }, (_, i) => `${i + 1}日`);
+  const options = chartOptions({
+    legend: {},
+    xAxis: { type: "category", data: days, boundaryGap: false },
+    yAxis: { type: "value" },
+    series: [
+      { name: "长文发布", type: "line", data: [42, 48, 45, 60, 58, 66, 71, 69, 80, 78, 85, 90, 88, 96] },
+      { name: "图片排序", type: "line", data: [20, 22, 25, 24, 28, 27, 30, 33, 31, 35, 34, 36, 38, 40] },
+    ],
+  });
+  return (
+    <div className="xxd-chart-card" style={{ width: "100%", maxWidth: 720 }}>
+      <div className="xxd-chart-card__head"><h3 className="xxd-chart-card__title">每天写入篇数</h3><span className="xxd-chart-card__meta">Kumo &lt;Chart&gt; + Xxd.chartOptions</span></div>
+      <Chart echarts={echarts as never} options={options as never} height={260} />
+    </div>
+  );
+}
+
+export function StatDemo() {
+  return (
+    <div className="xxd-stats" style={{ width: "100%", maxWidth: 640 }}>
+      {[["本周写入", "1,284", "篇", "up", "↑ 12.4% 比上周", [8, 9, 7, 11, 10, 13, 15]], ["新会员", "86", "", "down", "↓ 3 比上周", [12, 11, 13, 10, 9, 10, 8]]].map(([label, value, unit, tone, delta, data]) => (
+        <div className="xxd-stat" key={label as string}>
+          <p className="xxd-stat__label">{label}</p>
+          <p className="xxd-stat__value">{value}{unit && <span className="xxd-stat__unit">{unit}</span>}</p>
+          <span className="xxd-stat__delta" data-tone={tone as string}>{delta}</span>
+          <span className="xxd-stat__spark" dangerouslySetInnerHTML={{ __html: sparkline(data as number[]) }} />
+        </div>
+      ))}
     </div>
   );
 }

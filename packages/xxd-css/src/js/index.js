@@ -14,6 +14,7 @@ import { initStructure, installStructure } from "./structure.js";
 import { initData, installData } from "./data.js";
 import { installDrawerSwipe } from "./layers.js";
 import { installAuth, installConfirmTwice, installSortable } from "./patterns.js";
+import { initSparklines } from "./chart.js";
 
 export { openDialog, closeDialog, confirmDialog, confirmDelete } from "./dialog.js";
 export { toggleSidebar, collapseBreadcrumbs, spyToc, watchTabsOverflow } from "./structure.js";
@@ -26,6 +27,7 @@ export { toast, copyText, showTooltip, hideTooltip, showBubble, runBusy } from "
 export { openSheet, closeSheet, openPanel, closePanel, openLayer, closeLayer } from "./layers.js";
 export { bindSearch, markMatches, clearMarks, addTag, tagValues, openCommandPalette, bindCommandPalette } from "./inputs.js";
 export { mountAppearance, APPEARANCE_LABELS } from "./appearance.js";
+export { chartTokens, chartPalette, chartOptions, watchChartTheme, sparkline, initSparklines } from "./chart.js";
 export { bindDrop, openViewer, flip, setStatus, rollText, celebrate, filterSettings, bindSettingsSearch } from "./patterns.js";
 export { ICON } from "./icons-min.js";
 
@@ -63,5 +65,6 @@ export function init(root = document) {
   initPickers(root);
   initStructure(root);
   initData(root);
+  initSparklines(root);
   globalThis.XxdIcons?.hydrateIcons?.(root);
 }

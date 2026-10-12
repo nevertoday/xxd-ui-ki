@@ -1118,6 +1118,44 @@
         "一个颜色四种强度：100% 指向、40% 线与标记、12% 行内代码、6% 代码块",
         "阅读列 680px"
       ]
+    },
+    {
+      "name": "Stat",
+      "zh": "统计卡",
+      "category": "展示",
+      "summary": "标签 · 数字（等宽数字）· 和上期比的变化 · 迷你折线。变化只有涨（成功色）跌（危险色）两种含义色。",
+      "classes": [
+        "xxd-stats",
+        "xxd-stat",
+        "xxd-stat__label",
+        "xxd-stat__value",
+        "xxd-stat__unit",
+        "xxd-stat__delta",
+        "xxd-stat__spark"
+      ],
+      "markup": "<div class=\"xxd-stats\" style=\"width:100%;max-width:640px\">\n  <div class=\"xxd-stat\"><p class=\"xxd-stat__label\">本周写入</p><p class=\"xxd-stat__value\">1,284<span class=\"xxd-stat__unit\">篇</span></p><span class=\"xxd-stat__delta\" data-tone=\"up\">↑ 12.4% 比上周</span><span class=\"xxd-stat__spark\" data-spark=\"8,9,7,11,10,13,15\"></span></div>\n  <div class=\"xxd-stat\"><p class=\"xxd-stat__label\">新会员</p><p class=\"xxd-stat__value\">86</p><span class=\"xxd-stat__delta\" data-tone=\"down\">↓ 3 比上周</span><span class=\"xxd-stat__spark\" data-spark=\"12,11,13,10,9,10,8\"></span></div>\n  <div class=\"xxd-stat\"><p class=\"xxd-stat__label\">平均写入耗时</p><p class=\"xxd-stat__value\">2.4<span class=\"xxd-stat__unit\">秒</span></p><span class=\"xxd-stat__delta\">持平</span><span class=\"xxd-stat__spark\" data-spark=\"5,5,6,5,5,4,5\"></span></div>\n</div>",
+      "a11y": [
+        "迷你折线是 aria-hidden 的装饰；变化要写成文字（↑ 12.4% 比上周），不能只靠颜色。"
+      ],
+      "js": "el.innerHTML = Xxd.sparkline([3, 5, 4, 8])  // 或者 data-spark=\"3,5,4,8\" 再 Xxd.init()"
+    },
+    {
+      "name": "Chart",
+      "zh": "图表",
+      "category": "展示",
+      "summary": "ECharts + Xxd.chartOptions()：一条重点线用主色，其余是墨色的深浅；发丝网格线；切主题、主色自动重画。也能直接喂给 Kumo 的 <Chart options>。",
+      "classes": [
+        "xxd-chart",
+        "xxd-chart-card",
+        "xxd-chart-card__head",
+        "xxd-chart-card__title",
+        "xxd-chart-card__meta"
+      ],
+      "markup": "<div style=\"display:grid;gap:16px;width:100%;max-width:720px\">\n<div class=\"xxd-chart-card\">\n  <div class=\"xxd-chart-card__head\"><h3 class=\"xxd-chart-card__title\">每天写入篇数</h3><span class=\"xxd-chart-card__meta\">最近 14 天</span></div>\n  <div class=\"xxd-chart\" id=\"chart-line\"></div>\n</div>\n<div class=\"xxd-chart-card\">\n  <div class=\"xxd-chart-card__head\"><h3 class=\"xxd-chart-card__title\">各插件用户</h3></div>\n  <div class=\"xxd-chart\" id=\"chart-bar\" style=\"--chart-h:220px\"></div>\n</div>\n</div>\n<script>\n  if (window.echarts) {\n    const days = Array.from({ length: 14 }, (_, i) => `${i + 1}日`);\n    const line = echarts.init(document.getElementById(\"chart-line\"));\n    const lineOpt = () => Xxd.chartOptions({ legend: {}, xAxis: { type: \"category\", data: days, boundaryGap: false }, yAxis: { type: \"value\" }, series: [{ name: \"长文发布\", type: \"line\", data: [42, 48, 45, 60, 58, 66, 71, 69, 80, 78, 85, 90, 88, 96] }, { name: \"图片排序\", type: \"line\", data: [20, 22, 25, 24, 28, 27, 30, 33, 31, 35, 34, 36, 38, 40] }] });\n    line.setOption(lineOpt());\n    Xxd.watchChartTheme(line, lineOpt);\n    const bar = echarts.init(document.getElementById(\"chart-bar\"));\n    const barOpt = () => Xxd.chartOptions({ xAxis: { type: \"category\", data: [\"长文发布\", \"排序链接\", \"批量存图\", \"今日待办\"] }, yAxis: { type: \"value\" }, series: [{ type: \"bar\", data: [2410, 830, 5102, 312] }] });\n    bar.setOption(barOpt());\n    Xxd.watchChartTheme(bar, barOpt);\n    new ResizeObserver(() => { line.resize(); bar.resize(); }).observe(document.getElementById(\"chart-line\").parentElement.parentElement);\n  }\n</script>",
+      "a11y": [
+        "图表旁边要有一句话结论或一张表；颜色之外，线宽也区分重点线。"
+      ],
+      "js": "chart.setOption(Xxd.chartOptions(option))\nXxd.watchChartTheme(chart, () => Xxd.chartOptions(option))\n// React：<Chart echarts={echarts} options={Xxd.chartOptions(option)} />"
     }
   ]
 }

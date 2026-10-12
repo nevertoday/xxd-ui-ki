@@ -5,6 +5,7 @@ import {
 } from "@xxd/icons/phosphor";
 import { useCallback, useState } from "react";
 import { cn } from "../../utils/cn";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 /** DateRangePicker size and variant definitions mapping names to their Tailwind classes. */
 export const KUMO_DATE_RANGE_PICKER_VARIANTS = {
@@ -169,6 +170,7 @@ export function DateRangePicker({
   timezone = "New York, NY, USA (GMT-4)",
   className,
 }: DateRangePickerProps) {
+  const { common } = useKumoLocale();
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [viewingMonth, setViewingMonth] = useState<Date>(new Date());
@@ -273,7 +275,7 @@ export function DateRangePicker({
         <div className={cn("relative", sizeConfig.calendarWidth)}>
           <button
             type="button"
-            aria-label="Previous month"
+            aria-label={common.previousMonth}
             className="absolute top-0 left-0 cursor-pointer rounded bg-kumo-interact/85 p-1.5 hover:bg-kumo-interact"
             onClick={() => adjustMonth(-1)}
           >
@@ -374,7 +376,7 @@ export function DateRangePicker({
         <div className={cn("relative", sizeConfig.calendarWidth)}>
           <button
             type="button"
-            aria-label="Next month"
+            aria-label={common.nextMonth}
             className="absolute top-0 right-0 cursor-pointer rounded bg-kumo-interact/85 p-1.5 hover:bg-kumo-interact"
             onClick={() => adjustMonth(1)}
           >
@@ -594,6 +596,7 @@ function DateRangeMonthHeader({
   size?: KumoDateRangePickerSize;
   updateCurrentMonth?: (dateString: string) => void;
 }) {
+  const { common } = useKumoLocale();
   const sizeConfig = getSizeConfig(size);
 
   return (
@@ -601,7 +604,7 @@ function DateRangeMonthHeader({
       <div className="mb-3 text-center">
         <input
           key={`${month}-${year}`}
-          aria-label="Edit month and year"
+          aria-label={common.editMonthYear}
           defaultValue={`${month} ${year}`}
           className={cn(
             "w-full rounded-md border-none bg-transparent py-1.5 text-center font-semibold text-kumo-default transition-all duration-200 focus:ring-[1.5px] focus:ring-kumo-focus/50 focus:outline-none",

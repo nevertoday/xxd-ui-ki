@@ -4,12 +4,14 @@ import { nav, flatPages } from "../data/nav.js";
 import { icon } from "../lib/data.js";
 
 interface Props {
+  /** 这页要用 ECharts（图表组件页） */
+  charts?: boolean;
   title: string;
   description?: string;
   headings?: { slug: string; text: string; depth?: number }[];
   wide?: boolean;
 }
-const { title, description = "小小东 UI Kit：小小东提示词与 Chrome 插件共用的设计系统。", headings = [], wide = false } = Astro.props;
+const { title, description = "小小东 UI Kit：小小东提示词与 Chrome 插件共用的设计系统。", headings = [], wide = false, charts = false } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 const searchIndex = JSON.stringify(flatPages.map((p) => ({ label: p.label, hint: p.sub ? `${p.sub} · ${p.group}` : p.group, href: p.href })));
 const mdHref = path === "/" ? "/md/index.md" : `/md${path}.md`;
@@ -32,6 +34,7 @@ const mdHref = path === "/" ? "/md/index.md" : `/md${path}.md`;
     <link rel="stylesheet" href="/site.css" />
     <script is:inline src="/xxd/icons.js"></script>
     <script is:inline src="/xxd/xxd.js"></script>
+    {charts && <script is:inline src="/xxd/echarts.js"></script>}
   </head>
   <body class="xxd-page">
     <a class="site-skip xxd-sr-only" href="#main">跳到正文</a>

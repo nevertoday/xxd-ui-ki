@@ -15,6 +15,7 @@ import {
   type KumoTextVariant,
   type TextProps,
 } from "../text/text";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 const COPIED_FEEDBACK_MS = 1500;
 
@@ -144,13 +145,16 @@ export const InlineCopyText = forwardRef<
       onClick,
       onCopy,
       labels: {
-        copyAction = "Copy to clipboard",
-        copied: copiedLabel = "Copied",
+        copyAction: copyActionProp,
+        copied: copiedLabelProp,
       } = {},
       ...props
     },
     ref,
   ) => {
+    const { common } = useKumoLocale();
+    const copyAction = copyActionProp ?? common.copyToClipboard;
+    const copiedLabel = copiedLabelProp ?? common.copied;
     const [copied, setCopied] = useState(false);
     const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const valueToCopy = resolveCopyValue(children, value);

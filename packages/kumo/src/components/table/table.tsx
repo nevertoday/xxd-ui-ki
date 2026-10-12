@@ -2,6 +2,7 @@ import { forwardRef } from "react";
 import { cn } from "../../utils";
 import { resolveVariant } from "../../utils/resolve-variant";
 import { Checkbox, type CheckboxChangeEventDetails } from "../checkbox";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 /** Table layout and row variant definitions mapping names to their Tailwind classes. */
 export const KUMO_TABLE_VARIANTS = {
@@ -255,12 +256,13 @@ const TableResizeHandle = forwardRef<
   HTMLButtonElement,
   React.HTMLAttributes<HTMLButtonElement>
 >((props, ref) => {
+  const { common } = useKumoLocale();
   return (
     <button
       ref={ref}
       {...props}
       type="button"
-      aria-label="Resize column"
+      aria-label={common.resizeColumn}
       className={cn(
         "invisible h-full group-hover:visible", // Make the handle invisible by default
         "w-[10px]", // Hitting area

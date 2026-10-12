@@ -13,6 +13,7 @@ import {
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import { Chart, ChartEvents, KumoChartOption } from "./EChart";
 import { ChartPalette } from "./Color";
+import { useKumoLocale } from "../../utils/locale-provider";
 import {
   buildTimeseriesMarkerAnnotations,
   clusterTimeseriesMarkers,
@@ -962,6 +963,7 @@ function ChartSkeletonLoader({
   isDarkMode?: boolean;
   type?: "line" | "bar";
 }) {
+  const { common } = useKumoLocale();
   const id = `kumo-chart-loader-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const fillId = `${id}-fill`;
   const shineId = `${id}-shine`;
@@ -1003,7 +1005,7 @@ function ChartSkeletonLoader({
   return (
     <div
       role="status"
-      aria-label="Loading chart"
+      aria-label={common.loadingChart}
       className="absolute inset-0 overflow-hidden"
       style={{ height }}
     >

@@ -366,3 +366,48 @@
 .kumo-input-placeholder::placeholder {
   color: var(--text-color-kumo-placeholder);
 }
+
+/* ── 小小东动效（xxd-ui-kit 优化计划 D2 / D4），和 @xxd/css 一致 ──
+ * D2：移上立即变色，移开按组件自己的时长淡回（Kumo 是 150ms）。
+ * D4：浮层（菜单 / 弹出层）从锚点缩放 0.96；对话框只淡入 + 上移 8px，不缩放；关闭比打开快（100ms）。 */
+:where([data-kumo-component], .kumo-tabs-list, [role="menuitem"], [role="option"], [role="tab"]):hover {
+  transition-duration: 0s;
+}
+
+.kumo-popover-popup[data-starting-style],
+.kumo-popover-popup[data-ending-style],
+[role="menu"][data-starting-style],
+[role="menu"][data-ending-style],
+[role="listbox"][data-starting-style],
+[role="listbox"][data-ending-style] {
+  --tw-scale-x: 96%;
+  --tw-scale-y: 96%;
+  --tw-scale-z: 96%;
+}
+
+:is([role="dialog"], [role="alertdialog"]):not(.kumo-popover-popup)[data-starting-style],
+:is([role="dialog"], [role="alertdialog"]):not(.kumo-popover-popup)[data-ending-style] {
+  --tw-scale-x: 100%;
+  --tw-scale-y: 100%;
+  --tw-scale-z: 100%;
+  --tw-translate-y: 8px;
+}
+
+:is([role="dialog"], [role="alertdialog"]):not(.kumo-popover-popup) {
+  transition-property: opacity, translate, scale;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-ending-style]:is(.kumo-popover-popup, .kumo-tooltip-popup, [role="menu"], [role="listbox"], [role="dialog"], [role="alertdialog"]) {
+  transition-duration: 100ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-starting-style],
+  [data-ending-style] {
+    --tw-scale-x: 100%;
+    --tw-scale-y: 100%;
+    --tw-scale-z: 100%;
+    --tw-translate-y: 0px;
+  }
+}

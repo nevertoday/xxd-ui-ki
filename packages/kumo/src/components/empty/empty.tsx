@@ -5,6 +5,7 @@ import { Text } from "../../components/text";
 import { cn } from "../../utils/cn";
 import { resolveVariant } from "../../utils/resolve-variant";
 import { useCopyFeedback } from "../../utils/use-copy-feedback";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 /** Empty state size variant definitions mapping sizes to their Tailwind classes. */
 export const KUMO_EMPTY_VARIANTS = {
@@ -99,6 +100,7 @@ export function Empty({
   size = "base",
   className,
 }: EmptyProps) {
+  const { common } = useKumoLocale();
   const { copied: emptyStateCopied, runCopy } = useCopyFeedback(1000);
 
   const handleCopy = useCallback(async () => {
@@ -152,7 +154,7 @@ export function Empty({
             size="sm"
             variant="ghost"
             shape="square"
-            aria-label="Copy command"
+            aria-label={common.copyCommand}
             onClick={handleCopy}
           >
             {emptyStateCopied ? (

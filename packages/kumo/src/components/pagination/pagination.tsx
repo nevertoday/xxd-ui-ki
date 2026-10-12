@@ -17,6 +17,7 @@ import {
 import { cn } from "../../utils/cn";
 import { resolveVariant } from "../../utils/resolve-variant";
 import { Select } from "../select";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [25, 50, 100, 250] as const;
 
@@ -554,11 +555,12 @@ function PaginationRoot(props: PaginationProps) {
       ? (props.controls ?? KUMO_PAGINATION_DEFAULT_VARIANTS.controls)
       : KUMO_PAGINATION_DEFAULT_VARIANTS.controls;
   const [editingPage, setEditingPage] = useState<number>(1);
+  const { pagination: localeLabels } = useKumoLocale();
 
   // Merge provided labels with defaults
   const labels = useMemo<Required<PaginationLabels>>(
-    () => ({ ...DEFAULT_LABELS, ...labelsProp }),
-    [labelsProp],
+    () => ({ ...DEFAULT_LABELS, ...localeLabels, ...labelsProp }),
+    [labelsProp, localeLabels],
   );
 
   useEffect(() => {

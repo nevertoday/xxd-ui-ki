@@ -27,7 +27,7 @@ const headings = [
 ];
 ---
 
-<Site title={`${c.zh} ${c.name}`} description={c.summary ?? `${c.zh}（${c.name}）—— 小小东 UI 组件`} headings={headings}>
+<Site title={`${c.zh} ${c.name}`} description={c.summary ?? `${c.zh}（${c.name}）—— 小小东 UI 组件`} headings={headings} charts={c.name === "Chart"}>
   <header class="site-head">
     <p class="xxd-text" data-variant="caption">组件 · {c.category}{hasReact && " · 原生 HTML 与 React"}</p>
     <h1 class="xxd-text" data-variant="display">{c.zh} <span class="xxd-text" data-variant="mono-secondary">{c.name}</span></h1>

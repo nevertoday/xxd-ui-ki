@@ -552,10 +552,12 @@ function LayerDialogAction({
   children,
   loading,
   menu,
-  menuLabel = "More actions",
+  menuLabel: menuLabelProp,
   variant = "primary",
   ...props
 }: LayerDialogActionProps) {
+  const { layerDialog } = useKumoLocale();
+  const menuLabel = menuLabelProp ?? layerDialog.moreActions ?? "More actions";
   const container = useContext(LayerDialogPortalContainerContext);
   const button = (
     <Button {...props} loading={loading} variant={variant}>

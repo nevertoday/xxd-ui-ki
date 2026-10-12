@@ -6,6 +6,7 @@ import { Button } from "../button";
 import { inputVariants } from "../input";
 import { cn } from "../../utils/cn";
 import { resolveVariant } from "../../utils/resolve-variant";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 // External manager — same-id re-adds update + reset timeout in Base UI's store
 const clipboardToastManager = Toast.createToastManager();
@@ -183,10 +184,12 @@ export const ClipboardText = forwardRef<HTMLDivElement, ClipboardTextProps>(
       size = KUMO_CLIPBOARD_TEXT_DEFAULT_VARIANTS.size,
       onCopy,
       tooltip,
-      labels: { copyAction = "Copy to clipboard" } = {},
+      labels: { copyAction: copyActionProp } = {},
     },
     ref,
   ) => {
+    const { common } = useKumoLocale();
+    const copyAction = copyActionProp ?? common.copyToClipboard;
     const [copied, setCopied] = useState(false);
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -199,8 +202,8 @@ export const ClipboardText = forwardRef<HTMLDivElement, ClipboardTextProps>(
 
     // Destructure tooltip config with defaults
     const {
-      text: tooltipText = "Copy",
-      copiedText = "Copied",
+      text: tooltipText = common.copy,
+      copiedText = common.copied,
       side: tooltipSide = "top",
     } = tooltip ?? {};
 

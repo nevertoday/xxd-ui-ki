@@ -13,6 +13,7 @@ import { useLinkComponent } from "../../utils/link-provider";
 import { cn } from "../../utils/cn";
 import { resolveVariant } from "../../utils/resolve-variant";
 import { useCopyFeedback } from "../../utils/use-copy-feedback";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 /** Breadcrumbs size variant definitions. */
 export const KUMO_BREADCRUMBS_VARIANTS = {
@@ -143,6 +144,7 @@ function MobileEllipsis() {
 }
 
 function Clipboard({ text }: { text: string }) {
+  const { common } = useKumoLocale();
   const { copied: isCopied, runCopy } = useCopyFeedback();
 
   const handleCopyDeeplink = async () => {
@@ -161,8 +163,8 @@ function Clipboard({ text }: { text: string }) {
       size="sm"
       className="opacity-0 transition-[opacity] group-hover:opacity-100"
       onClick={handleCopyDeeplink}
-      title="Click to copy"
-      aria-label="Copy"
+      title={common.clickToCopy}
+      aria-label={common.copy}
     >
       {isCopied ? (
         <CheckIcon weight="bold" className="text-kumo-success" />
@@ -211,13 +213,14 @@ export function Breadcrumb({
   size = "base",
   className,
 }: BreadcrumbsProps) {
+  const { common } = useKumoLocale();
   const childArray = Children.toArray(children);
   const mobileChildren = getMobileBreadcrumbChildren(childArray);
 
   return (
     <nav
       className={cn(breadcrumbsVariants({ size }), className)}
-      aria-label="breadcrumb"
+      aria-label={common.breadcrumb}
     >
       <div className="contents sm:hidden">{mobileChildren}</div>
       <div className="hidden sm:contents">{childArray}</div>

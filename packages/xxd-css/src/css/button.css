@@ -4,7 +4,7 @@
  *   size: xs | sm | md（缺省）| lg；data-icon-only 纯图标（务必加 aria-label）；data-shape="round" 圆形图标按钮（跟随圆角开关）
  *   aria-busy="true" 进行中：文字保留但透明（宽度不跳），转圈居中；Xxd.runBusy(btn, task) 完成后图标变勾一下。
  *   对话框的取消用 class="xxd-btn ui-dialog-cancel"：内容宽度、视觉安静。
- *   质感：<html data-finish="material"> 时实心按钮有顶部 1px 内高光、深一点的边、按下下沉 0.5px；缺省纯平。 */
+ *   质感：<html data-finish="material">（或任何容器上，局部 data-finish="flat" 可以关掉）时实心按钮有顶部 1px 内高光、深一点的边、按下下沉 0.5px；缺省纯平。 */
 @layer xxd.components {
   .xxd-btn {
     --btn-fg: var(--ink);
@@ -186,17 +186,17 @@
   }
 
   /* 质感（data-finish="material"）：只给实心按钮；这是材质，不是浮起 —— 没有外阴影。 */
-  :root[data-finish="material"] .xxd-btn:is([data-variant="primary"], [data-variant="danger"]) {
+  [data-finish="material"] .xxd-btn:not([data-finish="flat"] *):is([data-variant="primary"], [data-variant="danger"]) {
     --btn-bd: color-mix(in srgb, var(--btn-bg) 86%, #000000);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
   }
 
-  :root[data-finish="material"] .xxd-btn:is([data-variant="primary"], [data-variant="danger"]):active {
+  [data-finish="material"] .xxd-btn:not([data-finish="flat"] *):is([data-variant="primary"], [data-variant="danger"]):active {
     transform: translateY(0.5px);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 
-  :root[data-finish="material"] .xxd-btn:not([data-variant="primary"], [data-variant="danger"], [data-variant="ghost"], .ui-dialog-cancel):active {
+  [data-finish="material"] .xxd-btn:not([data-finish="flat"] *, [data-variant="primary"], [data-variant="danger"], [data-variant="ghost"], .ui-dialog-cancel):active {
     transform: translateY(0.5px);
   }
 

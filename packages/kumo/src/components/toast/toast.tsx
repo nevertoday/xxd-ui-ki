@@ -19,6 +19,7 @@ import {
   WarningOctagonIcon,
   XIcon,
 } from "@phosphor-icons/react/dist/ssr";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 /**
  * Toast styling configuration for Figma plugin consumption.
@@ -355,6 +356,7 @@ export function Toasty({
 export const ToastProvider = Toasty;
 
 function ToastList() {
+  const { common } = useKumoLocale();
   const { toasts } = useKumoToastManager();
   return toasts.map((toast) => (
     <Toast.Root
@@ -401,13 +403,13 @@ function ToastList() {
         )}
         <Toast.Close
           data-kumo-part="close"
-          aria-label="Close"
+          aria-label={common.close}
           render={
             <Button
               variant="ghost"
               size="sm"
               shape="square"
-              aria-label="Close"
+              aria-label={common.close}
               className={cn(
                 "absolute top-2 right-2 size-5 rounded text-kumo-subtle hover:bg-current/15",
                 toast.variant && TOAST_CLOSE_CLASSES[toast.variant],

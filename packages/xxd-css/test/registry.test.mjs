@@ -13,6 +13,7 @@ describe("registry.json", () => {
   it("每个组件有名字、中文名、分类、示例", () => {
     for (const c of registry.components) {
       expect(c.name && c.zh && c.category && c.markup, c.name).toBeTruthy();
+      for (const k of ["a11y", "rules", "classes"]) if (c[k] !== undefined) expect(Array.isArray(c[k]), `${c.name}.${k} 要是数组`).toBe(true);
     }
     const names = registry.components.map((c) => c.name);
     expect(new Set(names).size).toBe(names.length);

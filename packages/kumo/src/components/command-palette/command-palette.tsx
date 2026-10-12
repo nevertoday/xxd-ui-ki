@@ -35,6 +35,7 @@ import type {
   CommandPaletteFooterProps,
   CommandPaletteResultItemProps,
 } from "./types";
+import { useKumoLocale } from "../../utils/locale-provider";
 
 /**
  * CommandPalette - A composable command palette component for Kumo
@@ -370,10 +371,11 @@ function Item<T>({
  * Re-export of Autocomplete.Empty with default styling.
  */
 function Empty({ children }: CommandPaletteEmptyProps) {
+  const { common } = useKumoLocale();
   return (
     <Autocomplete.Empty>
       <div className="p-8 text-center">
-        <p className="text-kumo-subtle">{children ?? "No results found"}</p>
+        <p className="text-kumo-subtle">{children ?? common.noResults}</p>
       </div>
     </Autocomplete.Empty>
   );

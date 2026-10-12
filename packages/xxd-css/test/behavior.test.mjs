@@ -570,3 +570,33 @@ describe("O4 小小东模式", () => {
     expect(v.dialog.isConnected).toBe(false);
   });
 });
+
+describe("O7 图表", () => {
+  it("chartOptions：重点线用主色，其余墨色深浅；不覆盖你写的值", () => {
+    const tokens = { dark: false, ink: "#111111", muted: "#666666", line: "#eeeeee", paper: "#ffffff", accent: "#3b74b8", success: "#2f7d4f", danger: "#c4372c", warning: "#b7791f", font: "sans-serif", mono: "monospace" };
+    const o = Xxd.chartOptions({ xAxis: { type: "category" }, yAxis: { type: "value" }, series: [{ type: "line", data: [1, 2] }, { type: "line", data: [2, 3], lineStyle: { width: 3 } }] }, { tokens });
+    expect(o.color[0]).toBe("#3b74b8");
+    expect(o.series[0].lineStyle.width).toBe(2);
+    expect(o.series[1].lineStyle.width).toBe(3);
+    expect(o.series[0].symbol).toBe("none");
+    expect(o.xAxis.splitLine.lineStyle.color).toBe("#eeeeee");
+    expect(o.xAxis.type).toBe("category");
+    expect(o.tooltip.backgroundColor).toBe("#ffffff");
+  });
+
+  it("柱子是直角，坐标轴可以是数组", () => {
+    const tokens = Xxd.chartTokens();
+    const o = Xxd.chartOptions({ yAxis: [{ type: "value" }, { type: "value" }], series: [{ type: "bar", data: [1] }] }, { tokens });
+    expect(o.series[0].itemStyle.borderRadius).toBe(0);
+    expect(o.yAxis).toHaveLength(2);
+    expect(o.yAxis[1].axisTick.show).toBe(false);
+  });
+
+  it("sparkline：少于两个点不画；data-spark 声明式", () => {
+    expect(Xxd.sparkline([1])).toBe("");
+    expect(Xxd.sparkline([1, 3, 2])).toMatch(/^<svg[^>]+aria-hidden="true"/);
+    html(`<span class="xxd-stat__spark" data-spark="1,2,3"></span>`);
+    Xxd.init(document);
+    expect(document.querySelector("[data-spark] svg")).toBeTruthy();
+  });
+});

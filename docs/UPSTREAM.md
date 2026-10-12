@@ -24,7 +24,7 @@ pnpm install && pnpm --filter @cloudflare/kumo build && pnpm test
 换皮后如果每次合并都要花半天以上解决冲突，而上游的新东西我们用不上，就停止同步，在 `docs/PLAN.md` 记录日期和原因，
 之后可以把内部包名 `@cloudflare/kumo` 改成 `@xxd/react` 并删掉 `upstream` 远端。
 
-## 决定（2026-10-12）：继续同步，内部包名不改
+## 决定（2026-10-11）：继续同步，内部包名不改
 
 量了一下换皮后 `packages/kumo` 与上游的差别（相对分叉基点 543dc8a）：
 
@@ -36,3 +36,8 @@ pnpm install && pnpm --filter @cloudflare/kumo build && pnpm test
 - 保留 `upstream` 远端（只读）、保留目录 `packages/kumo` 和内部包名 `@cloudflare/kumo`；消费者只认 `@xxd/react`。
 - 新的换皮改动继续优先放在 `xxd-overrides.ts`、`kumo-binding.css` 和新文件里；组件内部只做一行内的替换。
 - **脱钩的条件**（满足任一就脱钩，并在 `docs/PLAN.md` 记日期）：一次合并要花半天以上解决冲突；或者要改组件结构（不只是换 class）的地方超过 10 个组件；或者决定开源 `@xxd/react` 并发布到 npm。
+
+## 第二轮的改动（优化计划 O5，2026-10-11）
+
+- **三语文案**：`utils/locale-provider.tsx` 加了 `common`、`pagination` 两组文案和 `layerDialog.moreActions`，合并改成按组通用合并。下面这些组件里写死的英文换成了 `useKumoLocale()`（英文默认值不变，所以上游测试照常通过）：breadcrumbs、clipboard-text、inline-copy-text、sensitive-input、empty、toast、combobox、command-palette、loader、table、pagination、date-range-picker、chart/TimeseriesChart、layer-dialog。每处都是「加一行 hook + 把字面量换成变量」。上游要是自己做了 i18n，以上游为准，再把 `@xxd/react` 的 `KUMO_TRANSLATIONS` 对上去。
+- **动效（D2 / D4）**：只在 `kumo-binding.css` 末尾加了一段，组件不动。
