@@ -2,7 +2,7 @@
   "name": "@xxd/css",
   "version": "0.1.0",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "description": "小小东原生组件：纯 CSS + 极少行为 JS，不依赖任何框架。给 Chrome 插件和会员站用。",
   "type": "module",
   "sideEffects": [

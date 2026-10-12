@@ -1,6 +1,6 @@
 # xxd-ui-ki 工作说明（给 Claude / Codex）
 
-小小东的闭源设计系统，fork 自 cloudflare/kumo。
+小小东的开源设计系统（MIT），fork 自 cloudflare/kumo。
 
 ## 开工前必读
 
@@ -10,7 +10,7 @@
 
 ## 硬规则
 
-- **闭源**：不要发布到 npm，不要把代码推到任何公开仓库，不要 push 到 `upstream`。所有 package 保持 `private: true`。
+- **许可与发布**：MIT 开源。来自 Kumo 的代码保留 `LICENSE-KUMO`。不要 push 到 `upstream`（那是 Cloudflare 的仓库）；推送、发布 npm、部署都等小小东说了再做。package 暂时保持 `private: true`，防止误发 npm。
 - **令牌唯一来源**是 `packages/xxd-tokens/tokens.css`。组件里不写死颜色、圆角、阴影、字重。
 - 矩形圆角只用 `--r-xs / sm / md / lg / pill`；语义圆用 `--r-circle`。默认直角。
 - 卡片、行、按钮不加阴影；动效只动 opacity / transform；字重只有 400 / 500 / 600。

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 开源前的自查（阶段 7）：列出仓库里不该公开的内部引用。只读，不改任何文件。
+// 开源自查：列出仓库里不该公开的内部引用。只读，不改任何文件。推送前跑一次。
 //   node scripts/open-source-audit.mjs          人看的报告
 //   node scripts/open-source-audit.mjs --json   机器读
 import { execFileSync } from "node:child_process";
@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const files = execFileSync("git", ["ls-files"], { cwd: root, encoding: "utf8" })
   .split("\n")
+  .filter((f) => f !== "scripts/open-source-audit.mjs")
   .filter((f) => f && !/(^|\/)(pnpm-lock\.yaml|CHANGELOG\.md)$/.test(f) && !/\.(png|jpe?g|gif|webp|ico|woff2?|ttf|pdf)$/i.test(f));
 
 export const CHECKS = [
@@ -18,8 +19,9 @@ export const CHECKS = [
   { id: "wechat", label: "微信号", re: /newbe2012/g },
   { id: "member-domain", label: "会员站域名", re: /vip\.xiaoxiaodong\.ai|xiaoxiaodong\.ai/g },
   { id: "store-id", label: "Chrome 商店 ID", re: /\b[a-p]{32}\b/g },
-  { id: "proprietary", label: "闭源声明（开源时要换许可）", re: /UNLICENSED|All rights reserved|闭源/g },
-  { id: "private-flag", label: "private: true（开源时决定是否发布）", re: /"private":\s*true/g },
+  // 应当是 0 处。
+  { id: "proprietary", label: "旧的保留所有权利声明", re: /UNLICENSED|小小东 \(xiaoxiaodong\.ai\)\. All rights reserved|\u95ed\u6e90/g },
+  { id: "private-flag", label: "private: true（要发 npm 的包再改）", re: /"private":\s*true/g },
   { id: "upstream-brand", label: "上游 Cloudflare 品牌 / 账号", re: /cloudflare-logo|CloudflareLogo|account_id|kumo-ui\.com/g },
 ];
 

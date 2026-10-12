@@ -75,17 +75,17 @@ xxd-ui-ki/
 │   ├── DESIGN-PRINCIPLES.md   审美宪法
 │   ├── UPSTREAM.md        如何同步 Kumo 上游
 │   └── upstream/          Kumo 原版 README / AGENTS
-└── LICENSE                闭源；Kumo 部分的 MIT 声明在 LICENSE-KUMO
+└── LICENSE                MIT；Kumo 部分的 MIT 原文在 LICENSE-KUMO
 ```
 
 依赖方向只能往下：L3 → L1/L2 → L0。L1 和 L2 互不依赖，但**同一个组件的视觉必须一致**，文档站并排展示两者。
 
-**分发方式（闭源，不发 npm）**
+**分发方式（不发 npm）**
 
 - 有构建的项目（会员站、esbuild 插件、React 项目）：`"@xxd/tokens": "file:../xxd-ui-ki/packages/xxd-tokens"` 或 `link:`。
 - 无构建的插件：`pnpm xxd sync <插件目录>` 把编译好的 `xxd.css / xxd.js / icons` 拷进 `<插件>/vendor/xxd/`，
   并写 `vendor/xxd/VERSION`（版本 + commit），这样每个插件锁定自己用的版本，打包上架不依赖本仓库。
-- 以后要开源或团队协作再考虑 GitHub Packages 私有 registry。
+- 要给别人的 React 项目用时，再决定发不发 npm。
 
 ## 4. 阶段
 
@@ -94,7 +94,7 @@ xxd-ui-ki/
 ### 阶段 0 · 地基 ✅ 2026-10-11
 
 - [x] 克隆 Kumo 完整历史（`upstream` 远端，push 已禁用），本地 `main` 分支
-- [x] 闭源：根 `LICENSE` 改为保留所有权利，Kumo 的 MIT 原文移到 `LICENSE-KUMO`；所有 package `private: true`、`UNLICENSED`；changeset `access: restricted`
+- [x] 许可：根 `LICENSE` 写小小东的部分，Kumo 的 MIT 原文移到 `LICENSE-KUMO`；所有 package `private: true`（防止误发 npm）；changeset `access: restricted`。2026-10-12 根 `LICENSE` 定为 MIT，各包 `license` 字段改为 `MIT`
 - [x] 删除 `.github/`（Cloudflare 的 CI、npm 发布、bonk 机器人）
 - [x] 基线：`pnpm install` + `pnpm --filter @cloudflare/kumo build` 成功；`test` 64 文件 / 1450 测试全绿（Node 26.11 / pnpm 12.3.4）
 - [x] `packages/xxd-tokens/tokens.css` 种子：从 xPoster `xxd-theme.css` + 会员站移植，补上字号、间距、控件尺寸、图标尺寸、动效、层级
@@ -211,7 +211,7 @@ xxd-ui-ki/
 1. 文档站改造：首页讲原则；每个组件页有四种外观切换、React 与原生两份代码、注意事项（对应原则条目）。
 2. 组件注册表覆盖原生组件；CLI 改名 `xxd ls / doc / add`，Claude/Codex 写插件时可以直接查 API。
 3. 写一个 `xxd-ui` Skill：新插件、新页面时自动用这套系统、遵守原则、跑合同测试。
-4. 文档站只本地或私有部署（Cloudflare Access 保护），不公开。
+4. 文档站部署由你决定（见 `docs/DOCS-SITE.md`）。
 
 ### 阶段 7 · 开源准备 ✅ 准备完成 2026-10-12
 
@@ -235,7 +235,7 @@ xxd-ui-ki/
 ## 7. 决定（2026-10-12 按默认处理，可以改）
 
 1. 包名前缀 `@xxd/*`；目录名 `xxd-ui-ki` 不改。
-2. GitHub 私有仓库：**没有建、没有推送**（对外操作，等你说）。建的话：`gh repo create nevertoday/xxd-ui-ki --private --source . --push`（会推 `main`；`upstream` 的推送已禁用）。
+2. GitHub 仓库：2026-10-12 按你的要求建了**公开**仓库并推送 `main`：<https://github.com/nevertoday/xxd-ui-ki>（`upstream` 的推送仍然禁用）。
 3. 三条提议都采纳：密度两档（`data-density`）、Shadow DOM 注入（`mountXxdUI`）、规则做成门禁（各包的合同测试）。
 4. 试点：图片排序（排序链接）+ xPoster 的令牌层。
 
@@ -250,7 +250,7 @@ xxd-ui-ki/
 | 4 插件套件 + 试点 | ✅ 完成 | 2026-10-12 |
 | 5 会员站接入 | ✅ 完成（分支 xxd-ui-tokens，未合并、未部署） | 2026-10-12 |
 | 6 文档站与 AI | ✅ 完成 | 2026-10-12 |
-| 7 开源准备 | ✅ 完成（清理自查、许可、贡献指南、上游决定；是否真的开源由你决定） | 2026-10-12 |
+| 7 开源准备 | ✅ 完成（清理自查、许可、贡献指南、上游决定）；2026-10-12 定为 MIT 开源 | 2026-10-12 |
 
 ## 9. 各阶段做了什么（摘要）
 
@@ -261,22 +261,22 @@ xxd-ui-ki/
 - **5 会员站**：分支 `xxd-ui-tokens`：layered 令牌（老变量永远优先，自动跳过 4 个有后备值冲突的名字）、`pnpm xxd adopt` 把 8 个相同的声明改由令牌提供、旧名 `--ui-backdrop` 做别名（`--ui-radius*` 按直角硬规则保持字面 0）、图标改由 `@xxd/icons` 同步。验证：404 个变量亮暗最终值全同；220 个图标渲染逐个相同；全量测试与 main 逐条一致（7965 个，同样 5 个既有失败）。详见 `docs/member-site.md`。
 - **6 文档站与 AI**：`/xxd`（原则）、`/xxd/native`（由注册表生成）、`/xxd/extension`；`pnpm xxd ls / doc / add`；`xxd-ui` Skill（`skills/xxd-ui`，已链接到 `~/.claude/skills/xxd-ui`）。部署说明见 `docs/DOCS-SITE.md`（没有部署）。
 - **7 开源准备**：
-  - 清理内部引用：`scripts/open-source-audit.mjs` 自查，提交的文件里没有本机路径、邮箱、微信号、商店 ID；剩下的是闭源声明和上游品牌，开源那天按清单换。
-  - 许可：根 `LICENSE`（闭源）+ `LICENSE-KUMO`（MIT 原文）；`packages/kumo` 和文档站补上了随包的 `LICENSE`（MIT 原文 + 改动的版权）；各包 `license` 字段逐个核对。
+  - 清理内部引用：`scripts/open-source-audit.mjs` 自查，提交的文件里没有本机路径、邮箱、微信号、商店 ID；许可声明已换成 MIT，剩下的上游品牌见清单。
+  - 许可：根 `LICENSE`（MIT）+ `LICENSE-KUMO`（Kumo 的 MIT 原文）；`packages/kumo` 和文档站补上了随包的 `LICENSE`（MIT 原文 + 改动的版权）；各包 `license` 字段逐个核对。
   - 贡献指南：`CONTRIBUTING.md`（上游的移到 `docs/upstream/KUMO-CONTRIBUTING.md`）。
   - 上游决定：继续同步、内部包名不改，量化依据和脱钩条件见 `docs/UPSTREAM.md`。
-  - 开源当天的步骤：`docs/OPEN-SOURCE-CHECKLIST.md`。
+  - 推到公开仓库前的收尾：`docs/OPEN-SOURCE-CHECKLIST.md`。
 
 ## 10. 不在计划范围内、留给你决定的事
 
 计划的 0–7 阶段都已完成（各阶段的验收见上）。下面这些不是计划的任务，而是需要你本人决定的对外 / 不可逆操作：
-**你的决定（2026-10-12）：三个试点分支先不合并，由你看过后自己合并；项目继续闭源。**
+**你的决定（2026-10-12）：三个试点分支先不合并，由你看过后自己合并；项目定为 MIT 开源。**
 
-按你最初的要求（「设置为闭源项目，后续我做好再考虑开源」），项目保持闭源；试点的验收是「在分支上迁移并用测试证明无回归」，合并进你正在工作的分支、推送、部署都由你来做。
+项目以 MIT 许可开源，公开在 <https://github.com/nevertoday/xxd-ui-ki>；试点的验收是「在分支上迁移并用测试证明无回归」，合并进你正在工作的分支、推送、部署都由你来做。
 
 - 合并试点分支（都没推送）：
   - 图片排序：`插件chrome-排序链接` 的 `xxd-ui-pilot`（基于 de316fb；你当前在 `picsort-redesign` 上的未提交改动没有动）。
   - xPoster：`xxd-ui-pilot`（基于 b7d65ef）。
   - 会员站：`小小东-提示词` 的 `xxd-ui-tokens`（基于 main 31ebee75e）。**推 main 会触发 Cloudflare 部署**。
 - （可选，属于新的视觉改动，不是接入的一部分）会员站 4 个有冲突的变量（`--danger` 五种红等）要不要统一：见 `docs/member-site.md`。
-- 是否建 GitHub 私有仓库、是否部署文档站（加 Cloudflare Access）。
+- 是否部署文档站、是否发 npm。

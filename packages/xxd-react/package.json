@@ -2,7 +2,7 @@
   "name": "@xxd/react",
   "version": "0.1.0",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "description": "小小东 React 组件：Kumo 换皮版 + 小小东独有组件 + 外观 / 语言 Provider + 对话框按钮区。",
   "type": "module",
   "sideEffects": [

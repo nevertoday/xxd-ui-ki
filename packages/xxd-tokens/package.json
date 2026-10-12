@@ -2,7 +2,7 @@
   "name": "@xxd/tokens",
   "version": "0.1.0",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "description": "小小东设计令牌：颜色、圆角（直角/圆角）、主色、字体、间距、动效 + 首帧前的外观脚本。",
   "type": "module",
   "sideEffects": ["*.css", "./src/boot.js"],

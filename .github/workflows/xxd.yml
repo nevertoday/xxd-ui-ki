@@ -1,4 +1,4 @@
-# 小小东 UI Kit 的最小 CI：只在有远端仓库后才会运行（现在闭源、没有推送）。
+# 小小东 UI Kit 的最小 CI：推到 main 和提 PR 时运行。
 name: xxd
 on:
   push:

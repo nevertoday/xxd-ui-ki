@@ -2,7 +2,7 @@
   "name": "@xxd/icons",
   "version": "0.1.0",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "description": "小小东图标：24 网格、1.5 线宽、圆头、斜接角、方角。SVG 字符串（原生 JS）+ React 组件 + Phosphor 兼容层。",
   "type": "module",
   "sideEffects": false,

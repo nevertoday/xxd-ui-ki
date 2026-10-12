@@ -1,11 +1,11 @@
 ---
 name: xxd-ui
-description: Build or restyle any 小小东 interface with the closed-source 小小东 UI Kit (xxd-ui-ki) — Chrome extension side panels, options pages, popups, content-script UI, the 小小东提示词 member site, or React apps. Use whenever the user asks to 做一个新插件、新建插件、写个侧边栏、做设置页、改界面、统一样式、换成小小东风格、用 UI Kit、接入 xxd-ui-ki, or edits UI in any 小小东 project, even if the kit is not named. Covers scaffolding (pnpm xxd new), syncing (pnpm xxd sync), component lookup (pnpm xxd doc), the design rules (square corners by default, ink emphasis, warm-black dark, 1.5 miter icons, dialog action order) and the checks to run.
+description: Build or restyle any 小小东 interface with the open-source (MIT) 小小东 UI Kit (xxd-ui-ki) — Chrome extension side panels, options pages, popups, content-script UI, the 小小东提示词 member site, or React apps. Use whenever the user asks to 做一个新插件、新建插件、写个侧边栏、做设置页、改界面、统一样式、换成小小东风格、用 UI Kit、接入 xxd-ui-ki, or edits UI in any 小小东 project, even if the kit is not named. Covers scaffolding (pnpm xxd new), syncing (pnpm xxd sync), component lookup (pnpm xxd doc), the design rules (square corners by default, ink emphasis, warm-black dark, 1.5 miter icons, dialog action order) and the checks to run.
 ---
 
 # 小小东 UI Kit
 
-仓库：`/Volumes/T7-usb/js/xxd-ui-ki`（闭源：不发 npm、不推公开仓库、不 push `upstream`）。
+仓库：`/Volumes/T7-usb/js/xxd-ui-ki`（MIT 开源；不 push `upstream`；推送、发 npm 等小小东说了再做）。
 
 ## 先读
 

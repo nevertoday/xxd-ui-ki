@@ -1,6 +1,6 @@
 # 参与 xxd-ui-ki
 
-> 现在是闭源项目，只有小小东和他的 AI 助手（Claude / Codex）在改。开源后这份指南同样适用。
+> 这是 MIT 开源项目，欢迎提 issue 和 PR。日常主要由小小东和他的 AI 助手（Claude / Codex）在改。
 > Kumo 上游的贡献指南在 `docs/upstream/KUMO-CONTRIBUTING.md`，改 `packages/kumo` 内部时仍然有效。
 
 ## 动手之前
@@ -41,6 +41,8 @@ pnpm lint                                 # 动了 packages/kumo、文档站或 
 插件、会员站各有自己的仓库和未提交的工作：用 `git worktree add -b <新分支>` 在临时目录里改、在新分支上提交；
 **不推送、不部署**，由小小东决定合并。先跑那个项目自己的测试做基线，改完再跑一次对比。
 
-## 闭源
+## 许可与发布
 
-不要发布到 npm，不要推到公开仓库，不要 push `upstream`。所有 package 保持 `private: true`。
+- 代码以 MIT 许可开源；来自 Kumo 的部分保留 `LICENSE-KUMO`，不要删。
+- 不要 push `upstream`（Cloudflare 的仓库）。
+- package 暂时保持 `private: true`，防止误发 npm；要发哪个包由小小东决定。

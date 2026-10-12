@@ -1,8 +1,8 @@
 {
   "name": "xxd-ui-ki",
   "private": true,
-  "license": "UNLICENSED",
-  "description": "小小东 UI Kit — 小小东提示词与 Chrome 插件共用的设计系统（基于 cloudflare/kumo 二次开发，闭源）",
+  "license": "MIT",
+  "description": "小小东 UI Kit — 小小东提示词与 Chrome 插件共用的设计系统（基于 cloudflare/kumo 二次开发，MIT 开源）",
   "type": "module",
   "scripts": {
     "build": "pnpm --filter @cloudflare/kumo-docs-astro build",

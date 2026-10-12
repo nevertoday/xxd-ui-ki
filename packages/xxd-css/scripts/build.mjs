@@ -24,7 +24,7 @@ for (const dir of [tokensDir, iconsDir]) {
 
 // 和 @xxd/tokens 用同一个转换（:root → :host、令牌在 Shadow 内部再声明、继承属性重置）
 const { toShadow } = await import("../../xxd-tokens/scripts/build.mjs");
-const banner = "/* @xxd/css — 小小东原生组件。Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */";
+const banner = "/* @xxd/css — 小小东原生组件。Copyright (c) 2026 小小东 (xiaoxiaodong.ai). MIT License. */";
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });

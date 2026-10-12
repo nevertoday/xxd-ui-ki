@@ -112,7 +112,7 @@ export function toLayered(css) {
   // :root → :where(:root)：layer 里本来就最弱，再去掉优先级；文字上也和老项目自己的 :root[...] 块区分开
   // （有些老测试按文本找第一个 `:root[data-theme="dark"] {`）。
   const scoped = withoutMotion.replace(/:root((?:\[[^\]]+\])*)/g, (_, attrs) => `:where(:root${attrs})`);
-  return `/* @xxd/tokens（layered）— Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */\n@layer xxd.tokens {\n${scoped.trim()}\n}\n`;
+  return `/* @xxd/tokens（layered）— Copyright (c) 2026 小小东 (xiaoxiaodong.ai). MIT License. */\n@layer xxd.tokens {\n${scoped.trim()}\n}\n`;
 }
 
 const MODE_NAMES = {
@@ -127,7 +127,7 @@ const MODE_NAMES = {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   rmSync(dist, { recursive: true, force: true });
   mkdirSync(dist, { recursive: true });
-  writeFileSync(join(dist, "tokens.css"), `/* @xxd/tokens — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */\n${source}`);
+  writeFileSync(join(dist, "tokens.css"), `/* @xxd/tokens — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). MIT License. */\n${source}`);
   writeFileSync(join(dist, "tokens.shadow.css"), toShadow(source));
   writeFileSync(join(dist, "tokens.layered.css"), toLayered(source));
 
@@ -148,7 +148,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     `/** 小小东设计令牌的 CSS 变量名（自动生成）。 */\nexport type XxdToken =\n${names.map((n) => `  | "${n}"`).join("\n")};\n`,
   );
 
-  const common = { bundle: true, target: "es2020", legalComments: "none", banner: { js: "/* @xxd/tokens — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */" } };
+  const common = { bundle: true, target: "es2020", legalComments: "none", banner: { js: "/* @xxd/tokens — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). MIT License. */" } };
   await build({ ...common, entryPoints: [join(root, "src/boot.js")], format: "iife", minify: true, outfile: join(dist, "boot.js") });
   await build({ ...common, entryPoints: [join(root, "src/index.js")], format: "esm", outfile: join(dist, "theme.js") });
   console.log(`@xxd/tokens: ${names.length} tokens → dist/`);
