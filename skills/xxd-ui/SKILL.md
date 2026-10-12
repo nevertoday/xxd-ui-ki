@@ -5,7 +5,7 @@ description: Build or restyle any 小小东 interface with the open-source (MIT)
 
 # 小小东 UI Kit
 
-仓库：`/Volumes/T7-usb/js/xxd-ui-ki`（MIT 开源；不 push `upstream`；推送、发 npm 等小小东说了再做）。
+仓库：`/Volumes/T7-usb/js/xxd-ui-kit`（MIT 开源；不 push `upstream`；推送、发 npm 等小小东说了再做）。
 
 ## 先读
 
@@ -24,7 +24,7 @@ description: Build or restyle any 小小东 interface with the open-source (MIT)
 ## 新插件
 
 ```bash
-cd /Volumes/T7-usb/js/xxd-ui-ki
+cd /Volumes/T7-usb/js/xxd-ui-kit
 pnpm xxd new <目录> --name 四字名字 --name-en "English" --slug short-id
 ```
 
