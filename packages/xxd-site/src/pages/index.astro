@@ -1,0 +1,33 @@
+---
+// 首页：组件墙。每格一个真的组件（能点、能切外观），点名字进组件页。
+import Site from "../layouts/Site.astro";
+import { components } from "../lib/data.js";
+const wall = components.filter((c) => c.wall !== false);
+---
+
+<Site title="小小东 UI" wide>
+  <header class="site-head" style="max-width:760px">
+    <h1 class="xxd-text" data-variant="display">小小东 UI</h1>
+    <p class="site-lead">
+      小小东提示词和每一个小小东插件共用的设计系统。黑白灰、默认直角、强调靠墨色；右上角切换主题、圆角、主色、密度和按钮质感，下面每一格都跟着变。
+    </p>
+    <div class="xxd-cluster" style="margin-top:var(--space-5)">
+      <a class="xxd-btn" data-variant="primary" href="/start">开始使用</a>
+      <a class="xxd-btn" href="/principles">设计原则</a>
+      <a class="xxd-btn" data-variant="ghost" href="/tools">命令行</a>
+    </div>
+  </header>
+  <section class="site-wall" aria-label="全部组件">
+    {
+      wall.map((c) => (
+        <div class="site-wall__cell">
+          <div class="site-wall__stage xxd-page" set:html={c.wall ?? c.markup} />
+          <a class="site-wall__name" href={`/components/${c.slug}`}>
+            {c.zh}
+            <span>{c.name}</span>
+          </a>
+        </div>
+      ))
+    }
+  </section>
+</Site>

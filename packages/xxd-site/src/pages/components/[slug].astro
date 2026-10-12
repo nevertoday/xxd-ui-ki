@@ -1,0 +1,102 @@
+---
+// 每个组件一页（从 packages/xxd-css/registry.json 生成）。固定结构：演示 · 状态 · 属性 · JS · 规则 · 相关。
+import Site from "../../layouts/Site.astro";
+import Demo from "../../components/Demo.astro";
+import StateMatrix from "../../components/StateMatrix.astro";
+import PropsTable from "../../components/PropsTable.astro";
+import { components } from "../../lib/data.js";
+import * as reactDemos from "../../react/demos.tsx";
+
+export function getStaticPaths() {
+  return components.map((c) => ({ params: { slug: c.slug }, props: { c } }));
+}
+
+const { c } = Astro.props;
+const hasReact = `${c.name}Demo` in reactDemos;
+const related = components.filter((x) => x.category === c.category && x.slug !== c.slug);
+const extraDemos = c.examples ?? [];
+const headings = [
+  { slug: "demo", text: "演示" },
+  ...extraDemos.map((e, i) => ({ slug: `example-${i}`, text: e.title, depth: 3 })),
+  ...(c.sample && c.states ? [{ slug: "states", text: "状态" }] : []),
+  { slug: "props", text: "属性与类名" },
+  ...(c.js ? [{ slug: "js", text: "JS" }] : []),
+  ...(c.a11y ? [{ slug: "a11y", text: "键盘与读屏" }] : []),
+  ...(c.rules?.length ? [{ slug: "rules", text: "规则" }] : []),
+  ...(related.length ? [{ slug: "related", text: "同类组件" }] : []),
+];
+---
+
+<Site title={`${c.zh} ${c.name}`} description={c.summary ?? `${c.zh}（${c.name}）—— 小小东 UI 组件`} headings={headings}>
+  <header class="site-head">
+    <p class="xxd-text" data-variant="caption">组件 · {c.category}{hasReact && " · 原生 HTML 与 React"}</p>
+    <h1 class="xxd-text" data-variant="display">{c.zh} <span class="xxd-text" data-variant="mono-secondary">{c.name}</span></h1>
+    {c.summary && <p class="site-lead">{c.summary}</p>}
+  </header>
+
+  <h2 class="site-h2" id="demo">演示</h2>
+  <Demo markup={c.markup} react={hasReact ? c.name : undefined} align={c.align} block={c.block} title={c.name} />
+
+  {
+    extraDemos.map((e, i) => (
+      <>
+        <h3 class="site-h3" id={`example-${i}`}>{e.title}</h3>
+        {e.text && <p class="site-p">{e.text}</p>}
+        <Demo markup={e.markup} align={e.align} block={e.block} />
+      </>
+    ))
+  }
+
+  {
+    c.sample && c.states && (
+      <>
+        <h2 class="site-h2" id="states">状态</h2>
+        <p class="site-p">同一个元素的各种状态并排。悬停、聚焦、按下用的是组件 CSS 里真实的规则（构建时复制成强制状态），不是手画的。</p>
+        <StateMatrix sample={c.sample} states={c.states} />
+      </>
+    )
+  }
+
+  <h2 class="site-h2" id="props">属性与类名</h2>
+  <PropsTable attributes={c.attributes} classes={c.classes} />
+
+  {
+    c.js && (
+      <>
+        <h2 class="site-h2" id="js">JS</h2>
+        <pre class="site-code" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{c.js}</code></pre>
+      </>
+    )
+  }
+
+  {
+    c.a11y && (
+      <>
+        <h2 class="site-h2" id="a11y">键盘与读屏</h2>
+        <ul class="site-rules">{c.a11y.map((r) => <li>{r}</li>)}</ul>
+      </>
+    )
+  }
+
+  {
+    c.rules?.length > 0 && (
+      <>
+        <h2 class="site-h2" id="rules">规则</h2>
+        <ul class="site-rules">{c.rules.map((r) => <li>{r}</li>)}</ul>
+      </>
+    )
+  }
+
+  {
+    related.length > 0 && (
+      <>
+        <h2 class="site-h2" id="related">同类组件</h2>
+        <div class="xxd-cluster">
+          {related.map((r) => (
+            <a class="xxd-chip" href={`/components/${r.slug}`}>{r.zh}</a>
+          ))}
+        </div>
+      </>
+    )
+  }
+</Site>

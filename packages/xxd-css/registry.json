@@ -66,7 +66,38 @@
         "破坏性操作写清楚，不只靠颜色",
         "§9"
       ],
-      "js": "await Xxd.runBusy(button, () => save())"
+      "js": "await Xxd.runBusy(button, () => save())",
+      "sample": "<button class=\"xxd-btn\" data-variant=\"primary\">写入 X</button>",
+      "states": [
+        "default",
+        "hover",
+        "focus",
+        "active",
+        "disabled",
+        "busy"
+      ],
+      "summary": "按钮文字描述下一次点击会做什么。一处只放一个实心按钮。",
+      "examples": [
+        {
+          "title": "尺寸",
+          "markup": "<button class=\"xxd-btn\" data-size=\"xs\">xs</button>\n<button class=\"xxd-btn\" data-size=\"sm\">sm</button>\n<button class=\"xxd-btn\">md</button>\n<button class=\"xxd-btn\" data-size=\"lg\">lg</button>"
+        },
+        {
+          "title": "图标按钮",
+          "markup": "<button class=\"xxd-btn\" data-icon-only aria-label=\"搜索\" data-tooltip=\"搜索 ⌘F\"><i data-xxd-icon=\"Search\"></i></button>\n<button class=\"xxd-btn\" data-icon-only data-shape=\"round\" aria-label=\"新建\" data-tooltip=\"新建\"><i data-xxd-icon=\"Plus\"></i></button>\n<button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only aria-label=\"更多\" data-tooltip=\"更多\"><i data-xxd-icon=\"Ellipsis\"></i></button>",
+          "text": "纯图标按钮必须有 aria-label；悬停时 tooltip 连续出现。圆形图标按钮跟随圆角开关。"
+        },
+        {
+          "title": "纯平 / 质感（D1 对比）",
+          "markup": "<div class=\"xxd-cluster\" data-finish-preview=\"flat\"><button class=\"xxd-btn\" data-variant=\"primary\">写入 X</button><button class=\"xxd-btn\" data-variant=\"danger\">删除</button></div>",
+          "text": "右上角「主色」里把按钮质感切到「质感」：实心按钮多一条顶部 1px 内高光、深一点的边，按下时下沉 0.5px。"
+        },
+        {
+          "title": "进行中与完成",
+          "markup": "<button class=\"xxd-btn\" data-variant=\"primary\" onclick=\"Xxd.runBusy(this, () => new Promise((r) => setTimeout(r, 1200)))\"><i data-xxd-icon=\"Save\" data-size=\"16\"></i>保存</button>",
+          "text": "点一下：宽度不跳，转圈居中；完成后图标变勾 1 秒。"
+        }
+      ]
     },
     {
       "name": "Link",
@@ -83,7 +114,13 @@
       "attributes": {
         "data-variant": "inline（缺省）| plain | current",
         "data-external / target=_blank": "后面带外链图标"
-      }
+      },
+      "sample": "<a class=\"xxd-link\" href=\"#\">改为新建一篇</a>",
+      "states": [
+        "default",
+        "hover",
+        "focus"
+      ]
     },
     {
       "name": "ButtonGroup",
@@ -117,6 +154,15 @@
       "rules": [
         "一个框只有一个框：聚焦时边框变深一次，不加外圈和内框",
         "§4"
+      ],
+      "sample": "<input class=\"xxd-input\" style=\"width:120px\" placeholder=\"标题\">",
+      "states": [
+        "default",
+        "hover",
+        "focus",
+        "disabled",
+        "error",
+        "readonly"
       ]
     },
     {
@@ -134,6 +180,13 @@
       "rules": [
         "原生 <select>，不重写下拉",
         "设置行里用 bare：值 + chevron，不是盒子"
+      ],
+      "sample": "<label class=\"xxd-select\"><select aria-label=\"质量\"><option>高</option></select></label>",
+      "states": [
+        "default",
+        "hover",
+        "focus",
+        "disabled"
       ]
     },
     {
@@ -163,6 +216,14 @@
       "rules": [
         "直角模式下开关也是方的（--r-pill）",
         "开 = --switch-on：墨色时是灰，有主色时是主色"
+      ],
+      "sample": "<input type=\"checkbox\" role=\"switch\" class=\"xxd-switch\" aria-label=\"开关\">",
+      "states": [
+        "default",
+        "hover",
+        "focus",
+        "checked",
+        "disabled"
       ]
     },
     {
@@ -174,7 +235,15 @@
         "xxd-choice"
       ],
       "markup": "<label class=\"xxd-choice\"><input type=\"checkbox\" class=\"xxd-check\" checked>智能标点</label>",
-      "react": "Checkbox"
+      "react": "Checkbox",
+      "sample": "<input type=\"checkbox\" class=\"xxd-check\" aria-label=\"复选\">",
+      "states": [
+        "default",
+        "hover",
+        "focus",
+        "checked",
+        "disabled"
+      ]
     },
     {
       "name": "Radio",
@@ -190,6 +259,14 @@
       "rules": [
         "单选是语义上的圆，永远是圆",
         "一组选项是一个列表，不是一叠盒子"
+      ],
+      "sample": "<input type=\"radio\" class=\"xxd-radio\" aria-label=\"单选\">",
+      "states": [
+        "default",
+        "hover",
+        "focus",
+        "checked",
+        "disabled"
       ]
     },
     {
@@ -567,7 +644,14 @@
       "classes": [
         "xxd-chip"
       ],
-      "markup": "<button class=\"xxd-chip\" aria-pressed=\"true\">海报</button> <button class=\"xxd-chip\">封面</button>"
+      "markup": "<button class=\"xxd-chip\" aria-pressed=\"true\">海报</button> <button class=\"xxd-chip\">封面</button>",
+      "sample": "<button class=\"xxd-chip\">海报</button>",
+      "states": [
+        "default",
+        "hover",
+        "focus",
+        "pressed"
+      ]
     },
     {
       "name": "Dot",

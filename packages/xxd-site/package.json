@@ -1,0 +1,38 @@
+{
+  "name": "@xxd/site",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "小小东 UI Kit 展示站：用和 Kumo 文档站同样的架构（Astro + 活演示 + 注册表生成），呈现小小东风格。",
+  "type": "module",
+  "scripts": {
+    "assets": "node scripts/assets.mjs",
+    "dev": "pnpm run assets && astro dev --port 4400",
+    "build": "pnpm run assets && astro build",
+    "preview": "astro preview --port 4400",
+    "visual": "node scripts/visual.mjs",
+    "visual:update": "node scripts/visual.mjs --update",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^7.0.3",
+    "@astrojs/react": "^6.0.1",
+    "@cloudflare/kumo": "workspace:*",
+    "@xxd/css": "workspace:*",
+    "@xxd/extension": "workspace:*",
+    "@xxd/icons": "workspace:*",
+    "@xxd/react": "workspace:*",
+    "@xxd/tokens": "workspace:*",
+    "astro": "7.2.8",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "pixelmatch": "^7.1.0",
+    "playwright": "^1.57.0",
+    "pngjs": "^7.0.0",
+    "typescript": "catalog:"
+  }
+}

@@ -1,0 +1,23 @@
+---
+import Site from "../../layouts/Site.astro";
+import { tokens } from "../../lib/data.js";
+const space = Object.entries(tokens.base).filter(([k]) => k.startsWith("--space-"));
+const controls = [["--control-h-xs", "xs"], ["--control-h-sm", "sm"], ["--control-h", "md"]];
+---
+
+<Site title="间距与尺寸" headings={[{ slug: "space", text: "间距" }, { slug: "controls", text: "控件高度与密度" }]}>
+  <header class="site-head">
+    <p class="xxd-text" data-variant="caption">基础</p>
+    <h1 class="xxd-text" data-variant="display">间距与尺寸</h1>
+    <p class="site-lead">4px 基准。控件有标准和紧凑两档密度：会员站用标准（40px），侧边栏和 popup 用紧凑（32px）；点击区永远 ≥ 40px（粗指针 44px）。</p>
+  </header>
+  <h2 class="site-h2" id="space">间距</h2>
+  <div class="xxd-group__body">
+    {space.map(([k, v]) => (<div class="xxd-row"><div class="xxd-row__text xxd-text" data-variant="mono">{k}</div><div class="xxd-row__control"><span style={`display:block;width:${v};height:12px;background:var(--action)`}></span><span class="xxd-text" data-variant="caption" style="width:40px">{v}</span></div></div>))}
+  </div>
+  <h2 class="site-h2" id="controls">控件高度与密度（右上角「主色」里切换密度）</h2>
+  <div class="site-demo"><div class="site-demo__stage">
+    {controls.map(([k, size]) => (<button class="xxd-btn" data-size={size === "md" ? undefined : size}>{size} · var({k})</button>))}
+    <input class="xxd-input" style="width:160px" placeholder="输入框" />
+  </div></div>
+</Site>

@@ -1,0 +1,180 @@
+---
+// 展示站的外壳：顶栏（外观开关 + 搜索）、左侧导航、正文、右侧目录。界面本身全部用 @xxd/css。
+import { nav, flatPages } from "../data/nav.js";
+import { icon } from "../lib/data.js";
+
+interface Props {
+  title: string;
+  description?: string;
+  headings?: { slug: string; text: string; depth?: number }[];
+  wide?: boolean;
+}
+const { title, description = "小小东 UI Kit：小小东提示词与 Chrome 插件共用的设计系统。", headings = [], wide = false } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const searchIndex = JSON.stringify(flatPages.map((p) => ({ label: p.label, hint: p.sub ? `${p.sub} · ${p.group}` : p.group, href: p.href })));
+const mdHref = path === "/" ? "/md/index.md" : `/md${path}.md`;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title === "小小东 UI" ? title : `${title} · 小小东 UI`}</title>
+    <meta name="description" content={description} />
+    <link rel="alternate" type="text/markdown" href={mdHref} />
+    <!-- 层顺序：Tailwind（React 演示用）在前，小小东在后 —— 小小东的组件永远赢过 Tailwind 的重置 -->
+    <style is:inline>@layer properties, theme, base, components, utilities, xxd.base, xxd.components, site;</style>
+    <script is:inline src="/xxd/boot.js" data-key="xxd-site"></script>
+    <link rel="stylesheet" href="/xxd/kumo.css" />
+    <link rel="stylesheet" href="/xxd/xxd.css" />
+    <link rel="stylesheet" href="/xxd/forced-states.css" />
+    <link rel="stylesheet" href="/site.css" />
+    <script is:inline src="/xxd/icons.js"></script>
+    <script is:inline src="/xxd/xxd.js"></script>
+  </head>
+  <body class="xxd-page">
+    <a class="site-skip xxd-sr-only" href="#main">跳到正文</a>
+    <header class="site-top">
+      <button class="xxd-btn site-menu" data-variant="ghost" data-icon-only aria-label="打开导航" id="site-menu" set:html={icon("Menu", 18)} />
+      <a class="site-brand" href="/"><span class="site-mark" aria-hidden="true"></span>小小东 UI</a>
+      <button class="site-search" id="site-search" type="button">
+        <Fragment set:html={icon("Search", 14)} /><span>搜索组件、模式…</span><kbd class="xxd-kbd">⌘K</kbd>
+      </button>
+      <div class="site-appearance" id="site-appearance" aria-label="外观">
+        <div class="xxd-segmented" data-xxd-segmented data-name="theme" aria-label="主题">
+          <button role="radio" data-value="light" aria-label="亮" data-tooltip="亮" set:html={icon("Sun", 14)} />
+          <button role="radio" data-value="dark" aria-label="暗" data-tooltip="暗" set:html={icon("Moon", 14)} />
+          <button role="radio" data-value="system" aria-label="跟随系统" data-tooltip="跟随系统" set:html={icon("Contrast", 14)} />
+        </div>
+        <div class="xxd-segmented" data-xxd-segmented data-name="corners" aria-label="圆角">
+          <button role="radio" data-value="square">直角</button>
+          <button role="radio" data-value="rounded">圆角</button>
+        </div>
+        <button class="xxd-btn site-accent" data-size="sm" data-variant="ghost" data-xxd-popover="site-accents" aria-label="主色">
+          <span class="site-accent-dot" aria-hidden="true"></span>主色
+        </button>
+        <div class="xxd-popover site-accents" id="site-accents" popover data-placement="bottom-end">
+          <div class="xxd-swatches" role="radiogroup" aria-label="主色" id="site-swatches"></div>
+          <div class="site-more">
+            <div class="xxd-segmented" data-xxd-segmented data-name="density" aria-label="密度">
+              <button role="radio" data-value="comfortable">标准</button>
+              <button role="radio" data-value="compact">紧凑</button>
+            </div>
+            <div class="xxd-segmented" data-xxd-segmented data-name="finish" aria-label="按钮质感">
+              <button role="radio" data-value="flat">纯平</button>
+              <button role="radio" data-value="material">质感</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="site-body">
+      <nav class="site-nav" id="site-nav" aria-label="导航">
+        {
+          nav.map((group) => (
+            <section class="site-nav__group">
+              <h2>{group.title}</h2>
+              <ul>
+                {group.items.map((item) => (
+                  <li>
+                    <a href={item.href} aria-current={path === item.href ? "page" : undefined}>
+                      {item.label}
+                      {item.sub && <span>{item.sub}</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </nav>
+
+      <main id="main" class:list={["site-main", { "site-main--wide": wide }]}>
+        <slot />
+      </main>
+
+      {
+        headings.length > 1 && (
+          <aside class="site-toc" aria-label="本页">
+            <h2>本页</h2>
+            <ul>
+              {headings.map((h) => (
+                <li class={h.depth === 3 ? "is-sub" : undefined}>
+                  <a href={`#${h.slug}`}>{h.text}</a>
+                </li>
+              ))}
+            </ul>
+            <a class="site-toc__md" href={mdHref}>本页的 Markdown（给 AI）</a>
+          </aside>
+        )
+      }
+    </div>
+    <div class="site-nav-scrim" id="site-nav-scrim"></div>
+
+    <script is:inline define:vars={{ searchIndex }}>
+      (() => {
+        const T = window.XxdTheme;
+        const X = window.Xxd;
+        if (!T || !X) return;
+        const pages = JSON.parse(searchIndex);
+        const current = () => ({ ...T.DEFAULT_SETTINGS, ...T.read() });
+
+        // 外观开关：读当前设置，改了就写回（boot.js 已在首帧前应用）
+        const root = document.getElementById("site-appearance");
+        const sync = () => {
+          const s = current();
+          for (const g of root.querySelectorAll("[data-name]")) {
+            for (const b of g.querySelectorAll('[role="radio"]')) {
+              const on = b.dataset.value === String(s[g.dataset.name]);
+              b.setAttribute("aria-checked", String(on));
+              b.tabIndex = on ? 0 : -1;
+            }
+          }
+          for (const b of document.querySelectorAll("#site-swatches .xxd-swatch")) b.setAttribute("aria-checked", String((s.accent || "") === b.dataset.value));
+          document.documentElement.style.setProperty("--site-accent", s.accent || "var(--ink)");
+        };
+        const sw = document.getElementById("site-swatches");
+        for (const p of T.ACCENT_PRESETS) {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "xxd-swatch";
+          b.setAttribute("role", "radio");
+          b.dataset.value = p.id;
+          b.dataset.tooltip = p.zh;
+          b.setAttribute("aria-label", p.zh);
+          if (p.id) b.style.setProperty("--swatch", p.id);
+          b.addEventListener("click", () => { T.set({ accent: p.id }); sync(); });
+          sw.append(b);
+        }
+        root.addEventListener("xxd:change", (e) => {
+          const name = e.target.dataset && e.target.dataset.name;
+          if (name) { T.set({ [name]: e.detail.value }); sync(); }
+        });
+        X.init(document);
+        sync();
+        window.addEventListener("xxd:settings", sync);
+
+        // 搜索：⌘K / 点按钮，用小小东自己的命令面板
+        const items = pages.map((p) => ({ label: p.label, hint: p.hint, run: () => { location.href = p.href; } }));
+        const open = () => X.openCommandPalette({ items, placeholder: "搜索组件、模式、页面…", empty: "没有找到" });
+        document.getElementById("site-search").addEventListener("click", open);
+        X.bindCommandPalette(items, { placeholder: "搜索组件、模式、页面…", empty: "没有找到" });
+
+        // 窄屏导航抽屉
+        const nav = document.getElementById("site-nav");
+        const scrim = document.getElementById("site-nav-scrim");
+        const toggle = (on) => { nav.toggleAttribute("data-open", on); scrim.toggleAttribute("data-open", on); };
+        document.getElementById("site-menu").addEventListener("click", () => toggle(!nav.hasAttribute("data-open")));
+        scrim.addEventListener("click", () => toggle(false));
+
+        // 代码块的复制按钮、活演示里的 JS 行为
+        for (const pre of document.querySelectorAll(".site-code")) {
+          const btn = pre.querySelector("[data-copy-target]");
+          if (btn) btn.setAttribute("data-copy-target", `#${pre.id} code`);
+        }
+      })();
+    </script>
+  </body>
+</html>
