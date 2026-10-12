@@ -211,7 +211,7 @@ xxd-ui-ki/
 1. 文档站改造：首页讲原则；每个组件页有四种外观切换、React 与原生两份代码、注意事项（对应原则条目）。
 2. 组件注册表覆盖原生组件；CLI 改名 `xxd ls / doc / add`，Claude/Codex 写插件时可以直接查 API。
 3. 写一个 `xxd-ui` Skill：新插件、新页面时自动用这套系统、遵守原则、跑合同测试。
-4. 文档站部署由你决定（见 `docs/DOCS-SITE.md`）。
+4. 展示站 2026-10-12 部署到 <https://ui.xiaoxiaodong.ai>（见 `docs/DOCS-SITE.md`）。
 
 ### 阶段 7 · 开源准备 ✅ 准备完成 2026-10-12
 
@@ -279,4 +279,4 @@ xxd-ui-ki/
   - xPoster：`xxd-ui-pilot`（基于 b7d65ef）。
   - 会员站：`小小东-提示词` 的 `xxd-ui-tokens`（基于 main 31ebee75e）。**推 main 会触发 Cloudflare 部署**。
 - （可选，属于新的视觉改动，不是接入的一部分）会员站 4 个有冲突的变量（`--danger` 五种红等）要不要统一：见 `docs/member-site.md`。
-- 是否部署文档站、是否发 npm。
+- 是否发 npm。

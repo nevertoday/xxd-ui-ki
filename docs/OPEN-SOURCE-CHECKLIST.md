@@ -31,7 +31,7 @@
 - [x] 历史：保留了 Kumo 的完整 git 历史（MIT 允许）。
 - [ ] **发不发 npm**：开源不等于要发 npm。插件靠 `pnpm xxd sync` 拷文件，不需要 npm；只有别人的 React 项目才需要。
       要发的包把 `"private": true` 改成 false，加 `publishConfig`，并把 `.changeset/config.json` 的 `access` 改成 `public`。
-- [ ] 展示站要不要部署到公开域名：见 `docs/DOCS-SITE.md`。
+- [x] 展示站部署到 <https://ui.xiaoxiaodong.ai>（2026-10-12），GitHub 仓库的 About 也填了这个网址。部署方法见 `docs/DOCS-SITE.md`。
 
 ## 4. 不需要做的
 

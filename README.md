@@ -4,6 +4,8 @@
 
 它基于 Cloudflare 的开源组件库 [Kumo](https://github.com/cloudflare/kumo) 改造：Kumo 负责键盘操作、焦点、读屏这些不容易做对的地方，我们换上小小东的样子。以 [MIT 许可](LICENSE) 开源。
 
+**在线看全部组件：<https://ui.xiaoxiaodong.ai>**
+
 **默认长这样：**
 
 - 默认直角，可以切成圆角
@@ -102,7 +104,7 @@ pnpm xxd doc Dialog     # 某个组件的写法、属性和规则
 pnpm xxd doc Dialog --react
 ```
 
-想直接看效果，就打开展示站：
+想直接看效果，就打开展示站 <https://ui.xiaoxiaodong.ai>。改代码时在本机跑：
 
 ```bash
 pnpm --filter @xxd/site dev     # 打开 http://localhost:4400
@@ -131,6 +133,14 @@ pnpm --filter @xxd/site audit    # 压力测试：无障碍零问题、超长文
 ```
 
 这两道检查都要用无头 Chrome，需要设置 `CHROME_EXE`。截图基线只存在本机。
+
+### 更新线上展示站
+
+```bash
+pnpm --filter @xxd/site run release   # 构建，再部署到 Cloudflare（ui.xiaoxiaodong.ai）
+```
+
+需要先用 `wrangler login` 登录 Cloudflare。推送到 GitHub 不会自动更新网站，要手动跑这一条。
 
 ### 改东西去哪改
 

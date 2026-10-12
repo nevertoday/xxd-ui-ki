@@ -13,7 +13,8 @@
     "visual": "node scripts/visual.mjs",
     "visual:update": "node scripts/visual.mjs --update",
     "audit": "node scripts/audit.mjs",
-    "test": "node --test 'test/*.test.mjs'"
+    "test": "node --test 'test/*.test.mjs'",
+    "release": "pnpm run build && wrangler deploy"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.3",
@@ -36,6 +37,7 @@
     "pixelmatch": "^7.1.0",
     "playwright": "^1.57.0",
     "pngjs": "^7.0.0",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "wrangler": "4.127.1"
   }
 }
