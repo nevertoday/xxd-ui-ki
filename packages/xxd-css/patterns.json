@@ -1,0 +1,233 @@
+{
+  "$comment": "小小东模式（O4）：展示站 /patterns/* 和注册表测试都读它。",
+  "patterns": [
+    {
+      "name": "DropZone",
+      "slug": "drop-zone",
+      "zh": "拖放区与拖入遮罩",
+      "from": "图片排序",
+      "summary": "空的时候是一块虚线区：把东西拖进来、或选择文件、或粘贴；有内容之后，拖到面板任何地方都会出现「松手，放进来」。",
+      "classes": [
+        "xxd-dropzone",
+        "xxd-dropzone__title",
+        "xxd-dropveil"
+      ],
+      "markup": "<div id=\"drop-demo\" style=\"position:relative;padding:16px;border:1px solid var(--line);background:var(--bg);min-height:220px\">\n  <div class=\"xxd-dropzone\" id=\"drop-zone\">\n    <i data-xxd-icon=\"ImagePlus\" data-size=\"24\"></i>\n    <p class=\"xxd-dropzone__title\">把图片拖到这里</p>\n    <p class=\"xxd-help\">也可以 <button class=\"xxd-link\" type=\"button\">选择图片文件</button>，或直接粘贴链接 ⌘V</p>\n  </div>\n  <p class=\"xxd-help\" id=\"drop-out\" style=\"margin-top:12px\"></p>\n</div>\n<script>\n  Xxd.bindDrop(document.getElementById(\"drop-demo\"), {\n    zone: document.getElementById(\"drop-zone\"),\n    onFiles: (files) => (document.getElementById(\"drop-out\").textContent = `收到 ${files.length} 个文件`),\n    onText: (text) => (document.getElementById(\"drop-out\").textContent = `收到文字：${text.slice(0, 40)}`),\n  });\n</script>",
+      "anatomy": [
+        "虚线区：图标 · 一句话 · 其他方式（选择文件 / 粘贴）",
+        "遮罩：盖住整个面板，一句话，拖出去就消失"
+      ],
+      "rules": [
+        "每种进来的方式在点之前就说清会带来什么",
+        "粘贴在输入框里时不接管"
+      ],
+      "js": "const off = Xxd.bindDrop(panel, { zone, onFiles(files) {…}, onText(text) {…}, veil: \"松手，加到这一组\" })"
+    },
+    {
+      "name": "Viewer",
+      "slug": "viewer",
+      "zh": "图片查看器",
+      "from": "图片排序、会员站",
+      "summary": "点开大图，← → 翻，Esc 回到同一张；底部一个深色胶囊放操作。",
+      "classes": [
+        "xxd-viewer",
+        "xxd-viewer__bar",
+        "xxd-viewer__stage",
+        "xxd-viewer__nav",
+        "xxd-pill"
+      ],
+      "markup": "<div class=\"xxd-cluster\" id=\"viewer-demo\">\n  <button class=\"xxd-btn\" data-i=\"0\">打开第 1 张</button><button class=\"xxd-btn\" data-i=\"2\">打开第 3 张</button>\n</div>\n<script>\n  const pics = [\"#d65f32\", \"#3b74b8\", \"#5a8a3c\", \"#7b61b0\"].map((c, i) => ({ src: `data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='800' height='560'><rect width='800' height='560' fill='${c}'/><text x='400' y='300' font-size='64' fill='white' text-anchor='middle' font-family='sans-serif'>${i + 1}</text></svg>`)}`, alt: `第 ${i + 1} 张` }));\n  document.getElementById(\"viewer-demo\").addEventListener(\"click\", (e) => {\n    const b = e.target.closest(\"[data-i]\");\n    if (b) Xxd.openViewer(pics, Number(b.dataset.i), { actions: [{ label: \"复制图片\", run: () => Xxd.toast(\"已复制图片\", { tone: \"success\" }) }, { label: \"下载\", run: () => Xxd.toast(\"开始下载\") }] });\n  });\n</script>",
+      "rules": [
+        "关闭后焦点回到打开它的那个缩略图",
+        "操作胶囊：深色半透明，像 X 自己的图片控件"
+      ],
+      "js": "Xxd.openViewer(items, startIndex, { actions: [{ label, icon, run(item, i) }] })"
+    },
+    {
+      "name": "Sortable",
+      "slug": "sortable",
+      "zh": "拖拽排序",
+      "from": "会员站导航排序、图片排序",
+      "summary": "拖把手排序，其余项滑到新位置（FLIP）。触屏长按；键盘：把手上按空格拿起，↑ ↓ 移动，空格放下，Esc 取消。",
+      "classes": [
+        "xxd-sortable",
+        "xxd-sort-handle"
+      ],
+      "markup": "<ul class=\"xxd-list xxd-group__body xxd-sortable\" data-xxd-sortable style=\"width:300px\" id=\"sort-demo\">\n  <li class=\"xxd-list__item\" data-sort-item data-id=\"write\"><button class=\"xxd-sort-handle\" aria-label=\"拖动排序：写作\" aria-pressed=\"false\"><i data-xxd-icon=\"GripVertical\" data-size=\"16\"></i></button>写作</li>\n  <li class=\"xxd-list__item\" data-sort-item data-id=\"prompts\"><button class=\"xxd-sort-handle\" aria-label=\"拖动排序：提示词\" aria-pressed=\"false\"><i data-xxd-icon=\"GripVertical\" data-size=\"16\"></i></button>提示词</li>\n  <li class=\"xxd-list__item\" data-sort-item data-id=\"history\"><button class=\"xxd-sort-handle\" aria-label=\"拖动排序：记录\" aria-pressed=\"false\"><i data-xxd-icon=\"GripVertical\" data-size=\"16\"></i></button>记录</li>\n  <li class=\"xxd-list__item\" data-sort-item data-id=\"settings\"><button class=\"xxd-sort-handle\" aria-label=\"拖动排序：设置\" aria-pressed=\"false\"><i data-xxd-icon=\"GripVertical\" data-size=\"16\"></i></button>设置</li>\n</ul>\n<p class=\"xxd-help\" id=\"sort-out\"></p>\n<script>document.getElementById(\"sort-demo\").addEventListener(\"xxd:change\", (e) => (document.getElementById(\"sort-out\").textContent = \"新顺序：\" + e.detail.order.join(\" · \")));</script>",
+      "rules": [
+        "动画只动 transform（FLIP），减少动效时直接到位",
+        "所有排序都能不用拖拽完成（键盘）"
+      ],
+      "js": "list.addEventListener(\"xxd:change\", (e) => e.detail.order)\nawait Xxd.flip(container, () => reorderDom())  // 通用的「滑到新位置」"
+    },
+    {
+      "name": "History",
+      "slug": "history",
+      "zh": "按天分组的记录",
+      "from": "长文发布、图片排序",
+      "summary": "「今天 / 昨天 / 9月12日」小标题下一行一条：缩略图叠放、标题、方式 · 时间；hover 出删除（点两次确认）。",
+      "classes": [
+        "xxd-history",
+        "xxd-history__day",
+        "xxd-thumbs"
+      ],
+      "markup": "<div class=\"xxd-history\" style=\"max-width:420px\">\n  <section><h3 class=\"xxd-history__day\">今天</h3>\n    <ul class=\"xxd-list xxd-group__body\" data-interactive>\n      <li class=\"xxd-list__item\"><span class=\"xxd-thumbs\"><span style=\"background:#d65f32\"></span><span style=\"background:#3b74b8\"></span><span style=\"background:#5a8a3c\"></span></span><div class=\"xxd-list__main\"><div class=\"xxd-list__title\">24 张图片</div><div class=\"xxd-list__meta\">渐变 · 14:02</div></div><button class=\"xxd-btn xxd-reveal\" data-variant=\"ghost\" data-size=\"xs\" data-confirm-twice=\"确认删除\">删除</button><button class=\"xxd-btn\" data-size=\"xs\">打开</button></li>\n      <li class=\"xxd-list__item\"><span class=\"xxd-thumbs\"><span style=\"background:#7b61b0\"></span><span style=\"background:#c98a1a\"></span></span><div class=\"xxd-list__main\"><div class=\"xxd-list__title\">8 张图片</div><div class=\"xxd-list__meta\">原样 · 09:40</div></div><button class=\"xxd-btn xxd-reveal\" data-variant=\"ghost\" data-size=\"xs\" data-confirm-twice=\"确认删除\">删除</button><button class=\"xxd-btn\" data-size=\"xs\">打开</button></li>\n    </ul></section>\n  <section><h3 class=\"xxd-history__day\">昨天</h3>\n    <ul class=\"xxd-list xxd-group__body\" data-interactive>\n      <li class=\"xxd-list__item\"><span class=\"xxd-thumbs\"><span style=\"background:#2a8a7a\"></span></span><div class=\"xxd-list__main\"><div class=\"xxd-list__title\">一篇关于设计系统的长文</div><div class=\"xxd-list__meta\">已写入 X · 21:15</div></div><button class=\"xxd-btn xxd-reveal\" data-variant=\"ghost\" data-size=\"xs\" data-confirm-twice=\"确认删除\">删除</button><button class=\"xxd-btn\" data-size=\"xs\">打开</button></li>\n    </ul></section>\n  <button class=\"xxd-link\" data-confirm-twice=\"确认清空全部记录\" style=\"color:var(--danger)\">清空全部记录</button>\n</div>",
+      "rules": [
+        "最多 50 行；同一组再做一次只更新那一行",
+        "删除点两次（不弹对话框）"
+      ]
+    },
+    {
+      "name": "ConfirmTwice",
+      "slug": "confirm-twice",
+      "zh": "两次确认",
+      "from": "图片排序",
+      "summary": "可撤销性低但不严重的删除：第一次点按钮变成「确认删除」（危险色），3 秒内再点才执行；不弹对话框。",
+      "classes": [],
+      "markup": "<button class=\"xxd-btn\" data-confirm-twice=\"确认删除\" id=\"twice-demo\">删除这一组</button>\n<script>document.getElementById(\"twice-demo\").addEventListener(\"xxd:confirm\", () => Xxd.toast(\"已删除\", { tone: \"success\" }));</script>",
+      "rules": [
+        "3 秒没再点就恢复原样",
+        "真正不可恢复、影响大的，用「输入名字确认删除」（Dialog）"
+      ],
+      "js": "button.addEventListener(\"xxd:confirm\", () => remove())"
+    },
+    {
+      "name": "SignIn",
+      "slug": "sign-in",
+      "zh": "登录",
+      "from": "各插件",
+      "summary": "没登录时侧边栏只有这一屏：标志、名字、一句话、新账号福利、Google 继续、或用邮箱（两步：邮箱 → 密码）、条款。",
+      "classes": [
+        "xxd-auth",
+        "xxd-auth__name",
+        "xxd-auth__line",
+        "xxd-auth__gift",
+        "xxd-auth__or",
+        "xxd-auth__terms"
+      ],
+      "markup": "<div class=\"xxd-auth\" data-xxd-auth style=\"border:1px solid var(--line);background:var(--paper)\">\n  <span class=\"xxd-logo\" data-size=\"lg\"><span class=\"xxd-logo__mark\"></span></span>\n  <h2 class=\"xxd-auth__name\">小小东 · 长文发布</h2>\n  <p class=\"xxd-auth__line\">把 Markdown 写进 X 文章，排版、图片一起带过去。</p>\n  <span class=\"xxd-auth__gift\">新账号送 7 天完整体验</span>\n  <form>\n    <button class=\"xxd-btn\" data-block type=\"button\"><i data-xxd-icon=\"Globe\" data-size=\"16\"></i>使用 Google 继续</button>\n    <div class=\"xxd-auth__or\">或使用邮箱</div>\n    <div data-step=\"email\" data-active>\n      <input class=\"xxd-input\" type=\"email\" placeholder=\"you@example.com\" aria-label=\"邮箱\" required>\n      <button class=\"xxd-btn\" data-variant=\"primary\" data-block data-auth-next=\"password\" hidden>继续</button>\n    </div>\n    <div data-step=\"password\">\n      <p class=\"xxd-help\">登录 <b data-auth-email></b></p>\n      <input class=\"xxd-input\" type=\"password\" placeholder=\"密码\" aria-label=\"密码\">\n      <div class=\"xxd-cluster\"><button class=\"xxd-btn ui-dialog-cancel\" data-auth-back=\"email\">返回</button><button class=\"xxd-btn\" data-variant=\"primary\" style=\"flex:1\">继续</button></div>\n      <button class=\"xxd-link\" type=\"button\" style=\"justify-self:start\">忘记密码？</button>\n    </div>\n  </form>\n  <p class=\"xxd-auth__terms\">继续即表示同意 <a class=\"xxd-link\" href=\"#\">服务条款</a> 和 <a class=\"xxd-link\" href=\"#\">隐私政策</a></p>\n</div>",
+      "rules": [
+        "<html data-account> 在首帧前就设好（不闪登录页）",
+        "邮箱里有字了「继续」才出现",
+        "会话过期回到这里时，要说一句为什么"
+      ]
+    },
+    {
+      "name": "Membership",
+      "slug": "membership",
+      "zh": "会员计划与购买",
+      "from": "长文发布、图片排序",
+      "summary": "账号卡上一行计划；「开通会员 / 续费」在原地展开购买面板：选计划 · 选支付方式 · 二维码 · 「我已支付，立即查询」。每种结果一句话。",
+      "classes": [
+        "xxd-account",
+        "xxd-account__main",
+        "xxd-account__name",
+        "xxd-plan-line",
+        "xxd-plans",
+        "xxd-plan",
+        "xxd-plan__name",
+        "xxd-plan__price",
+        "xxd-qr",
+        "xxd-qr__code"
+      ],
+      "markup": "<div style=\"display:grid;gap:12px;max-width:380px\">\n  <div class=\"xxd-group__body\"><div class=\"xxd-account\"><span class=\"xxd-avatar\" data-member style=\"--avatar-size:36px\">东</span><div class=\"xxd-account__main\"><div class=\"xxd-account__name\">小小东</div><div class=\"xxd-plan-line\" data-tone=\"member\" id=\"plan-line\">完整体验 · 还剩 6 天</div></div><button class=\"xxd-btn\" data-size=\"sm\" data-variant=\"primary\" id=\"buy\">开通会员</button></div></div>\n  <div class=\"xxd-plans\" role=\"radiogroup\" aria-label=\"计划\">\n    <label class=\"xxd-plan\"><input type=\"radio\" class=\"xxd-radio\" name=\"plan\" checked><span class=\"xxd-plan__name\">月度会员<small>每月自动提醒续费</small></span><span class=\"xxd-plan__price\">¥29</span></label>\n    <label class=\"xxd-plan\"><input type=\"radio\" class=\"xxd-radio\" name=\"plan\"><span class=\"xxd-plan__name\">年度会员<small>相当于每月 ¥19</small></span><span class=\"xxd-plan__price\">¥228</span></label>\n  </div>\n  <p class=\"xxd-help\">体验剩下的天数会保留；续费从当前到期日往后算。</p>\n  <div class=\"xxd-segmented\" data-xxd-segmented data-block aria-label=\"支付方式\"><button role=\"radio\" aria-checked=\"true\">微信</button><button role=\"radio\">支付宝</button><button role=\"radio\">银行卡</button></div>\n  <div class=\"xxd-qr\"><svg class=\"xxd-qr__code\" viewBox=\"0 0 21 21\" aria-label=\"付款二维码\"><path fill=\"#111\" d=\"M0 0h7v7H0zM14 0h7v7h-7zM0 14h7v7H0zM2 2v3h3V2zM16 2v3h3V2zM2 16v3h3v-3zM9 1h2v2H9zm0 4h3v2H9zm-1 4h2v2H8zm4 0h3v3h-3zm-4 4h3v2H8zm6 2h2v2h-2zm2-4h2v2h-2zm-4 6h2v2h-2zm6-2h3v3h-3z\"/></svg>微信扫码支付 · 二维码 2 小时内有效<button class=\"xxd-link\" type=\"button\" id=\"paid\">我已支付，立即查询</button></div>\n</div>\n<script>\n  document.getElementById(\"paid\").addEventListener(\"click\", (e) => Xxd.runBusy(e.target, () => new Promise((r) => setTimeout(r, 900))).then(() => { Xxd.rollText(document.getElementById(\"plan-line\"), \"会员 · 到 2027年11月8日\"); Xxd.celebrate(document.getElementById(\"buy\")); Xxd.toast(\"会员已开通\", { tone: \"success\" }); }));\n</script>",
+      "rules": [
+        "不说「额度 / 配额 / 试用」：说「完整体验」「今天还能写入 N 篇」「开通会员」",
+        "门槛在用户动手的地方说话，从不弹窗",
+        "每种结果都有自己的一句话（已支付、还没付、已关闭、网络问题……），没有沉默的失败",
+        "计划行变化时旧字上滚出、新字上滚进；减少动效时直接换"
+      ]
+    },
+    {
+      "name": "StatusLine",
+      "slug": "status-line",
+      "zh": "状态行",
+      "from": "图片排序、长文发布",
+      "summary": "dock 上方的一行：空着，除非有事要说 —— 一句话，最多一个动作。",
+      "classes": [
+        "xxd-statusline"
+      ],
+      "markup": "<div style=\"max-width:420px;border:1px solid var(--line);background:var(--paper)\">\n  <div class=\"xxd-statusline\" id=\"status-demo\" hidden></div>\n  <footer class=\"xxd-dock\" style=\"position:static\"><div class=\"xxd-dock__status\">24 张 · 来自 mp.weixin.qq.com</div><div class=\"xxd-dock__primary\"><button class=\"xxd-btn\" data-variant=\"primary\" data-size=\"sm\">复制 24 个链接</button></div></footer>\n</div>\n<div class=\"xxd-cluster\" style=\"margin-top:12px\">\n  <button class=\"xxd-btn\" data-size=\"sm\" onclick=\"Xxd.setStatus(document.getElementById('status-demo'), '正在读取颜色 12 / 40', { action: { label: '停止' } })\">进行中</button>\n  <button class=\"xxd-btn\" data-size=\"sm\" onclick=\"Xxd.setStatus(document.getElementById('status-demo'), '今天的 5 组颜色排序用完了（原样和倒过来不受限制）', { tone: 'warning', action: { label: '开通会员' } })\">用完了</button>\n  <button class=\"xxd-btn\" data-size=\"sm\" onclick=\"Xxd.setStatus(document.getElementById('status-demo'), '')\">清空</button>\n</div>",
+      "rules": [
+        "一句话，最多一个动作；没事就整行消失",
+        "不用弹窗、不用系统通知"
+      ],
+      "js": "Xxd.setStatus(el, text, { tone: \"warning\", action: { label, onClick } })"
+    },
+    {
+      "name": "ProgressPill",
+      "slug": "progress-pill",
+      "zh": "写入进度胶囊",
+      "from": "长文发布",
+      "summary": "在别人的网页上（X 编辑器）写入时，一个细细的深色胶囊：转圈 · 进度 · 数字。放在 Shadow DOM 里。",
+      "classes": [
+        "xxd-progress-pill"
+      ],
+      "markup": "<div class=\"xxd-progress-pill\"><span class=\"xxd-spinner\" aria-hidden=\"true\"></span>正在写入<progress class=\"xxd-progress\" value=\"62\" max=\"100\"></progress>62%</div>",
+      "rules": [
+        "用 XxdExtension.mountXxdUI 放进 Shadow DOM，不碰宿主页面",
+        "完成后变成一个勾再淡出"
+      ]
+    },
+    {
+      "name": "Celebrate",
+      "slug": "celebrate",
+      "zh": "庆祝",
+      "from": "长文发布",
+      "summary": "会员开通、第一次写入这类时刻：画一个圈打勾、字依次升起、彩纸从勾那里散开；减少动效时直接给最终状态。",
+      "classes": [
+        "xxd-celebrate",
+        "xxd-celebrate__ring",
+        "xxd-confetti"
+      ],
+      "markup": "<div class=\"xxd-celebrate\" id=\"cele\">\n  <svg class=\"xxd-celebrate__ring\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"miter\"><circle cx=\"12\" cy=\"12\" r=\"9.5\" pathLength=\"1\"/><path d=\"m7.5 12 3 3 6-6\" pathLength=\"1\"/></svg>\n  <p class=\"xxd-text\" data-variant=\"heading2\">会员已开通</p>\n  <p class=\"xxd-text\" data-variant=\"caption\">有效期至 2027年11月8日</p>\n  <button class=\"xxd-btn\" data-variant=\"primary\" onclick=\"Xxd.celebrate(this.closest('.xxd-celebrate').querySelector('svg'))\">开始写作</button>\n</div>",
+      "rules": [
+        "只在真正值得的时刻；一次",
+        "只动 opacity / transform；减少动效时不放彩纸"
+      ],
+      "js": "Xxd.celebrate(anchorElement)"
+    },
+    {
+      "name": "SettingsSearch",
+      "slug": "settings-search",
+      "zh": "设置搜索",
+      "from": "长文发布",
+      "summary": "搜索框钉在设置页顶部（⌘F 跳过来，Esc 清空）：过滤到匹配的行并标出字；每行带几个别人可能搜的词（暗色 / dark / 夜间 都能找到主题）。",
+      "classes": [],
+      "markup": "<div style=\"max-width:440px\">\n  <div class=\"xxd-input-wrap\" style=\"margin-bottom:16px\"><i data-xxd-icon=\"Search\" data-size=\"16\"></i><input class=\"xxd-input\" type=\"search\" id=\"ss-input\" placeholder=\"搜索设置（⌘F）\" aria-label=\"搜索设置\"><button class=\"xxd-input-clear\" aria-label=\"清空\"><i data-xxd-icon=\"X\" data-size=\"14\"></i></button></div>\n  <div class=\"xxd-settings\" id=\"ss-box\">\n    <section class=\"xxd-group\"><h3 class=\"xxd-group__title\">外观</h3><div class=\"xxd-group__body\">\n      <div class=\"xxd-row\" data-keywords=\"暗色 dark 夜间 主题\"><div class=\"xxd-row__text\"><div class=\"xxd-row__title\">主题</div><div class=\"xxd-row__desc\">亮 · 暗 · 跟随系统</div></div></div>\n      <div class=\"xxd-row\" data-keywords=\"圆角 rounded 直角\"><div class=\"xxd-row__text\"><div class=\"xxd-row__title\">圆角</div></div><div class=\"xxd-row__control\"><input type=\"checkbox\" role=\"switch\" class=\"xxd-switch\" aria-label=\"圆角\"></div></div>\n    </div></section>\n    <section class=\"xxd-group\"><h3 class=\"xxd-group__title\">写入</h3><div class=\"xxd-group__body\">\n      <div class=\"xxd-row\" data-keywords=\"标点 引号 punctuation\"><div class=\"xxd-row__text\"><div class=\"xxd-row__title\">智能标点</div></div><div class=\"xxd-row__control\"><input type=\"checkbox\" role=\"switch\" class=\"xxd-switch\" checked aria-label=\"智能标点\"></div></div>\n    </div></section>\n  </div>\n</div>\n<script>Xxd.bindSettingsSearch(document.getElementById(\"ss-input\"), document.getElementById(\"ss-box\"), { hotkey: false });</script>",
+      "rules": [
+        "没有匹配的行和整组藏起来",
+        "放在别处的设置也作为捷径出现在结果里"
+      ],
+      "js": "Xxd.bindSettingsSearch(input, settingsContainer)"
+    },
+    {
+      "name": "AccountCard",
+      "slug": "account-card",
+      "zh": "账号卡",
+      "from": "各插件",
+      "summary": "头像（会员有一圈主色环）· 名字 · 计划行 · 一个动作。",
+      "classes": [],
+      "markup": "<div class=\"xxd-group__body\" style=\"max-width:380px\"><div class=\"xxd-account\"><span class=\"xxd-avatar\" style=\"--avatar-size:36px\">东</span><div class=\"xxd-account__main\"><div class=\"xxd-account__name\">小小东</div><div class=\"xxd-plan-line\">免费版 · 今天还能写入 3 篇</div></div><button class=\"xxd-btn\" data-size=\"sm\">开通会员</button></div>\n<div class=\"xxd-account\" style=\"border-top:1px solid var(--line)\"><span class=\"xxd-avatar\" data-member style=\"--avatar-size:36px\">东</span><div class=\"xxd-account__main\"><div class=\"xxd-account__name\">小小东</div><div class=\"xxd-plan-line\" data-tone=\"warning\">会员 · 还剩 3 天到期</div></div><button class=\"xxd-btn\" data-size=\"sm\">续费</button></div></div>",
+      "rules": [
+        "数字只在有用时出现：会员看不到次数",
+        "最后一周用警告色"
+      ]
+    },
+    {
+      "name": "RollText",
+      "slug": "roll-text",
+      "zh": "字的滚动替换",
+      "from": "长文发布",
+      "summary": "计划行、计数变化时：旧的字往上滚出、新的往上滚进，一道光扫过（这里只做滚动）。",
+      "classes": [
+        "xxd-roll"
+      ],
+      "markup": "<p class=\"xxd-plan-line\" style=\"font-size:14px\"><span id=\"roll-demo\">免费版 · 今天还能写入 3 篇</span></p>\n<button class=\"xxd-btn\" data-size=\"sm\" onclick=\"const el=document.getElementById('roll-demo'); Xxd.rollText(el, el.textContent.includes('免费') ? '会员 · 到 2027年11月8日' : '免费版 · 今天还能写入 3 篇')\">换一下</button>",
+      "rules": [
+        "减少动效时直接换字"
+      ],
+      "js": "Xxd.rollText(element, newText)"
+    }
+  ]
+}

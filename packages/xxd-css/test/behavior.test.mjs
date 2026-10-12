@@ -463,3 +463,110 @@ describe("O3 组件", () => {
     await expect(p).resolves.toBe(true);
   });
 });
+
+describe("O4 小小东模式", () => {
+  it("两次确认：第一次变成确认文字，第二次才派发 xxd:confirm", () => {
+    html(`<button class="xxd-btn" data-confirm-twice="确认删除" id="tw">删除</button>`);
+    const b = document.getElementById("tw");
+    const seen = vi.fn();
+    b.addEventListener("xxd:confirm", seen);
+    b.click();
+    expect(b.textContent).toBe("确认删除");
+    expect(b.hasAttribute("data-confirming")).toBe(true);
+    expect(seen).not.toHaveBeenCalled();
+    b.click();
+    expect(seen).toHaveBeenCalledTimes(1);
+    expect(b.textContent).toBe("删除");
+  });
+
+  it("登录：邮箱有字才出「继续」，继续进到密码步、返回回去", () => {
+    html(`<div data-xxd-auth><div data-step="email" data-active><input type="email" required><button data-auth-next="password" hidden>继续</button></div>
+      <div data-step="password"><b data-auth-email></b><input type="password"><button data-auth-back="email">返回</button></div></div>`);
+    const email = document.querySelector('input[type="email"]');
+    const next = document.querySelector("[data-auth-next]");
+    email.value = "a@b.co";
+    email.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(next.hidden).toBe(false);
+    next.click();
+    expect(document.querySelector('[data-step="password"]').hasAttribute("data-active")).toBe(true);
+    expect(document.querySelector("[data-auth-email]").textContent).toBe("a@b.co");
+    document.querySelector("[data-auth-back]").click();
+    expect(document.querySelector('[data-step="email"]').hasAttribute("data-active")).toBe(true);
+  });
+
+  it("拖放：拖进来出现遮罩，松手交给 onFiles", () => {
+    html(`<div id="dz"></div>`);
+    const target = document.getElementById("dz");
+    const onFiles = vi.fn();
+    const off = Xxd.bindDrop(target, { onFiles });
+    const file = new File(["x"], "a.png", { type: "image/png" });
+    const dt = { types: ["Files"], files: [file], getData: () => "" };
+    const ev = (type) => Object.assign(new Event(type, { bubbles: true, cancelable: true }), { dataTransfer: dt });
+    target.dispatchEvent(ev("dragenter"));
+    expect(target.querySelector(".xxd-dropveil").hasAttribute("data-open")).toBe(true);
+    target.dispatchEvent(ev("drop"));
+    expect(onFiles).toHaveBeenCalledWith([file]);
+    expect(target.querySelector(".xxd-dropveil").hasAttribute("data-open")).toBe(false);
+    off();
+  });
+
+  it("状态行：有字显示、一个动作；空字符串藏起来", () => {
+    html(`<div class="xxd-statusline" id="st" hidden></div>`);
+    const el = document.getElementById("st");
+    const onClick = vi.fn();
+    Xxd.setStatus(el, "今天用完了", { tone: "warning", action: { label: "开通会员", onClick } });
+    expect(el.hidden).toBe(false);
+    expect(el.dataset.tone).toBe("warning");
+    el.querySelector("button").click();
+    expect(onClick).toHaveBeenCalled();
+    Xxd.setStatus(el, "");
+    expect(el.hidden).toBe(true);
+  });
+
+  it("字的滚动替换：旧字标 data-out，新字 data-in", () => {
+    html(`<span id="rl">免费版</span>`);
+    const el = document.getElementById("rl");
+    Xxd.rollText(el, "会员");
+    expect(el.querySelector("[data-out]").textContent).toBe("免费版");
+    expect(el.querySelector("[data-in]").textContent).toBe("会员");
+  });
+
+  it("设置搜索：按标题和关键词过滤，整组没匹配就藏", () => {
+    html(`<div id="box"><section class="xxd-group"><div class="xxd-row" data-keywords="dark 夜间">主题</div><div class="xxd-row">圆角</div></section>
+      <section class="xxd-group"><div class="xxd-row">智能标点</div></section></div>`);
+    const box = document.getElementById("box");
+    expect(Xxd.filterSettings(box, "夜间")).toBe(1);
+    const [g1, g2] = box.querySelectorAll(".xxd-group");
+    expect(g2.hasAttribute("data-search-hidden")).toBe(true);
+    expect(g1.hasAttribute("data-search-hidden")).toBe(false);
+    Xxd.filterSettings(box, "");
+    expect(box.querySelectorAll("[data-search-hidden]").length).toBe(0);
+  });
+
+  it("拖拽排序：键盘空格拿起、↓ 移动、空格放下，派发新顺序", () => {
+    html(`<ul data-xxd-sortable><li data-sort-item data-id="a"><button class="xxd-sort-handle" id="ha">a</button></li><li data-sort-item data-id="b"><button class="xxd-sort-handle">b</button></li><li data-sort-item data-id="c"><button class="xxd-sort-handle">c</button></li></ul>`);
+    const list = document.querySelector("ul");
+    const seen = vi.fn();
+    list.addEventListener("xxd:change", (e) => seen(e.detail.order));
+    const h = document.getElementById("ha");
+    h.focus();
+    key(h, " ");
+    expect(h.getAttribute("aria-pressed")).toBe("true");
+    key(h, "ArrowDown");
+    key(h, " ");
+    expect(seen).toHaveBeenLastCalledWith(["b", "a", "c"]);
+  });
+
+  it("图片查看器：← → 翻、计数、关闭后移除", async () => {
+    if (!HTMLDialogElement.prototype.showModal) HTMLDialogElement.prototype.showModal = function () { this.open = true; };
+    const v = Xxd.openViewer([{ src: "a.png" }, { src: "b.png" }, { src: "c.png" }], 1);
+    expect(v.dialog.querySelector("[data-count]").textContent).toBe("2 / 3");
+    v.dialog.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(v.index).toBe(2);
+    v.dialog.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(v.index).toBe(0);
+    v.dialog.close();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(v.dialog.isConnected).toBe(false);
+  });
+});

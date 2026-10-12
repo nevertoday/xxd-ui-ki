@@ -41,7 +41,7 @@ describe("圆角只走令牌", () => {
 });
 
 describe("阴影只给浮层", () => {
-  const FLOATING = /xxd-(dialog|sheet|menu|popover|tooltip|toast|panel|listbox|surface-float)\b|xxd-surface\[data-level="raised"\]|xxd-sidebar\[data-variant="floating"\]/;
+  const FLOATING = /xxd-(dialog|sheet|menu|popover|tooltip|toast|panel|listbox|surface-float)\b|xxd-surface\[data-level="raised"\]|xxd-sidebar\[data-variant="floating"\]|\[data-dragging\]|xxd-progress-pill/;
   it("非浮层只允许 0 模糊的描边环（box-shadow: 0 0 0 Npx / inset）", () => {
     const bad = [];
     for (const r of all)

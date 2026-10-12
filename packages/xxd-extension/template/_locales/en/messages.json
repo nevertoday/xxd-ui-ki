@@ -34,5 +34,80 @@
   },
   "searchPlaceholder": {
     "message": "Search settings (⌘F)"
+  },
+  "signinGift": {
+    "message": "New accounts get a 7-day full experience"
+  },
+  "signinGoogle": {
+    "message": "Continue with Google"
+  },
+  "signinOr": {
+    "message": "or use email"
+  },
+  "signinAs": {
+    "message": "Sign in as"
+  },
+  "continue": {
+    "message": "Continue"
+  },
+  "back": {
+    "message": "Back"
+  },
+  "terms": {
+    "message": "By continuing you agree to the Terms and Privacy Policy"
+  },
+  "dropTitle": {
+    "message": "Drop files here"
+  },
+  "dropOr": {
+    "message": "or"
+  },
+  "dropPick": {
+    "message": "choose files"
+  },
+  "dropVeil": {
+    "message": "Drop to add"
+  },
+  "groupAccount": {
+    "message": "Account"
+  },
+  "groupAbout": {
+    "message": "About"
+  },
+  "upgrade": {
+    "message": "Become a member"
+  },
+  "planMonth": {
+    "message": "Monthly"
+  },
+  "planYear": {
+    "message": "Yearly"
+  },
+  "planKeep": {
+    "message": "Your remaining trial days are kept."
+  },
+  "pay": {
+    "message": "Pay"
+  },
+  "paid": {
+    "message": "I've paid — check now"
+  },
+  "payOpened": {
+    "message": "The payment page opened in a new tab"
+  },
+  "memberDone": {
+    "message": "Membership is active"
+  },
+  "signout": {
+    "message": "Sign out"
+  },
+  "version": {
+    "message": "Version"
+  },
+  "today": {
+    "message": "Today"
+  },
+  "yesterday": {
+    "message": "Yesterday"
   }
 }

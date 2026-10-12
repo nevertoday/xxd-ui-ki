@@ -446,3 +446,4 @@ export function bindCommandPalette(getItems, { key = "k", ...options } = {}) {
   globalThis.addEventListener("keydown", handler);
   return () => globalThis.removeEventListener("keydown", handler);
 }
+

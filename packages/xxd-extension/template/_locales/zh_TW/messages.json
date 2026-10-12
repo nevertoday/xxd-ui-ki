@@ -34,5 +34,80 @@
   },
   "searchPlaceholder": {
     "message": "搜尋設定（⌘F）"
+  },
+  "signinGift": {
+    "message": "新帳號送 7 天完整體驗"
+  },
+  "signinGoogle": {
+    "message": "使用 Google 繼續"
+  },
+  "signinOr": {
+    "message": "或使用電子郵件"
+  },
+  "signinAs": {
+    "message": "登入"
+  },
+  "continue": {
+    "message": "繼續"
+  },
+  "back": {
+    "message": "返回"
+  },
+  "terms": {
+    "message": "繼續即表示同意服務條款和隱私權政策"
+  },
+  "dropTitle": {
+    "message": "把檔案拖到這裡"
+  },
+  "dropOr": {
+    "message": "也可以"
+  },
+  "dropPick": {
+    "message": "選擇檔案"
+  },
+  "dropVeil": {
+    "message": "放開，放進來"
+  },
+  "groupAccount": {
+    "message": "帳號"
+  },
+  "groupAbout": {
+    "message": "關於"
+  },
+  "upgrade": {
+    "message": "開通會員"
+  },
+  "planMonth": {
+    "message": "月度會員"
+  },
+  "planYear": {
+    "message": "年度會員"
+  },
+  "planKeep": {
+    "message": "體驗剩下的天數會保留。"
+  },
+  "pay": {
+    "message": "去付款"
+  },
+  "paid": {
+    "message": "我已付款，立即查詢"
+  },
+  "payOpened": {
+    "message": "已在新分頁開啟付款頁"
+  },
+  "memberDone": {
+    "message": "會員已開通"
+  },
+  "signout": {
+    "message": "登出"
+  },
+  "version": {
+    "message": "版本"
+  },
+  "today": {
+    "message": "今天"
+  },
+  "yesterday": {
+    "message": "昨天"
   }
 }

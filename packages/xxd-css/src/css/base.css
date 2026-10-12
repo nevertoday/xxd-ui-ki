@@ -43,6 +43,11 @@
     background: color-mix(in srgb, var(--action) 18%, transparent);
   }
 
+  /* hidden 属性永远有效：组件自己写了 display（grid / flex）也一样。 */
+  :where([class*="xxd-"])[hidden] {
+    display: none !important;
+  }
+
   /* 只给读屏 */
   .xxd-sr-only {
     position: absolute;

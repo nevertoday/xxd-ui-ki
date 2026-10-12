@@ -30,7 +30,8 @@
       .xxd-toolbar__item,
       .xxd-th-sort,
       .xxd-toc a,
-      .xxd-inline-copy
+      .xxd-inline-copy,
+      .xxd-dropzone
     ):hover {
     transition-duration: 0s;
   }

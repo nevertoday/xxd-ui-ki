@@ -4,6 +4,18 @@ body {
   height: 100%;
 }
 
+/* 没登录只显示登录页；登录后只显示应用 */
+:root[data-account="signed-out"] .app,
+:root[data-account="signed-in"] .view-signin {
+  display: none;
+}
+
+.view-signin {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+}
+
 .app {
   display: flex;
   flex-direction: column;
@@ -21,6 +33,13 @@ body {
   overflow: auto;
 }
 
+.app-panel[hidden] {
+  display: none;
+}
+
 .app-panel {
+  display: grid;
+  gap: 12px;
+  align-content: start;
   padding: 14px;
 }

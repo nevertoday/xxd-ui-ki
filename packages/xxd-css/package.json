@@ -17,12 +17,14 @@
     "./index.css": "./src/index.css",
     "./css/*": "./src/css/*",
     "./dist/*": "./dist/*",
-    "./registry.json": "./registry.json"
+    "./registry.json": "./registry.json",
+    "./patterns.json": "./patterns.json"
   },
   "files": [
     "src",
     "dist",
-    "registry.json"
+    "registry.json",
+    "patterns.json"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",

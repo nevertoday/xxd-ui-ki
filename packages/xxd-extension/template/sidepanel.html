@@ -6,6 +6,8 @@
   <title>__APP_NAME__</title>
   <!-- 首帧前应用主题 / 圆角 / 主色（读 localStorage 镜像），侧边栏用紧凑密度 -->
   <script src="vendor/xxd/boot.js" data-key="__SLUG__-ui" data-default-density="compact"></script>
+  <!-- 登录状态也在首帧前定下来：没登录只显示登录页，不闪 -->
+  <script src="account-boot.js"></script>
   <link rel="stylesheet" href="vendor/xxd/xxd.css">
   <link rel="stylesheet" href="sidepanel.css">
   <script src="vendor/xxd/icons.js"></script>
@@ -13,6 +15,30 @@
   <script src="vendor/xxd/extension.js"></script>
 </head>
 <body class="xxd-page">
+  <!-- 登录页：没登录时侧边栏只有这一屏 -->
+  <section class="view-signin" aria-label="登录">
+    <div class="xxd-auth" data-xxd-auth>
+      <span class="xxd-logo" data-size="lg"><span class="xxd-logo__mark"></span></span>
+      <h1 class="xxd-auth__name">__APP_NAME__</h1>
+      <p class="xxd-auth__line" data-i18n="appDescription">__APP_DESC__</p>
+      <span class="xxd-auth__gift" data-i18n="signinGift">新账号送 7 天完整体验</span>
+      <form id="signin-form">
+        <button class="xxd-btn" data-block type="button" id="signin-google"><i data-xxd-icon="Globe" data-size="16"></i><span data-i18n="signinGoogle">使用 Google 继续</span></button>
+        <div class="xxd-auth__or" data-i18n="signinOr">或使用邮箱</div>
+        <div data-step="email" data-active>
+          <input class="xxd-input" type="email" placeholder="you@example.com" aria-label="邮箱" required>
+          <button class="xxd-btn" data-variant="primary" data-block data-auth-next="password" hidden data-i18n="continue">继续</button>
+        </div>
+        <div data-step="password">
+          <p class="xxd-help"><span data-i18n="signinAs">登录</span> <b data-auth-email></b></p>
+          <input class="xxd-input" type="password" placeholder="密码" aria-label="密码">
+          <div class="xxd-cluster"><button class="xxd-btn ui-dialog-cancel" data-auth-back="email" data-i18n="back">返回</button><button class="xxd-btn" data-variant="primary" style="flex:1" type="submit" data-i18n="continue">继续</button></div>
+        </div>
+      </form>
+      <p class="xxd-auth__terms" data-i18n="terms">继续即表示同意服务条款和隐私政策</p>
+    </div>
+  </section>
+
   <div class="app xxd-sheet-host">
     <!-- tab 在最上面，没有顶栏；tab 的基线就是那条线 -->
     <nav class="xxd-tabs app-tabs" data-xxd-tabs aria-label="主导航">
@@ -23,21 +49,57 @@
 
     <main class="app-body">
       <section id="panel-main" class="xxd-read app-panel">
-        <div class="xxd-empty">
-          <i data-xxd-icon="Sparkles"></i>
-          <p class="xxd-empty__title" data-i18n="emptyTitle">从这里开始</p>
-          <p class="xxd-empty__text" data-i18n="emptyText">这是用小小东 UI Kit 生成的插件模板。</p>
+        <div class="xxd-dropzone" id="dropzone">
+          <i data-xxd-icon="ImagePlus" data-size="24"></i>
+          <p class="xxd-dropzone__title" data-i18n="dropTitle">把文件拖到这里</p>
+          <p class="xxd-help"><span data-i18n="dropOr">也可以</span> <button class="xxd-link" type="button" id="pick" data-i18n="dropPick">选择文件</button></p>
         </div>
+        <ul class="xxd-list xxd-group__body" id="items" hidden></ul>
       </section>
+
       <section id="panel-history" class="xxd-read app-panel">
-        <div class="xxd-empty"><i data-xxd-icon="History"></i><p class="xxd-empty__title" data-i18n="historyEmpty">还没有记录</p></div>
+        <div class="xxd-history" id="history"></div>
+        <div class="xxd-empty" id="history-empty"><i data-xxd-icon="History"></i><p class="xxd-empty__title" data-i18n="historyEmpty">还没有记录</p></div>
       </section>
+
       <section id="panel-settings" class="xxd-read app-panel">
-        <div class="xxd-settings" id="settings"></div>
+        <div class="xxd-input-wrap" style="margin-bottom:16px">
+          <i data-xxd-icon="Search" data-size="16"></i>
+          <input class="xxd-input" type="search" id="settings-search" data-i18n-attr="placeholder:searchPlaceholder,aria-label:searchPlaceholder">
+          <button class="xxd-input-clear" aria-label="清空"><i data-xxd-icon="X" data-size="14"></i></button>
+        </div>
+        <div class="xxd-settings" id="settings">
+          <section class="xxd-group">
+            <h3 class="xxd-group__title" data-i18n="groupAccount">账号</h3>
+            <div class="xxd-group__body">
+              <div class="xxd-account">
+                <span class="xxd-avatar" id="avatar" style="--avatar-size:32px">东</span>
+                <div class="xxd-account__main"><div class="xxd-account__name" id="account-name">小小东</div><div class="xxd-plan-line" id="plan-line"></div></div>
+                <button class="xxd-btn" data-size="sm" data-variant="primary" id="upgrade" data-i18n="upgrade">开通会员</button>
+              </div>
+              <div class="xxd-row" id="purchase" hidden data-stack>
+                <div class="xxd-plans" role="radiogroup" aria-label="计划">
+                  <label class="xxd-plan"><input type="radio" class="xxd-radio" name="plan" value="month" checked><span class="xxd-plan__name" data-i18n="planMonth">月度会员</span><span class="xxd-plan__price">¥29</span></label>
+                  <label class="xxd-plan"><input type="radio" class="xxd-radio" name="plan" value="year"><span class="xxd-plan__name" data-i18n="planYear">年度会员</span><span class="xxd-plan__price">¥228</span></label>
+                </div>
+                <p class="xxd-help" data-i18n="planKeep">体验剩下的天数会保留。</p>
+                <button class="xxd-btn" data-variant="primary" data-block id="pay" data-i18n="pay">去支付</button>
+                <button class="xxd-link" type="button" id="paid" data-i18n="paid">我已支付，立即查询</button>
+              </div>
+              <div class="xxd-row"><div class="xxd-row__text"><div class="xxd-row__title" data-i18n="signout">退出登录</div></div><div class="xxd-row__control"><button class="xxd-btn" data-size="sm" data-confirm-twice="确认退出" id="signout" data-i18n="signout">退出登录</button></div></div>
+            </div>
+          </section>
+          <div id="appearance"></div>
+          <section class="xxd-group">
+            <h3 class="xxd-group__title" data-i18n="groupAbout">关于</h3>
+            <div class="xxd-group__body"><div class="xxd-row" data-keywords="version 版本"><div class="xxd-row__text"><div class="xxd-row__title" data-i18n="version">版本</div></div><div class="xxd-row__control xxd-text" data-variant="mono-secondary" id="version"></div></div></div>
+          </section>
+        </div>
       </section>
     </main>
 
-    <!-- 底部 dock：状态在开头，下一步在末尾 -->
+    <!-- 状态行：空着，除非有事要说；底部 dock：状态在开头，下一步在末尾 -->
+    <div class="xxd-statusline" id="statusline" hidden></div>
     <footer class="xxd-dock">
       <div class="xxd-dock__status" id="status" aria-live="polite"></div>
       <div class="xxd-dock__primary"><button class="xxd-btn" data-variant="primary" id="primary" data-i18n="primaryAction">开始</button></div>

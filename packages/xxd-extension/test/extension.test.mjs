@@ -132,6 +132,8 @@ describe("CLI：new / sync / status", () => {
       const all = readdirSync(dir).filter((f) => /\.(html|js|json)$/.test(f)).map((f) => readFileSync(join(dir, f), "utf8")).join("\n");
       expect(all).not.toMatch(/__[A-Z_]+__/);
       expect(all).toContain("bulk-save-ui");
+      expect(all).toContain("bulk-save-account");
+      expect(readFileSync(join(dir, "account-boot.js"), "utf8")).not.toMatch(/__[A-Z_]+__/);
       expect(status(dir).state).toBe("最新");
       sync(dir, { quiet: true });
     } finally {

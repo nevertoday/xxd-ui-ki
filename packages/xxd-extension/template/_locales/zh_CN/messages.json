@@ -34,5 +34,80 @@
   },
   "searchPlaceholder": {
     "message": "搜索设置（⌘F）"
+  },
+  "signinGift": {
+    "message": "新账号送 7 天完整体验"
+  },
+  "signinGoogle": {
+    "message": "使用 Google 继续"
+  },
+  "signinOr": {
+    "message": "或使用邮箱"
+  },
+  "signinAs": {
+    "message": "登录"
+  },
+  "continue": {
+    "message": "继续"
+  },
+  "back": {
+    "message": "返回"
+  },
+  "terms": {
+    "message": "继续即表示同意服务条款和隐私政策"
+  },
+  "dropTitle": {
+    "message": "把文件拖到这里"
+  },
+  "dropOr": {
+    "message": "也可以"
+  },
+  "dropPick": {
+    "message": "选择文件"
+  },
+  "dropVeil": {
+    "message": "松手，放进来"
+  },
+  "groupAccount": {
+    "message": "账号"
+  },
+  "groupAbout": {
+    "message": "关于"
+  },
+  "upgrade": {
+    "message": "开通会员"
+  },
+  "planMonth": {
+    "message": "月度会员"
+  },
+  "planYear": {
+    "message": "年度会员"
+  },
+  "planKeep": {
+    "message": "体验剩下的天数会保留。"
+  },
+  "pay": {
+    "message": "去支付"
+  },
+  "paid": {
+    "message": "我已支付，立即查询"
+  },
+  "payOpened": {
+    "message": "已在新标签页打开支付页"
+  },
+  "memberDone": {
+    "message": "会员已开通"
+  },
+  "signout": {
+    "message": "退出登录"
+  },
+  "version": {
+    "message": "版本"
+  },
+  "today": {
+    "message": "今天"
+  },
+  "yesterday": {
+    "message": "昨天"
   }
 }

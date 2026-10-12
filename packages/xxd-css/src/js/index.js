@@ -13,6 +13,7 @@ import { initPickers, installPickers, installSecrets } from "./picker.js";
 import { initStructure, installStructure } from "./structure.js";
 import { initData, installData } from "./data.js";
 import { installDrawerSwipe } from "./layers.js";
+import { installAuth, installConfirmTwice, installSortable } from "./patterns.js";
 
 export { openDialog, closeDialog, confirmDialog, confirmDelete } from "./dialog.js";
 export { toggleSidebar, collapseBreadcrumbs, spyToc, watchTabsOverflow } from "./structure.js";
@@ -25,6 +26,7 @@ export { toast, copyText, showTooltip, hideTooltip, showBubble, runBusy } from "
 export { openSheet, closeSheet, openPanel, closePanel, openLayer, closeLayer } from "./layers.js";
 export { bindSearch, markMatches, clearMarks, addTag, tagValues, openCommandPalette, bindCommandPalette } from "./inputs.js";
 export { mountAppearance, APPEARANCE_LABELS } from "./appearance.js";
+export { bindDrop, openViewer, flip, setStatus, rollText, celebrate, filterSettings, bindSettingsSearch } from "./patterns.js";
 export { ICON } from "./icons-min.js";
 
 const installed = new WeakSet();
@@ -46,6 +48,9 @@ export function install(root = document) {
     installStructure(root, byId, closestFrom);
     installData(root, closestFrom);
     installDrawerSwipe(root, closestFrom);
+    installSortable(root, closestFrom);
+    installConfirmTwice(root, closestFrom);
+    installAuth(root, closestFrom);
   }
   init(root);
   return root;

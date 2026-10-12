@@ -87,3 +87,12 @@ export declare function syncSelectAll(table: HTMLElement): number;
 export declare function syncRangePair(pair: HTMLElement, moved?: HTMLInputElement): [number, number] | null;
 export declare function highlight(el: HTMLElement, lang?: "js" | "ts" | "json" | "css" | "html" | "bash"): HTMLElement;
 export declare function highlightText(text: string, lang?: string): string;
+
+export declare function bindDrop(target: HTMLElement, options?: { onFiles?: (files: File[]) => void; onText?: (text: string) => void; veil?: string; zone?: HTMLElement }): () => void;
+export declare function openViewer(items: { src: string; alt?: string }[], start?: number, options?: { actions?: { label: string; icon?: string; run?: (item: { src: string; alt?: string }, index: number) => void }[]; within?: HTMLElement; labels?: Record<string, string> }): { dialog: HTMLDialogElement; show(i: number): void; readonly index: number };
+export declare function flip(container: Element, mutate: () => void, options?: { duration?: number; easing?: string; selector?: string }): Promise<void>;
+export declare function setStatus(el: HTMLElement, text: string, options?: { tone?: "danger" | "warning" | "success"; action?: { label: string; onClick?: () => void } }): HTMLElement;
+export declare function rollText(el: HTMLElement, text: string): void;
+export declare function celebrate(anchor: Element, options?: { colors?: string[]; count?: number }): void;
+export declare function filterSettings(container: Element, query: string): number;
+export declare function bindSettingsSearch(input: HTMLInputElement, container: Element, options?: { hotkey?: boolean }): () => void;
