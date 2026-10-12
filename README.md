@@ -28,7 +28,8 @@ pnpm xxd ls / pnpm xxd doc Dialog         # 查组件
 
 ## 文档
 
-- [开发计划](docs/PLAN.md) —— 现在做到哪、下一步做什么
+- [开发计划](docs/PLAN.md) —— 第一轮（已完成）
+- [优化计划](docs/OPTIMIZATION-PLAN.md) —— 第二轮：对照 Kumo 补组件、补交互细节、建展示站
 - [设计原则](docs/DESIGN-PRINCIPLES.md) —— 一切设计决定的依据
 - [插件套件](docs/EXTENSION-KIT.md) · [会员站接入](docs/member-site.md) · [文档站](docs/DOCS-SITE.md)
 - [Kumo → 小小东 令牌映射](docs/token-map.md) · [同步上游](docs/UPSTREAM.md) · [开源准备](docs/OPEN-SOURCE-CHECKLIST.md)
