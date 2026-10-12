@@ -1,13 +1,22 @@
 {
   "name": "@xxd/tokens",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "license": "UNLICENSED",
-  "description": "小小东设计令牌：颜色、圆角（直角/圆角）、主色、字体、间距、动效。纯 CSS，任何项目都能直接用。",
+  "description": "小小东设计令牌：颜色、圆角（直角/圆角）、主色、字体、间距、动效 + 首帧前的外观脚本。",
   "type": "module",
-  "sideEffects": ["*.css"],
+  "sideEffects": ["*.css", "./src/boot.js"],
   "exports": {
-    "./tokens.css": "./tokens.css"
+    ".": { "types": "./src/index.d.ts", "import": "./src/index.js" },
+    "./tokens.css": "./tokens.css",
+    "./accent": "./src/accent.js",
+    "./theme": "./src/theme.js",
+    "./dist/*": "./dist/*"
   },
-  "files": ["tokens.css"]
+  "files": ["tokens.css", "src", "dist"],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/"
+  },
+  "devDependencies": { "esbuild": "0.28.1" }
 }

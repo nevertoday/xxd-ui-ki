@@ -30,7 +30,9 @@
     "test:watch": "pnpm --filter @cloudflare/kumo test:watch",
     "typecheck": "pnpm -r typecheck",
     "version": "changeset version",
-    "version:beta": "./ci/versioning/version-beta.sh"
+    "version:beta": "./ci/versioning/version-beta.sh",
+    "xxd:build": "pnpm --filter \"./packages/xxd-*\" -r build",
+    "xxd:test": "pnpm --filter \"./packages/xxd-*\" -r test"
   },
   "devDependencies": {
     "@changesets/cli": "2.29.7",
