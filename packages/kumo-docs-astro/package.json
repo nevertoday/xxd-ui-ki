@@ -2,6 +2,7 @@
   "name": "@cloudflare/kumo-docs-astro",
   "version": "1.5.22",
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "exports": {
     "./demo-metadata.json": "./dist/demo-metadata.json"

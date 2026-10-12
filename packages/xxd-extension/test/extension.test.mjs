@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { createAppearanceStore } from "../src/settings.js";
 import { mountXxdUI } from "../src/shadow.js";
 import { applyI18n, t, uiLocale } from "../src/i18n.js";
-import { buildAll, create, docComponent, listComponents, dropDeclarations, findFallbackConflicts, status, sync, upsertRegion } from "../scripts/cli.mjs";
+import { adoptTokens, buildAll, create, docComponent, listComponents, dropDeclarations, findFallbackConflicts, status, sync, upsertRegion } from "../scripts/cli.mjs";
 import { mkdirSync, writeFileSync } from "node:fs";
 
 function mockChrome() {
@@ -181,5 +181,22 @@ describe("ls / doc", () => {
     expect(doc).toContain("取消在前");
     expect(docComponent("Button", { react: true })).toContain('import { Button } from "@xxd/react"');
     expect(() => docComponent("Nope")).toThrow();
+  });
+});
+
+describe("adopt", () => {
+  it("只删亮暗都相同的声明；亮色同而暗色不同的保留；旧名改别名；令牌区域不动", async () => {
+    const { parseBlocks } = await import("../../xxd-tokens/scripts/build.mjs");
+    const tokensCss = `:root {\n  --bg: #fcfcfc;\n  --paper: #ffffff;\n  --r-md: 0px;\n  --z-popover: 50;\n}\n:root[data-theme="dark"] {\n  --bg: #171612;\n  --paper: #201f1a;\n}`;
+    const legacy = `/* xxd:tokens:start */\n:where(:root){--bg:#fcfcfc}\n/* xxd:tokens:end */\n:root {\n  --bg: #fcfcfc;\n  --paper: #ffffff;\n  --z-popover: 50;\n  --ui-radius: 0;\n  --own: 1px;\n}\n.x { color: red; }\n:root[data-theme="dark"] {\n  --bg: #171612;\n  --paper: #222222;\n}\n`;
+    const r = adoptTokens(legacy, { tokensCss, parseBlocks, aliases: { "--ui-radius": "var(--r-md)" } });
+    expect(r.removed.sort()).toEqual(["--bg", "--z-popover"]);
+    expect(r.aliased).toEqual(["--ui-radius"]);
+    expect(r.css).toContain("--paper: #ffffff;");
+    expect(r.css).toContain("--paper: #222222;");
+    expect(r.css).toContain("--ui-radius: var(--r-md);");
+    expect(r.css).toContain("--own: 1px;");
+    expect(r.css).toContain(":where(:root){--bg:#fcfcfc}");
+    expect(r.css.split(":root[data-theme").pop()).not.toContain("--bg");
   });
 });

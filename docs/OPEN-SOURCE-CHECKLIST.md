@@ -8,7 +8,7 @@
 - [ ] **开哪些**：建议只开 `@xxd/tokens`、`@xxd/icons`、`@xxd/css`（纯前端、没有业务）；`@xxd/extension` 的模板和 CLI 看情况；
       会员站相关的 `docs/member-site.md`、试点记录不公开。
 - [ ] **许可**：Kumo 部分必须保留 MIT（`LICENSE-KUMO`）。你自己的部分可选 MIT（最省事、和 Kumo 一致）或 GPL-3.0（和你其他开源项目一致，如 xiaoxiaodong 主页）。
-- [ ] **和 Kumo 上游的关系**：继续同步（保留 `packages/kumo` 目录与 `@cloudflare/kumo` 内部名），还是脱钩（改名 `@xxd/react`、删 `upstream`）。见 `docs/UPSTREAM.md`。
+- [x] **和 Kumo 上游的关系**：已决定继续同步、内部包名不改（2026-10-12，依据和脱钩条件见 `docs/UPSTREAM.md`）。
 - [ ] **发不发 npm**：开源不等于要发 npm。插件靠 `pnpm xxd sync` 拷文件，不需要 npm；React 项目才需要。
 
 ## 2. 清理（跑自查脚本逐项清零或确认）
@@ -25,10 +25,12 @@
 
 ## 3. 补齐
 
-- [ ] `CONTRIBUTING.md`：用中文写清楚——先读 `docs/DESIGN-PRINCIPLES.md`；令牌只改 `tokens.css`；`pnpm xxd:test` 必须过；视觉改动附四种外观截图（亮/暗 × 直角/圆角）。
+- [x] 许可核对（2026-10-12）：根 `LICENSE` + `LICENSE-KUMO`；`packages/kumo/LICENSE`、`packages/kumo-docs-astro/LICENSE` 带 MIT 原文；kumo-figma / screenshot-worker 是未改动的上游代码，保持 MIT。
+
+- [x] `CONTRIBUTING.md`：已写（中文；先读原则、各层改哪里、提交前的检查、改别的项目用 worktree）。开源时把开头的「闭源」段落改掉即可。
 - [ ] `README.md`：面向外部读者重写（截图、安装、三层架构、`pnpm xxd new` 一分钟上手）。
-- [ ] CI：只跑 `pnpm xxd:test`、Kumo 测试、lint（上游的 `.github/` 已删除，需要新写一个最小的）。
-- [ ] 安全：确认没有任何 token / 密钥（仓库里现在没有；开源前再跑一次 `git log -p | grep -iE "token|secret|key"` 看历史）。
+- [x] CI：`.github/workflows/xxd.yml`（构建 + 小小东测试 + Kumo 测试 + lint）；上游的工作流已删除。有远端仓库后才会运行。
+- [x] 安全：2026-10-12 扫过本项目新增的全部提交（543dc8a..HEAD），没有密钥 / 令牌 / 密码。开源前对完整历史再扫一次（上游历史由 Cloudflare 公开维护）。
 - [ ] 历史：仓库带着 Kumo 的完整 git 历史，开源时可以保留（MIT 允许），或者从一个干净的提交开始新仓库。
 
 ## 4. 不需要在开源前做的

@@ -23,3 +23,16 @@ pnpm install && pnpm --filter @cloudflare/kumo build && pnpm test
 
 换皮后如果每次合并都要花半天以上解决冲突，而上游的新东西我们用不上，就停止同步，在 `docs/PLAN.md` 记录日期和原因，
 之后可以把内部包名 `@cloudflare/kumo` 改成 `@xxd/react` 并删掉 `upstream` 远端。
+
+## 决定（2026-10-12）：继续同步，内部包名不改
+
+量了一下换皮后 `packages/kumo` 与上游的差别（相对分叉基点 543dc8a）：
+
+- 组件源码：33 个文件、89 行换 89 行，几乎都是一行内的替换（图标的 import 路径、`rounded-full` → `rounded-pill / rounded-circle`、选中态的 token）。
+- 其余：`scripts/theme-generator/xxd-overrides.ts`（新文件）+ `config.ts` 两行、`kumo-binding.css` 一段、`kumo.css` 三处、`vite.config.ts` 一行、`package.json`、3 个测试断言、1 个合同测试（新文件）。
+
+这样的改动和上游合并时冲突很少，值得继续拿上游的 bug 修复和新组件。所以：
+
+- 保留 `upstream` 远端（只读）、保留目录 `packages/kumo` 和内部包名 `@cloudflare/kumo`；消费者只认 `@xxd/react`。
+- 新的换皮改动继续优先放在 `xxd-overrides.ts`、`kumo-binding.css` 和新文件里；组件内部只做一行内的替换。
+- **脱钩的条件**（满足任一就脱钩，并在 `docs/PLAN.md` 记日期）：一次合并要花半天以上解决冲突；或者要改组件结构（不只是换 class）的地方超过 10 个组件；或者决定开源 `@xxd/react` 并发布到 npm。

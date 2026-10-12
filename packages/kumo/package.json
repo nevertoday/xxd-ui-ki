@@ -10,7 +10,7 @@
     "react",
     "ui"
   ],
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cloudflare/kumo.git",

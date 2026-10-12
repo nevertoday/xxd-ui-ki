@@ -250,7 +250,7 @@ xxd-ui-ki/
 | 4 插件套件 + 试点 | ✅ 完成 | 2026-10-12 |
 | 5 会员站接入 | ✅ 完成（分支 xxd-ui-tokens，未合并、未部署） | 2026-10-12 |
 | 6 文档站与 AI | ✅ 完成 | 2026-10-12 |
-| 7 开源准备 | ✅ 准备完成（是否开源由你决定） | 2026-10-12 |
+| 7 开源准备 | ✅ 完成（清理自查、许可、贡献指南、上游决定；是否真的开源由你决定） | 2026-10-12 |
 
 ## 9. 各阶段做了什么（摘要）
 
@@ -260,7 +260,12 @@ xxd-ui-ki/
 - **4 插件套件**：`@xxd/extension`（MV3 模板、`chrome.storage` 外观同步、Shadow DOM 挂载、三语 i18n、`pnpm xxd new / sync / status`、`xxd.config.json`）。试点：图片排序分支 `xxd-ui-pilot`（330 个元素样式指纹：暗色全同、亮色只有 muted 对比度修正；打包检查通过）；xPoster 分支 `xxd-ui-pilot`（89 个令牌值全同，`npm test` 前后都通过）。
 - **5 会员站**：分支 `xxd-ui-tokens`：layered 令牌（老变量永远优先，自动跳过 4 个有后备值冲突的名字）、图标改由 `@xxd/icons` 同步（220 个图标渲染逐个相同）；全量测试没有新增失败。详见 `docs/member-site.md`。
 - **6 文档站与 AI**：`/xxd`（原则）、`/xxd/native`（由注册表生成）、`/xxd/extension`；`pnpm xxd ls / doc / add`；`xxd-ui` Skill（`skills/xxd-ui`，已链接到 `~/.claude/skills/xxd-ui`）。部署说明见 `docs/DOCS-SITE.md`（没有部署）。
-- **7 开源准备**：`scripts/open-source-audit.mjs` 自查 + `docs/OPEN-SOURCE-CHECKLIST.md`。
+- **7 开源准备**：
+  - 清理内部引用：`scripts/open-source-audit.mjs` 自查，提交的文件里没有本机路径、邮箱、微信号、商店 ID；剩下的是闭源声明和上游品牌，开源那天按清单换。
+  - 许可：根 `LICENSE`（闭源）+ `LICENSE-KUMO`（MIT 原文）；`packages/kumo` 和文档站补上了随包的 `LICENSE`（MIT 原文 + 改动的版权）；各包 `license` 字段逐个核对。
+  - 贡献指南：`CONTRIBUTING.md`（上游的移到 `docs/upstream/KUMO-CONTRIBUTING.md`）。
+  - 上游决定：继续同步、内部包名不改，量化依据和脱钩条件见 `docs/UPSTREAM.md`。
+  - 开源当天的步骤：`docs/OPEN-SOURCE-CHECKLIST.md`。
 
 ## 10. 留给你的事
 

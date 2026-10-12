@@ -1,0 +1,22 @@
+# 小小东 UI Kit 的最小 CI：只在有远端仓库后才会运行（现在闭源、没有推送）。
+name: xxd
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm xxd:build
+      - run: pnpm xxd:test
+      - run: pnpm --filter @cloudflare/kumo build
+      - run: pnpm --filter @cloudflare/kumo test
+      - run: pnpm lint

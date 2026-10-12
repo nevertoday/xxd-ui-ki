@@ -10,11 +10,13 @@
 //   pnpm xxd ls                      列出全部组件（原生 @xxd/css 与 React @xxd/react）
 //   pnpm xxd doc <组件> [--react]     一个组件的用法、属性、规则（--react 看 React 版的 props）
 //   pnpm xxd add <block> [--cwd 项目]  把 React 区块装进项目（转给 Kumo CLI 的 add）
+//   pnpm xxd adopt <项目目录>          老项目「改为引入令牌」：删掉与令牌亮暗两种值都相同的 :root 声明，旧名改成别名（xxd.config.json 的 adopt）
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import { build } from "esbuild";
+import { parseBlocks } from "../../xxd-tokens/scripts/build.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pkgDir = resolve(here, "..");
@@ -105,6 +107,54 @@ export function dropDeclarations(css, names) {
   if (!names.length) return css;
   const re = new RegExp(`^\\s*(?:${names.map((n) => n.replace(/[-]/g, "\\-")).join("|")})\\s*:[^;]*;\\s*$\\n?`, "gm");
   return css.replace(re, "");
+}
+
+/**
+ * 老项目接过令牌之后的第二步（「改为引入 @xxd/tokens，旧名先做别名」）：
+ * - :root 与 :root[data-theme="dark"] 里，亮暗两种值都与令牌相同的变量 → 删掉，改由令牌提供；
+ *   只要有一种模式不同就保留（否则老项目没进 layer 的亮色声明会在暗色里继续生效）。
+ * - aliases：{ "--ui-radius": "var(--r-md)" } 把旧名的值换成指向令牌（只在亮暗值都不变时才该写）。
+ * 返回 { css, removed, aliased }。只动 xxd:tokens 区域之外的那两个块。
+ */
+export function adoptTokens(css, { tokensCss, parseBlocks, aliases = {}, darkSelector = ':root[data-theme="dark"]' }) {
+  const regionEnd = css.indexOf("/* xxd:tokens:end */");
+  const head = regionEnd === -1 ? "" : css.slice(0, regionEnd + "/* xxd:tokens:end */".length);
+  let body = regionEnd === -1 ? css : css.slice(head.length);
+  const ours = parseBlocks(tokensCss);
+  const oursLight = ours[":root"];
+  const oursDark = { ...oursLight, ...ours[':root[data-theme="dark"]'] };
+  const theirs = parseBlocks(body);
+  const theirLight = theirs[":root"] || {};
+  const theirDark = { ...theirLight, ...(theirs[darkSelector] || {}) };
+  const removed = Object.keys(theirLight).filter(
+    (k) => k in oursLight && !(k in aliases) && theirLight[k] === oursLight[k] && theirDark[k] === oursDark[k],
+  );
+  const firstBlock = (sel) => {
+    const re = new RegExp(`(^|\\n)${sel.replace(/[[\]"().*+?^$|\\]/g, "\\$&")}\\s*\\{`, "");
+    const m = re.exec(body);
+    if (!m) return null;
+    const start = m.index + m[0].length;
+    const end = body.indexOf("}", start);
+    return { start, end };
+  };
+  const rewrite = (sel, fn) => {
+    const b = firstBlock(sel);
+    if (!b) return;
+    body = body.slice(0, b.start) + fn(body.slice(b.start, b.end)) + body.slice(b.end);
+  };
+  const dropLines = (text) => removed.reduce((t, k) => t.replace(new RegExp(`\\n[ \\t]*${k}\\s*:[^;]*;[^\\n]*`), ""), text);
+  const aliased = [];
+  rewrite(":root", (text) => {
+    let t = dropLines(text);
+    for (const [k, v] of Object.entries(aliases)) {
+      const next = t.replace(new RegExp(`(\\n[ \\t]*${k}\\s*:)[^;]*;`), `$1 ${v}; /* 别名 → @xxd/tokens */`);
+      if (next !== t) aliased.push(k);
+      t = next;
+    }
+    return t;
+  });
+  rewrite(darkSelector, dropLines);
+  return { css: head + body, removed, aliased };
 }
 
 function readConfig(dir) {
@@ -303,6 +353,20 @@ async function main() {
     console.log(listComponents());
   } else if (cmd === "doc") {
     console.log(docComponent(args._[0], { react: Boolean(args.react) }));
+  } else if (cmd === "adopt") {
+    const dir = targets[0];
+    const config = readConfig(dir)?.adopt;
+    if (!config?.file) throw new Error("xxd.config.json 里需要 adopt: { file, aliases }");
+    const file = join(dir, config.file);
+    const result = adoptTokens(readFileSync(file, "utf8"), {
+      tokensCss: readFileSync(join(repo, "packages/xxd-tokens/tokens.css"), "utf8"),
+      parseBlocks,
+      aliases: config.aliases,
+      darkSelector: config.darkSelector,
+    });
+    writeFileSync(file, result.css);
+    console.log(`✓ 改由令牌提供（删掉 ${result.removed.length} 个相同的声明）：${result.removed.join(" ")}`);
+    console.log(`✓ 旧名改为别名：${result.aliased.join(" ") || "（无）"}`);
   } else if (cmd === "add" || cmd === "blocks") {
     const kumoCli = join(repo, "packages/kumo/dist/command-line/cli.js");
     if (!existsSync(kumoCli)) throw new Error("先构建 React 组件库：pnpm --filter @cloudflare/kumo build");
