@@ -46,7 +46,7 @@ export async function buildAll({ quiet = false } = {}) {
     minify: true,
     target: "es2020",
     legalComments: "none",
-    banner: { js: "/* @xxd/extension（闭源） */" },
+    banner: { js: "/* @xxd/extension — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */" },
     outfile: join(pkgDir, "dist/extension.js"),
   });
 }
@@ -62,6 +62,13 @@ export function sync(target, { quiet = false } = {}) {
     if (!existsSync(from)) throw new Error(`缺少 ${relative(repo, from)}，先运行 pnpm xxd:build`);
     cpSync(from, join(vendor, f));
   }
+  // xxd-chrome-publish 把 vendor/ 下的文件当第三方代码检查许可：放一份整个目录的 LICENSE。
+  writeFileSync(
+    join(vendor, "LICENSE"),
+    "Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved.\n\n" +
+      "小小东 UI Kit（xxd-ui-ki）的构建产物：设计令牌、原生组件、图标与插件套件。\n" +
+      "闭源，仅供小小东自己的产品使用；未经书面许可不得复制、修改或分发。\n",
+  );
   const v = currentVersion();
   // 老项目的令牌文件路径不想改（测试、网站都引用它）：xxd.config.json 里写 { "tokensTargets": ["src/xxd-theme.css"] }，
   // sync 会把同一份 tokens.css 也写到那些路径，开头注明来源。

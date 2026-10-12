@@ -46,7 +46,7 @@ const MODE_NAMES = {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   rmSync(dist, { recursive: true, force: true });
   mkdirSync(dist, { recursive: true });
-  writeFileSync(join(dist, "tokens.css"), source);
+  writeFileSync(join(dist, "tokens.css"), `/* @xxd/tokens — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */\n${source}`);
   writeFileSync(join(dist, "tokens.shadow.css"), toShadow(source));
 
   const blocks = parseBlocks(source);
@@ -66,7 +66,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     `/** 小小东设计令牌的 CSS 变量名（自动生成）。 */\nexport type XxdToken =\n${names.map((n) => `  | "${n}"`).join("\n")};\n`,
   );
 
-  const common = { bundle: true, target: "es2020", legalComments: "none", banner: { js: "/* @xxd/tokens（闭源） */" } };
+  const common = { bundle: true, target: "es2020", legalComments: "none", banner: { js: "/* @xxd/tokens — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */" } };
   await build({ ...common, entryPoints: [join(root, "src/boot.js")], format: "iife", minify: true, outfile: join(dist, "boot.js") });
   await build({ ...common, entryPoints: [join(root, "src/index.js")], format: "esm", outfile: join(dist, "theme.js") });
   console.log(`@xxd/tokens: ${names.length} tokens → dist/`);

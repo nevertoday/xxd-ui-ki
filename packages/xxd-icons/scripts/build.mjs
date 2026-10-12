@@ -19,7 +19,7 @@ await build({
   minify: true,
   legalComments: "none",
   outfile: join(dist, "icons.iife.js"),
-  banner: { js: "/* @xxd/icons — 小小东图标（闭源） */" },
+  banner: { js: "/* @xxd/icons — 小小东图标。Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */" },
 });
 
 for (const name of ICON_NAMES) writeFileSync(join(dist, "svg", `${name}.svg`), iconSVG(name, { size: 24 }) + "\n");

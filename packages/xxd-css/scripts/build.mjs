@@ -23,7 +23,7 @@ for (const dir of [tokensDir, iconsDir]) {
 }
 
 const toShadow = (css) => css.replace(/:root((?:\[[^\]]+\])*)/g, (_, attrs) => (attrs ? `:host(${attrs})` : ":host"));
-const banner = "/* @xxd/css — 小小东原生组件（闭源） */";
+const banner = "/* @xxd/css — 小小东原生组件。Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */";
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });

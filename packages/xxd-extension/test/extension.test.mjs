@@ -125,7 +125,7 @@ describe("CLI：new / sync / status", () => {
         expect(msgs.appName.message).toBeTruthy();
       }
       expect(JSON.parse(readFileSync(join(dir, "_locales/zh_TW/messages.json"), "utf8")).appName.message).toBe("批量存圖");
-      for (const f of ["tokens.css", "xxd.css", "xxd.shadow.css", "xxd.js", "boot.js", "icons.js", "extension.js", "VERSION"]) {
+      for (const f of ["tokens.css", "xxd.css", "xxd.shadow.css", "xxd.js", "boot.js", "icons.js", "extension.js", "VERSION", "LICENSE"]) {
         expect(existsSync(join(dir, "vendor/xxd", f)), f).toBe(true);
       }
       const all = readdirSync(dir).filter((f) => /\.(html|js|json)$/.test(f)).map((f) => readFileSync(join(dir, f), "utf8")).join("\n");
