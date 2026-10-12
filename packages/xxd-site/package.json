@@ -13,7 +13,7 @@
     "visual": "node scripts/visual.mjs",
     "visual:update": "node scripts/visual.mjs --update",
     "audit": "node scripts/audit.mjs",
-    "test": "node --test test/"
+    "test": "node --test 'test/*.test.mjs'"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.3",
