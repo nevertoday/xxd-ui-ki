@@ -18,12 +18,12 @@ const code = (s) => s.trim();
 
   <h2 class="site-h2" id="extension">Chrome 插件</h2>
   <p class="site-p">一分钟新建一个插件，组件拷进插件自己的 <code class="xxd-code-inline">vendor/xxd/</code>（MV3 不能加载远程代码）。</p>
-  <pre class="site-code" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{code(`
+  <pre class="site-code" tabindex="0" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{code(`
 cd xxd-ui-ki
 pnpm xxd new ~/js/插件-今日待办 --name 今日待办 --name-en "Today" --slug today
 pnpm xxd sync ~/js/插件-今日待办     # 以后更新组件
 pnpm xxd status ~/js/插件-*          # 谁落后了`)}</code></pre>
-  <pre class="site-code" style="border:1px solid var(--line);border-radius:var(--r-md);margin-top:var(--space-3)"><code>{code(`
+  <pre class="site-code" tabindex="0" style="border:1px solid var(--line);border-radius:var(--r-md);margin-top:var(--space-3)"><code>{code(`
 <script src="vendor/xxd/boot.js" data-key="today-ui" data-default-density="compact"></script>
 <link rel="stylesheet" href="vendor/xxd/xxd.css">
 <script src="vendor/xxd/icons.js"></script>
@@ -33,7 +33,7 @@ pnpm xxd status ~/js/插件-*          # 谁落后了`)}</code></pre>
 
   <h2 class="site-h2" id="member">会员站（已有一套变量的项目）</h2>
   <p class="site-p">不改样子地接入：layered 令牌（老变量永远优先）、相同的声明改由令牌提供、图标从 @xxd/icons 同步。</p>
-  <pre class="site-code" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{code(`
+  <pre class="site-code" tabindex="0" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{code(`
 // member-cloudflare/xxd.config.json
 { "vendorDir": false, "layeredTokensRegions": ["public/styles.css"], "iconNodesTargets": ["src/lib/xxd-icon-nodes.js"],
   "adopt": { "file": "public/styles.css", "aliases": { "--ui-backdrop": "var(--backdrop)" } } }
@@ -43,7 +43,7 @@ pnpm xxd adopt …/member-cloudflare
 CHROME_EXE=… node scripts/verify/css-vars-diff.cjs before.css after.css   # 应当零变化`)}</code></pre>
 
   <h2 class="site-h2" id="react">React 项目</h2>
-  <pre class="site-code" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{code(`
+  <pre class="site-code" tabindex="0" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{code(`
 import { Button, Dialog, DialogActions, XxdAppearanceProvider } from "@xxd/react";
 import "@xxd/react/standalone.css";       // 不用 Tailwind
 // 或 Tailwind v4：@import "tailwindcss"; @import "@xxd/react/styles.css";`)}</code></pre>

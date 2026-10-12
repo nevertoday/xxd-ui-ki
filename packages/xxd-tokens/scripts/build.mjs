@@ -14,9 +14,77 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 const source = readFileSync(join(root, "tokens.css"), "utf8");
 
-/** :root → :host；:root[...] → :host([...])；保留后代选择器。 */
+// 写在 <html>（Shadow 里是 host）上的外观属性
+const ROOT_ATTR = /^\[data-(?:theme|corners|accent|density|finish|input)\b[^\]]*\]/;
+
+/** 按顶层逗号切选择器列表（:is() / :not() 里的逗号不切）。 */
+function splitSelectors(list) {
+  const parts = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < list.length; i += 1) {
+    const ch = list[i];
+    if (ch === "(" || ch === "[") depth += 1;
+    else if (ch === ")" || ch === "]") depth -= 1;
+    else if (ch === "," && depth === 0) {
+      parts.push(list.slice(start, i));
+      start = i + 1;
+    }
+  }
+  parts.push(list.slice(start));
+  return parts.map((p) => p.trim()).filter(Boolean);
+}
+
+function shadowSelector(list) {
+  const out = [];
+  for (const sel of splitSelectors(list)) {
+    out.push(sel);
+    // 令牌块：host 上的值可能被宿主页面的规则盖掉（页面里 `div { --ink: … }` 会打到 host 上，
+    // 而且外面的规则永远赢过 :host），所以在 Shadow 内部的顶层元素上再声明一次——那里宿主页面够不着。
+    if (/^:host(\([^()]*\))?$/.test(sel)) out.push(`${sel} > *`);
+    // `[data-finish=material] .xxd-btn` 这类：属性写在 host 上时也生效
+    const attr = sel.match(ROOT_ATTR);
+    if (attr && /^\s/.test(sel.slice(attr[0].length))) out.push(`:host(${attr[0]})${sel.slice(attr[0].length)}`);
+  }
+  return out.join(",\n");
+}
+
+/**
+ * 继承属性的隔离：宿主页面的 text-transform / letter-spacing / text-align / line-height … 会穿过 Shadow 边界继承进来。
+ * 在 Shadow 的顶层元素上重置；放在最先声明的 layer 里，所以任何组件样式都赢过它。
+ */
+export const SHADOW_RESET = `@layer xxd.reset {
+  :host > * {
+    color: var(--ink);
+    font: var(--weight-regular) var(--text-sm) / 1.55 var(--font-body);
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-align: start;
+    text-indent: 0;
+    text-shadow: none;
+    white-space: normal;
+    cursor: auto;
+    visibility: visible;
+    hyphens: manual;
+    writing-mode: horizontal-tb;
+    -webkit-text-fill-color: currentcolor;
+    -webkit-font-smoothing: antialiased;
+    font-synthesis: none;
+  }
+}
+`;
+
+/** :root → :host；:root[...] → :host([...])；令牌在 Shadow 内部再声明一次；外观属性选择器加 :host() 版本；继承属性重置。 */
 export function toShadow(css) {
-  return css.replace(/:root((?:\[[^\]]+\])*)/g, (_, attrs) => (attrs ? `:host(${attrs})` : ":host"));
+  const hosted = css
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/:root((?:\[[^\]]+\])*)/g, (_, attrs) => (attrs ? `:host(${attrs})` : ":host"));
+  // 只改规则的选择器（前面是 { } ; 或开头），不碰 @规则
+  const body = hosted.replace(/(^|[{};])(\s*)([^{}@;\s][^{};]*?)(\s*)\{/g, (_, pre, ws, sel, ws2) =>
+    /^(from|to|\d+(\.\d+)?%)(\s*,\s*(from|to|\d+(\.\d+)?%))*$/.test(sel) ? `${pre}${ws}${sel}${ws2}{` : `${pre}${ws}${shadowSelector(sel)}${ws2}{`,
+  );
+  return `${SHADOW_RESET}${body}`;
 }
 
 /** 解析出每个规则块里的自定义属性。 */

@@ -16,8 +16,8 @@ import { ICON_NAMES, ICON_ALIASES, icon } from "../../lib/data.js";
   </header>
   <div class="site-icons" id="icon-grid">
     {ICON_NAMES.map((n) => (
-      <button type="button" data-name={n} data-copy={`<i data-xxd-icon="${n}"></i>`} data-copy-done={`已复制 ${n}`}>
-        <Fragment set:html={icon(n, 24)} />{n}
+      <button type="button" data-name={n} title={n} data-copy={`<i data-xxd-icon="${n}"></i>`} data-copy-done={`已复制 ${n}`}>
+        <Fragment set:html={icon(n, 24)} /><span class="site-icons__name">{n}</span>
       </button>
     ))}
   </div>

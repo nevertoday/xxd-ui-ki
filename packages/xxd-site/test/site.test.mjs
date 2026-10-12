@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { forceStates } from "../scripts/assets.mjs";
-import { extractFunction, withAttr, STATES } from "../src/lib/markup.js";
+import { embed, extractFunction, withAttr, STATES } from "../src/lib/markup.js";
 
 test("forceStates：把 :hover / :focus-visible / :active 复制成 [data-force] 版本，包在 xxd.components 层里", () => {
   const css = `@layer xxd.components { .xxd-btn:hover { background: red; } .xxd-btn:focus-visible { outline: 1px solid; } @media (max-width: 400px) { .a:active { color: blue; } } @keyframes k { from { opacity: 0 } } .plain { color: x; } }`;
@@ -24,4 +24,9 @@ test("extractFunction 抽出某个演示函数的源码", () => {
   assert.equal(extractFunction(src, "ADemo"), "export function ADemo() {\n  return 1;\n}");
   assert.equal(extractFunction(src, "BDemo"), "export function BDemo() {\n  return 2;\n}");
   assert.equal(extractFunction(src, "None"), "");
+});
+
+test("embed：示例里的 main / aside 换成 div（不和站点的 main 打架）", () => {
+  assert.equal(embed('<main class="a"><aside id="s">x</aside></main>'), '<div data-landmark="main" class="a"><div data-landmark="aside" id="s">x</div></div>');
+  assert.equal(embed("<mainly>"), "<mainly>");
 });

@@ -77,10 +77,12 @@ export function Settings({ className, ...rest }: HTMLAttributes<HTMLDivElement>)
   return <div className={cx("xxd-settings", className)} {...rest} />;
 }
 
-export function SettingsGroup({ title, note, children, className }: { title?: ReactNode; note?: ReactNode; children: ReactNode; className?: string }) {
+/** level：组名的标题级别。缺省 2（设置页的 h1 下面一层）；放在更深的地方时改 3。 */
+export function SettingsGroup({ title, note, children, className, level = 2 }: { title?: ReactNode; note?: ReactNode; children: ReactNode; className?: string; level?: 2 | 3 | 4 }) {
+  const Heading = `h${level}` as "h2" | "h3" | "h4";
   return (
     <section className={cx("xxd-group", className)}>
-      {title != null && <h3 className="xxd-group__title">{title}</h3>}
+      {title != null && <Heading className="xxd-group__title">{title}</Heading>}
       <div className="xxd-group__body">{children}</div>
       {note != null && <p className="xxd-group__note">{note}</p>}
     </section>
@@ -201,9 +203,20 @@ export function Rail({ items, current, label = "主导航" }: { items: { href: s
 /* ── Swatches：主色预设 ── */
 export function Swatches({ value, onValueChange, presets = ACCENT_PRESETS, label }: { value: string; onValueChange: (value: string) => void; presets?: readonly { id: string; name: string; zh?: string }[]; label?: string }) {
   const { locale, t } = useXxdLocale();
+  const ref = useRef<HTMLDivElement>(null);
+  const current = Math.max(0, presets.findIndex((p) => p.id === (value || "")));
+  // 一组单选：← → ↑ ↓ Home End 选择并移动焦点，Tab 只停在选中的那一个
+  const onKeyDown = (e: KeyboardEvent) => {
+    const keys: Record<string, number> = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 };
+    if (!(e.key in keys) && e.key !== "Home" && e.key !== "End") return;
+    e.preventDefault();
+    const n = e.key === "Home" ? 0 : e.key === "End" ? presets.length - 1 : (current + keys[e.key] + presets.length) % presets.length;
+    onValueChange(presets[n].id);
+    requestAnimationFrame(() => ref.current?.querySelectorAll<HTMLButtonElement>("[role=radio]")[n]?.focus());
+  };
   return (
-    <div className="xxd-swatches" role="radiogroup" aria-label={label ?? t.accent}>
-      {presets.map((p) => {
+    <div ref={ref} className="xxd-swatches" role="radiogroup" aria-label={label ?? t.accent} onKeyDown={onKeyDown}>
+      {presets.map((p, i) => {
         const name = locale === "en" ? p.name : p.zh || p.name;
         return (
           <button
@@ -211,6 +224,7 @@ export function Swatches({ value, onValueChange, presets = ACCENT_PRESETS, label
             type="button"
             role="radio"
             className="xxd-swatch"
+            tabIndex={i === current ? 0 : -1}
             aria-checked={(value || "") === p.id}
             aria-label={name}
             data-tooltip={name}

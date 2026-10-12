@@ -19,5 +19,5 @@ const headings = [{ slug: "demo", text: "演示" }, ...(p.anatomy ? [{ slug: "an
   <Demo markup={p.markup} block={p.block ?? true} align="start" />
   {p.anatomy && (<><h2 class="site-h2" id="anatomy">结构</h2><ul class="site-rules">{p.anatomy.map((a) => <li>{a}</li>)}</ul></>)}
   {p.rules?.length > 0 && (<><h2 class="site-h2" id="rules">规则</h2><ul class="site-rules">{p.rules.map((r) => <li>{r}</li>)}</ul></>)}
-  {p.js && (<><h2 class="site-h2" id="js">JS</h2><pre class="site-code" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{p.js}</code></pre></>)}
+  {p.js && (<><h2 class="site-h2" id="js">JS</h2><pre class="site-code" tabindex="0" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{p.js}</code></pre></>)}
 </Site>

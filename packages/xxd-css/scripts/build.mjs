@@ -1,7 +1,7 @@
 // 构建 @xxd/css：
 //   dist/components.css   只有组件（需要另外引入 tokens.css）
 //   dist/xxd.css          令牌 + 组件（一个文件搞定）
-//   dist/xxd.shadow.css   Shadow DOM 版本（:root → :host）
+//   dist/xxd.shadow.css   Shadow DOM 版本（:root → :host；宿主页面的继承样式和同名变量进不来）
 //   dist/xxd.js           经典脚本 window.Xxd（自动 install）
 //   dist/xxd.esm.js       ESM 打包版
 //   dist/boot.js          @xxd/tokens 首帧脚本（方便一起拷进插件）
@@ -22,7 +22,8 @@ for (const dir of [tokensDir, iconsDir]) {
   if (!existsSync(join(dir, "dist"))) execFileSync("node", ["scripts/build.mjs"], { cwd: dir, stdio: "inherit" });
 }
 
-const toShadow = (css) => css.replace(/:root((?:\[[^\]]+\])*)/g, (_, attrs) => (attrs ? `:host(${attrs})` : ":host"));
+// 和 @xxd/tokens 用同一个转换（:root → :host、令牌在 Shadow 内部再声明、继承属性重置）
+const { toShadow } = await import("../../xxd-tokens/scripts/build.mjs");
 const banner = "/* @xxd/css — 小小东原生组件。Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */";
 
 rmSync(dist, { recursive: true, force: true });
@@ -40,7 +41,7 @@ const components = cssResult.outputFiles[0].text;
 const tokens = readFileSync(join(tokensDir, "tokens.css"), "utf8");
 writeFileSync(join(dist, "components.css"), `${banner}\n${components}`);
 writeFileSync(join(dist, "xxd.css"), `${banner}\n${tokens}\n${components}`);
-writeFileSync(join(dist, "xxd.shadow.css"), `${banner}\n${toShadow(tokens)}\n${toShadow(components)}`);
+writeFileSync(join(dist, "xxd.shadow.css"), `${banner}\n${toShadow(`${tokens}\n${components}`)}`);
 
 const minCss = await build({ stdin: { contents: `${tokens}\n${components}`, loader: "css" }, write: false, minify: true, target: ["chrome114"] });
 writeFileSync(join(dist, "xxd.min.css"), `${banner}\n${minCss.outputFiles[0].text}`);

@@ -1,5 +1,6 @@
 // 结构类组件的行为：侧栏（折叠 / 子菜单 / 拖宽）、工具条键盘、文章目录高亮、面包屑折叠、横幅关闭、tab 溢出。
 import { emit } from "./dom.js";
+import { t } from "./i18n.js";
 
 /* ── 侧栏 ── */
 export function toggleSidebar(sidebar, collapsed = !sidebar.hasAttribute("data-collapsed")) {
@@ -71,7 +72,7 @@ export function collapseBreadcrumbs(crumbs) {
   const gap = document.createElement("li");
   gap.className = "xxd-breadcrumbs__gap";
   const id = `crumbs-${Math.random().toString(36).slice(2, 8)}`;
-  gap.innerHTML = `<button class="xxd-breadcrumbs__more" data-xxd-menu="${id}" aria-label="显示 ${hidden.length} 级">…</button><div class="xxd-menu" id="${id}" role="menu" popover></div>`;
+  gap.innerHTML = `<button class="xxd-breadcrumbs__more" data-xxd-menu="${id}" aria-label="${t("showLevels", { n: hidden.length }, crumbs)}">…</button><div class="xxd-menu" id="${id}" role="menu" popover></div>`;
   const menu = gap.querySelector(".xxd-menu");
   for (const li of hidden) {
     const a = li.querySelector("a");
@@ -126,7 +127,10 @@ export function installStructure(root, byId, closestFrom) {
     if (close) {
       const banner = close.closest(".xxd-banner");
       banner.setAttribute("data-leaving", "");
+      // 关掉的东西里有焦点：先把焦点交给后面（或前面）最近的可聚焦元素，不让它掉到 body 上
+      const hadFocus = banner.contains(banner.getRootNode().activeElement);
       setTimeout(() => {
+        if (hadFocus) nearestFocusable(banner)?.focus();
         banner.remove();
       }, 130);
       emit(document, "xxd:banner-close", { id: banner.id });
@@ -168,3 +172,10 @@ export function installStructure(root, byId, closestFrom) {
   });
 }
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+/** el 之后（没有就之前）文档顺序里第一个可聚焦、可见的元素（el 自己里面的不算）。 */
+function nearestFocusable(el) {
+  const all = [...el.getRootNode().querySelectorAll(FOCUSABLE)].filter((n) => !el.contains(n) && n.getClientRects().length);
+  const after = all.find((n) => el.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_FOLLOWING);
+  return after ?? all.filter((n) => el.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_PRECEDING).pop();
+}

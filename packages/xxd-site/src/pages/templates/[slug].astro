@@ -2,6 +2,7 @@
 import Site from "../../layouts/Site.astro";
 import { templates } from "../../data/templates.js";
 import { icon } from "../../lib/data.js";
+import { embed } from "../../lib/markup.js";
 export function getStaticPaths() {
   return templates.map((t) => ({ params: { slug: t.slug }, props: { t } }));
 }
@@ -19,7 +20,7 @@ const { t } = Astro.props;
     </div>
   </header>
   <div class="site-template" style={`border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:var(--bg);${t.width ? `max-width:${t.width}px;` : ""}${t.height ? `height:${t.height}px;` : ""}`}>
-    <div class="xxd-page" style="height:100%;position:relative" set:html={t.markup} />
+    <div class="xxd-page" style="height:100%;position:relative" set:html={embed(t.markup)} />
   </div>
   <pre id="tpl-src" hidden><code>{t.markup.trim()}</code></pre>
 </Site>

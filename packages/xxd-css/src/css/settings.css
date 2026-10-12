@@ -3,7 +3,7 @@
  * 列表只在行之间画线，第一行上面、最后一行下面都不画。选中行是一层淡色，不加彩色边或竖条。
  *
  *   <section class="xxd-group">
- *     <h3 class="xxd-group__title">外观</h3>
+ *     <h2 class="xxd-group__title">外观</h2>
  *     <div class="xxd-group__body">
  *       <div class="xxd-row">
  *         <div class="xxd-row__text"><div class="xxd-row__title">圆角</div><div class="xxd-row__desc">只影响这个插件</div></div>
@@ -155,6 +155,7 @@
   }
 
   .xxd-list > .xxd-list__item[aria-selected="true"],
+  .xxd-list > .xxd-list__item[aria-current]:not([aria-current="false"]),
   .xxd-list > .xxd-list__item[data-selected] {
     background: var(--selected-bg);
   }

@@ -30,6 +30,8 @@ export { mountAppearance, APPEARANCE_LABELS } from "./appearance.js";
 export { chartTokens, chartPalette, chartOptions, watchChartTheme, sparkline, initSparklines } from "./chart.js";
 export { bindDrop, openViewer, flip, setStatus, rollText, celebrate, filterSettings, bindSettingsSearch } from "./patterns.js";
 export { ICON } from "./icons-min.js";
+export { setLocale, getLocale, resolveLocale, t } from "./i18n.js";
+export { layerRoot } from "./dom.js";
 
 const installed = new WeakSet();
 

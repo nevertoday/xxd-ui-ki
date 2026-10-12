@@ -12,10 +12,17 @@ const base = blocks[":root"];
 const dark = blocks[':root[data-theme="dark"]'];
 const rounded = blocks[':root[data-corners="rounded"]'];
 const rgb = (hex) => toRgb(hex);
+const hsl = (h, s, l) => {
+  s /= 100; l /= 100;
+  const k = (n) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)))));
+  return "#" + [f(0), f(8), f(4)].map((v) => v.toString(16).padStart(2, "0")).join("");
+};
 
-test("正文与次要文字对比度 ≥ 4.5（亮/暗，paper 和 wash 上）", () => {
+test("正文与次要文字对比度 ≥ 4.5（亮/暗，paper / bg / wash / wash-strong / 选中底上）", () => {
   for (const [name, mode] of [["light", base], ["dark", { ...base, ...dark }]]) {
-    for (const surface of ["--paper", "--bg", "--wash"]) {
+    for (const surface of ["--paper", "--bg", "--wash", "--wash-strong", "--selected-bg"]) {
       for (const text of ["--ink", "--muted"]) {
         const ratio = contrast(rgb(mode[text]), rgb(mode[surface]));
         assert.ok(ratio >= 4.5, `${name}: ${text} on ${surface} = ${ratio.toFixed(2)}`);
@@ -42,7 +49,7 @@ test("语义色做底：白字 ≥ 4.5，暗纸上做标记 ≥ 3", () => {
   }
 });
 
-test("18 个主色 × 亮/暗：标记 ≥ 3，文字版 ≥ 4.5，颜色上的文字 ≥ 3", () => {
+test("18 个主色 × 亮/暗：标记 ≥ 3，文字版 ≥ 4.5，实心底（含 hover）上的字 ≥ 4.5", () => {
   assert.equal(ACCENT_PRESETS.length, 18);
   assert.equal(ACCENT_PRESETS[0].id, "", "第一个是墨色");
   for (const preset of ACCENT_PRESETS.slice(1)) {
@@ -57,12 +64,30 @@ test("18 个主色 × 亮/暗：标记 ≥ 3，文字版 ≥ 4.5，颜色上的�
       const ratio = contrast(rgb(hex), paper);
       assert.ok(ratio >= min - 0.01, `${preset.name} ${label}: ${ratio.toFixed(2)}`);
     }
-    for (const [bg, on] of [["--action-custom", "--on-action-custom"], ["--action-custom-dark", "--on-action-custom-dark"]]) {
+    for (const [bg, on] of [
+      ["--action-fill-custom", "--on-action-custom"],
+      ["--action-fill-hover-custom", "--on-action-custom"],
+      ["--action-fill-custom-dark", "--on-action-custom-dark"],
+      ["--action-fill-hover-custom-dark", "--on-action-custom-dark"],
+    ]) {
       const ratio = contrast(rgb(p[bg]), rgb(p[on]));
-      assert.ok(ratio >= 3, `${preset.name} ${on}: ${ratio.toFixed(2)}`);
+      assert.ok(ratio >= 4.5, `${preset.name} ${on} on ${bg}: ${ratio.toFixed(2)}`);
     }
+    // 文字版放在选中底上（chip、选中的导航项）也 ≥ 4.5
+    const sel = (paper, mark, t) => paper.map((v, i) => Math.round(v + (mark[i] - v) * t));
+    assert.ok(contrast(rgb(p["--action-text-custom"]), sel(LIGHT_PAPER, rgb(p["--action-custom"]), 0.13)) >= 4.5, `${preset.name} light text on selected`);
+    assert.ok(contrast(rgb(p["--action-text-custom-dark"]), sel(DARK_PAPER, rgb(p["--action-custom-dark"]), 0.18)) >= 4.5, `${preset.name} dark text on selected`);
+    // 实心底仍是同一个颜色：在纸上 ≥ 3，压暗不超过 25%
+    assert.ok(contrast(rgb(p["--action-fill-custom-dark"]), DARK_PAPER) >= 3 - 0.01, `${preset.name} dark fill mark`);
   }
   assert.equal(accentPalette(""), null);
+  // 任意颜色（不只是预设）也成立：扫一圈色相 × 明度
+  for (let h = 0; h < 360; h += 15) for (const l of [35, 50, 65, 80]) {
+    const c = hsl(h, 70, l);
+    const p = accentPalette(c);
+    for (const [bg, on] of [["--action-fill-custom", "--on-action-custom"], ["--action-fill-custom-dark", "--on-action-custom-dark"], ["--action-fill-hover-custom", "--on-action-custom"], ["--action-fill-hover-custom-dark", "--on-action-custom-dark"]])
+      assert.ok(contrast(rgb(p[bg]), rgb(p[on])) >= 4.5, `${c} ${bg}`);
+  }
 });
 
 test("默认直角：五档矩形圆角都是 0；圆角模式 4/6/10/14/999；语义圆不跟开关", () => {
@@ -90,6 +115,22 @@ test("Shadow 版本：:root → :host", () => {
   assert.ok(!/:root/.test(shadow.replace(/\/\*[\s\S]*?\*\//g, "")));
   assert.match(shadow, /:host\(\[data-theme="dark"\]\[data-accent\]\)/);
   assert.match(shadow, /:host\(\[data-corners="rounded"\]\)/);
+});
+
+test("Shadow 版本：宿主页面打不进来（O8）", () => {
+  const shadow = toShadow(css);
+  // 令牌在 Shadow 内部的顶层元素上再声明一次（宿主页面的 `div { --ink: … }` 会打到 host 上）
+  assert.match(shadow, /:host,\n:host > \* \{/);
+  assert.match(shadow, /:host\(\[data-theme="dark"\]\),\n:host\(\[data-theme="dark"\]\) > \* \{/);
+  // 继承属性在最先声明的 layer 里重置
+  assert.ok(shadow.startsWith("@layer xxd.reset {"));
+  for (const prop of ["text-transform: none", "letter-spacing: normal", "text-align: start", "word-spacing: normal", "cursor: auto"]) assert.ok(shadow.includes(prop), prop);
+  // 写在 host 上的外观属性：后代选择器多一个 :host() 版本；:is() 里的逗号不切
+  const out = toShadow('@layer x { [data-finish="material"] .b:not([data-finish="flat"] *, .c):active, .d { color: red; } @keyframes k { from { opacity: 0 } to { opacity: 1 } } }');
+  assert.match(out, /:host\(\[data-finish="material"\]\) \.b:not\(\[data-finish="flat"\] \*, \.c\):active/);
+  assert.match(out, /\[data-finish="material"\] \.b:not\(\[data-finish="flat"\] \*, \.c\):active,\n/);
+  assert.match(out, /from \{ opacity: 0 \}/);
+  assert.ok(!/:host\(from/.test(out));
 });
 
 function fakeElement() {
@@ -137,4 +178,16 @@ test("layered 版本：整份放进 @layer xxd.tokens，不带全局减少动效
   assert.ok(layered.includes(':where(:root[data-theme="dark"])'));
   assert.ok(!/(^|[^(]):root\[data-theme="dark"\] \{/m.test(layered), "不留下和老项目同形的 :root[...] 块");
   assert.equal((layered.match(/\{/g) || []).length, (layered.match(/\}/g) || []).length);
+});
+
+test("prefers-contrast: more：控件边框 ≥ 3（纸 / wash / 选中底），次要文字 ≥ 4.5", () => {
+  const more = css.slice(css.indexOf("@media (prefers-contrast: more)"));
+  const light = parseBlocks(more.slice(0, more.indexOf(':root[data-theme="dark"],')))[":root,\n  :root[data-accent]"] ?? Object.values(parseBlocks(more.slice(0, more.indexOf(':root[data-theme="dark"],'))))[0];
+  const darkMore = Object.values(parseBlocks(more.slice(more.indexOf(':root[data-theme="dark"],'), more.indexOf("/* 减少动效"))))[0];
+  for (const [name, mode] of [["light", { ...base, ...light }], ["dark", { ...base, ...dark, ...darkMore }]]) {
+    for (const surface of ["--paper", "--bg", "--wash", "--selected-bg"]) {
+      assert.ok(contrast(rgb(mode["--line-strong"]), rgb(mode[surface])) >= 3, `${name} line-strong on ${surface}`);
+      assert.ok(contrast(rgb(mode["--muted"]), rgb(mode[surface])) >= 4.5, `${name} muted on ${surface}`);
+    }
+  }
 });

@@ -167,7 +167,7 @@
   }
 
   .site-nav a span {
-    color: var(--muted-2);
+    color: var(--muted);
     font: var(--text-2xs) var(--font-mono);
   }
 
@@ -218,7 +218,7 @@
   }
 
   .site-toc__md {
-    color: var(--muted-2) !important;
+    color: var(--muted) !important;
   }
 
   /* 正文 */
@@ -428,7 +428,7 @@
   }
 
   .site-wall__name span {
-    color: var(--muted-2);
+    color: var(--muted);
     font: var(--text-2xs) var(--font-mono);
   }
 
@@ -542,6 +542,15 @@
   .site-icons button:hover {
     background: var(--wash);
     color: var(--ink);
+  }
+
+  /* 图标名不拆词：放不下就省略号，完整名字在 title 里 */
+  .site-icons__name {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow-wrap: normal;
   }
 
   .site-icons button svg {

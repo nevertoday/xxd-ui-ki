@@ -237,7 +237,7 @@
   }
 
   .xxd-code .tok-c {
-    color: var(--muted-2);
+    color: var(--muted);
     font-style: italic;
   }
 
@@ -316,7 +316,7 @@
   .xxd-badge[data-variant="new"] {
     height: 16px;
     padding: 0 5px;
-    background: var(--action);
+    background: var(--action-fill);
     color: var(--on-action);
     font-size: 10px;
     letter-spacing: 0;

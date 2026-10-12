@@ -27,8 +27,9 @@ export const XXD_COLOR: Record<string, string> = {
   "kumo-fill": "var(--wash-strong, #ececee)",
   "kumo-fill-hover": "var(--wash, #f4f4f5)",
   // 强调：墨色或主色
-  "kumo-brand": "var(--action, #111111)",
-  "kumo-brand-hover": "color-mix(in srgb, var(--action, #111111) 84%, var(--paper, #ffffff))",
+  // 实心底（上面放白字）：主色时是压暗到 4.5:1 的 fill
+  "kumo-brand": "var(--action-fill, var(--action, #111111))",
+  "kumo-brand-hover": "var(--action-fill-hover, color-mix(in srgb, var(--action, #111111) 84%, var(--paper, #ffffff)))",
   // 线
   "kumo-line": "var(--line, #e7e7ea)",
   "kumo-hairline": "var(--line, #e7e7ea)",
@@ -52,10 +53,10 @@ export const XXD_COLOR: Record<string, string> = {
   "kumo-badge-red": "var(--danger-strong, #b42318)",
   "kumo-badge-green": "var(--success-strong, #15803d)",
   "kumo-badge-orange": "var(--warning-strong, #b45309)",
-  "kumo-badge-purple": "var(--action, #111111)",
-  "kumo-badge-teal": "var(--action, #111111)",
-  "kumo-badge-blue": "var(--action, #111111)",
-  "kumo-badge-neutral": "var(--muted, #6f6f6f)",
+  "kumo-badge-purple": "var(--action-fill, var(--action, #111111))",
+  "kumo-badge-teal": "var(--action-fill, var(--action, #111111))",
+  "kumo-badge-blue": "var(--action-fill, var(--action, #111111))",
+  "kumo-badge-neutral": "var(--muted, #6b6b6b)",
   "kumo-badge-inverted": "var(--ink, #111111)",
 };
 
@@ -63,9 +64,9 @@ export const XXD_TEXT: Record<string, string> = {
   "kumo-default": "var(--ink, #111111)",
   "kumo-inverse": "var(--on-ink, #ffffff)",
   "kumo-strong": "var(--ink, #111111)",
-  "kumo-subtle": "var(--muted, #6f6f6f)",
+  "kumo-subtle": "var(--muted, #6b6b6b)",
   "kumo-inactive": "var(--muted-2, #9a968d)",
-  "kumo-placeholder": "var(--muted-2, #9a968d)",
+  "kumo-placeholder": "var(--muted, #6b6b6b)",
   "kumo-brand": "var(--action-text, #111111)",
   "kumo-link": "var(--action-text, #111111)",
   "kumo-info": "var(--ink, #111111)",

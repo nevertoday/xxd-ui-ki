@@ -22,17 +22,17 @@
 
   .xxd-badge[data-tone="success"] {
     background: color-mix(in srgb, var(--success) 12%, var(--paper));
-    color: var(--success);
+    color: color-mix(in srgb, var(--success) 78%, var(--ink)); /* 淡底上也 ≥ 4.5 */
   }
 
   .xxd-badge[data-tone="danger"] {
     background: color-mix(in srgb, var(--danger) 12%, var(--paper));
-    color: var(--danger);
+    color: color-mix(in srgb, var(--danger) 78%, var(--ink)); /* 淡底上也 ≥ 4.5 */
   }
 
   .xxd-badge[data-tone="warning"] {
     background: color-mix(in srgb, var(--warning) 14%, var(--paper));
-    color: var(--warning);
+    color: color-mix(in srgb, var(--warning) 78%, var(--ink)); /* 淡底上也 ≥ 4.5 */
   }
 
   .xxd-badge[data-variant="solid"] {
@@ -41,7 +41,7 @@
   }
 
   .xxd-badge[data-variant="solid"][data-tone="action"] {
-    background: var(--action);
+    background: var(--action-fill);
     color: var(--on-action);
   }
 

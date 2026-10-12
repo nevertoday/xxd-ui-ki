@@ -19,6 +19,16 @@ describe("registry.json", () => {
     expect(new Set(names).size).toBe(names.length);
   });
 
+  it("每个组件都有简介和「键盘与读屏」说明（O8）", () => {
+    const missing = registry.components.filter((c) => !c.summary || !c.a11y?.length).map((c) => c.name);
+    expect(missing).toEqual([]);
+  });
+
+  it("示例里没有写死的宽度（width: Npx 会在手机上溢出，用 max-width）", () => {
+    const bad = [...registry.components, ...patternsFile.patterns].filter((c) => /style="[^"]*(?<!max-|min-)width:\s*\d+px/.test(c.markup)).map((c) => c.name);
+    expect(bad).toEqual([]);
+  });
+
   it("模式（patterns.json）登记的类也都存在，slug 唯一", () => {
     const missing = patternsFile.patterns.flatMap((p) => p.classes.filter((k) => !defined.has(k)).map((k) => `${p.name}: ${k}`));
     expect(missing).toEqual([]);

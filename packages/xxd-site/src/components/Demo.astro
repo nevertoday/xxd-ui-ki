@@ -1,7 +1,7 @@
 ---
 // 活演示：上面是真的组件，下面是代码。有 React 版时多一个「React」标签页，两种实现并排。
 import { icon } from "../lib/data.js";
-import { extractFunction, nextId } from "../lib/markup.js";
+import { embed, extractFunction, nextId } from "../lib/markup.js";
 import ReactDemo from "../react/ReactDemo.tsx";
 import demoSource from "../react/demos.tsx?raw";
 
@@ -20,7 +20,7 @@ const hasReact = Boolean(reactCode);
 
 <div class="site-demo" data-demo={title}>
   <div id={`${id}-native`}>
-    <div class="site-demo__stage" data-align={align} data-block={block ? "" : undefined} set:html={markup} />
+    <div class="site-demo__stage" data-align={align} data-block={block ? "" : undefined} set:html={embed(markup)} />
   </div>
   {
     hasReact && (
@@ -40,8 +40,8 @@ const hasReact = Boolean(reactCode);
       <Fragment set:html={icon("Code", 14)} />代码
     </button>
   </div>
-  <pre class="site-code" id={`${id}-code1`} hidden><code>{markup.trim()}</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="复制" data-copy-target={`#${id}-code1 code`} set:html={icon("Copy", 14)} /></pre>
-  {hasReact && <pre class="site-code" id={`${id}-code2`} hidden><code>{reactCode}</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="复制" data-copy-target={`#${id}-code2 code`} set:html={icon("Copy", 14)} /></pre>}
+  <pre class="site-code" tabindex="0" id={`${id}-code1`} hidden><code>{markup.trim()}</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="复制" data-copy-target={`#${id}-code1 code`} set:html={icon("Copy", 14)} /></pre>
+  {hasReact && <pre class="site-code" tabindex="0" id={`${id}-code2`} hidden><code>{reactCode}</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="复制" data-copy-target={`#${id}-code2 code`} set:html={icon("Copy", 14)} /></pre>}
 </div>
 
 <script is:inline>

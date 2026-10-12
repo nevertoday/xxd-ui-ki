@@ -25,7 +25,7 @@ const sidepanel = `
     </section>
     <section id="sp-p3" style="padding:14px" class="xxd-settings">
       <div class="xxd-group__body"><div class="xxd-account"><span class="xxd-avatar" data-member style="--avatar-size:32px">东</span><div class="xxd-account__main"><div class="xxd-account__name">小小东</div><div class="xxd-plan-line" data-tone="member">会员 · 到 2027年11月8日</div></div><button class="xxd-btn" data-size="sm">管理</button></div></div>
-      <section class="xxd-group"><h3 class="xxd-group__title">排序</h3><div class="xxd-group__body">
+      <section class="xxd-group"><h2 class="xxd-group__title">排序</h2><div class="xxd-group__body">
         <div class="xxd-row"><div class="xxd-row__text"><div class="xxd-row__title">新的一组先用</div></div><div class="xxd-row__control"><label class="xxd-select" data-variant="bare"><select aria-label="新的一组先用"><option>渐变</option><option>原样</option></select></label></div></div>
         <div class="xxd-row"><div class="xxd-row__text"><div class="xxd-row__title">只留图片链接</div><div class="xxd-row__desc">去掉没有图片后缀的链接</div></div><div class="xxd-row__control"><input type="checkbox" role="switch" class="xxd-switch" checked aria-label="只留图片链接"></div></div>
       </div></section>
@@ -60,17 +60,17 @@ const settings = `
   <h1 class="xxd-text" data-variant="heading1" style="margin-bottom:16px">设置</h1>
   <div class="xxd-input-wrap" style="margin-bottom:20px">${I("Search")}<input class="xxd-input" type="search" placeholder="搜索设置（⌘F）" aria-label="搜索设置"><button class="xxd-input-clear" aria-label="清空">${I("X", 14)}</button></div>
   <div class="xxd-settings">
-    <section class="xxd-group"><h3 class="xxd-group__title">账号</h3><div class="xxd-group__body"><div class="xxd-account"><span class="xxd-avatar" style="--avatar-size:36px">东</span><div class="xxd-account__main"><div class="xxd-account__name">小小东</div><div class="xxd-plan-line">免费版 · 今天还能写入 3 篇</div></div><button class="xxd-btn" data-size="sm" data-variant="primary">开通会员</button></div></div></section>
-    <section class="xxd-group"><h3 class="xxd-group__title">写入</h3><div class="xxd-group__body">
+    <section class="xxd-group"><h2 class="xxd-group__title">账号</h2><div class="xxd-group__body"><div class="xxd-account"><span class="xxd-avatar" style="--avatar-size:36px">东</span><div class="xxd-account__main"><div class="xxd-account__name">小小东</div><div class="xxd-plan-line">免费版 · 今天还能写入 3 篇</div></div><button class="xxd-btn" data-size="sm" data-variant="primary">开通会员</button></div></div></section>
+    <section class="xxd-group"><h2 class="xxd-group__title">写入</h2><div class="xxd-group__body">
       <div class="xxd-row" data-keywords="标题 title"><div class="xxd-row__text"><div class="xxd-row__title">写入标题</div><div class="xxd-row__desc">第一行 # 标题作为文章标题</div></div><div class="xxd-row__control"><input type="checkbox" role="switch" class="xxd-switch" checked aria-label="写入标题"></div></div>
       <div class="xxd-row" data-keywords="标点 引号"><div class="xxd-row__text"><div class="xxd-row__title">智能标点</div></div><div class="xxd-row__control"><input type="checkbox" role="switch" class="xxd-switch" checked aria-label="智能标点"></div></div>
       <a class="xxd-row" href="#"><div class="xxd-row__text"><div class="xxd-row__title">本地图片文件夹</div><div class="xxd-row__desc">未连接</div></div></a>
     </div></section>
-    <section class="xxd-group"><h3 class="xxd-group__title">AI 服务</h3><div class="xxd-group__body">
+    <section class="xxd-group"><h2 class="xxd-group__title">AI 服务</h2><div class="xxd-group__body">
       <div class="xxd-row" data-stack><div class="xxd-row__text"><div class="xxd-row__title">API 密钥</div><div class="xxd-row__desc">只保存在这台电脑上</div></div><div class="xxd-input-group xxd-secret" data-xxd-secret><input type="password" value="sk_live_4f8a2c91d7e3b6a0" readonly aria-label="API 密钥"><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-toggle aria-label="显示">${I("Eye")}</button><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-copy aria-label="复制">${I("Copy")}</button></div></div>
     </div></section>
     <div id="tpl-appearance"></div>
-    <section class="xxd-group"><h3 class="xxd-group__title">关于</h3><div class="xxd-group__body">
+    <section class="xxd-group"><h2 class="xxd-group__title">关于</h2><div class="xxd-group__body">
       <div class="xxd-row"><div class="xxd-row__text"><div class="xxd-row__title">版本</div></div><div class="xxd-row__control xxd-text" data-variant="mono-secondary">1.8.2</div></div>
       <a class="xxd-row" href="#"><div class="xxd-row__text"><div class="xxd-row__title">隐私政策</div></div></a>
     </div></section>
@@ -122,7 +122,7 @@ const resourceList = `
   </header>
   <div class="xxd-cluster" style="margin-bottom:12px"><div class="xxd-input-wrap" style="width:260px">${I("Search")}<input class="xxd-input" data-size="sm" type="search" placeholder="搜索插件" aria-label="搜索插件"></div><button class="xxd-chip" aria-pressed="true">全部</button><button class="xxd-chip">落后</button><button class="xxd-chip">待发布</button></div>
   <div class="xxd-table-wrap"><table class="xxd-table" data-interactive>
-    <thead><tr><th class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-all aria-label="全选"></th><th aria-sort="ascending"><button class="xxd-th-sort">插件</button></th><th>UI Kit</th><th aria-sort="none" data-align="end"><button class="xxd-th-sort">用户</button></th><th>状态</th><th class="xxd-table__actions"></th></tr></thead>
+    <thead><tr><th class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-all aria-label="全选"></th><th aria-sort="ascending"><button class="xxd-th-sort">插件</button></th><th>UI Kit</th><th aria-sort="none" data-align="end"><button class="xxd-th-sort">用户</button></th><th>状态</th><th class="xxd-table__actions"><span class="xxd-sr-only">操作</span></th></tr></thead>
     <tbody>
       ${[["长文发布", "最新", "2,410", "success", "已上架"], ["排序链接", "落后 2", "830", "warning", "待发布"], ["批量存图", "未接入", "5,102", "", "已上架"], ["今日待办", "最新", "312", "action", "审核中"]].map(([n, v, u, t, s]) => `<tr><td class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-row aria-label="选择 ${n}"></td><td><span class="xxd-logo" data-size="sm"><span class="xxd-logo__mark"></span>${n}</span></td><td>${v}</td><td data-align="end">${u}</td><td><span class="xxd-badge" data-appearance="dot" ${t ? `data-tone="${t}"` : ""}>${s}</span></td><td class="xxd-table__actions"><button class="xxd-btn xxd-reveal" data-variant="ghost" data-size="xs">同步</button></td></tr>`).join("")}
     </tbody>

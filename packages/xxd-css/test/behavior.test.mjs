@@ -164,6 +164,11 @@ describe("外观设置组", () => {
     expect(set).toHaveBeenCalledWith({ corners: "rounded" });
     host.querySelector('.xxd-swatch[data-value="#3b74b8"]').click();
     expect(state.accent).toBe("#3b74b8");
+    // 色块是一组单选：← 回到墨色，Tab 只停在选中的那一个
+    const lake = host.querySelector('.xxd-swatch[data-value="#3b74b8"]');
+    key(lake, "ArrowLeft");
+    expect(state.accent).toBe("");
+    expect([...host.querySelectorAll(".xxd-swatch")].map((b) => b.tabIndex)).toEqual([0, -1]);
     host.querySelector('[data-name="theme"] [data-value="dark"]').click();
     expect(state.theme).toBe("dark");
 
@@ -598,5 +603,128 @@ describe("O7 图表", () => {
     html(`<span class="xxd-stat__spark" data-spark="1,2,3"></span>`);
     Xxd.init(document);
     expect(document.querySelector("[data-spark] svg")).toBeTruthy();
+  });
+});
+
+describe("O8 加固", () => {
+  afterEach(() => {
+    Xxd.setLocale(null);
+    document.documentElement.removeAttribute("lang");
+  });
+
+  it("三语：缺省跟 <html lang>，setLocale 可以固定；参数仍然优先", async () => {
+    document.documentElement.lang = "en";
+    expect(Xxd.getLocale()).toBe("en");
+    const p = Xxd.confirmDialog({ title: "Delete?" });
+    const dialog = document.querySelector("dialog.xxd-dialog");
+    expect([...dialog.querySelectorAll(".xxd-dialog__actions button")].map((b) => b.textContent)).toEqual(["Cancel", "OK"]);
+    dialog.close("cancel");
+    await p;
+    Xxd.setLocale("zh-TW");
+    expect(Xxd.t("cancel")).toBe("取消");
+    expect(Xxd.t("loading")).toBe("正在載入…");
+    expect(Xxd.resolveLocale("zh-HK")).toBe("zh-Hant");
+    expect(Xxd.resolveLocale("zh")).toBe("zh-CN");
+    expect(Xxd.resolveLocale("fr")).toBe("en");
+    const q = Xxd.confirmDialog({ title: "x", confirmLabel: "好的" });
+    expect(document.querySelector("dialog.xxd-dialog:last-of-type .xxd-dialog__actions button:last-child").textContent).toBe("好的");
+    document.querySelector("dialog.xxd-dialog:last-of-type").close("cancel");
+    await q;
+  });
+
+  it("两个对话框同时开：标题 id 不重复", async () => {
+    const a = Xxd.confirmDialog({ title: "一" });
+    const b = Xxd.confirmDialog({ title: "二" });
+    const ids = [...document.querySelectorAll("dialog.xxd-dialog")].map((d) => d.getAttribute("aria-labelledby"));
+    expect(new Set(ids).size).toBe(2);
+    for (const d of document.querySelectorAll("dialog.xxd-dialog")) d.close("cancel");
+    await Promise.all([a, b]);
+  });
+
+  it("名字里带 $& / $1 时原样显示（不被当成替换模式）", async () => {
+    const p = Xxd.confirmDelete({ name: "a$&b$1" });
+    const dialog = document.querySelector("dialog.xxd-dialog");
+    expect(dialog.querySelector(".xxd-label").textContent).toBe("输入「a$&b$1」确认");
+    expect(dialog.querySelector(".xxd-dialog__title").textContent).toBe("删除「a$&b$1」？");
+    dialog.close("cancel");
+    await p;
+    html(`<div data-xxd-combobox data-creatable><input class="xxd-input"><ul class="xxd-listbox"><li class="xxd-option">海报</li></ul></div>`);
+    const input = document.querySelector("[data-xxd-combobox] input");
+    input.value = "x$&y";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(document.querySelector("[data-create]").textContent).toBe("创建「x$&y」");
+  });
+
+  it("图片查看器：空列表返回 null 不报错；按钮文字只当文字", () => {
+    expect(Xxd.openViewer([])).toBeNull();
+    const v = Xxd.openViewer([{ src: "data:," }], 0, { actions: [{ label: "<img src=x onerror=alert(1)>", icon: "<svg></svg>" }] });
+    const btn = v.dialog.querySelector("[data-actions] button");
+    expect(btn.querySelector("img")).toBeNull();
+    expect(btn.querySelector("svg")).toBeTruthy();
+    expect(btn.textContent).toBe("<img src=x onerror=alert(1)>");
+    v.dialog.close();
+  });
+
+  it("两次确认：只换文字，图标留着；恢复后原样", () => {
+    html(`<button class="xxd-btn" data-confirm-twice="确认删除"><svg class="ui-icon"></svg>删除</button>`);
+    const btn = document.querySelector("[data-confirm-twice]");
+    btn.click();
+    expect(btn.querySelector("svg")).toBeTruthy();
+    expect(btn.textContent).toBe("确认删除");
+    btn.click();
+    expect(btn.querySelector("svg")).toBeTruthy();
+    expect(btn.textContent).toBe("删除");
+  });
+
+  it("Shadow DOM：tooltip 挂在 Shadow 里（id 引用不跨边界）；toast 的 within 可以是 ShadowRoot", () => {
+    const host = document.createElement("div");
+    document.body.append(host);
+    const root = host.attachShadow({ mode: "open" });
+    root.innerHTML = `<button class="xxd-btn" data-tooltip="提示">tip</button>`;
+    const btn = root.querySelector("button");
+    Xxd.showTooltip(btn);
+    const tip = root.querySelector(".xxd-tooltip");
+    expect(tip).toBeTruthy();
+    expect(btn.getAttribute("aria-describedby")).toBe(tip.id);
+    expect(document.body.querySelector(":scope > .xxd-tooltip")).toBeNull();
+    Xxd.hideTooltip();
+    expect(() => Xxd.toast("已保存", { within: root })).not.toThrow();
+    expect(root.querySelector(".xxd-toast")).toBeTruthy();
+    expect(Xxd.layerRoot(btn)).toBe(root);
+    expect(Xxd.layerRoot(document.body)).toBe(document.body);
+  });
+
+  it("能横向滚动、里面没有可聚焦元素的代码块 / 表格：键盘能进去", () => {
+    html(`<pre class="xxd-code"><code>const a = 1;</code></pre><div class="xxd-table-wrap"><table class="xxd-table"><tr><td>1</td></tr></table></div><div class="xxd-table-wrap" id="w2"><table class="xxd-table"><tr><td><button>x</button></td></tr></table></div>`);
+    expect(document.querySelector("pre.xxd-code").tabIndex).toBe(0);
+    expect(document.querySelector(".xxd-table-wrap").getAttribute("tabindex")).toBe("0");
+    expect(document.getElementById("w2").hasAttribute("tabindex")).toBe(false);
+  });
+});
+
+describe("O8 焦点与计时", () => {
+  it("toast：带操作的缺省停 6 秒；键盘聚焦到里面时暂停", () => {
+    vi.useFakeTimers();
+    try {
+      const plain = Xxd.toast("已保存");
+      const undo = Xxd.toast("已删除", { action: { label: "撤销" } });
+      vi.advanceTimersByTime(3000);
+      expect(plain.element.hasAttribute("data-leaving") || !plain.element.isConnected).toBe(true);
+      expect(undo.element.hasAttribute("data-leaving")).toBe(false);
+      undo.element.querySelector("button").dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+      vi.advanceTimersByTime(10000);
+      expect(undo.element.hasAttribute("data-leaving")).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("关掉横幅时焦点交给后面的按钮，不掉到 body 上", async () => {
+    html(`<div class="xxd-banner"><p>提醒</p><button class="xxd-btn" data-banner-close aria-label="关闭">x</button></div><button id="after">下一个</button>`);
+    const close = document.querySelector("[data-banner-close]");
+    close.focus();
+    close.click();
+    await new Promise((r) => setTimeout(r, 160));
+    expect(document.activeElement?.id).toBe("after");
   });
 });

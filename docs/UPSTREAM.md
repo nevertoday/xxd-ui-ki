@@ -41,3 +41,9 @@ pnpm install && pnpm --filter @cloudflare/kumo build && pnpm test
 
 - **三语文案**：`utils/locale-provider.tsx` 加了 `common`、`pagination` 两组文案和 `layerDialog.moreActions`，合并改成按组通用合并。下面这些组件里写死的英文换成了 `useKumoLocale()`（英文默认值不变，所以上游测试照常通过）：breadcrumbs、clipboard-text、inline-copy-text、sensitive-input、empty、toast、combobox、command-palette、loader、table、pagination、date-range-picker、chart/TimeseriesChart、layer-dialog。每处都是「加一行 hook + 把字面量换成变量」。上游要是自己做了 i18n，以上游为准，再把 `@xxd/react` 的 `KUMO_TRANSLATIONS` 对上去。
 - **动效（D2 / D4）**：只在 `kumo-binding.css` 末尾加了一段，组件不动。
+
+## 第三轮（优化计划 O8 加固，2026-10-12）
+
+- 只改了 `scripts/theme-generator/xxd-overrides.ts`（然后 `pnpm --filter @cloudflare/kumo codegen:themes` 重新生成 `theme-kumo.css`），组件源码没动：
+  - `kumo-brand` / `kumo-brand-hover` / `kumo-badge-{purple,teal,blue}` 改用 `--action-fill`（主色实心底上白字 ≥ 4.5:1）；
+  - `kumo-placeholder` 从 `--muted-2` 改成 `--muted`；兜底色 `#6f6f6f` → `#6b6b6b`。

@@ -7,5 +7,7 @@ export default defineConfig({
   site: "http://localhost:4400",
   integrations: [react(), mdx()],
   build: { format: "directory" },
+  // github-dark 的注释色只有 3:1；-default 版本是 6:1（axe 门禁）
+  markdown: { shikiConfig: { theme: "github-dark-default" } },
   vite: { server: { fs: { allow: ["../.."] } } },
 });

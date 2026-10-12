@@ -2,6 +2,7 @@
 // 首页：组件墙。每格一个真的组件（能点、能切外观），点名字进组件页。
 import Site from "../layouts/Site.astro";
 import { components } from "../lib/data.js";
+import { embed } from "../lib/markup.js";
 const wall = components.filter((c) => c.wall !== false);
 ---
 
@@ -21,7 +22,7 @@ const wall = components.filter((c) => c.wall !== false);
     {
       wall.map((c) => (
         <div class="site-wall__cell">
-          <div class="site-wall__stage xxd-page" set:html={c.wall ?? c.markup} />
+          <div class="site-wall__stage xxd-page" set:html={embed(c.wall ?? c.markup)} />
           <a class="site-wall__name" href={`/components/${c.slug}`}>
             {c.zh}
             <span>{c.name}</span>

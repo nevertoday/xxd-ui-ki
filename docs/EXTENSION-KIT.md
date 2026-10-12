@@ -94,6 +94,17 @@ store.subscribe((s) => ui.update(s));
 
 `manifest.json` 里把 `vendor/xxd/xxd.shadow.css` 加进 `web_accessible_resources`。`xxd.js` 作为 content script 加载时不会自动接管宿主页面。
 
+`xxd.shadow.css` 自己就挡得住宿主页面（O8，`pnpm --filter @xxd/site audit` 里有一张恶意宿主页做门禁）：
+
+- 宿主页面的继承样式（`text-transform`、`letter-spacing`、`text-align`、行高、字体、光标……）在 Shadow 的顶层元素上重置；
+- 令牌在 Shadow 内部再声明一次：宿主页面就算写了 `div { --ink: … }` 打到 host 上，也改不了我们的颜色和圆角；
+- `data-theme` / `data-corners` / `data-finish` 写在 host 上都生效；
+- tooltip、toast、「已复制」气泡、彩纸都挂在锚点所在的 Shadow 里（`Xxd.toast(msg, { within: ui.root })` 可以直接传 ShadowRoot）。
+
+## 行为 JS 的语言
+
+原生组件生成的文字（上一页、关闭、复制失败、图片查看器……）跟 `<html lang>` 走三语；插件里 `i18n.js` 已经写好 `lang`。要固定就 `Xxd.setLocale("en")`。参数和 `data-*` 文案仍然优先。
+
 ## 三语
 
 ```html

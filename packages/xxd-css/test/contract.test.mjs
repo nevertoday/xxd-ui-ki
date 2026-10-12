@@ -117,6 +117,115 @@ describe("颜色来自令牌", () => {
   });
 });
 
+describe("颜色只有令牌、黑白和系统色（O8：变异测试补的漏洞）", () => {
+  const NAMED = "aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue slateblue slategray slategrey snow springgreen steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen".split(" ");
+  const SYSTEM = "canvas canvastext linktext visitedtext activetext buttonface buttontext buttonborder field fieldtext highlight highlighttext selecteditem selecteditemtext mark marktext graytext accentcolor accentcolortext".split(" ");
+  const COLOR_PROP = /^(color|background|background-color|border|border-(top|right|bottom|left|block|inline)(-(start|end))?(-color)?|border-color|outline|outline-color|fill|stroke|box-shadow|caret-color|text-decoration|text-decoration-color|accent-color|column-rule|--[\w-]+)$/;
+  const words = (v) => v.replace(/var\([^)]*\)/g, " ").replace(/url\([^)]*\)/g, " ").toLowerCase().match(/[a-z-]+/g) ?? [];
+
+  it("没有命名色（transparent / currentColor 除外）；系统色只在 forced-colors.css 里", () => {
+    const bad = [];
+    for (const r of all)
+      for (const [p, v] of r.decls) {
+        if (!COLOR_PROP.test(p)) continue;
+        for (const w of words(v)) {
+          if (NAMED.includes(w)) bad.push(`${r.file} ${r.selector} ${p}: ${w}`);
+          if (SYSTEM.includes(w) && r.file !== "forced-colors.css") bad.push(`${r.file} ${r.selector} ${p}: 系统色 ${w}`);
+        }
+      }
+    expect(bad).toEqual([]);
+  });
+
+  it("rgb() / rgba() 字面量只能是白或近黑（图片上的半透明控件）；hsl() 不用", () => {
+    const bad = [];
+    for (const [file, css] of Object.entries(files)) {
+      for (const m of css.matchAll(/\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch)\(([^()]*)\)/g)) {
+        if (m[1].startsWith("rgb") && /^\s*var\(/.test(m[2])) continue;
+        if (!m[1].startsWith("rgb")) {
+          bad.push(`${file}: ${m[0]}`);
+          continue;
+        }
+        const [r, g, b] = m[2].split(/[\s,/]+/).filter(Boolean).map(Number);
+        const white = r === 255 && g === 255 && b === 255;
+        const nearBlack = Math.max(r, g, b) <= 20;
+        if (!white && !nearBlack) bad.push(`${file}: ${m[0]}`);
+      }
+      // rgba(var(--x-rgb), a) 写法里的 var 括号会打断上面的匹配，单独查一次
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it("没有装饰性渐变：只允许遮罩、纯色块、带硬边的填充、往透明淡出", () => {
+    const bad = [];
+    const splitTop = (s) => {
+      const out = [];
+      let depth = 0;
+      let start = 0;
+      for (let i = 0; i < s.length; i += 1) {
+        if (s[i] === "(") depth += 1;
+        else if (s[i] === ")") depth -= 1;
+        else if (s[i] === "," && depth === 0) {
+          out.push(s.slice(start, i).trim());
+          start = i + 1;
+        }
+      }
+      out.push(s.slice(start).trim());
+      return out;
+    };
+    for (const r of all)
+      for (const [p, v] of r.decls) {
+        if (/mask/.test(p)) continue;
+        let i = v.search(/(repeating-)?(linear|radial|conic)-gradient\(/);
+        while (i !== -1) {
+          const open = v.indexOf("(", i);
+          let depth = 0;
+          let end = open;
+          for (; end < v.length; end += 1) {
+            if (v[end] === "(") depth += 1;
+            else if (v[end] === ")" && --depth === 0) break;
+          }
+          const args = splitTop(v.slice(open + 1, end)).filter((a) => !/^(to |\d+(\.\d+)?(deg|turn|rad)|circle|ellipse|from |at )/.test(a));
+          const hasTransparent = args.some((a) => /transparent/.test(a));
+          const hasStops = args.some((a) => /\)\s+[\d.]+(%|px)?|\s(\d+(\.\d+)?(%|px)|calc\()/.test(a.replace(/^[^ ]*\(.*\)$/, "")) || /\s[\d.]+(%|px)?(\s|$)|calc\(/.test(a.replace(/^(color-mix|var|rgba?)\([^]*?\)\s*/, " ")));
+          const colors = new Set(args.map((a) => a.replace(/\s+[\d.]+(%|px)?.*$/, "")));
+          if (!hasTransparent && !hasStops && colors.size > 1) bad.push(`${r.file} ${r.selector} ${p}: ${v.slice(i, end + 1)}`);
+          i = v.slice(end).search(/(repeating-)?(linear|radial|conic)-gradient\(/);
+          if (i !== -1) i += end;
+        }
+      }
+    expect(bad).toEqual([]);
+  });
+
+  it("--muted-2 只做装饰：当 color 用时只能是图标或伪元素（文字用 --muted，≥ 4.5:1）", () => {
+    const bad = [];
+    for (const r of all)
+      for (const [p, v] of r.decls)
+        if (p === "color" && v.includes("--muted-2") && !/\.ui-icon|::(before|after|marker)/.test(r.selector)) bad.push(`${r.file} ${r.selector}`);
+    expect(bad).toEqual([]);
+  });
+
+  it("没有 text-shadow，没有 filter: drop-shadow()", () => {
+    const bad = [];
+    for (const r of all)
+      for (const [p, v] of r.decls) {
+        if (p === "text-shadow" && v !== "none") bad.push(`${r.file} ${r.selector} ${p}: ${v}`);
+        if (/filter$/.test(p) && /drop-shadow\(/.test(v)) bad.push(`${r.file} ${r.selector} ${p}: ${v}`);
+      }
+    expect(bad).toEqual([]);
+  });
+
+  it("白色内高光只在质感模式（data-finish=\"material\"）下", () => {
+    const bad = [];
+    for (const r of all)
+      for (const [p, v] of r.decls) {
+        if (p !== "box-shadow" || !/inset/.test(v)) continue;
+        const highlight = /inset[^,]*\b0 -?[1-9][\d.]*px[^,]*(rgba?\(\s*255\s*,\s*255\s*,\s*255|#fff(fff)?\b|\bwhite\b|var\(--on-ink\))/.test(v);
+        if (highlight && !r.selector.includes('data-finish="material"')) bad.push(`${r.file} ${r.selector}: ${v}`);
+      }
+    expect(bad).toEqual([]);
+  });
+});
+
 describe("对话框按钮层级", () => {
   it("ui-dialog-cancel 内容宽度、安静：不 flex-grow，不用实心主色", () => {
     const cancel = all.filter((r) => r.selector.includes("ui-dialog-cancel") && !r.selector.includes(":not(.ui-dialog-cancel)"));

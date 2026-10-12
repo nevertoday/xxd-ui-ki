@@ -44,7 +44,7 @@
   }
 
   .xxd-input-group > input::placeholder {
-    color: var(--muted-2);
+    color: var(--muted);
   }
 
   .xxd-input-group__addon,
@@ -228,7 +228,7 @@
   }
 
   .xxd-picker__value[data-placeholder] {
-    color: var(--muted-2);
+    color: var(--muted);
   }
 
   .xxd-picker[data-size="sm"] .xxd-picker__trigger {

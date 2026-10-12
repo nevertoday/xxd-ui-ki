@@ -30,6 +30,7 @@ pnpm xxd ls / pnpm xxd doc Dialog         # 查组件
 ```bash
 pnpm --filter @xxd/site dev               # localhost:4400
 pnpm --filter @xxd/site build && pnpm --filter @xxd/site visual   # 截图回归（4 种外观 × 每页；基线只在本机）
+pnpm --filter @xxd/site audit                                      # 对抗门禁：axe 零违规、长文字不溢出、恶意宿主页、高对比模式
 ```
 
 预览：`packages/xxd-css/playground.html`、`packages/xxd-tokens/preview.html`（用任意静态服务器打开仓库根目录）。
@@ -37,7 +38,7 @@ pnpm --filter @xxd/site build && pnpm --filter @xxd/site visual   # 截图回归
 ## 文档
 
 - [开发计划](docs/PLAN.md) —— 第一轮（已完成）
-- [优化计划](docs/OPTIMIZATION-PLAN.md) —— 第二轮（已完成）：对照 Kumo 补组件、补交互细节、小小东模式、React 对齐、展示站、图表
+- [优化计划](docs/OPTIMIZATION-PLAN.md) —— 第二轮（已完成）：对照 Kumo 补组件、补交互细节、小小东模式、React 对齐、展示站、图表；O8 对抗测试后的加固（无障碍、Shadow 隔离、长内容、高对比、三语）
 - [设计原则](docs/DESIGN-PRINCIPLES.md) —— 一切设计决定的依据
 - [插件套件](docs/EXTENSION-KIT.md) · [会员站接入](docs/member-site.md) · [文档站](docs/DOCS-SITE.md)
 - [Kumo → 小小东 令牌映射](docs/token-map.md) · [同步上游](docs/UPSTREAM.md) · [开源准备](docs/OPEN-SOURCE-CHECKLIST.md)

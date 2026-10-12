@@ -12,7 +12,7 @@ export declare function confirmDialog(options?: {
   cancelLabel?: string;
   closeLabel?: string;
   tone?: "danger";
-  within?: HTMLElement;
+  within?: HTMLElement | ShadowRoot;
 }): Promise<boolean>;
 
 export declare function showFloating(trigger: HTMLElement, floating: HTMLElement, options?: { placement?: string; focusFirst?: boolean }): void;
@@ -30,7 +30,7 @@ export declare function moveInk(list: HTMLElement): void;
 
 export declare function toast(
   message: string,
-  options?: { tone?: Tone | "info"; within?: HTMLElement; duration?: number; action?: { label: string; onClick?: () => void }; stack?: boolean },
+  options?: { tone?: Tone | "info"; within?: HTMLElement | ShadowRoot; duration?: number; action?: { label: string; onClick?: () => void }; stack?: boolean },
 ): { element: HTMLElement; dismiss: () => void };
 export declare function copyText(text: string): Promise<boolean>;
 export declare function showTooltip(anchor: HTMLElement): void;
@@ -52,7 +52,7 @@ export declare function addTag(box: HTMLElement, value: string): boolean;
 export declare function tagValues(box: HTMLElement): string[];
 
 export interface CommandItem { id?: string; label: string; hint?: string; keywords?: string; group?: string; run?: () => void }
-export declare function openCommandPalette(options?: { items?: CommandItem[]; placeholder?: string; empty?: string; within?: HTMLElement; recentKey?: string; recentLabel?: string; loading?: boolean; loadingLabel?: string }): HTMLDialogElement & { setItems(items: CommandItem[]): void };
+export declare function openCommandPalette(options?: { items?: CommandItem[]; placeholder?: string; empty?: string; within?: HTMLElement | ShadowRoot; recentKey?: string; recentLabel?: string; loading?: boolean; loadingLabel?: string }): HTMLDialogElement & { setItems(items: CommandItem[]): void };
 export declare function bindCommandPalette(items: CommandItem[] | (() => CommandItem[]), options?: { key?: string; placeholder?: string; empty?: string }): () => void;
 
 export interface AppearanceSettings { theme?: "light" | "dark" | "system"; corners?: "square" | "rounded"; accent?: string; density?: "comfortable" | "compact"; finish?: "flat" | "material" }
@@ -76,7 +76,7 @@ export declare function mountAppearance(
 
 export declare const ICON: Record<"close" | "check" | "copy" | "search" | "success" | "danger" | "warning" | "info", (size?: number) => string>;
 
-export declare function confirmDelete(options: { name: string; what?: string; title?: string; confirmLabel?: string; cancelLabel?: string; hint?: string; within?: HTMLElement }): Promise<boolean>;
+export declare function confirmDelete(options: { name: string; what?: string; title?: string; confirmLabel?: string; cancelLabel?: string; hint?: string; within?: HTMLElement | ShadowRoot }): Promise<boolean>;
 export declare function toggleSidebar(sidebar: HTMLElement, collapsed?: boolean): void;
 export declare function collapseBreadcrumbs(crumbs: HTMLElement): void;
 export declare function spyToc(toc: HTMLElement): void;
@@ -89,7 +89,7 @@ export declare function highlight(el: HTMLElement, lang?: "js" | "ts" | "json" |
 export declare function highlightText(text: string, lang?: string): string;
 
 export declare function bindDrop(target: HTMLElement, options?: { onFiles?: (files: File[]) => void; onText?: (text: string) => void; veil?: string; zone?: HTMLElement }): () => void;
-export declare function openViewer(items: { src: string; alt?: string }[], start?: number, options?: { actions?: { label: string; icon?: string; run?: (item: { src: string; alt?: string }, index: number) => void }[]; within?: HTMLElement; labels?: Record<string, string> }): { dialog: HTMLDialogElement; show(i: number): void; readonly index: number };
+export declare function openViewer(items: { src: string; alt?: string }[], start?: number, options?: { actions?: { label: string; icon?: string; run?: (item: { src: string; alt?: string }, index: number) => void }[]; within?: HTMLElement | ShadowRoot; labels?: Record<string, string> }): { dialog: HTMLDialogElement; show(i: number): void; readonly index: number } | null;
 export declare function flip(container: Element, mutate: () => void, options?: { duration?: number; easing?: string; selector?: string }): Promise<void>;
 export declare function setStatus(el: HTMLElement, text: string, options?: { tone?: "danger" | "warning" | "success"; action?: { label: string; onClick?: () => void } }): HTMLElement;
 export declare function rollText(el: HTMLElement, text: string): void;
@@ -104,3 +104,12 @@ export declare function chartOptions<T extends Record<string, any>>(option?: T, 
 export declare function watchChartTheme(chart: { setOption(option: any, opts?: any): void }, build: () => any, options?: { el?: Element }): () => void;
 export declare function sparkline(values: (number | string)[], options?: { width?: number; height?: number; strokeWidth?: number; area?: boolean }): string;
 export declare function initSparklines(root?: ParentNode): void;
+
+/** 行为 JS 自己生成的文字用哪种语言（缺省跟 <html lang>）。传空值恢复成跟 <html lang>。 */
+export type XxdLocale = "zh-CN" | "zh-Hant" | "en";
+export declare function setLocale(locale?: string | null): XxdLocale;
+export declare function getLocale(node?: Element): XxdLocale;
+export declare function resolveLocale(input?: string | null): XxdLocale;
+export declare function t(key: string, vars?: Record<string, string | number> | null, node?: Element): string;
+/** 浮层挂在哪：节点在 Shadow 里就是那个 ShadowRoot，否则是 body。 */
+export declare function layerRoot(node: Node): HTMLElement | ShadowRoot;

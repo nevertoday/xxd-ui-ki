@@ -1,7 +1,9 @@
 // 主色：一个颜色定整个界面的调子。移植自 xPoster src/accent-color.js（同一套算法与 18 个预设）。
 // - 空值 = 墨色（默认），什么都不写。
 // - 太浅的颜色在亮纸上压暗一点、太深的在暗纸上提亮一点，直到 3:1，保证按钮和标记看得见。
-// - 颜色上的文字是白色，除非白色低于 3:1，那就用近黑。
+// - 「标记」（开关、tab 下划线、选中、焦点）用原色，只保证在纸上 3:1。
+// - 「实心底」（主按钮、实心徽标、勾选框）上面要放字：另算一个 fill，把原色压暗一点直到白字 4.5:1
+//   （18 个预设最多压暗 22%）；压暗后在暗纸上不足 3:1 才改用近黑字。hover 色同样保证 4.5:1。
 // - 另有一个更深的「文字版」（链接、小标签），在纸上达到 4.5:1。
 // tokens.css 根据这些变量推出其余一切：hover/选中淡层、焦点、灰色和线条里的一点色调。
 
@@ -69,17 +71,39 @@ export function ensureContrast(rgb, paper, toward, min = 3) {
   return clampRgb(next);
 }
 
-const onColor = (rgb) => (contrast(rgb, [255, 255, 255]) >= 3 ? "#ffffff" : "#111111");
+const WHITE = [255, 255, 255];
+const NEAR_BLACK = [17, 17, 17];
+
+/** 实心底：白字 ≥ 4.5（压暗原色），同时在这张纸上仍是 ≥ 3 的标记；做不到就用近黑字。 */
+export function accentFill(mark, paper) {
+  if (contrast(mark, WHITE) >= 4.5) return { fill: mark, on: WHITE };
+  for (let t = 0.02; t <= 0.4; t += 0.02) {
+    const next = clampRgb(mix(mark, [0, 0, 0], t));
+    if (contrast(next, WHITE) >= 4.5 && contrast(next, paper) >= 3) return { fill: next, on: WHITE };
+  }
+  return { fill: mark, on: NEAR_BLACK };
+}
+
+/** hover：先试着往纸色淡 10%，字仍 ≥ 4.5 就用；否则往反方向加深 10%。 */
+export function accentFillHover(fill, on, paper) {
+  const lighter = clampRgb(mix(fill, paper, 0.1));
+  if (contrast(lighter, on) >= 4.5) return lighter;
+  return clampRgb(mix(fill, on === WHITE ? [0, 0, 0] : WHITE, 0.1));
+}
 
 export const ACCENT_KEYS = Object.freeze([
   "action-custom",
   "action-rgb-custom",
   "on-action-custom",
   "action-text-custom",
+  "action-fill-custom",
+  "action-fill-hover-custom",
   "action-custom-dark",
   "action-rgb-custom-dark",
   "on-action-custom-dark",
   "action-text-custom-dark",
+  "action-fill-custom-dark",
+  "action-fill-hover-custom-dark",
 ]);
 
 /** 一个主色的全部变量；墨色返回 null。prefix 用于作用域（如注入第三方页面时用 "xxd-"）。 */
@@ -89,18 +113,25 @@ export function accentPalette(value, prefix = "") {
   const base = toRgb(hex);
   const light = ensureContrast(base, LIGHT_PAPER, [0, 0, 0]);
   const dark = ensureContrast(base, DARK_PAPER, [255, 255, 255]);
-  const lightText = ensureContrast(base, LIGHT_PAPER, [0, 0, 0], 4.5);
-  const darkText = ensureContrast(base, DARK_PAPER, [255, 255, 255], 4.5);
+  // 文字版要在纸上和「选中底」（tokens.css 的 --selected-bg：亮 13%、暗 18% 主色）上都 ≥ 4.5
+  const lightText = ensureContrast(base, clampRgb(mix(LIGHT_PAPER, light, 0.13)), [0, 0, 0], 4.5);
+  const darkText = ensureContrast(base, clampRgb(mix(DARK_PAPER, dark, 0.18)), [255, 255, 255], 4.5);
+  const lightFill = accentFill(light, LIGHT_PAPER);
+  const darkFill = accentFill(dark, DARK_PAPER);
   const name = (key) => `--${prefix}${key}`;
   return {
     [name("action-custom")]: toHex(light),
     [name("action-rgb-custom")]: light.join(", "),
-    [name("on-action-custom")]: onColor(light),
+    [name("on-action-custom")]: toHex(lightFill.on),
     [name("action-text-custom")]: toHex(lightText),
+    [name("action-fill-custom")]: toHex(lightFill.fill),
+    [name("action-fill-hover-custom")]: toHex(accentFillHover(lightFill.fill, lightFill.on, LIGHT_PAPER)),
     [name("action-custom-dark")]: toHex(dark),
     [name("action-rgb-custom-dark")]: dark.join(", "),
-    [name("on-action-custom-dark")]: onColor(dark),
+    [name("on-action-custom-dark")]: toHex(darkFill.on),
     [name("action-text-custom-dark")]: toHex(darkText),
+    [name("action-fill-custom-dark")]: toHex(darkFill.fill),
+    [name("action-fill-hover-custom-dark")]: toHex(accentFillHover(darkFill.fill, darkFill.on, DARK_PAPER)),
   };
 }
 

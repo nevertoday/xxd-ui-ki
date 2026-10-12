@@ -1,5 +1,6 @@
 // 数据类组件的行为：表格（全选 / 排序 / 拖列宽 / 固定列阴影）、分页渲染、区间滑块、代码高亮。
 import { emit } from "./dom.js";
+import { t } from "./i18n.js";
 
 /* ── 表格 ──
  * 全选：<th class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-all></th>，每行 <input class="xxd-check" data-select-row>
@@ -28,6 +29,11 @@ export function initData(root) {
   for (const r of root.querySelectorAll(".xxd-range[data-fill]")) syncFill(r);
   for (const el of root.querySelectorAll(".xxd-code[data-highlight] code, code.xxd-code[data-highlight]")) highlight(el);
   for (const el of root.querySelectorAll("[data-xxd-pagination]")) renderPagination(el);
+  // 能横向滚动的代码块 / 表格：里面没有能聚焦的东西时，键盘也要能进去滚（WCAG 2.1.1）
+  for (const el of root.querySelectorAll("pre.xxd-code, .xxd-table-wrap")) {
+    if (el.hasAttribute("tabindex") || el.querySelector("a[href], button, input, select, textarea, [tabindex]")) continue;
+    el.tabIndex = 0;
+  }
 }
 
 const stickyWatched = new WeakSet();
@@ -60,8 +66,8 @@ export function renderPagination(nav, { page = Number(nav.dataset.page) || 1, to
   nav.dataset.page = String(current);
   nav.dataset.total = String(total);
   nav.dataset.perPage = String(perPage);
-  const prev = `<button type="button" data-page-to="${current - 1}" aria-label="上一页" ${current === 1 ? "disabled" : ""}>${CHEV("m15 6-6 6 6 6")}</button>`;
-  const next = `<button type="button" data-page-to="${current + 1}" aria-label="下一页" ${current === pages ? "disabled" : ""}>${CHEV("m9 6 6 6-6 6")}</button>`;
+  const prev = `<button type="button" data-page-to="${current - 1}" aria-label="${t("prevPage", null, nav)}" ${current === 1 ? "disabled" : ""}>${CHEV("m15 6-6 6 6 6")}</button>`;
+  const next = `<button type="button" data-page-to="${current + 1}" aria-label="${t("nextPage", null, nav)}" ${current === pages ? "disabled" : ""}>${CHEV("m9 6 6 6-6 6")}</button>`;
   const middle = pageList(current, pages)
     .map((p) => (p === "…" ? `<span class="xxd-pagination__gap">…</span>` : `<button type="button" data-page-to="${p}" ${p === current ? 'aria-current="page"' : ""}>${p}</button>`))
     .join("");

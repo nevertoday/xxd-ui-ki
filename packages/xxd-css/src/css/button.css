@@ -56,9 +56,9 @@
 
   .xxd-btn[data-variant="primary"] {
     --btn-fg: var(--on-action);
-    --btn-bg: var(--action);
-    --btn-bd: var(--action);
-    --btn-bg-hover: color-mix(in srgb, var(--action) 86%, var(--paper));
+    --btn-bg: var(--action-fill);
+    --btn-bd: var(--action-fill);
+    --btn-bg-hover: var(--action-fill-hover);
   }
 
   .xxd-btn[data-variant="primary"]:hover {
@@ -258,7 +258,7 @@
 
   .xxd-btn-group > .xxd-btn[data-variant="primary"] + .xxd-btn[data-variant="primary"] {
     margin-left: 0;
-    border-left-color: color-mix(in srgb, var(--on-action) 30%, var(--action));
+    border-left-color: color-mix(in srgb, var(--on-action) 30%, var(--action-fill));
   }
 
   .xxd-btn-group > .xxd-btn:first-child {

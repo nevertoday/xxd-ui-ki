@@ -208,7 +208,7 @@
 
   .xxd-pagination > .xxd-pagination__gap {
     min-width: 20px;
-    color: var(--muted-2);
+    color: var(--muted);
     pointer-events: none;
   }
 

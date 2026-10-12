@@ -42,3 +42,10 @@ export function afterTransition(el, fn, fallback = 260) {
   el.addEventListener("transitionend", finish);
   setTimeout(finish, fallback);
 }
+
+/** 浮层挂在哪：锚点在 Shadow 里就是那个 ShadowRoot，否则是 body。 */
+export function layerRoot(node) {
+  const doc = node.ownerDocument || document;
+  const root = node.getRootNode?.();
+  return root && root !== doc && root.nodeType === 11 ? root : doc.body;
+}

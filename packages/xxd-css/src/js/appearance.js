@@ -3,6 +3,7 @@
 //                               languages: [{ value: "zh-CN", label: "简体中文" }, …], language, onLanguage })
 // 读写默认走 window.XxdTheme（@xxd/tokens/dist/boot.js）；插件里可以传 get / set 接到 chrome.storage。
 import { emit } from "./dom.js";
+import { getLocale, resolveLocale } from "./i18n.js";
 
 const PRESETS_FALLBACK = [{ id: "", name: "Ink", zh: "墨色" }];
 
@@ -70,7 +71,7 @@ export function mountAppearance(container, options = {}) {
   const doc = container.ownerDocument;
   const theme = globalThis.XxdTheme;
   const {
-    locale = "zh-CN",
+    locale: localeOption,
     labels: customLabels,
     get = () => ({ ...(theme?.DEFAULT_SETTINGS ?? {}), ...(theme?.read() ?? {}) }),
     set = (patch) => theme?.set(patch),
@@ -82,6 +83,8 @@ export function mountAppearance(container, options = {}) {
     language,
     onLanguage,
   } = options;
+  // 缺省跟 Xxd.setLocale / <html lang>
+  const locale = localeOption ? resolveLocale(localeOption) : getLocale(container);
   const L = { ...(APPEARANCE_LABELS[locale] || APPEARANCE_LABELS["zh-CN"]), ...customLabels };
   const s = get();
 
@@ -115,6 +118,8 @@ export function mountAppearance(container, options = {}) {
   swatches.className = "xxd-swatches";
   swatches.setAttribute("role", "radiogroup");
   swatches.setAttribute("aria-label", L.accent);
+  // 和分段控件同一套键盘：← → ↑ ↓ Home End 选择，Tab 只停在选中的那一个
+  swatches.setAttribute("data-xxd-segmented", "");
   for (const p of presets) {
     const b = doc.createElement("button");
     b.type = "button";
@@ -126,13 +131,14 @@ export function mountAppearance(container, options = {}) {
     b.dataset.value = p.id;
     if (p.id) b.style.setProperty("--swatch", p.id);
     b.setAttribute("aria-checked", String((s.accent || "") === p.id));
+    b.tabIndex = (s.accent || "") === p.id ? 0 : -1;
     swatches.append(b);
   }
-  swatches.addEventListener("click", (event) => {
-    const b = event.target.closest(".xxd-swatch");
-    if (!b) return;
-    for (const x of swatches.children) x.setAttribute("aria-checked", String(x === b));
-    set({ accent: b.dataset.value });
+  if (![...swatches.children].some((b) => b.tabIndex === 0)) swatches.firstElementChild.tabIndex = 0;
+  // 点击和方向键都由 install() 的分段控件委托处理，派发 xxd:change
+  swatches.addEventListener("xxd:change", (event) => {
+    event.stopPropagation();
+    set({ accent: event.detail.value });
     emit(group, "xxd:appearance", get());
   });
   const accentRow = row(doc, L.accent, L.accentDesc, swatches);
@@ -178,7 +184,11 @@ export function mountAppearance(container, options = {}) {
     }
     const sw = group.querySelector(".xxd-switch");
     if (sw) sw.checked = now.corners === "rounded";
-    for (const b of swatches.children) b.setAttribute("aria-checked", String((now.accent || "") === b.dataset.value));
+    for (const b of swatches.children) {
+      const on = (now.accent || "") === b.dataset.value;
+      b.setAttribute("aria-checked", String(on));
+      b.tabIndex = on ? 0 : -1;
+    }
   }
   const onSettings = () => sync();
   globalThis.addEventListener?.("xxd:settings", onSettings);

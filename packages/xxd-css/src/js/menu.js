@@ -9,6 +9,7 @@ import { emit } from "./dom.js";
 
 const ITEM = '[role="menuitem"]:not([disabled]):not([aria-disabled="true"]), [role="menuitemcheckbox"]:not([disabled]), [role="menuitemradio"]:not([disabled])';
 const openers = new WeakMap();
+const POPOVER_FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 function isOpen(el) {
   try {
@@ -29,6 +30,8 @@ export function showFloating(trigger, floating, { placement, focusFirst = false 
   trigger?.setAttribute("aria-expanded", "true");
   place(trigger, floating, { placement: placement || floating.dataset.placement || "bottom-start" });
   if (focusFirst) floating.querySelector(ITEM)?.focus();
+  // 说明浮层里有可交互的东西（小表单、链接）：焦点移进去，否则键盘用户够不着
+  else if (floating.classList.contains("xxd-popover")) floating.querySelector(POPOVER_FOCUSABLE)?.focus({ preventScroll: true });
 }
 
 export function hideFloating(floating, { restoreFocus = false } = {}) {
@@ -197,6 +200,9 @@ export function installMenus(root, byId, closestFrom) {
       const el = event.target;
       if (event.newState === "closed" && el?.classList && (el.classList.contains("xxd-menu") || el.classList.contains("xxd-popover"))) {
         openers.get(el)?.setAttribute("aria-expanded", "false");
+        // 焦点在里面时（Esc 关掉）还给触发按钮
+        const active = el.getRootNode().activeElement;
+        if (active && el.contains(active)) openers.get(el)?.focus({ preventScroll: true });
         // 父菜单关了，子菜单一起关
         if (el.classList.contains("xxd-menu")) closeAllSubmenus(el);
       }

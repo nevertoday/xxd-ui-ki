@@ -3,6 +3,14 @@ export function withAttr(markup, attrs) {
   return markup.replace(/^(\s*<[a-zA-Z][\w-]*)/, `$1 ${attrs}`);
 }
 
+/**
+ * 嵌进展示站页面里的活示例：示例自己的 <main> / <aside> 是给真实整页用的，
+ * 放进站点的 <main> 里会变成「两个 main」「main 套在 landmark 里」——换成 div（代码视图里仍是原文）。
+ */
+export function embed(markup) {
+  return markup.replace(/<(\/?)(main|aside)\b/g, (_, slash, tag) => (slash ? "</div" : `<div data-landmark="${tag}"`));
+}
+
 let uid = 0;
 export const nextId = (p = "d") => `${p}${++uid}`;
 

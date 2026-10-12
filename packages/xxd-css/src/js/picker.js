@@ -5,6 +5,7 @@
 import { place } from "./floating.js";
 import { emit, nextId } from "./dom.js";
 import { showBubble, copyText } from "./feedback.js";
+import { t } from "./i18n.js";
 
 const parts = (picker) => ({
   trigger: picker.querySelector(".xxd-picker__trigger"),
@@ -29,10 +30,10 @@ function render(picker) {
   picker.dataset.value = values.join(",");
   if (hidden) hidden.value = picker.dataset.value;
   if (chosen.length) {
-    value.textContent = picker.hasAttribute("data-multiple") && chosen.length > 2 ? `${labels.slice(0, 2).join("、")} 等 ${chosen.length} 项` : labels.join("、");
+    value.textContent = picker.hasAttribute("data-multiple") && chosen.length > 2 ? t("selectedMany", { list: labels.slice(0, 2).join(t("listSep", null, picker)), n: chosen.length }, picker) : labels.join(t("listSep", null, picker));
     value.removeAttribute("data-placeholder");
   } else {
-    value.textContent = picker.dataset.placeholder || "请选择";
+    value.textContent = picker.dataset.placeholder || t("selectPlaceholder", null, picker);
     value.setAttribute("data-placeholder", "");
   }
   return values;
@@ -174,7 +175,7 @@ export function installSecrets(root, closestFrom) {
       const input = toggle.closest("[data-xxd-secret]").querySelector("input");
       const show = input.type === "password";
       input.type = show ? "text" : "password";
-      toggle.setAttribute("aria-label", show ? toggle.dataset.hideLabel || "隐藏" : toggle.dataset.showLabel || "显示");
+      toggle.setAttribute("aria-label", show ? toggle.dataset.hideLabel || t("hide", null, toggle) : toggle.dataset.showLabel || t("show", null, toggle));
       toggle.setAttribute("aria-pressed", String(show));
       toggle.innerHTML = show ? EYE_OFF : EYE;
       return;
@@ -182,7 +183,7 @@ export function installSecrets(root, closestFrom) {
     const copy = closestFrom(event, "[data-xxd-secret] [data-secret-copy]");
     if (copy) {
       const input = copy.closest("[data-xxd-secret]").querySelector("input");
-      if (await copyText(input.value)) showBubble(copy, copy.dataset.copyDone || "已复制");
+      if (await copyText(input.value)) showBubble(copy, copy.dataset.copyDone || t("copied", null, copy));
     }
   });
 }

@@ -28,9 +28,9 @@
   --ink: #111111;
   --ink-rgb: 17, 17, 17;
   --on-ink: #ffffff;
-  /* #777 在白底只有 4.48:1，小字需要 4.5；#6f6f6f 是 5.0（wash 上 4.6）。 */
-  --muted: #6f6f6f;
-  --muted-2: #9a968d;
+  /* #777 在白底只有 4.48:1，小字需要 4.5；#6b6b6b 是 5.3（wash 上 4.85、选中底 / wash-strong 上 4.5）。 */
+  --muted: #6b6b6b;
+  --muted-2: #9a968d; /* 只做装饰（图标、分隔点、行号），不当文字色：在白底只有 2.9:1 */
   --line: #e7e7ea;
   --line-strong: #c9c9ce;
   --paper-rgb: 255, 255, 255;
@@ -53,6 +53,9 @@
   --action-rgb: var(--ink-rgb);
   --on-action: var(--on-ink);
   --action-text: var(--ink);
+  /* 实心底（上面放字）：墨色时就是 --action；主色时由 accent.js 压暗到白字 4.5:1 */
+  --action-fill: var(--action);
+  --action-fill-hover: color-mix(in srgb, var(--action) 86%, var(--paper));
   --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 24%, transparent);
 
   /* ── 圆角：直角（缺省）/ 圆角 ─────────────────── */
@@ -188,6 +191,8 @@
   --action-rgb: var(--action-rgb-custom);
   --on-action: var(--on-action-custom);
   --action-text: var(--action-text-custom);
+  --action-fill: var(--action-fill-custom);
+  --action-fill-hover: var(--action-fill-hover-custom);
   --switch-on: var(--action);
   --selected-bg: color-mix(in srgb, var(--action) 13%, #ffffff);
   --bg: color-mix(in srgb, #fcfcfc 97%, var(--action));
@@ -203,6 +208,8 @@
   --action-rgb: var(--action-rgb-custom-dark);
   --on-action: var(--on-action-custom-dark);
   --action-text: var(--action-text-custom-dark);
+  --action-fill: var(--action-fill-custom-dark);
+  --action-fill-hover: var(--action-fill-hover-custom-dark);
   --selected-bg: color-mix(in srgb, var(--action) 18%, #201f1a);
   --bg: color-mix(in srgb, #171612 97%, var(--action));
   --wash: color-mix(in srgb, #2a2822 94%, var(--action));
@@ -219,6 +226,26 @@
 
 :root[data-accent] :is(input, textarea) {
   caret-color: var(--action);
+}
+
+/* 系统要求更高对比度（macOS「增强对比度」、prefers-contrast: more）：
+   控件边框到 3:1（WCAG 1.4.11），次要文字到 6:1 以上，线条加深。平时保持安静的发丝线。 */
+@media (prefers-contrast: more) {
+  :root,
+  :root[data-accent] {
+    --muted: #595959;
+    --muted-2: #6b6b6b;
+    --line: #b4b4ba;
+    --line-strong: #86868b;
+  }
+
+  :root[data-theme="dark"],
+  :root[data-theme="dark"][data-accent] {
+    --muted: #c9c3b6;
+    --muted-2: #a7a194;
+    --line: #5a564c;
+    --line-strong: #8a8478;
+  }
 }
 
 /* 减少动效：一次性全部静止，组件不各自例外 */

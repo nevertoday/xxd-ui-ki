@@ -1,11 +1,12 @@
 // 小小东模式的行为（优化计划 O4）。
-import { emit, reducedMotion } from "./dom.js";
+import { emit, layerRoot, reducedMotion } from "./dom.js";
 import { openDialog } from "./dialog.js";
 import { bindSearch, markMatches, clearMarks } from "./inputs.js";
+import { t } from "./i18n.js";
 
 /* ── 拖放 / 粘贴：Xxd.bindDrop(panel, { onFiles, onText, veil: "松手，放进来" }) ──
  * 拖到 panel 任何地方出现遮罩；松手交给 onFiles(files) / onText(text)；在 panel 里粘贴也一样。返回解绑函数。 */
-export function bindDrop(target, { onFiles, onText, veil = "松手，放进来", zone } = {}) {
+export function bindDrop(target, { onFiles, onText, veil = t("dropVeil", null, target), zone } = {}) {
   const doc = target.ownerDocument;
   let depth = 0;
   let veilEl = target.querySelector(":scope > .xxd-dropveil");
@@ -73,11 +74,12 @@ export function bindDrop(target, { onFiles, onText, veil = "松手，放进来",
 const ARROW = (d) => `<svg class="ui-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="miter" aria-hidden="true"><path d="${d}"/></svg>`;
 
 export function openViewer(items, start = 0, { actions = [], within = document.body, labels = {} } = {}) {
-  const L = { prev: "上一张", next: "下一张", close: "关闭", ...labels };
+  if (!items?.length) return null;
+  const L = { prev: t("prevImage", null, within), next: t("nextImage", null, within), close: t("close", null, within), title: t("imageViewer", null, within), ...labels };
   const doc = within.ownerDocument;
   const dialog = doc.createElement("dialog");
   dialog.className = "xxd-viewer";
-  dialog.setAttribute("aria-label", "图片查看器");
+  dialog.setAttribute("aria-label", L.title);
   dialog.innerHTML = `<div class="xxd-viewer__bar"><span data-count></span><span style="flex:1"></span><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-close aria-label="${L.close}">${ARROW("m6 6 12 12M18 6 6 18")}</button></div>
     <div class="xxd-viewer__stage"><button class="xxd-viewer__nav" data-dir="prev" aria-label="${L.prev}">${ARROW("m15 6-6 6 6 6")}</button><img alt=""><button class="xxd-viewer__nav" data-dir="next" aria-label="${L.next}">${ARROW("m9 6 6 6-6 6")}</button></div>
     <div class="xxd-pill" data-actions></div>`;
@@ -88,7 +90,9 @@ export function openViewer(items, start = 0, { actions = [], within = document.b
   for (const a of actions) {
     const b = doc.createElement("button");
     b.type = "button";
-    b.innerHTML = `${a.icon ?? ""}${a.label}`;
+    // icon 是你自己的 SVG 字符串；label 是文字（可能来自用户数据），只当文字放
+    if (a.icon) b.innerHTML = a.icon;
+    b.append(a.label ?? "");
     b.addEventListener("click", () => a.run?.(items[i], i));
     pill.append(b);
   }
@@ -235,6 +239,13 @@ export function installSortable(root, closestFrom) {
   });
 }
 
+function restoreLabel(btn) {
+  btn.removeAttribute("data-confirming");
+  const nodes = btn._labelNodes ?? [];
+  if (btn._label?.length) nodes.forEach((n, i) => (n.nodeValue = btn._label[i] ?? ""));
+  else nodes.forEach((n) => n.remove());
+}
+
 /* ── 两次确认：<button class="xxd-btn" data-confirm-twice="确认删除">删除</button> → 第二次点派发 xxd:confirm ── */
 export function installConfirmTwice(root, closestFrom) {
   root.addEventListener("click", (event) => {
@@ -242,19 +253,22 @@ export function installConfirmTwice(root, closestFrom) {
     if (!btn) return;
     if (btn.hasAttribute("data-confirming")) {
       clearTimeout(btn._confirmTimer);
-      btn.removeAttribute("data-confirming");
-      btn.textContent = btn._label;
+      restoreLabel(btn);
       emit(btn, "xxd:confirm");
       return;
     }
     event.preventDefault();
-    btn._label = btn.textContent;
-    btn.textContent = btn.dataset.confirmTwice || "确认";
+    // 只换文字，按钮里的图标留着
+    const label = [...btn.childNodes].filter((n) => n.nodeType === 3 && n.nodeValue.trim());
+    btn._label = label.map((n) => n.nodeValue);
+    btn._labelNodes = label;
+    const text = btn.dataset.confirmTwice || t("confirmTwice", null, btn);
+    if (label.length) {
+      label[0].nodeValue = text;
+      label.slice(1).forEach((n) => (n.nodeValue = ""));
+    } else btn.append((btn._labelNodes = [btn.ownerDocument.createTextNode(text)])[0]);
     btn.setAttribute("data-confirming", "");
-    btn._confirmTimer = setTimeout(() => {
-      btn.removeAttribute("data-confirming");
-      btn.textContent = btn._label;
-    }, 3000);
+    btn._confirmTimer = setTimeout(() => restoreLabel(btn), 3000);
   });
 }
 
@@ -354,7 +368,7 @@ export function celebrate(anchor, { colors = ["#c98a1a", "var(--success)", "var(
     bit.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
     bit.style.setProperty("--dy", `${Math.sin(angle) * dist + 40}px`);
     bit.style.setProperty("--rot", `${Math.random() * 360}deg`);
-    doc.body.append(bit);
+    layerRoot(anchor).append(bit);
     setTimeout(() => bit.remove(), 950);
   }
   anchor.closest(".xxd-celebrate")?.setAttribute("data-play", "");

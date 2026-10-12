@@ -176,7 +176,7 @@
     place-items: center;
     width: 20px;
     height: 28px;
-    color: var(--muted-2);
+    color: var(--muted);
     cursor: grab;
     touch-action: none;
   }
@@ -276,7 +276,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: var(--muted-2);
+    color: var(--muted);
     font-size: var(--text-2xs);
   }
 
@@ -290,7 +290,7 @@
 
   .xxd-auth__terms {
     margin-top: var(--space-2);
-    color: var(--muted-2);
+    color: var(--muted);
     font-size: var(--text-2xs);
     line-height: 1.6;
   }

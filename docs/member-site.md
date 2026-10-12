@@ -52,7 +52,7 @@
 | 模式 | 变量 | 会员站 | 小小东令牌 |
 | --- | --- | --- | --- |
 | 亮 | `--paper` | `#fcfcfc` | `#ffffff` |
-| 亮 | `--muted` | `#777777`（白底 4.48:1，略低于小字的 4.5） | `#6f6f6f` |
+| 亮 | `--muted` | `#777777`（白底 4.48:1，略低于小字的 4.5） | `#6b6b6b` |
 | 亮 | `--font-body` | 少了 `-apple-system, BlinkMacSystemFont, "Segoe UI"` | 系统字体兜底更全 |
 | 亮 | `--font-title` | 少了 `Georgia` | 有 `Georgia` 兜底 |
 

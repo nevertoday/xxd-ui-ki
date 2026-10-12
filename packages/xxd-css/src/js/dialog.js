@@ -1,6 +1,7 @@
 // 对话框：原生 <dialog>。按钮层级见 DESIGN-PRINCIPLES §10：取消在前（辅助、内容宽度），主操作最后。
-import { afterTransition, emit } from "./dom.js";
+import { afterTransition, emit, nextId } from "./dom.js";
 import { ICON } from "./icons-min.js";
+import { fill$1, t } from "./i18n.js";
 
 const returnTo = new WeakMap();
 
@@ -23,7 +24,6 @@ function onClose(event) {
   if (prev && typeof prev.focus === "function" && prev.isConnected) prev.focus();
 }
 
-const DEFAULT_LABELS = { confirm: "确定", cancel: "取消", close: "关闭" };
 
 /**
  * 确认对话框，返回 Promise<boolean>。
@@ -33,15 +33,16 @@ const DEFAULT_LABELS = { confirm: "确定", cancel: "取消", close: "关闭" };
 export function confirmDialog({
   title,
   message = "",
-  confirmLabel = DEFAULT_LABELS.confirm,
-  cancelLabel = DEFAULT_LABELS.cancel,
-  closeLabel = DEFAULT_LABELS.close,
+  confirmLabel = t("confirm"),
+  cancelLabel = t("cancel"),
+  closeLabel = t("close"),
   tone,
   within = document.body,
 } = {}) {
   const dialog = document.createElement("dialog");
   dialog.className = "xxd-dialog";
-  dialog.setAttribute("aria-labelledby", "xxd-confirm-title");
+  const titleId = nextId("xxd-confirm-title");
+  dialog.setAttribute("aria-labelledby", titleId);
   const form = document.createElement("form");
   form.method = "dialog";
 
@@ -49,7 +50,7 @@ export function confirmDialog({
   head.className = "xxd-dialog__head";
   const h = document.createElement("h2");
   h.className = "xxd-dialog__title";
-  h.id = "xxd-confirm-title";
+  h.id = titleId;
   h.textContent = title ?? "";
   const close = document.createElement("button");
   close.className = "xxd-btn";
@@ -127,14 +128,14 @@ export function installDialogs(root, byId, closestFrom) {
  *   await confirmDelete({ name: "长文发布", what: "这个插件的全部记录" })
  * 输入框里打对名字之前，删除按钮是禁用的。返回 true / false。
  */
-export function confirmDelete({ name, what = "", title, confirmLabel = "删除", cancelLabel = "取消", hint = "输入「$1」确认", within = document.body } = {}) {
+export function confirmDelete({ name, what = "", title, confirmLabel = t("delete"), cancelLabel = t("cancel"), hint, within = document.body } = {}) {
   const field = document.createElement("div");
   field.className = "xxd-field";
   const p = document.createElement("p");
-  p.textContent = what ? `会永久删除${what}，不能恢复。` : "删除后不能恢复。";
+  p.textContent = what ? t("deleteWhat", { what }) : t("deleteIrreversible");
   const label = document.createElement("label");
   label.className = "xxd-label";
-  label.textContent = hint.replace("$1", name);
+  label.textContent = hint ? fill$1(hint, name) : t("typeToConfirm", { name });
   const input = document.createElement("input");
   input.className = "xxd-input";
   input.autocomplete = "off";
@@ -143,8 +144,8 @@ export function confirmDelete({ name, what = "", title, confirmLabel = "删除",
   field.append(label, input);
   const body = document.createElement("div");
   body.append(p, field);
-  const promise = confirmDialog({ title: title ?? `删除「${name}」？`, message: body, confirmLabel, cancelLabel, tone: "danger", within });
-  const dialog = within.querySelector("dialog.xxd-dialog:last-of-type");
+  const promise = confirmDialog({ title: title ?? t("deleteTitle", { name }), message: body, confirmLabel, cancelLabel, tone: "danger", within });
+  const dialog = [...within.querySelectorAll(":scope > dialog.xxd-dialog")].pop();
   const ok = dialog.querySelector('button[value="confirm"]');
   ok.disabled = true;
   input.addEventListener("input", () => (ok.disabled = input.value.trim() !== name));

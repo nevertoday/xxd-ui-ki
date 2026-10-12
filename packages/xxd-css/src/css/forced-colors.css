@@ -1,0 +1,127 @@
+/* 高对比模式（Windows「对比度主题」，forced-colors: active）（优化计划 O8）。
+ * 这时浏览器把所有颜色换成系统色、背景色几乎全变成 Canvas：靠背景色画出来的东西
+ * （勾、开关滑块、tab 下划线、进度条、选中的分段）都会消失。这里用系统色重画，
+ * 并且让「选中」总有一个不靠颜色深浅的记号（边框 / 描边）。 */
+@layer xxd.components {
+  @media (forced-colors: active) {
+    /* 自绘控件：自己控制颜色 */
+    .xxd-switch,
+    .xxd-check,
+    .xxd-radio,
+    .xxd-progress,
+    .xxd-loadbar,
+    .xxd-meter,
+    .xxd-dot,
+    .xxd-tabs__ink {
+      forced-color-adjust: none;
+    }
+
+    .xxd-switch,
+    .xxd-check,
+    .xxd-radio {
+      border-color: CanvasText;
+      background: Canvas;
+    }
+
+    .xxd-switch::before {
+      background: CanvasText;
+      box-shadow: none;
+    }
+
+    .xxd-switch:checked,
+    .xxd-check:checked,
+    .xxd-check:indeterminate,
+    .xxd-radio:checked {
+      border-color: Highlight;
+      background: Highlight;
+    }
+
+    .xxd-switch:checked::before,
+    .xxd-check:checked::after,
+    .xxd-check:indeterminate::after {
+      background: HighlightText;
+    }
+
+    .xxd-radio:checked {
+      box-shadow: inset 0 0 0 3.5px Canvas;
+    }
+
+    .xxd-switch:disabled,
+    .xxd-check:disabled,
+    .xxd-radio:disabled {
+      border-color: GrayText;
+      opacity: 1;
+    }
+
+    /* 进度：轨道描边，进度是 Highlight */
+    .xxd-progress,
+    .xxd-loadbar,
+    .xxd-meter {
+      border: 1px solid CanvasText;
+      background: Canvas;
+    }
+
+    .xxd-progress::-webkit-progress-bar {
+      background: Canvas;
+    }
+
+    .xxd-progress::-webkit-progress-value,
+    .xxd-loadbar::after,
+    .xxd-meter__fill {
+      background: Highlight;
+    }
+
+    .xxd-progress::-moz-progress-bar {
+      background: Highlight;
+    }
+
+    .xxd-dot {
+      background: CanvasText;
+    }
+
+    /* tab：选中的那一个有 2px 下边框（伪元素的背景会被抹掉） */
+    .xxd-tabs__ink {
+      background: Highlight;
+    }
+
+    .xxd-tabs > [role="tab"][aria-selected="true"] {
+      color: Highlight;
+      text-decoration: underline 2px;
+      text-underline-offset: 6px;
+    }
+
+    /* 选中 / 按下：描边，不靠底色 */
+    .xxd-segmented > [aria-checked="true"],
+    .xxd-segmented > [aria-pressed="true"],
+    .xxd-chip[aria-pressed="true"],
+    .xxd-btn[aria-pressed="true"],
+    .xxd-option[aria-selected="true"],
+    .xxd-list > .xxd-list__item[aria-selected="true"],
+    .xxd-list > .xxd-list__item[aria-current],
+    .xxd-rail > [aria-current="page"],
+    .xxd-rail > [aria-selected="true"],
+    .xxd-menu__item[aria-checked="true"] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    /* 原本只靠底色区分的面：给一条边 */
+    .xxd-badge,
+    .xxd-chip,
+    .xxd-segmented,
+    .xxd-kbd {
+      border: 1px solid CanvasText;
+    }
+
+    .xxd-btn[data-variant="primary"],
+    .xxd-btn[data-variant="danger"] {
+      border-color: ButtonText;
+    }
+
+    .xxd-btn:disabled,
+    .xxd-btn[aria-disabled="true"] {
+      border-color: GrayText;
+      color: GrayText;
+    }
+  }
+}

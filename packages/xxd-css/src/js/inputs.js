@@ -3,6 +3,7 @@ import { place } from "./floating.js";
 import { emit, nextId } from "./dom.js";
 import { openDialog, closeDialog } from "./dialog.js";
 import { ICON } from "./icons-min.js";
+import { fill$1, t } from "./i18n.js";
 
 /* ── 搜索 ── */
 /** 绑定一个搜索框：⌘F / Ctrl+F 跳到它，Esc 清空。onQuery(query) 在输入时调用。返回解绑函数。 */
@@ -103,7 +104,7 @@ export function addTag(box, raw) {
   const value = String(raw).trim();
   if (!value || tagValues(box).includes(value)) return false;
   const input = box.querySelector(":scope > input");
-  box.insertBefore(chip(box.ownerDocument, value, box.dataset.removeLabel || "删除"), input);
+  box.insertBefore(chip(box.ownerDocument, value, box.dataset.removeLabel || t("remove", null, box)), input);
   emit(box, "xxd:change", { value: tagValues(box) });
   return true;
 }
@@ -177,7 +178,7 @@ function cbOpen(wrap) {
         list.prepend(create);
       }
       create.dataset.value = raw;
-      create.textContent = (wrap.dataset.createLabel || "创建「$1」").replace("$1", raw);
+      create.textContent = wrap.dataset.createLabel ? fill$1(wrap.dataset.createLabel, raw) : t("createOption", { value: raw }, wrap);
       create.hidden = false;
     } else if (create) create.hidden = true;
   }
@@ -318,7 +319,7 @@ export function installComboboxes(root, closestFrom) {
  * recentKey：记住最近运行的命令（localStorage），没有输入时排在最前「最近使用」。
  * loading：true 时显示「正在加载…」（异步命令列表）；之后 palette.setItems(items) 换上真的。
  */
-export function openCommandPalette({ items = [], placeholder = "输入命令或搜索…", empty = "没有匹配的命令", within = document.body, recentKey, recentLabel = "最近使用", loading = false, loadingLabel = "正在加载…" } = {}) {
+export function openCommandPalette({ items = [], placeholder = t("commandPlaceholder"), empty = t("commandEmpty"), within = document.body, recentKey, recentLabel = t("recent"), loading = false, loadingLabel = t("loading") } = {}) {
   const doc = within.ownerDocument;
   const dialog = doc.createElement("dialog");
   dialog.className = "xxd-dialog xxd-palette";
@@ -342,7 +343,8 @@ export function openCommandPalette({ items = [], placeholder = "输入命令或�
   const render = () => {
     const q = input.value.trim().toLowerCase();
     if (loading) {
-      list.innerHTML = `<li class="xxd-palette__empty"><span class="xxd-spinner" aria-hidden="true"></span> ${loadingLabel}</li>`;
+      list.innerHTML = `<li class="xxd-palette__empty"><span class="xxd-spinner" aria-hidden="true"></span> </li>`;
+      list.firstChild.append(loadingLabel);
       shown = [];
       return;
     }

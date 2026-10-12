@@ -43,7 +43,7 @@
 | color | `kumo-badge-purple` | `var(--action, #111111)` |
 | color | `kumo-badge-teal` | `var(--action, #111111)` |
 | color | `kumo-badge-blue` | `var(--action, #111111)` |
-| color | `kumo-badge-neutral` | `var(--muted, #6f6f6f)` |
+| color | `kumo-badge-neutral` | `var(--muted, #6b6b6b)` |
 | color | `kumo-badge-inverted` | `var(--ink, #111111)` |
 
 ## 文字（text-*）
@@ -53,7 +53,7 @@
 | text | `kumo-default` | `var(--ink, #111111)` |
 | text | `kumo-inverse` | `var(--on-ink, #ffffff)` |
 | text | `kumo-strong` | `var(--ink, #111111)` |
-| text | `kumo-subtle` | `var(--muted, #6f6f6f)` |
+| text | `kumo-subtle` | `var(--muted, #6b6b6b)` |
 | text | `kumo-inactive` | `var(--muted-2, #9a968d)` |
 | text | `kumo-placeholder` | `var(--muted-2, #9a968d)` |
 | text | `kumo-brand` | `var(--action-text, #111111)` |

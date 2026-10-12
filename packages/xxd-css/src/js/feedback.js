@@ -1,7 +1,8 @@
 // Tooltip、Toast、复制。
 import { place } from "./floating.js";
-import { nextId } from "./dom.js";
+import { layerRoot, nextId } from "./dom.js";
 import { ICON } from "./icons-min.js";
+import { t } from "./i18n.js";
 
 /* ── Tooltip：[data-tooltip="说明"]，可选 data-tooltip-placement="bottom" ── */
 let tip = null;
@@ -11,20 +12,30 @@ let tipHiddenAt = 0;
 // tooltip 组（I5）：刚关掉的 300ms 内移到别的按钮，立即出现、原地换字
 const GROUP_WINDOW = 300;
 
-function ensureTip(doc) {
-  if (tip && tip.isConnected) return tip;
-  tip = doc.createElement("div");
-  tip.className = "xxd-tooltip";
-  tip.id = nextId("xxd-tip");
-  tip.setAttribute("role", "tooltip");
-  doc.body.append(tip);
-  return tip;
+// 每个根（document / 每个 ShadowRoot）一个 tooltip：放进锚点所在的 Shadow 里，才吃得到 Shadow 里的样式，
+// aria-describedby 也才能指过去（id 引用不跨 Shadow 边界）。
+const tips = new WeakMap();
+
+function ensureTip(anchor) {
+  const container = layerRoot(anchor);
+  let el = tips.get(container);
+  if (!el?.isConnected) {
+    el = anchor.ownerDocument.createElement("div");
+    el.className = "xxd-tooltip";
+    el.id = nextId("xxd-tip");
+    el.setAttribute("role", "tooltip");
+    container.append(el);
+    tips.set(container, el);
+  }
+  if (tip && tip !== el) tip.removeAttribute("data-open");
+  tip = el;
+  return el;
 }
 
 export function showTooltip(anchor) {
   const text = anchor.getAttribute("data-tooltip");
   if (!text) return;
-  const el = ensureTip(anchor.ownerDocument);
+  const el = ensureTip(anchor);
   const instant = el.hasAttribute("data-open") || Date.now() - tipHiddenAt < GROUP_WINDOW;
   el.textContent = text;
   el.toggleAttribute("data-arrow", anchor.hasAttribute("data-tooltip-arrow"));
@@ -38,7 +49,8 @@ export function showTooltip(anchor) {
 export function hideTooltip() {
   clearTimeout(tipTimer);
   if (!tip) return;
-  if (tip.hasAttribute("data-open")) tipHiddenAt = Date.now();
+  // 只有真的在屏幕上的才算「刚关掉」（已经被移出文档的不算）
+  if (tip.hasAttribute("data-open") && tip.isConnected) tipHiddenAt = Date.now();
   tip.removeAttribute("data-open");
   if (tipAnchor) tipAnchor.removeAttribute("aria-describedby");
   tipAnchor = null;
@@ -80,7 +92,8 @@ function regionFor(within) {
   region.className = "xxd-toast-region";
   region.setAttribute("role", "status");
   region.setAttribute("aria-live", "polite");
-  if (host !== doc.body) {
+  // within 是 ShadowRoot：当作一整页（固定在视口角上），不是容器
+  if (host !== doc.body && host.nodeType === 1) {
     region.setAttribute("data-scoped", "");
     if (getComputedStyle(host).position === "static") host.style.position = "relative";
   }
@@ -109,7 +122,9 @@ const timers = new WeakMap();
  * 堆叠（I6）：多张叠成一摞，hover 展开；同一句话再来时不加新的，只轻轻动一下并重新计时；横向滑动关闭。
  * stack: false 时一张张排开（旧行为）。
  */
-export function toast(message, { tone = "neutral", within, duration = 2600, action, stack = true } = {}) {
+export function toast(message, { tone = "neutral", within, duration, action, stack = true } = {}) {
+  // 带操作（撤销、重试）的要留够时间去点：缺省 6 秒；只是告知的 2.6 秒
+  duration ??= action?.label ? 6000 : 2600;
   const region = regionFor(within);
   region.toggleAttribute("data-stack", stack);
   const key = `${tone}\u0000${message}`;
@@ -153,8 +168,13 @@ export function toast(message, { tone = "neutral", within, duration = 2600, acti
     if (ms > 0) timer = setTimeout(dismiss, ms);
   };
   restart();
+  // 鼠标放上去、或键盘聚焦到 toast 里的按钮时暂停计时（WCAG 2.2.1）
   el.addEventListener("pointerenter", () => clearTimeout(timer));
   el.addEventListener("pointerleave", () => restart(1200));
+  el.addEventListener("focusin", () => clearTimeout(timer));
+  el.addEventListener("focusout", (event) => {
+    if (!el.contains(event.relatedTarget)) restart(1200);
+  });
   region.addEventListener("pointerenter", () => restack(region));
   region.addEventListener("pointerleave", () => restack(region));
 
@@ -229,13 +249,13 @@ export function installCopy(root, closestFrom) {
     const targetSel = btn.getAttribute("data-copy-target");
     const text = targetSel ? btn.getRootNode().querySelector(targetSel)?.textContent ?? "" : btn.getAttribute("data-copy");
     const ok = await copyText(text);
-    if (!ok) return toast(btn.getAttribute("data-copy-failed") || "复制失败", { tone: "danger" });
+    if (!ok) return toast(btn.getAttribute("data-copy-failed") || t("copyFailed", null, btn), { tone: "danger" });
     const icon = btn.querySelector(".ui-icon");
     const original = icon?.outerHTML;
     if (icon) icon.outerHTML = ICON.check(Number(icon.getAttribute("width")) || 16);
     btn.setAttribute("data-done", "");
-    showBubble(btn, btn.getAttribute("data-copy-done") || "已复制");
-    if (btn.hasAttribute("data-copy-toast")) toast(btn.getAttribute("data-copy-toast") || "已复制", { tone: "success" });
+    showBubble(btn, btn.getAttribute("data-copy-done") || t("copied", null, btn));
+    if (btn.hasAttribute("data-copy-toast")) toast(btn.getAttribute("data-copy-toast") || t("copied", null, btn), { tone: "success" });
     setTimeout(() => {
       btn.removeAttribute("data-done");
       const now = btn.querySelector(".ui-icon");
@@ -254,8 +274,8 @@ export function showBubble(anchor, text, { duration = 1200 } = {}) {
     bubble.className = "xxd-bubble";
     bubble.setAttribute("role", "status");
     bubble.setAttribute("aria-live", "polite");
-    doc.body.append(bubble);
   }
+  if (bubble.parentNode !== layerRoot(anchor)) layerRoot(anchor).append(bubble);
   clearTimeout(bubbleTimer);
   bubble.textContent = text;
   place(anchor, bubble, { placement: "top", offset: 6 });
