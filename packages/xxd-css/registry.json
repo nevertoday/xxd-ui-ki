@@ -317,7 +317,11 @@
         "focus",
         "checked",
         "disabled"
-      ]
+      ],
+      "attributes": {
+        "data-size": "sm | （缺省）| lg",
+        "role=\"switch\"": "必须"
+      }
     },
     {
       "name": "Checkbox",
@@ -336,7 +340,11 @@
         "focus",
         "checked",
         "disabled"
-      ]
+      ],
+      "attributes": {
+        "aria-invalid": "出错",
+        "indeterminate（JS）": "半选"
+      }
     },
     {
       "name": "Radio",
@@ -367,10 +375,17 @@
       "zh": "滑块",
       "category": "表单",
       "classes": [
-        "xxd-range"
+        "xxd-range",
+        "xxd-range-pair",
+        "xxd-range-value"
       ],
-      "markup": "<input type=\"range\" class=\"xxd-range\" min=\"1\" max=\"4\" value=\"2\" aria-label=\"同时生成\">",
-      "react": "Slider"
+      "markup": "<div class=\"xxd-field\" style=\"width:260px\"><label class=\"xxd-label\">同时生成</label><input type=\"range\" class=\"xxd-range\" data-fill min=\"1\" max=\"4\" value=\"2\" aria-label=\"同时生成\"></div>\n<div class=\"xxd-field\" style=\"width:260px\"><span class=\"xxd-label\">价格区间 <span class=\"xxd-range-value\"></span></span><div class=\"xxd-range-pair\"><input type=\"range\" class=\"xxd-range\" min=\"0\" max=\"100\" value=\"20\" aria-label=\"最低\"><input type=\"range\" class=\"xxd-range\" min=\"0\" max=\"100\" value=\"70\" aria-label=\"最高\"></div></div>",
+      "react": "Slider",
+      "attributes": {
+        "data-fill": "已填部分用主色",
+        "data-ticks + --ticks": "刻度",
+        ".xxd-range-pair": "两个把手的区间（最低不会超过最高）"
+      }
     },
     {
       "name": "TagInput",
@@ -393,9 +408,15 @@
         "xxd-option",
         "xxd-option__hint"
       ],
-      "markup": "<div data-xxd-combobox>\n  <input class=\"xxd-input\" placeholder=\"输入筛选\" aria-label=\"主色\">\n  <ul class=\"xxd-listbox\">\n    <li class=\"xxd-option\" data-value=\"#3b74b8\">湖蓝</li>\n    <li class=\"xxd-option\" data-value=\"#5a8a3c\">苔绿</li>\n  </ul>\n</div>",
+      "markup": "<div data-xxd-combobox style=\"width:240px\"><input class=\"xxd-input\" placeholder=\"输入筛选\" aria-label=\"主色\"><ul class=\"xxd-listbox\"><li class=\"xxd-option\" data-value=\"ink\">墨色</li><li class=\"xxd-option\" data-value=\"#1d9bf0\">X 蓝</li><li class=\"xxd-option\" data-value=\"#3b74b8\">湖蓝</li><li class=\"xxd-option\" data-value=\"#5a8a3c\">苔绿</li></ul></div>\n<div data-xxd-combobox data-multiple data-creatable style=\"width:280px\"><div class=\"xxd-taginput\"><input placeholder=\"选或新建标签\" aria-label=\"标签\"></div><ul class=\"xxd-listbox\"><li class=\"xxd-option\">海报</li><li class=\"xxd-option\">封面</li><li class=\"xxd-option\">卡片</li></ul></div>",
       "js": "wrap.addEventListener(\"xxd:change\", (e) => e.detail.value)",
-      "react": "Combobox"
+      "react": "Combobox",
+      "attributes": {
+        "data-multiple": "多选：选中的变成前面的 chip（.xxd-taginput 包住 input）",
+        "data-creatable": "没有完全相同的项时出现「创建「xx」」",
+        "data-create-label": "自定义「创建」的字",
+        ".xxd-option-group": "分组（筛掉后整组隐藏）"
+      }
     },
     {
       "name": "Tabs",
@@ -414,7 +435,7 @@
         "基线上的文字 + 滑动的短墨线",
         "选中改颜色不加粗",
         "tab 下面不再画第二条线",
-        "§4 §5"
+        "放不下时两端渐隐，选中项自动滚进视野"
       ]
     },
     {
@@ -436,10 +457,15 @@
       "zh": "面包屑",
       "category": "导航",
       "classes": [
-        "xxd-breadcrumbs"
+        "xxd-breadcrumbs",
+        "xxd-breadcrumbs__more"
       ],
-      "markup": "<ol class=\"xxd-breadcrumbs\"><li><a href=\"#\">设置</a></li><li aria-current=\"page\">外观</li></ol>",
-      "react": "Breadcrumbs"
+      "markup": "<ol class=\"xxd-breadcrumbs\" data-collapse=\"4\"><li><a href=\"#\">首页</a></li><li><a href=\"#\">插件</a></li><li><a href=\"#\">长文发布</a></li><li><a href=\"#\">版本</a></li><li><a href=\"#\">1.8</a></li><li aria-current=\"page\">1.8.2</li></ol>",
+      "react": "Breadcrumbs",
+      "attributes": {
+        "data-collapse": "超过 N 项（缺省 4）时中间折叠成「…」菜单",
+        "data-size": "sm"
+      }
     },
     {
       "name": "Pagination",
@@ -447,10 +473,19 @@
       "category": "导航",
       "classes": [
         "xxd-pagination",
-        "xxd-pagination__gap"
+        "xxd-pagination__gap",
+        "xxd-pagination-bar",
+        "xxd-pagination__info",
+        "xxd-pagination__size"
       ],
-      "markup": "<nav class=\"xxd-pagination\" aria-label=\"分页\"><button aria-current=\"page\">1</button><button>2</button><span class=\"xxd-pagination__gap\">…</span><button>9</button></nav>",
-      "react": "Pagination"
+      "markup": "<div class=\"xxd-pagination-bar\">\n  <span class=\"xxd-pagination__info\"></span>\n  <nav class=\"xxd-pagination\" data-xxd-pagination data-page=\"3\" data-total=\"230\" data-per-page=\"20\" aria-label=\"分页\"></nav>\n  <label class=\"xxd-pagination__size\">每页<span class=\"xxd-select\" data-size=\"sm\"><select><option>20</option><option>50</option></select></span></label>\n</div>\n<nav class=\"xxd-pagination\" data-simple aria-label=\"分页（简洁）\"><button aria-label=\"上一页\"><i data-xxd-icon=\"ChevronLeft\" data-size=\"14\"></i></button><button aria-current=\"page\">2</button><button aria-label=\"下一页\"><i data-xxd-icon=\"ChevronRight\" data-size=\"14\"></i></button></nav>",
+      "react": "Pagination",
+      "attributes": {
+        "data-xxd-pagination": "按 data-page / data-total / data-per-page 生成按钮",
+        "data-simple": "只留上一页 / 下一页"
+      },
+      "js": "nav.addEventListener(\"xxd:change\", (e) => e.detail.page)\nXxd.renderPagination(nav, { page: 1, total: 230, perPage: 20 })",
+      "block": true
     },
     {
       "name": "Rail",
@@ -468,6 +503,42 @@
       ]
     },
     {
+      "name": "Sidebar",
+      "zh": "侧栏",
+      "category": "导航",
+      "classes": [
+        "xxd-sidebar",
+        "xxd-sidebar__head",
+        "xxd-sidebar__body",
+        "xxd-sidebar__foot",
+        "xxd-sidebar__group",
+        "xxd-sidebar__label",
+        "xxd-sidebar__item",
+        "xxd-sidebar__sub",
+        "xxd-sidebar__resize"
+      ],
+      "summary": "完整的侧栏：分组、子菜单、徽标、折叠成 56px 图标栏（标签淡出、悬停出 tooltip）、拖动宽度；浮动 / 内嵌两种变体。",
+      "block": true,
+      "attributes": {
+        "data-collapsed": "折叠成图标栏",
+        "data-variant": "floating | inset",
+        "--sidebar-w": "宽度（拖动时更新）",
+        "data-min / data-max": "拖动范围（缺省 200–400）",
+        "[data-xxd-sidebar-toggle=\"id\"]": "折叠 / 展开按钮",
+        "data-sidebar-sub=\"id\"": "有子菜单的项"
+      },
+      "markup": "<div style=\"display:flex;height:420px;border:1px solid var(--line)\">\n<aside class=\"xxd-sidebar\" data-xxd-sidebar id=\"sb1\" style=\"--sidebar-w:232px\">\n  <div class=\"xxd-sidebar__head\"><span class=\"xxd-logo\"><span class=\"xxd-logo__mark\"></span><span data-sidebar-hide>小小东</span></span></div>\n  <nav class=\"xxd-sidebar__body\">\n    <div class=\"xxd-sidebar__group\">\n      <div class=\"xxd-sidebar__label\">内容</div>\n      <a class=\"xxd-sidebar__item\" href=\"#\" aria-current=\"page\"><i data-xxd-icon=\"House\" data-size=\"18\"></i><span>首页</span></a>\n      <a class=\"xxd-sidebar__item\" href=\"#\"><i data-xxd-icon=\"Bookmark\" data-size=\"18\"></i><span>收藏</span><span class=\"xxd-badge\">12</span></a>\n      <button class=\"xxd-sidebar__item\" aria-expanded=\"true\" data-sidebar-sub=\"sb1-sub\"><i data-xxd-icon=\"Folder\" data-size=\"18\"></i><span>风格库</span></button>\n      <div class=\"xxd-sidebar__sub\" id=\"sb1-sub\">\n        <a class=\"xxd-sidebar__item\" href=\"#\"><span>海报</span></a>\n        <a class=\"xxd-sidebar__item\" href=\"#\"><span>封面</span></a>\n      </div>\n    </div>\n    <div class=\"xxd-sidebar__group\">\n      <div class=\"xxd-sidebar__label\">账号</div>\n      <a class=\"xxd-sidebar__item\" href=\"#\"><i data-xxd-icon=\"Settings\" data-size=\"18\"></i><span>设置</span></a>\n    </div>\n  </nav>\n  <div class=\"xxd-sidebar__foot\"><button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"sm\" data-xxd-sidebar-toggle=\"sb1\" aria-label=\"折叠侧栏\"><i data-xxd-icon=\"PanelsTopLeft\" data-size=\"16\"></i></button></div>\n  <div class=\"xxd-sidebar__resize\" data-sidebar-resize></div>\n</aside>\n<main style=\"flex:1;padding:16px\" class=\"xxd-muted\">内容区</main>\n</div>",
+      "react": "Sidebar",
+      "a11y": [
+        "折叠时每个项的名字自动变成 aria-label 和 tooltip",
+        "子菜单按钮带 aria-expanded"
+      ],
+      "rules": [
+        "折叠切换即时，标签淡出、图标不动（只动 opacity）",
+        "激活改颜色和底色，不改线宽、不加粗"
+      ]
+    },
+    {
       "name": "Topbar",
       "zh": "顶栏",
       "category": "导航",
@@ -479,6 +550,45 @@
       "rules": [
         "56px，分隔线属于这一行"
       ]
+    },
+    {
+      "name": "Toolbar",
+      "zh": "工具条",
+      "category": "导航",
+      "classes": [
+        "xxd-toolbar",
+        "xxd-toolbar__item",
+        "xxd-toolbar__sep",
+        "xxd-toolbar__spacer"
+      ],
+      "summary": "编辑器的格式工具栏这类：一组小按钮，← → 在项之间移动（roving tabindex）。",
+      "attributes": {
+        "role=\"toolbar\"": "开启键盘移动",
+        "data-framed": "带框",
+        "data-size": "sm | lg",
+        "aria-pressed": "切换态（加粗等）"
+      },
+      "markup": "<div class=\"xxd-toolbar\" role=\"toolbar\" aria-label=\"格式\" data-framed>\n  <button class=\"xxd-toolbar__item\" aria-label=\"加粗\" aria-pressed=\"true\" data-tooltip=\"加粗 ⌘B\"><i data-xxd-icon=\"Bold\" data-size=\"16\"></i></button>\n  <button class=\"xxd-toolbar__item\" aria-label=\"斜体\" data-tooltip=\"斜体 ⌘I\"><i data-xxd-icon=\"Italic\" data-size=\"16\"></i></button>\n  <button class=\"xxd-toolbar__item\" aria-label=\"标题\" data-tooltip=\"标题\"><i data-xxd-icon=\"Heading1\" data-size=\"16\"></i></button>\n  <span class=\"xxd-toolbar__sep\"></span>\n  <button class=\"xxd-toolbar__item\" aria-label=\"链接\" data-tooltip=\"链接 ⌘K\"><i data-xxd-icon=\"Link\" data-size=\"16\"></i></button>\n  <button class=\"xxd-toolbar__item\" aria-label=\"图片\" data-tooltip=\"图片\"><i data-xxd-icon=\"Image\" data-size=\"16\"></i></button>\n  <span class=\"xxd-toolbar__spacer\"></span>\n  <button class=\"xxd-toolbar__item\"><i data-xxd-icon=\"Eye\" data-size=\"14\"></i>预览</button>\n</div>",
+      "react": "Toolbar",
+      "a11y": [
+        "← → Home End 在项之间移动；Tab 进出整个工具条只停一次"
+      ]
+    },
+    {
+      "name": "PageHeader",
+      "zh": "页面头",
+      "category": "导航",
+      "classes": [
+        "xxd-page-header",
+        "xxd-page-header__row",
+        "xxd-page-header__title",
+        "xxd-page-header__desc",
+        "xxd-page-header__actions"
+      ],
+      "summary": "面包屑、标题、说明、操作、tab —— 资源页、设置页的顶部。",
+      "block": true,
+      "markup": "<header class=\"xxd-page-header\">\n  <ol class=\"xxd-breadcrumbs\"><li><a href=\"#\">插件</a></li><li aria-current=\"page\">长文发布</li></ol>\n  <div class=\"xxd-page-header__row\">\n    <h1 class=\"xxd-page-header__title\">长文发布</h1>\n    <div class=\"xxd-page-header__actions\"><button class=\"xxd-btn\">打开商店页</button><button class=\"xxd-btn\" data-variant=\"primary\">发布新版本</button></div>\n  </div>\n  <p class=\"xxd-page-header__desc\">把 Markdown 写进 X 文章。v1.8.2 · 2,410 位用户</p>\n  <div class=\"xxd-tabs\"><button role=\"tab\" aria-selected=\"true\">概览</button><button role=\"tab\">版本</button><button role=\"tab\">设置</button></div>\n</header>",
+      "react": "PageHeader（区块）"
     },
     {
       "name": "SettingsGroup",
@@ -571,7 +681,7 @@
         "role=\"alertdialog\"": "必须回答的确认：不加 data-light-dismiss"
       },
       "markup": "<dialog class=\"xxd-dialog\" id=\"d1\" aria-labelledby=\"d1-title\">\n  <div class=\"xxd-dialog__head\"><h2 class=\"xxd-dialog__title\" id=\"d1-title\">写入哪篇文章？</h2></div>\n  <div class=\"xxd-dialog__body\"><p>默认不会替换已有内容。</p></div>\n  <div class=\"xxd-dialog__actions\">\n    <button class=\"xxd-btn ui-dialog-cancel\" data-xxd-dialog-close>取消</button>\n    <button class=\"xxd-btn\" data-variant=\"primary\" data-xxd-dialog-close=\"new\">写入为新文章</button>\n  </div>\n</dialog>\n<button class=\"xxd-btn\" data-xxd-dialog-open=\"d1\">打开</button>",
-      "js": "await Xxd.confirmDialog({ title, message, confirmLabel: \"删除\", tone: \"danger\" })  // → true / false",
+      "js": "await Xxd.confirmDialog({ title, message, confirmLabel: \"删除\", tone: \"danger\" })  // → true / false\nawait Xxd.confirmDelete({ name: \"长文发布\", what: \"这个插件的全部记录\" })  // 输入名字才能删",
       "react": "Dialog + DialogActions（@xxd/react）",
       "rules": [
         "取消在前（DOM 顺序），内容宽度、安静；主操作最后、最右",
@@ -719,9 +829,14 @@
         "xxd-palette__list",
         "xxd-palette__empty"
       ],
-      "markup": "<button class=\"xxd-btn\" onclick=\"Xxd.openCommandPalette({ items: [{ label: '新建文章', run(){} }] })\">命令面板 ⌘K</button>",
-      "js": "Xxd.bindCommandPalette(items)  // ⌘K / Ctrl+K",
-      "react": "CommandPalette"
+      "markup": "<button class=\"xxd-btn\" onclick=\"Xxd.openCommandPalette({ recentKey: 'xxd-site-demo', items: [{ label: '新建文章', hint: '⌘N', group: '写作', run(){} }, { label: '写入 X', group: '写作', run(){} }, { label: '切换主题', group: '外观', run(){ XxdTheme.set({ theme: XxdTheme.read().theme === 'dark' ? 'light' : 'dark' }) } }, { label: '切换圆角', group: '外观', run(){ XxdTheme.set({ corners: XxdTheme.read().corners === 'rounded' ? 'square' : 'rounded' }) } }] })\">命令面板 ⌘K</button>",
+      "js": "Xxd.openCommandPalette({ items: [{ label, hint, group, run }], recentKey: \"my-ext-recent\", loading: false })\nXxd.bindCommandPalette(items)  // ⌘K / Ctrl+K",
+      "react": "CommandPalette",
+      "rules": [
+        "按 group 分组，带组标题",
+        "recentKey：没有输入时「最近使用」排最前",
+        "loading：先显示「正在加载…」，再 setItems"
+      ]
     },
     {
       "name": "Badge",
@@ -732,9 +847,10 @@
       ],
       "attributes": {
         "data-tone": "action | success | danger | warning",
-        "data-variant": "solid | outline"
+        "data-variant": "solid | outline | new",
+        "data-appearance": "dot：点 + 字"
       },
-      "markup": "<span class=\"xxd-badge\">草稿</span> <span class=\"xxd-badge\" data-tone=\"success\">已写入</span> <span class=\"xxd-badge\" data-tone=\"warning\">待更新</span>",
+      "markup": "<span class=\"xxd-badge\">草稿</span> <span class=\"xxd-badge\" data-tone=\"success\">已写入</span> <span class=\"xxd-badge\" data-tone=\"warning\">待更新</span> <span class=\"xxd-badge\" data-appearance=\"dot\" data-tone=\"success\">运行中</span> <span class=\"xxd-badge\" data-variant=\"new\">新</span>",
       "react": "Badge"
     },
     {
@@ -773,10 +889,17 @@
         "xxd-banner",
         "xxd-banner__title",
         "xxd-banner__text",
-        "xxd-banner__actions"
+        "xxd-banner__actions",
+        "xxd-banner__close"
       ],
-      "markup": "<div class=\"xxd-banner\" data-tone=\"warning\"><i data-xxd-icon=\"TriangleAlert\"></i><div><p class=\"xxd-banner__title\">今天还能写入 1 篇</p><p class=\"xxd-banner__text\">明天 0 点恢复。</p></div></div>",
-      "react": "Banner"
+      "markup": "<div class=\"xxd-banner\" data-tone=\"warning\" style=\"max-width:520px\"><i data-xxd-icon=\"TriangleAlert\"></i><div><p class=\"xxd-banner__title\">今天还能写入 1 篇</p><p class=\"xxd-banner__text\">明天 0 点恢复；会员不限。</p></div><div class=\"xxd-banner__actions\"><button class=\"xxd-btn\" data-size=\"sm\">开通会员</button></div><button class=\"xxd-btn xxd-banner__close\" data-variant=\"ghost\" data-icon-only data-size=\"xs\" data-banner-close aria-label=\"关闭\"><i data-xxd-icon=\"X\" data-size=\"14\"></i></button></div>",
+      "react": "Banner",
+      "attributes": {
+        "data-tone": "warning | danger | success",
+        "data-size": "sm",
+        "[data-banner-close]": "关闭按钮（淡出后移除，派发 xxd:banner-close）"
+      },
+      "block": true
     },
     {
       "name": "Empty",
@@ -788,11 +911,14 @@
         "xxd-empty__text",
         "xxd-empty__actions"
       ],
-      "markup": "<div class=\"xxd-empty\"><i data-xxd-icon=\"FileText\"></i><p class=\"xxd-empty__title\">还没有记录</p><p class=\"xxd-empty__text\">写入 X 的文章会出现在这里。</p><div class=\"xxd-empty__actions\"><button class=\"xxd-btn\" data-size=\"sm\">打开 X 文章</button></div></div>",
+      "markup": "<div class=\"xxd-empty\" data-size=\"sm\"><i data-xxd-icon=\"FileText\"></i><p class=\"xxd-empty__title\">还没有记录</p></div>\n<div class=\"xxd-empty\"><i data-xxd-icon=\"Package\"></i><p class=\"xxd-empty__title\">还没有插件</p><p class=\"xxd-empty__text\">用一行命令新建一个。</p><div class=\"xxd-clipboard\" data-size=\"sm\"><code>pnpm xxd new ~/js/插件-今日待办</code><button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"xs\" aria-label=\"复制\" data-copy=\"pnpm xxd new ~/js/插件-今日待办\"><i data-xxd-icon=\"Copy\" data-size=\"14\"></i></button></div></div>",
       "react": "Empty",
       "rules": [
         "说明 + 一个明确的下一步"
-      ]
+      ],
+      "attributes": {
+        "data-size": "sm | lg"
+      }
     },
     {
       "name": "Progress",
@@ -820,10 +946,25 @@
       "category": "内容",
       "classes": [
         "xxd-table",
-        "xxd-table-wrap"
+        "xxd-table-wrap",
+        "xxd-table__check",
+        "xxd-th-sort",
+        "xxd-th-resize",
+        "xxd-table__actions"
       ],
-      "markup": "<div class=\"xxd-table-wrap\"><table class=\"xxd-table\"><thead><tr><th>插件</th><th data-align=\"end\">用户</th></tr></thead><tbody><tr><td>长文发布</td><td data-align=\"end\">2,410</td></tr></tbody></table></div>",
-      "react": "Table"
+      "markup": "<div class=\"xxd-table-wrap\" style=\"max-width:560px\">\n<table class=\"xxd-table\" data-interactive>\n  <thead><tr>\n    <th class=\"xxd-table__check\"><input type=\"checkbox\" class=\"xxd-check\" data-select-all aria-label=\"全选\"></th>\n    <th aria-sort=\"ascending\" data-key=\"name\" data-sticky=\"start\"><button class=\"xxd-th-sort\">插件</button><span class=\"xxd-th-resize\"></span></th>\n    <th>版本</th>\n    <th aria-sort=\"none\" data-key=\"users\" data-align=\"end\"><button class=\"xxd-th-sort\">用户</button></th>\n    <th class=\"xxd-table__actions\"><span class=\"xxd-sr-only\">操作</span></th>\n  </tr></thead>\n  <tbody>\n    <tr><td class=\"xxd-table__check\"><input type=\"checkbox\" class=\"xxd-check\" data-select-row aria-label=\"选择 长文发布\"></td><td data-sticky=\"start\">长文发布</td><td>1.8.2</td><td data-align=\"end\">2,410</td><td class=\"xxd-table__actions\"><button class=\"xxd-btn xxd-reveal\" data-variant=\"ghost\" data-size=\"xs\">编辑</button></td></tr>\n    <tr><td class=\"xxd-table__check\"><input type=\"checkbox\" class=\"xxd-check\" data-select-row checked aria-label=\"选择 排序链接\"></td><td data-sticky=\"start\">排序链接</td><td>0.9.0</td><td data-align=\"end\">830</td><td class=\"xxd-table__actions\"><button class=\"xxd-btn xxd-reveal\" data-variant=\"ghost\" data-size=\"xs\">编辑</button></td></tr>\n    <tr><td class=\"xxd-table__check\"><input type=\"checkbox\" class=\"xxd-check\" data-select-row aria-label=\"选择 批量存图\"></td><td data-sticky=\"start\">批量存图</td><td>2.1.0</td><td data-align=\"end\">5,102</td><td class=\"xxd-table__actions\"><button class=\"xxd-btn xxd-reveal\" data-variant=\"ghost\" data-size=\"xs\">编辑</button></td></tr>\n  </tbody>\n  <tfoot><tr><td></td><td colspan=\"2\">3 个插件</td><td data-align=\"end\">8,342</td><td></td></tr></tfoot>\n</table></div>",
+      "react": "Table",
+      "attributes": {
+        "data-interactive": "行可悬停",
+        "data-density": "compact：紧凑",
+        "data-sticky-head": "表头吸顶",
+        "data-sticky（th/td）": "start | end：固定首列 / 末列",
+        "aria-sort（th）": "none | ascending | descending；里面放 .xxd-th-sort",
+        "[data-select-all] / [data-select-row]": "全选与行选择（半选自动）",
+        ".xxd-th-resize": "拖动列宽"
+      },
+      "js": "table.addEventListener(\"xxd:sort\", (e) => e.detail /* { key, direction } */)\ntable.addEventListener(\"xxd:select\", (e) => e.detail.count)",
+      "block": true
     },
     {
       "name": "Collapsible",
@@ -832,8 +973,15 @@
       "classes": [
         "xxd-collapse"
       ],
-      "markup": "<details class=\"xxd-collapse\"><summary>为什么默认直角？</summary><p>会员站的硬规则。</p></details>",
-      "react": "Collapsible"
+      "markup": "<details class=\"xxd-collapse\" name=\"faq\" open><summary>为什么默认直角？</summary><p>会员站的硬规则：对话框、卡片、按钮、输入框都不许圆角。</p></details>\n<details class=\"xxd-collapse\" name=\"faq\"><summary>主色怎么挑？</summary><p>18 个预设，墨色是第一个也是默认。</p></details>\n<details class=\"xxd-collapse\" name=\"faq\"><summary>能用 React 吗？</summary><p>@xxd/react，同一套令牌。</p></details>",
+      "react": "Collapsible",
+      "attributes": {
+        "name（details）": "同名的一组只开一个（手风琴，浏览器原生）"
+      },
+      "rules": [
+        "展开只淡入 + 小位移，不做高度动画"
+      ],
+      "block": true
     },
     {
       "name": "Code",
@@ -843,14 +991,22 @@
         "xxd-code",
         "xxd-code-inline",
         "xxd-kbd",
-        "xxd-copy"
+        "xxd-copy",
+        "xxd-code-block",
+        "xxd-code__head"
       ],
-      "markup": "<pre class=\"xxd-code\"><code>toast(\"已保存\")</code><button class=\"xxd-btn xxd-copy\" data-variant=\"ghost\" data-icon-only data-size=\"sm\" aria-label=\"复制\" data-copy='toast(\"已保存\")'><i data-xxd-icon=\"Copy\" data-size=\"14\"></i></button></pre>\n<kbd class=\"xxd-kbd\">⌘</kbd><kbd class=\"xxd-kbd\">K</kbd>",
-      "js": "[data-copy] / [data-copy-target]：复制后图标变勾 1.2s",
+      "markup": "<div class=\"xxd-code-block\" style=\"max-width:520px\">\n  <div class=\"xxd-code__head\">sidepanel.js<button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"xs\" aria-label=\"复制\" data-copy-target=\"#code-demo code\"><i data-xxd-icon=\"Copy\" data-size=\"14\"></i></button></div>\n  <pre class=\"xxd-code\" id=\"code-demo\" data-highlight data-lines><code data-lang=\"js\">// 外观设置存在 chrome.storage\nconst store = createAppearanceStore({ key: \"today-ui\" });\nawait store.load();\nXxd.toast(\"已保存\", { tone: \"success\" });</code></pre>\n</div>\n<p>行内代码 <code class=\"xxd-code-inline\">--r-sm</code>，按键 <kbd class=\"xxd-kbd\">⌘</kbd><kbd class=\"xxd-kbd\">K</kbd></p>",
+      "js": "Xxd.highlight(codeElement, \"js\")",
       "react": "Code / ClipboardText",
       "rules": [
         "行内代码 12%，代码块 6%"
-      ]
+      ],
+      "attributes": {
+        "data-highlight": "轻量高亮（js / ts / json / css / html / bash，data-lang）",
+        "data-lines": "行号",
+        ".xxd-code__head": "文件名 + 复制"
+      },
+      "block": true
     },
     {
       "name": "Avatar",
@@ -883,6 +1039,71 @@
         "卡片没有阴影，hover 只加深边线",
         "角标贴着角（读作界面）"
       ]
+    },
+    {
+      "name": "LayerCard",
+      "zh": "分层卡片",
+      "category": "内容",
+      "classes": [
+        "xxd-layer",
+        "xxd-layer__secondary",
+        "xxd-layer__primary"
+      ],
+      "summary": "主体（纸）+ 次要区（洗色）：卡片上方或下方的一条说明 / 操作。不要层层嵌套。",
+      "markup": "<div class=\"xxd-layer\" style=\"width:300px\">\n  <div class=\"xxd-layer__secondary\">下一步<button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"xs\" aria-label=\"前往\" style=\"margin-left:auto\"><i data-xxd-icon=\"ArrowRight\" data-size=\"14\"></i></button></div>\n  <div class=\"xxd-layer__primary\">用小小东 UI 做第一个插件</div>\n</div>",
+      "react": "LayerCard",
+      "rules": [
+        "不要把分层卡片叠在分层卡片里"
+      ]
+    },
+    {
+      "name": "Layout",
+      "zh": "布局预设",
+      "category": "内容",
+      "classes": [
+        "xxd-layout",
+        "xxd-surface"
+      ],
+      "summary": "常用的两栏 / 三栏布局，720px 以下自动叠成一栏；面分三层：base（纸）、sunken（洗色）、raised（只给浮层）。",
+      "block": true,
+      "attributes": {
+        "data-cols": "2up | 3up | 4up | 1-2 | 2-1 | 1-3 | side",
+        "--layout-gap": "间距",
+        "data-level（.xxd-surface）": "base | sunken | raised"
+      },
+      "markup": "<div class=\"xxd-layout\" data-cols=\"1-2\">\n  <div class=\"xxd-surface\" data-level=\"sunken\" style=\"padding:16px\">侧栏 1</div>\n  <div class=\"xxd-surface\" style=\"padding:16px\">主体 2</div>\n</div>",
+      "react": "Grid / Surface"
+    },
+    {
+      "name": "TableOfContents",
+      "zh": "文章目录",
+      "category": "内容",
+      "classes": [
+        "xxd-toc",
+        "xxd-toc__title"
+      ],
+      "summary": "长文的目录：滚动到哪一节，哪一项高亮（data-spy）。",
+      "attributes": {
+        "data-spy": "跟着滚动高亮当前节",
+        "data-depth=\"3\"（li）": "二级缩进"
+      },
+      "markup": "<nav aria-label=\"本文目录\"><p class=\"xxd-toc__title\">本文</p>\n<ul class=\"xxd-toc\" data-spy>\n  <li><a href=\"#demo\" aria-current=\"true\">演示</a></li>\n  <li data-depth=\"3\"><a href=\"#props\">属性与类名</a></li>\n  <li><a href=\"#rules\">规则</a></li>\n</ul></nav>",
+      "react": "TableOfContents"
+    },
+    {
+      "name": "Logo",
+      "zh": "小小东标志",
+      "category": "内容",
+      "classes": [
+        "xxd-logo",
+        "xxd-logo__mark"
+      ],
+      "summary": "暖黑方块上四个由满到淡的小方块，各插件同一个标；跟随主题（暗色时反过来）。",
+      "attributes": {
+        "data-size": "sm | （缺省 20px）| lg",
+        "--logo-size": "任意尺寸"
+      },
+      "markup": "<span class=\"xxd-logo\" data-size=\"sm\"><span class=\"xxd-logo__mark\"></span>小小东</span>\n<span class=\"xxd-logo\"><span class=\"xxd-logo__mark\"></span>长文发布</span>\n<span class=\"xxd-logo\" data-size=\"lg\"><span class=\"xxd-logo__mark\"></span>小小东 UI</span>"
     },
     {
       "name": "Prose",

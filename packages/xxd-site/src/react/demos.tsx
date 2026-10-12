@@ -2,6 +2,12 @@
 import { useState } from "react";
 import {
   Badge,
+  Grid,
+  GridItem,
+  Sidebar,
+  Surface,
+  TableOfContents,
+  Toolbar,
   Banner,
   Breadcrumbs,
   Button,
@@ -320,7 +326,7 @@ export function CodeDemo() {
   return <ClipboardText text="pnpm xxd new ~/js/插件-今日待办" />;
 }
 
-export function CardDemo() {
+export function LayerCardDemo() {
   return (
     <LayerCard className="w-72">
       <LayerCard.Secondary>下一步</LayerCard.Secondary>
@@ -384,5 +390,66 @@ export function PickerDemo() {
         ))}
       </Select.Group>
     </Select>
+  );
+}
+
+export function ToolbarDemo() {
+  return (
+    <Toolbar className="w-full max-w-md">
+      <Toolbar.Button icon={<Icon name="Bold" />} aria-label="加粗" />
+      <Toolbar.Button icon={<Icon name="Italic" />} aria-label="斜体" />
+      <Toolbar.Button icon={<Icon name="Link" />} aria-label="链接" />
+      <Toolbar.Button icon={<Icon name="Image" />} aria-label="图片" />
+    </Toolbar>
+  );
+}
+
+export function TableOfContentsDemo() {
+  return (
+    <TableOfContents>
+      <TableOfContents.Title>本文</TableOfContents.Title>
+      <TableOfContents.List>
+        {["演示", "属性与类名", "规则"].map((t) => (
+          <TableOfContents.Item key={t} active={t === "演示"}>
+            {t}
+          </TableOfContents.Item>
+        ))}
+      </TableOfContents.List>
+    </TableOfContents>
+  );
+}
+
+export function LayoutDemo() {
+  return (
+    <Grid variant="2up" gap="base">
+      <GridItem>
+        <Surface className="rounded-lg p-4">侧栏 1</Surface>
+      </GridItem>
+      <GridItem>
+        <Surface className="rounded-lg p-4">主体 2</Surface>
+      </GridItem>
+    </Grid>
+  );
+}
+
+export function SidebarDemo() {
+  return (
+    <div style={{ height: 320, display: "flex", border: "1px solid var(--line)" }}>
+      <Sidebar.Provider contained defaultOpen className="h-full min-h-0!">
+        <Sidebar>
+          <Sidebar.Content>
+            <Sidebar.Group>
+              <Sidebar.GroupLabel>内容</Sidebar.GroupLabel>
+              <Sidebar.Menu>
+                <Sidebar.MenuButton icon={(p: object) => <Icon name="House" {...p} />} active>
+                  首页
+                </Sidebar.MenuButton>
+                <Sidebar.MenuButton icon={(p: object) => <Icon name="Bookmark" {...p} />}>收藏</Sidebar.MenuButton>
+              </Sidebar.Menu>
+            </Sidebar.Group>
+          </Sidebar.Content>
+        </Sidebar>
+      </Sidebar.Provider>
+    </div>
   );
 }

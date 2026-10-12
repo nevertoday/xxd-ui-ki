@@ -51,7 +51,7 @@ const hasReact = Boolean(reactCode);
       demo.setAttribute("data-ready", "");
       const toggle = demo.querySelector("[data-site-code-toggle]");
       const codes = [...demo.querySelectorAll(".site-code")];
-      const tabs = [...demo.querySelectorAll('[role="tab"]')];
+      const tabs = [...demo.querySelectorAll('.site-demo__bar > .xxd-tabs > [role="tab"]')];
       const show = () => {
         const open = toggle.getAttribute("aria-expanded") === "true";
         const i = Math.max(0, tabs.findIndex((t) => t.getAttribute("aria-selected") === "true"));

@@ -335,3 +335,131 @@ describe("O2 组件", () => {
     expect(document.activeElement.id).toBe("ex");
   });
 });
+
+describe("O3 组件", () => {
+  it("表格：全选 / 半选、排序派发 xxd:sort", () => {
+    html(`<table class="xxd-table"><thead><tr><th><input type="checkbox" data-select-all></th><th aria-sort="none" data-key="name"><button class="xxd-th-sort">名</button></th></tr></thead>
+      <tbody><tr><td><input type="checkbox" data-select-row></td></tr><tr><td><input type="checkbox" data-select-row></td></tr></tbody></table>`);
+    const all = document.querySelector("[data-select-all]");
+    const rows = document.querySelectorAll("[data-select-row]");
+    rows[0].checked = true;
+    rows[0].dispatchEvent(new Event("change", { bubbles: true }));
+    expect(all.indeterminate).toBe(true);
+    all.checked = true;
+    all.dispatchEvent(new Event("change", { bubbles: true }));
+    expect([...rows].every((r) => r.checked)).toBe(true);
+    expect(all.indeterminate).toBe(false);
+    const seen = vi.fn();
+    document.querySelector("table").addEventListener("xxd:sort", (e) => seen(e.detail));
+    document.querySelector(".xxd-th-sort").click();
+    expect(seen).toHaveBeenCalledWith({ key: "name", direction: "ascending" });
+    document.querySelector(".xxd-th-sort").click();
+    expect(document.querySelector("th[data-key]").getAttribute("aria-sort")).toBe("descending");
+  });
+
+  it("分页：页码列表带省略、点击翻页、信息行", () => {
+    expect(Xxd.pageList(5, 12)).toEqual([1, "…", 4, 5, 6, "…", 12]);
+    html(`<div class="xxd-pagination-bar"><span class="xxd-pagination__info"></span><nav class="xxd-pagination" data-xxd-pagination data-page="1" data-total="45" data-per-page="20"></nav></div>`);
+    const nav = document.querySelector("nav");
+    expect(document.querySelector(".xxd-pagination__info").textContent).toBe("1–20 / 45");
+    nav.querySelector('[data-page-to="3"]').click();
+    expect(nav.dataset.page).toBe("3");
+    expect(nav.querySelector('[aria-current="page"]').textContent).toBe("3");
+    expect(document.querySelector(".xxd-pagination__info").textContent).toBe("41–45 / 45");
+    expect(nav.querySelector('[aria-label="下一页"]').disabled).toBe(true);
+  });
+
+  it("区间滑块：最低不会超过最高", () => {
+    html(`<div class="xxd-range-pair"><input type="range" class="xxd-range" min="0" max="100" value="20"><input type="range" class="xxd-range" min="0" max="100" value="50"></div>`);
+    const [a] = document.querySelectorAll(".xxd-range");
+    a.value = "80";
+    a.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(a.value).toBe("50");
+  });
+
+  it("代码高亮：关键字、字符串、注释、数字各有标记", () => {
+    const out = Xxd.highlightText('const n = 42; // 注释\nlet s = "hi";', "js");
+    expect(out).toContain('<span class="tok-k">const</span>');
+    expect(out).toContain('<span class="tok-n">42</span>');
+    expect(out).toContain('<span class="tok-c">// 注释</span>');
+    expect(out).toContain('<span class="tok-s">"hi"</span>');
+    expect(Xxd.highlightText("<b>x</b>", "html")).toContain('<span class="tok-t">b</span>');
+  });
+
+  it("侧栏：折叠时名字变成 tooltip 和 aria-label；子菜单展开", () => {
+    html(`<aside class="xxd-sidebar" data-xxd-sidebar id="sbx"><a class="xxd-sidebar__item" href="#"><span>首页</span></a>
+      <button class="xxd-sidebar__item" aria-expanded="false" data-sidebar-sub="subx"><span>库</span></button><div class="xxd-sidebar__sub" id="subx" hidden></div></aside>
+      <button data-xxd-sidebar-toggle="sbx">折叠</button>`);
+    document.querySelector("[data-xxd-sidebar-toggle]").click();
+    const item = document.querySelector(".xxd-sidebar__item");
+    expect(document.getElementById("sbx").hasAttribute("data-collapsed")).toBe(true);
+    expect(item.getAttribute("data-tooltip")).toBe("首页");
+    expect(item.getAttribute("aria-label")).toBe("首页");
+    document.querySelector("[data-sidebar-sub]").click();
+    expect(document.getElementById("sbx").hasAttribute("data-collapsed")).toBe(false);
+    expect(document.getElementById("subx").hidden).toBe(false);
+    expect(item.hasAttribute("aria-label")).toBe(false);
+  });
+
+  it("工具条：→ 移到下一项，roving tabindex", () => {
+    html(`<div class="xxd-toolbar" role="toolbar"><button class="xxd-toolbar__item" id="b1">B</button><button class="xxd-toolbar__item" id="b2">I</button></div>`);
+    const b1 = document.getElementById("b1");
+    expect(b1.tabIndex).toBe(0);
+    b1.focus();
+    key(b1, "ArrowRight");
+    expect(document.activeElement.id).toBe("b2");
+    expect(b1.tabIndex).toBe(-1);
+  });
+
+  it("面包屑：太长时中间折叠成菜单", () => {
+    html(`<ol class="xxd-breadcrumbs" data-collapse="4">${["a", "b", "c", "d", "e", "f"].map((x) => `<li><a href="#${x}">${x}</a></li>`).join("")}</ol>`);
+    const visible = [...document.querySelectorAll(".xxd-breadcrumbs > li:not([hidden])")];
+    expect(visible.length).toBe(4);
+    expect(document.querySelectorAll(".xxd-breadcrumbs .xxd-menu__item").length).toBe(3);
+  });
+
+  it("组合框多选 + 新建：选中变 chip，不存在的可以创建", () => {
+    html(`<div data-xxd-combobox data-multiple data-creatable><div class="xxd-taginput"><input></div><ul class="xxd-listbox"><li class="xxd-option">海报</li><li class="xxd-option">封面</li></ul></div>`);
+    const wrap = document.querySelector("[data-xxd-combobox]");
+    const input = wrap.querySelector("input");
+    input.value = "海";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    key(input, "ArrowDown");
+    key(input, "ArrowDown");
+    key(input, "Enter");
+    expect(Xxd.tagValues(wrap.querySelector(".xxd-taginput"))).toEqual(["海报"]);
+    input.value = "卡片";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    const create = wrap.querySelector(".xxd-option[data-create]");
+    expect(create.textContent).toBe("创建「卡片」");
+    create.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    expect(Xxd.tagValues(wrap.querySelector(".xxd-taginput"))).toEqual(["海报", "卡片"]);
+    key(input, "Backspace");
+    expect(Xxd.tagValues(wrap.querySelector(".xxd-taginput"))).toEqual(["海报"]);
+  });
+
+  it("命令面板：分组标题、最近使用排最前", () => {
+    localStorage.setItem("pal-test", JSON.stringify(["b"]));
+    const dialog = Xxd.openCommandPalette({ recentKey: "pal-test", items: [{ id: "a", label: "新建", group: "写作" }, { id: "b", label: "主题", group: "外观" }] });
+    const labels = [...dialog.querySelectorAll(".xxd-option-group__label")].map((l) => l.textContent);
+    expect(labels).toEqual(["最近使用", "写作"]);
+    expect(dialog.querySelector(".xxd-option").textContent).toBe("主题");
+    dialog.close();
+  });
+
+  it("输入名字确认删除：名字对了才能点删除", async () => {
+    const p = Xxd.confirmDelete({ name: "长文发布" });
+    const dialog = document.querySelector("dialog.xxd-dialog:last-of-type");
+    const ok = dialog.querySelector('button[value="confirm"]');
+    const input = dialog.querySelector("input");
+    expect(ok.disabled).toBe(true);
+    input.value = "长文";
+    input.dispatchEvent(new Event("input"));
+    expect(ok.disabled).toBe(true);
+    input.value = "长文发布";
+    input.dispatchEvent(new Event("input"));
+    expect(ok.disabled).toBe(false);
+    dialog.close("confirm");
+    await expect(p).resolves.toBe(true);
+  });
+});

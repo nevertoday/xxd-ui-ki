@@ -25,7 +25,12 @@
       .xxd-pagination > *,
       .xxd-rail > *,
       .xxd-picker__trigger,
-      .xxd-input-group
+      .xxd-input-group,
+      .xxd-sidebar__item,
+      .xxd-toolbar__item,
+      .xxd-th-sort,
+      .xxd-toc a,
+      .xxd-inline-copy
     ):hover {
     transition-duration: 0s;
   }

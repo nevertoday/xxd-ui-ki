@@ -6,10 +6,10 @@ interface Props {
 const { attributes = {}, classes } = Astro.props;
 ---
 
-<table class="site-props">
+<div style="overflow-x:auto"><table class="site-props">
   <thead><tr><th>属性 / 类名</th><th>说明</th></tr></thead>
   <tbody>
     {Object.entries(attributes).map(([k, v]) => (<tr><td>{k}</td><td>{v}</td></tr>))}
     <tr><td>类名</td><td class="xxd-text" data-variant="mono-secondary">{classes.join("  ")}</td></tr>
   </tbody>
-</table>
+</table></div>

@@ -94,3 +94,36 @@ export function installLayers(root, byId, closestFrom) {
     }
   });
 }
+
+/* ── 窄屏抽屉（I12）：.xxd-dialog / .xxd-panel 在窄屏变成底部抽屉；下滑超过 1/3 或甩得够快就关 ── */
+export function installDrawerSwipe(root, closestFrom) {
+  let drag = null;
+  root.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" || !globalThis.matchMedia?.("(max-width: 640px)").matches) return;
+    const layer = closestFrom(event, ".xxd-dialog[open], .xxd-panel[data-open]");
+    if (!layer) return;
+    const handleZone = event.target.closest?.(".xxd-drawer-handle, .xxd-dialog__head, .xxd-panel__head");
+    if (!handleZone && layer.scrollTop > 0) return;
+    drag = { layer, y: event.clientY, t: event.timeStamp, dy: 0 };
+  });
+  root.addEventListener("pointermove", (event) => {
+    if (!drag) return;
+    drag.dy = Math.max(0, event.clientY - drag.y);
+    drag.layer.style.transform = `translateY(${drag.dy}px)`;
+    drag.layer.style.transition = "none";
+  });
+  const end = (event) => {
+    if (!drag) return;
+    const { layer, dy, t } = drag;
+    drag = null;
+    layer.style.transition = "";
+    layer.style.transform = "";
+    const fast = dy / Math.max(1, event.timeStamp - t) > 0.6;
+    if (dy > layer.getBoundingClientRect().height / 3 || (fast && dy > 24)) {
+      if (layer instanceof HTMLDialogElement) layer.close("cancel");
+      else closeLayer(layer);
+    }
+  };
+  root.addEventListener("pointerup", end);
+  root.addEventListener("pointercancel", end);
+}

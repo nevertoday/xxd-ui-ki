@@ -51,8 +51,8 @@ export declare function clearMarks(root: Element): void;
 export declare function addTag(box: HTMLElement, value: string): boolean;
 export declare function tagValues(box: HTMLElement): string[];
 
-export interface CommandItem { id?: string; label: string; hint?: string; keywords?: string; run?: () => void }
-export declare function openCommandPalette(options?: { items?: CommandItem[]; placeholder?: string; empty?: string; within?: HTMLElement }): HTMLDialogElement;
+export interface CommandItem { id?: string; label: string; hint?: string; keywords?: string; group?: string; run?: () => void }
+export declare function openCommandPalette(options?: { items?: CommandItem[]; placeholder?: string; empty?: string; within?: HTMLElement; recentKey?: string; recentLabel?: string; loading?: boolean; loadingLabel?: string }): HTMLDialogElement & { setItems(items: CommandItem[]): void };
 export declare function bindCommandPalette(items: CommandItem[] | (() => CommandItem[]), options?: { key?: string; placeholder?: string; empty?: string }): () => void;
 
 export interface AppearanceSettings { theme?: "light" | "dark" | "system"; corners?: "square" | "rounded"; accent?: string; density?: "comfortable" | "compact"; finish?: "flat" | "material" }
@@ -75,3 +75,15 @@ export declare function mountAppearance(
 ): { element: HTMLElement; sync: () => void; destroy: () => void };
 
 export declare const ICON: Record<"close" | "check" | "copy" | "search" | "success" | "danger" | "warning" | "info", (size?: number) => string>;
+
+export declare function confirmDelete(options: { name: string; what?: string; title?: string; confirmLabel?: string; cancelLabel?: string; hint?: string; within?: HTMLElement }): Promise<boolean>;
+export declare function toggleSidebar(sidebar: HTMLElement, collapsed?: boolean): void;
+export declare function collapseBreadcrumbs(crumbs: HTMLElement): void;
+export declare function spyToc(toc: HTMLElement): void;
+export declare function watchTabsOverflow(list: HTMLElement): void;
+export declare function renderPagination(nav: HTMLElement, options?: { page?: number; total?: number; perPage?: number }): { page: number; pages: number };
+export declare function pageList(page: number, pages: number, around?: number): (number | "…")[];
+export declare function syncSelectAll(table: HTMLElement): number;
+export declare function syncRangePair(pair: HTMLElement, moved?: HTMLInputElement): [number, number] | null;
+export declare function highlight(el: HTMLElement, lang?: "js" | "ts" | "json" | "css" | "html" | "bash"): HTMLElement;
+export declare function highlightText(text: string, lang?: string): string;

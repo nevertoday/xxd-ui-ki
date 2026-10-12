@@ -10,8 +10,13 @@ import { installCopy, installTooltips } from "./feedback.js";
 import { installLayers } from "./layers.js";
 import { initComboboxes, installComboboxes, installTagInputs } from "./inputs.js";
 import { initPickers, installPickers, installSecrets } from "./picker.js";
+import { initStructure, installStructure } from "./structure.js";
+import { initData, installData } from "./data.js";
+import { installDrawerSwipe } from "./layers.js";
 
-export { openDialog, closeDialog, confirmDialog } from "./dialog.js";
+export { openDialog, closeDialog, confirmDialog, confirmDelete } from "./dialog.js";
+export { toggleSidebar, collapseBreadcrumbs, spyToc, watchTabsOverflow } from "./structure.js";
+export { renderPagination, pageList, syncSelectAll, syncRangePair, highlight, highlightText } from "./data.js";
 export { showFloating, hideFloating, openSubmenu, closeSubmenu } from "./menu.js";
 export { openPicker, closePicker, choose as choosePickerOption } from "./picker.js";
 export { place } from "./floating.js";
@@ -38,6 +43,9 @@ export function install(root = document) {
     installComboboxes(root, closestFrom);
     installPickers(root, closestFrom);
     installSecrets(root, closestFrom);
+    installStructure(root, byId, closestFrom);
+    installData(root, closestFrom);
+    installDrawerSwipe(root, closestFrom);
   }
   init(root);
   return root;
@@ -48,5 +56,7 @@ export function init(root = document) {
   initChoices(root);
   initComboboxes(root);
   initPickers(root);
+  initStructure(root);
+  initData(root);
   globalThis.XxdIcons?.hydrateIcons?.(root);
 }

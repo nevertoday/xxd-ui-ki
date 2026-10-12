@@ -158,8 +158,29 @@ function cbSetActive(input, list, option) {
 
 function cbOpen(wrap) {
   const { input, list } = cbParts(wrap);
-  const q = input.value.trim().toLowerCase();
-  for (const o of list.querySelectorAll(".xxd-option")) o.hidden = Boolean(q) && !o.textContent.toLowerCase().includes(q);
+  const raw = input.value.trim();
+  const q = raw.toLowerCase();
+  for (const o of list.querySelectorAll(".xxd-option:not([data-create])")) o.hidden = Boolean(q) && !o.textContent.toLowerCase().includes(q);
+  // 分组：组里一个都不剩时整组藏起来
+  for (const g of list.querySelectorAll(".xxd-option-group")) g.hidden = ![...g.querySelectorAll(".xxd-option")].some((o) => !o.hidden);
+  // 「创建 xx」：data-creatable，且没有完全相同的项
+  if (wrap.hasAttribute("data-creatable")) {
+    let create = list.querySelector(".xxd-option[data-create]");
+    const exact = [...list.querySelectorAll(".xxd-option:not([data-create])")].some((o) => o.textContent.trim().toLowerCase() === q);
+    if (q && !exact) {
+      if (!create) {
+        create = document.createElement("li");
+        create.className = "xxd-option";
+        create.setAttribute("role", "option");
+        create.setAttribute("data-create", "");
+        create.id = nextId("xxd-option");
+        list.prepend(create);
+      }
+      create.dataset.value = raw;
+      create.textContent = (wrap.dataset.createLabel || "创建「$1」").replace("$1", raw);
+      create.hidden = false;
+    } else if (create) create.hidden = true;
+  }
   list.hidden = cbVisible(list).length === 0;
   input.setAttribute("aria-expanded", String(!list.hidden));
   if (!list.hidden) {
@@ -177,11 +198,34 @@ function cbClose(wrap) {
 
 function cbChoose(wrap, option) {
   const { input, list } = cbParts(wrap);
+  const value = option.dataset.value ?? option.textContent.trim();
+  const label = option.hasAttribute("data-create") ? value : option.dataset.label ?? option.textContent.trim();
+  if (option.hasAttribute("data-create")) {
+    // 新建的项留在列表里
+    const added = document.createElement("li");
+    added.className = "xxd-option";
+    added.setAttribute("role", "option");
+    added.id = nextId("xxd-option");
+    added.dataset.value = value;
+    added.textContent = value;
+    option.after(added);
+    option.hidden = true;
+    option = added;
+  }
+  if (wrap.hasAttribute("data-multiple")) {
+    // 多选：选中的变成输入框前面的 chip（同 .xxd-taginput），列表不关
+    const box = wrap.querySelector(".xxd-taginput");
+    if (box && addTag(box, label)) option.setAttribute("aria-selected", "true");
+    input.value = "";
+    cbOpen(wrap);
+    emit(wrap, "xxd:change", { value: tagValues(box) });
+    return;
+  }
   for (const o of list.querySelectorAll(".xxd-option")) o.setAttribute("aria-selected", String(o === option));
-  input.value = option.dataset.label ?? option.textContent.trim();
-  wrap.dataset.value = option.dataset.value ?? input.value;
+  input.value = label;
+  wrap.dataset.value = value;
   cbClose(wrap);
-  emit(wrap, "xxd:change", { value: wrap.dataset.value, label: input.value });
+  emit(wrap, "xxd:change", { value, label });
 }
 
 export function initComboboxes(root) {
@@ -203,7 +247,30 @@ export function initComboboxes(root) {
   }
 }
 
+function cbRemoveChip(wrap, chipEl) {
+  const box = wrap.querySelector(".xxd-taginput");
+  const value = chipEl.dataset.value;
+  chipEl.remove();
+  for (const o of wrap.querySelectorAll(".xxd-option")) if ((o.dataset.value ?? o.textContent.trim()) === value) o.setAttribute("aria-selected", "false");
+  emit(wrap, "xxd:change", { value: tagValues(box) });
+}
+
 export function installComboboxes(root, closestFrom) {
+  // 多选：chip 上的 × 和空输入框里的退格
+  root.addEventListener("click", (event) => {
+    const x = closestFrom(event, "[data-xxd-combobox][data-multiple] .xxd-chip > button");
+    if (!x) return;
+    const wrap = x.closest("[data-xxd-combobox]");
+    cbRemoveChip(wrap, x.parentElement);
+    cbParts(wrap).input.focus();
+  });
+  root.addEventListener("keydown", (event) => {
+    if (event.key !== "Backspace") return;
+    const wrap = closestFrom(event, "[data-xxd-combobox][data-multiple]");
+    if (!wrap || cbParts(wrap).input.value) return;
+    const last = wrap.querySelector(".xxd-taginput > .xxd-chip:last-of-type");
+    if (last) cbRemoveChip(wrap, last);
+  });
   root.addEventListener("input", (event) => {
     const wrap = closestFrom(event, "[data-xxd-combobox]");
     if (wrap) cbOpen(wrap);
@@ -246,7 +313,12 @@ export function installComboboxes(root, closestFrom) {
 }
 
 /* ── 命令面板：openCommandPalette({ items: [{ id, label, hint, keywords, run }] }) ── */
-export function openCommandPalette({ items = [], placeholder = "输入命令或搜索…", empty = "没有匹配的命令", within = document.body } = {}) {
+/**
+ * items: [{ id, label, hint, keywords, group, run }]；group 相同的放在一起，带组标题。
+ * recentKey：记住最近运行的命令（localStorage），没有输入时排在最前「最近使用」。
+ * loading：true 时显示「正在加载…」（异步命令列表）；之后 palette.setItems(items) 换上真的。
+ */
+export function openCommandPalette({ items = [], placeholder = "输入命令或搜索…", empty = "没有匹配的命令", within = document.body, recentKey, recentLabel = "最近使用", loading = false, loadingLabel = "正在加载…" } = {}) {
   const doc = within.ownerDocument;
   const dialog = doc.createElement("dialog");
   dialog.className = "xxd-dialog xxd-palette";
@@ -260,12 +332,42 @@ export function openCommandPalette({ items = [], placeholder = "输入命令或�
   let shown = [];
   let active = 0;
 
+  const readRecent = () => {
+    try {
+      return JSON.parse(localStorage.getItem(recentKey) || "[]");
+    } catch {
+      return [];
+    }
+  };
   const render = () => {
     const q = input.value.trim().toLowerCase();
-    shown = items.filter((it) => !q || `${it.label} ${it.keywords ?? ""} ${it.hint ?? ""}`.toLowerCase().includes(q));
+    if (loading) {
+      list.innerHTML = `<li class="xxd-palette__empty"><span class="xxd-spinner" aria-hidden="true"></span> ${loadingLabel}</li>`;
+      shown = [];
+      return;
+    }
+    shown = items.filter((it) => !q || `${it.label} ${it.keywords ?? ""} ${it.hint ?? ""} ${it.group ?? ""}`.toLowerCase().includes(q));
+    if (!q && recentKey) {
+      const recent = readRecent();
+      const recentItems = recent.map((key) => items.find((it) => (it.id ?? it.label) === key)).filter(Boolean).map((it) => ({ ...it, group: recentLabel }));
+      shown = [...recentItems, ...shown.filter((it) => !recent.includes(it.id ?? it.label))];
+    }
+    // 按组排：保持第一次出现的顺序
+    const order = [...new Set(shown.map((it) => it.group ?? ""))];
+    shown = order.flatMap((g) => shown.filter((it) => (it.group ?? "") === g));
     active = Math.min(active, Math.max(0, shown.length - 1));
+    let lastGroup = null;
     list.replaceChildren(
-      ...shown.map((it, i) => {
+      ...shown.flatMap((it, i) => {
+        const nodes = [];
+        if ((it.group ?? "") !== lastGroup && it.group) {
+          const label = doc.createElement("li");
+          label.className = "xxd-option-group__label";
+          label.setAttribute("role", "presentation");
+          label.textContent = it.group;
+          nodes.push(label);
+        }
+        lastGroup = it.group ?? "";
         const li = doc.createElement("li");
         li.className = "xxd-option";
         li.id = `${listId}-${i}`;
@@ -279,7 +381,8 @@ export function openCommandPalette({ items = [], placeholder = "输入命令或�
           li.append(hint);
         }
         li.addEventListener("click", () => run(i));
-        return li;
+        nodes.push(li);
+        return nodes;
       }),
     );
     if (!shown.length) {
@@ -292,6 +395,14 @@ export function openCommandPalette({ items = [], placeholder = "输入命令或�
   };
   const run = (i) => {
     const item = shown[i];
+    if (item && recentKey) {
+      const key = item.id ?? item.label;
+      try {
+        localStorage.setItem(recentKey, JSON.stringify([key, ...readRecent().filter((k) => k !== key)].slice(0, 5)));
+      } catch {
+        /* 存不了就不记 */
+      }
+    }
     closeDialog(dialog, "run");
     item?.run?.();
   };
@@ -316,6 +427,11 @@ export function openCommandPalette({ items = [], placeholder = "输入命令或�
   render();
   openDialog(dialog);
   input.focus();
+  dialog.setItems = (next) => {
+    items = next;
+    loading = false;
+    render();
+  };
   return dialog;
 }
 

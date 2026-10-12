@@ -41,7 +41,7 @@ describe("圆角只走令牌", () => {
 });
 
 describe("阴影只给浮层", () => {
-  const FLOATING = /xxd-(dialog|sheet|menu|popover|tooltip|toast|panel|listbox|surface-float)\b/;
+  const FLOATING = /xxd-(dialog|sheet|menu|popover|tooltip|toast|panel|listbox|surface-float)\b|xxd-surface\[data-level="raised"\]|xxd-sidebar\[data-variant="floating"\]/;
   it("非浮层只允许 0 模糊的描边环（box-shadow: 0 0 0 Npx / inset）", () => {
     const bad = [];
     for (const r of all)
@@ -50,7 +50,11 @@ describe("阴影只给浮层", () => {
         if (FLOATING.test(r.selector)) continue;
         // 质感模式（D1）：实心按钮顶部 1px 内高光，是材质不是浮起
         if (r.selector.includes('data-finish="material"') && /^inset 0 1px 0 rgba\(255, 255, 255, 0\.\d+\)$/.test(v)) continue;
-        const rings = v.split(/,(?![^(]*\))/).every((part) => /^\s*(inset\s+)?0 0 0 [\d.]+px\b/.test(part.trim()) || /^inset 0 0 0 /.test(part.trim()));
+        // 允许的是「零模糊」的描边 / 分隔线（没有投影）：第三个长度（模糊）必须是 0
+        const rings = v.split(/,(?![^(]*\))/).every((part) => {
+          const lengths = part.replace(/(rgba?|color-mix|var)\([^)]*\)+/g, "").replace("inset", "").trim().split(/\s+/).filter((t) => /^-?[\d.]+(px)?$/.test(t));
+          return lengths.length >= 2 && (lengths[2] === undefined || parseFloat(lengths[2]) === 0);
+        });
         if (!rings) bad.push(`${r.file} ${r.selector}: ${v}`);
       }
     expect(bad).toEqual([]);

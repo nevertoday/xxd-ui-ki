@@ -113,6 +113,33 @@ async function worker() {
   }
 }
 await Promise.all(Array.from({ length: 4 }, worker));
+// React 演示藏在「React」标签页里，平时不渲染：逐页点开所有 React 标签，确认没有运行时错误、确实渲染出东西。
+const reactIssues = [];
+for (const page of targets.filter((p) => p.startsWith("/components/"))) {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const tab = await ctx.newPage();
+  const errors = [];
+  tab.on("pageerror", (e) => errors.push(String(e)));
+  tab.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+  await tab.goto(origin + page, { waitUntil: "networkidle" });
+  const tabs = await tab.$$('.site-demo__bar > .xxd-tabs > [role="tab"]:nth-child(2)');
+  for (const t of tabs) {
+    try {
+      await t.scrollIntoViewIfNeeded({ timeout: 2000 });
+      await t.click({ timeout: 3000 });
+    } catch (error) {
+      errors.push(`点不到 React 标签：${String(error).split("\n")[0]}`);
+    }
+    await tab.waitForTimeout(250);
+  }
+  if (tabs.length) {
+    const empty = await tab.evaluate(() => [...document.querySelectorAll('.site-demo [id$="-react"]:not([hidden]) astro-island')].filter((el) => !el.querySelector("*")).length);
+    if (empty) errors.push(`${empty} 个 React 演示没有渲染出内容`);
+  }
+  if (errors.length) reactIssues.push({ page, errors });
+  await ctx.close();
+}
+
 const overflow = [];
 for (const page of targets) {
   const px = await mobile(page);
@@ -126,6 +153,7 @@ const changed = results.filter((r) => r.diffPixels !== null && r.diffPixels !== 
 console.log(`页面 ${targets.length} 个 × ${MODES.length} 种外观 = ${results.length} 张截图${update ? "（已更新基线）" : ""}`);
 console.log(`控制台错误：${withErrors.length ? withErrors.map((r) => `${r.page} ${r.mode}: ${r.errors[0]}`).join("\n  ") : "无"}`);
 console.log(`手机宽度横向溢出：${overflow.length ? overflow.map((o) => `${o.page} +${o.px}px`).join("、") : "无"}`);
+console.log(`React 演示：${reactIssues.length ? reactIssues.map((r) => `${r.page}: ${r.errors[0]}`).join("\n  ") : "全部正常渲染"}`);
 if (!update) console.log(`和基线不同：${changed.length ? changed.map((r) => `${r.page} ${r.mode} ${r.diffPixels === -1 ? "尺寸变了" : `${r.diffPixels}px`}`).join("\n  ") : "无"}`);
-writeFileSync(join(root, "visual/report.json"), JSON.stringify({ when: new Date().toISOString(), pages: targets.length, results, overflow }, null, 2));
-process.exit(withErrors.length || overflow.length || changed.length ? 1 : 0);
+writeFileSync(join(root, "visual/report.json"), JSON.stringify({ when: new Date().toISOString(), pages: targets.length, results, overflow, reactIssues }, null, 2));
+process.exit(withErrors.length || overflow.length || changed.length || reactIssues.length ? 1 : 0);
