@@ -19,11 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Third-party code
-
-Parts of this repository are derived from Kumo (https://github.com/cloudflare/kumo),
-Copyright (c) 2026 Cloudflare, Inc., also licensed under the MIT License. Its
-license text is kept in LICENSE-KUMO and must stay with any copy of that code.

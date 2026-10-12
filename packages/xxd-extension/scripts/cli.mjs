@@ -180,8 +180,7 @@ export function sync(target, { quiet = false } = {}) {
   if (vendor) writeFileSync(
     join(vendor, "LICENSE"),
     "小小东 UI Kit（xxd-ui-ki）的构建产物：设计令牌、原生组件、图标与插件套件。\n\n" +
-      // 只取根 LICENSE 的 MIT 部分：拷进插件的这些文件都是小小东自己写的，不含 Kumo 的代码。
-      readFileSync(join(repo, "LICENSE"), "utf8").split("\n---\n")[0],
+      readFileSync(join(repo, "LICENSE"), "utf8"),
   );
   const v = currentVersion();
   // 老项目的令牌文件路径不想改（测试、网站都引用它）：xxd.config.json 里写 { "tokensTargets": ["src/xxd-theme.css"] }，
