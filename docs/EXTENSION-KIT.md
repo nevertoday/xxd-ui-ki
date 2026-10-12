@@ -40,6 +40,7 @@ pnpm xxd status ~/js/插件-今日待办 ~/js/xPoster    # 谁落后了
 | `layeredTokensRegions` | 把 layered 令牌写进这些 CSS 文件开头的标记区域：项目已有的变量永远优先，只多出新令牌（会员站） |
 | `layeredTokensExclude` | 额外跳过的令牌名（`sync` 已经会自动跳过「项目用了但没声明」的名字） |
 | `iconNodesTargets` | 把图标数据写到这些路径（会员站 `src/lib/xxd-icon-nodes.js`） |
+| `adopt` | `pnpm xxd adopt <目录>`：`{ file, aliases }`。删掉 `file` 里与令牌亮暗两种值都相同的 `:root` 声明（改由令牌提供），`aliases` 把旧名换成 `var(--令牌)`。改完用 `scripts/verify/css-vars-diff.cjs` 比较前后，应当零变化 |
 
 ## 页面里怎么接
 

@@ -23,11 +23,17 @@
      （`--r-*` 圆角刻度、`--space-*`、`--motion-*`、`--control-h`、`--text-*`、`--z-*` 等）。
    - 去掉了全局减少动效规则（会员站有自己的处理，要保留语义动画）。
    - 会员站从不设置 `data-corners` / `data-accent`，所以一直是直角、墨色（会员站的直角是硬规则）。
-2. **图标**：`src/lib/site-icons.js` 不再自己画，改为从 `src/lib/xxd-icon-nodes.js`（`@xxd/icons` 的同步副本）取；
+2. **改为引入令牌、旧名做别名**（`pnpm xxd adopt`，配置在 `xxd.config.json` 的 `adopt`）：
+   - 删掉会员站 `:root` / 暗色块里与令牌亮暗两种值都相同的 8 个声明，改由令牌提供：
+     `--bg --ink --muted-2 --line --line-strong --wash --z-popover --ui-icon-stroke`。
+   - 旧名做别名：`--ui-backdrop: var(--backdrop)`。
+   - `--ui-radius*` **保持字面 `0`**：会员站的直角是硬规则，`test/dialog-ui.test.mjs` 按字面检查 `--ui-radius: 0;`（试过别名，那条门禁会失败，所以不改）。
+   - 阴影不做别名：会员站暗色里沿用亮色阴影，令牌的暗色阴影更深，做别名会变样。
+3. **图标**：`src/lib/site-icons.js` 不再自己画，改为从 `src/lib/xxd-icon-nodes.js`（`@xxd/icons` 的同步副本）取；
    只取会员站一直重画的 184 个名字（`SITE_ICON_NAMES`），以后加名字就能把对应的 Lucide 图标换成统一画法。
    **图标的唯一来源从此是 xxd-ui-ki 的 `packages/xxd-icons/src/nodes.js`。**
 
-## 自动跳过的 4 个令牌
+## 自动跳过的 4 个令牌（按阶段 5 的「零视觉变化」要求保持原样）
 
 `sync` 发现会员站**用了但没声明**这些变量（靠 `var(--x, 后备值)`，或者干脆没有后备值），我们一声明它们的样子就会变，所以没写进去：
 
@@ -38,7 +44,8 @@
 | `--warning-strong` | 后备值 `#a15c00` |
 | `--focus-ring` | 会员站当颜色用（`var(--focus-ring, var(--active-ink))`），小小东令牌里它是 box-shadow 值 —— 含义不同 |
 
-统一它们会改变会员站的样子，需要你决定：建议把危险红统一成 `--danger`（`#b42318`），`--focus-ring` 在会员站改名 `--focus-color`。
+阶段 5 第 1 步要求接入时零视觉变化，所以这 4 个保持会员站现在的行为（不声明）。统一它们是一次**有意的**视觉改动，
+不属于接入本身：建议把危险红统一成 `--danger`（`#b42318`），把会员站的 `--focus-ring` 改名 `--focus-color` 后再接令牌。
 
 ## 会员站与令牌数值不同的地方（会员站的值继续生效）
 
@@ -53,9 +60,17 @@
 
 ## 验证
 
-- 图标：改动前后各构建一次 `lucide-core.js`，用 jsdom 渲染全部 220 个图标逐个比较 SVG：**220 / 220 完全相同**。
-  构建产物大 3KB（整张图标表被打包，未用的条目摇不掉），gzip 后可忽略。
-- 测试：`site-icons`、`icon-renderer`、`asset-hash-consistency`、`dialog-ui`、`right-panel-shell` 82 / 82 通过；全量测试结果见下。
+- **变量逐个比较**（`scripts/verify/css-vars-diff.cjs`，无头 Chromium）：会员站 main（31ebee75e）的 `styles.css` 对比这个分支的，
+  亮 / 暗两种主题下会员站的 **404 个变量最终值全部相同**，只多出 67 个新令牌；真实的圆角、遮罩、页面底色和字色、`color-scheme` 全部相同。
+- **图标**：改动前后各构建一次 `lucide-core.js`，jsdom 渲染全部 220 个图标逐个比较 SVG：**220 / 220 相同**。构建产物大 3KB（整张图标表被打包）。
+- **全量测试**：在两个干净的 worktree 里（main 与本分支），补齐同样的环境（根目录依赖 + `playwright-core`，跑过 `build-app` 和 `stamp-assets`），
+  用 TAP 逐条比较（`scripts/verify/tap-fail-diff.py`）：两边都是 7965 个测试、7700 通过、260 跳过、**同样的 5 个失败**，
+  这 5 个在没改动的 main 上就失败，与这次改动无关：
+  - A hands the favorite dot to the heart throughout the animation on shared image surfaces
+  - Create stacks Generate over its wallet in the recipe column; Skill forms keep the method beside Send
+  - security email is readable on narrow screens and without email-client media rules
+  - platform API panel keeps native scrolling and readable controls across viewport sizes and themes
+  - Command rating distinguishes intent, preview and confirmation for every score
 - `stamp-assets.mjs` 会顺带重新生成一些在 HEAD 上就已过期的文件（`sample-classification.js`、`member.html`），
   与这次改动无关，没有放进这个分支；部署时 `deploy.sh` 会照常 stamp。
 

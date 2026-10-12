@@ -257,8 +257,8 @@ xxd-ui-ki/
 - **1 令牌与图标**：`@xxd/tokens`（tokens.css 唯一来源 → shadow / layered / json / d.ts；boot.js 首帧外观；主色 18 预设与对比度提亮；对比度门禁）；`@xxd/icons`（201 个图标，会员站画法，规则门禁，SVG 字符串 / React / Phosphor 兼容层）；`packages/xxd-tokens/preview.html`。
 - **2 Kumo 换皮**：`xxd-overrides.ts` 把 54 个颜色 + 16 个文字 token 指向小小东变量（`docs/token-map.md`）；Tailwind 圆角与阴影映射到令牌；`rounded-full` 拆成 `rounded-pill` / `rounded-circle`；图标换成 `@xxd/icons`；开关 / 复选 / 单选 / 分段选中跟主色；`@xxd/react` 包；合同测试；文档站外观开关与 `/xxd/showcase`。Kumo 1456 个测试全过。
 - **3 原生组件**：`@xxd/css`，43 个组件（P0 / P1 / P2，注册表 `registry.json`），行为 JS（对话框、菜单、tabs、分段、toast、sheet、面板、combobox、标签、搜索、命令面板、外观组），合同测试（圆角、阴影、字重、动效、颜色、对话框层级）+ 行为测试；gzip CSS 9KB、JS 9KB；`packages/xxd-css/playground.html`。
-- **4 插件套件**：`@xxd/extension`（MV3 模板、`chrome.storage` 外观同步、Shadow DOM 挂载、三语 i18n、`pnpm xxd new / sync / status`、`xxd.config.json`）。试点：图片排序分支 `xxd-ui-pilot`（330 个元素样式指纹：暗色全同、亮色只有 muted 对比度修正；打包检查通过）；xPoster 分支 `xxd-ui-pilot`（89 个令牌值全同，`npm test` 前后都通过）。
-- **5 会员站**：分支 `xxd-ui-tokens`：layered 令牌（老变量永远优先，自动跳过 4 个有后备值冲突的名字）、图标改由 `@xxd/icons` 同步（220 个图标渲染逐个相同）；全量测试没有新增失败。详见 `docs/member-site.md`。
+- **4 插件套件**：`@xxd/extension`（MV3 模板、`chrome.storage` 外观同步、Shadow DOM 挂载、三语 i18n、`pnpm xxd new / sync / status`、`xxd.config.json`）。试点：图片排序分支 `xxd-ui-pilot`（330 个元素样式指纹：暗色全同、亮色只有 muted 对比度修正；16 组对抗探针在原版和分支上逐项相同；打包检查通过）；xPoster 分支 `xxd-ui-pilot`（89 个令牌值全同，`npm test` 前后都通过）。
+- **5 会员站**：分支 `xxd-ui-tokens`：layered 令牌（老变量永远优先，自动跳过 4 个有后备值冲突的名字）、`pnpm xxd adopt` 把 8 个相同的声明改由令牌提供、旧名 `--ui-backdrop` 做别名（`--ui-radius*` 按直角硬规则保持字面 0）、图标改由 `@xxd/icons` 同步。验证：404 个变量亮暗最终值全同；220 个图标渲染逐个相同；全量测试与 main 逐条一致（7965 个，同样 5 个既有失败）。详见 `docs/member-site.md`。
 - **6 文档站与 AI**：`/xxd`（原则）、`/xxd/native`（由注册表生成）、`/xxd/extension`；`pnpm xxd ls / doc / add`；`xxd-ui` Skill（`skills/xxd-ui`，已链接到 `~/.claude/skills/xxd-ui`）。部署说明见 `docs/DOCS-SITE.md`（没有部署）。
 - **7 开源准备**：
   - 清理内部引用：`scripts/open-source-audit.mjs` 自查，提交的文件里没有本机路径、邮箱、微信号、商店 ID；剩下的是闭源声明和上游品牌，开源那天按清单换。
@@ -270,8 +270,8 @@ xxd-ui-ki/
 ## 10. 留给你的事
 
 - 合并试点分支（都没推送）：
-  - 图片排序：`插件chrome-排序链接` 的 `xxd-ui-pilot`（基于 de316fb；你当前在 `picsort-redesign` 上的未提交改动没有动）。合并前在前台跑一次 `scripts/probe/probes.js`。
+  - 图片排序：`插件chrome-排序链接` 的 `xxd-ui-pilot`（基于 de316fb；你当前在 `picsort-redesign` 上的未提交改动没有动）。
   - xPoster：`xxd-ui-pilot`（基于 b7d65ef）。
   - 会员站：`小小东-提示词` 的 `xxd-ui-tokens`（基于 main 31ebee75e）。**推 main 会触发 Cloudflare 部署**。
-- 会员站 4 个有冲突的变量（`--danger` 五种红等）要不要统一：见 `docs/member-site.md`。
+- （可选，属于新的视觉改动，不是接入的一部分）会员站 4 个有冲突的变量（`--danger` 五种红等）要不要统一：见 `docs/member-site.md`。
 - 是否建 GitHub 私有仓库、是否部署文档站（加 Cloudflare Access）。
