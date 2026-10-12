@@ -1,5 +1,5 @@
 import { Select as SelectBase } from "@base-ui/react/select";
-import { CaretUpDownIcon, CheckIcon } from "@phosphor-icons/react";
+import { CaretUpDownIcon, CheckIcon } from "@xxd/icons/phosphor";
 import { forwardRef, useId } from "react";
 import type { ReactNode } from "react";
 import { cn } from "../../utils/cn";

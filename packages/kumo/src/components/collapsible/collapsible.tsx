@@ -1,5 +1,5 @@
 import { Collapsible as CollapsibleBase } from "@base-ui/react/collapsible";
-import { CaretDownIcon } from "@phosphor-icons/react";
+import { CaretDownIcon } from "@xxd/icons/phosphor";
 import {
   forwardRef,
   type ComponentPropsWithoutRef,

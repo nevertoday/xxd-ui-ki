@@ -1,6 +1,6 @@
 import { Tooltip } from "../tooltip";
 import { cn } from "../../utils/cn";
-import { IconContext } from "@phosphor-icons/react";
+import { IconContext } from "@xxd/icons/phosphor";
 import React, { useRef } from "react";
 import { useMenuNavigation } from "./use-menu-navigation";
 
@@ -23,7 +23,7 @@ export function menuBarVariants(_props: KumoMenuBarVariantsProps = {}) {
 
 /** Props for an individual menu option within a MenuBar. */
 type MenuOptionProps = {
-  /** Icon element (typically from `@phosphor-icons/react`) rendered at 18px */
+  /** Icon element (typically from `@xxd/icons/react`) rendered at 18px */
   icon: React.ReactNode;
   /** Unique identifier for the option (used when `optionIds` is true) */
   id?: number | string;

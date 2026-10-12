@@ -13,7 +13,7 @@ import {
   CaretDoubleRightIcon,
   CaretLeftIcon,
   CaretRightIcon,
-} from "@phosphor-icons/react";
+} from "@xxd/icons/phosphor";
 import { cn } from "../../utils/cn";
 import { resolveVariant } from "../../utils/resolve-variant";
 import { Select } from "../select";

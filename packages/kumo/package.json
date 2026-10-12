@@ -444,7 +444,7 @@
     "./styles/*": "./dist/styles/*.css"
   },
   "publishConfig": {
-    "access": "public",
+    "access": "restricted",
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
@@ -477,6 +477,7 @@
     "@base-ui/react": "^1.8.0",
     "@shikijs/langs": "^4.0.0",
     "@shikijs/themes": "^4.0.0",
+    "@xxd/icons": "workspace:*",
     "cn": "0.4.0",
     "d3-geo": "^3.1.1",
     "motion": "^12.34.1",
@@ -487,6 +488,7 @@
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.5",
     "@oxlint/plugins": "catalog:",
+    "@phosphor-icons/react": "catalog:",
     "@tailwindcss/cli": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@testing-library/react": "16.3.1",
@@ -519,7 +521,6 @@
     "zod": "^4.0.0"
   },
   "peerDependencies": {
-    "@phosphor-icons/react": "^2.1.10",
     "echarts": "^6.0.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",

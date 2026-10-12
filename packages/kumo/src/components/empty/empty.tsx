@@ -1,4 +1,4 @@
-import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
+import { CheckIcon, CopyIcon } from "@xxd/icons/phosphor";
 import { useCallback } from "react";
 import { Button } from "../../components/button";
 import { Text } from "../../components/text";
@@ -68,7 +68,7 @@ export function emptyVariants({
  * ```
  */
 export interface EmptyProps extends KumoEmptyVariantsProps {
-  /** Decorative icon displayed above the title (e.g. from `@phosphor-icons/react`). */
+  /** Decorative icon displayed above the title (e.g. from `@xxd/icons/react`). */
   icon?: React.ReactNode;
   /** Primary heading text for the empty state. */
   title: string;

@@ -1,0 +1,7 @@
+/* @xxd/react 样式（Tailwind v4 项目）：
+ *   @import "tailwindcss";
+ *   @import "@xxd/react/styles.css";
+ *   @source "../node_modules/@cloudflare/kumo/dist";   让 Tailwind 扫描组件类名
+ */
+@import "@xxd/tokens/tokens.css";
+@import "@cloudflare/kumo/styles";

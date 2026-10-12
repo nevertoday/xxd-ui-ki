@@ -88,13 +88,13 @@ export function Meter({
       </div>
       <BaseMeter.Track
         className={cn(
-          "relative h-2 w-full overflow-hidden rounded-full bg-kumo-fill",
+          "relative h-2 w-full overflow-hidden rounded-pill bg-kumo-fill",
           trackClassName,
         )}
       >
         <BaseMeter.Indicator
           className={cn(
-            "absolute inset-y-0 left-0 rounded-full bg-linear-to-r from-kumo-brand via-kumo-brand to-kumo-brand transition-[width] duration-300 ease-out",
+            "absolute inset-y-0 left-0 rounded-pill bg-linear-to-r from-kumo-brand via-kumo-brand to-kumo-brand transition-[width] duration-300 ease-out",
             indicatorClassName,
           )}
         />

@@ -1,5 +1,6 @@
 @source "../../../kumo/dist/**/*.{js,jsx,ts,tsx}";
 @source "../../../kumo/src/**/*.{ts,tsx}";
+@import "@xxd/tokens/tokens.css";
 @import "@cloudflare/kumo/styles";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
@@ -7,9 +8,8 @@
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
 
 @theme {
-  --font-sans:
-    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  /* 小小东：正文字体来自 @xxd/tokens */
+  --font-sans: var(--font-body);
 }
 
 * {

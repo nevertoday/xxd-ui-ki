@@ -1,4 +1,4 @@
-import { Eye, EyeSlash } from "@phosphor-icons/react";
+import { Eye, EyeSlash } from "@xxd/icons/phosphor";
 import {
   forwardRef,
   useCallback,

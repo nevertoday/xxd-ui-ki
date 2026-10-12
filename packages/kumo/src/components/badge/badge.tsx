@@ -1,11 +1,11 @@
 import React, { type ReactNode } from "react";
-import type { Icon } from "@phosphor-icons/react";
+import type { Icon } from "@xxd/icons/phosphor";
 import { cn } from "../../utils/cn";
 import { resolveVariant } from "../../utils/resolve-variant";
 
 /** Base styles applied to all badge variants. */
 export const KUMO_BADGE_BASE_STYLES =
-  "inline-flex w-fit flex-none shrink-0 items-center justify-self-start gap-1 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap [a:hover_&]:ring [a:hover_&]:ring-current";
+  "inline-flex w-fit flex-none shrink-0 items-center justify-self-start gap-1 rounded-pill px-2 py-0.5 text-xs font-medium whitespace-nowrap [a:hover_&]:ring [a:hover_&]:ring-current";
 
 /** Badge variant definitions mapping variant names to their Tailwind classes and descriptions. */
 export const KUMO_BADGE_VARIANTS = {
@@ -228,7 +228,7 @@ interface FilledBadgeProps extends BadgeBaseProps {
    * @default "filled"
    */
   appearance?: "filled";
-  /** Icon from `@phosphor-icons/react` or a React element. Rendered before children. */
+  /** Icon from `@xxd/icons/react` or a React element. Rendered before children. */
   icon?: Icon | ReactNode;
 }
 
@@ -286,7 +286,7 @@ export function Badge({
       {dotColor ? (
         <span
           aria-hidden="true"
-          className={cn("size-1.75 shrink-0 rounded-full", dotColor)}
+          className={cn("size-1.75 shrink-0 rounded-circle", dotColor)}
         />
       ) : null}
       {renderIconNode(icon)}

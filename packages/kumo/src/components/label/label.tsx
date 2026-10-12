@@ -1,4 +1,4 @@
-import { Info } from "@phosphor-icons/react";
+import { Info } from "@xxd/icons/phosphor";
 import type { ReactNode } from "react";
 import { cn } from "../../utils/cn";
 import { useKumoLocale } from "../../utils/locale-provider";

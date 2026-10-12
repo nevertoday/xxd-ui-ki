@@ -1,0 +1,3 @@
+/* @xxd/react 样式（不用 Tailwind 的项目）：预编译的全部组件样式 + 小小东令牌。 */
+@import "@xxd/tokens/tokens.css";
+@import "@cloudflare/kumo/styles/standalone";

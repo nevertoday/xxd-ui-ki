@@ -33,6 +33,15 @@ test("语义色在纸上 ≥ 4.5（亮/暗）", () => {
   }
 });
 
+test("语义色做底：白字 ≥ 4.5，暗纸上做标记 ≥ 3", () => {
+  for (const [name, mode, paper] of [["light", base, "#ffffff"], ["dark", { ...base, ...dark }, "#201f1a"]]) {
+    for (const color of ["--success-strong", "--danger-strong", "--warning-strong"]) {
+      assert.ok(contrast(rgb(mode[color]), [255, 255, 255]) >= 4.5, `${name}: white on ${color}`);
+      if (name === "dark") assert.ok(contrast(rgb(mode[color]), rgb(paper)) >= 3, `${name}: ${color} mark`);
+    }
+  }
+});
+
 test("18 个主色 × 亮/暗：标记 ≥ 3，文字版 ≥ 4.5，颜色上的文字 ≥ 3", () => {
   assert.equal(ACCENT_PRESETS.length, 18);
   assert.equal(ACCENT_PRESETS[0].id, "", "第一个是墨色");

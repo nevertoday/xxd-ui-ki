@@ -1,0 +1,36 @@
+{
+  "name": "@xxd/react",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "小小东 React 组件：Kumo 换皮版 + 小小东外观 Provider + 对话框按钮区。",
+  "type": "module",
+  "sideEffects": ["*.css"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./styles.css": "./styles.css",
+    "./standalone.css": "./standalone.css"
+  },
+  "files": ["dist", "styles.css", "standalone.css"],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cloudflare/kumo": "workspace:*",
+    "@xxd/icons": "workspace:*",
+    "@xxd/tokens": "workspace:*"
+  },
+  "peerDependencies": { "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" },
+  "devDependencies": {
+    "@testing-library/react": "16.3.1",
+    "@types/react": "catalog:",
+    "esbuild": "0.28.1",
+    "happy-dom": "catalog:",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

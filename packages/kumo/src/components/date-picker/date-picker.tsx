@@ -1,4 +1,4 @@
-import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
+import { CaretLeftIcon, CaretRightIcon } from "@xxd/icons/phosphor";
 import type { ReactElement } from "react";
 import {
   DayPicker,

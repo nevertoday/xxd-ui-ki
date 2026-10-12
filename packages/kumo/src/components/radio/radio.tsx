@@ -49,7 +49,7 @@ export const KUMO_RADIO_VARIANTS = {
     },
     segmented: {
       classes:
-        "group relative z-0 my-0 mr-0 -ml-px first:ml-0 inline-flex h-8.5 shrink-0 cursor-pointer items-center border-r last:border-r-0 border-kumo-line/60 bg-transparent px-3 first:pl-2.75 last:pr-2.75 first:rounded-l-lg last:rounded-r-lg text-sm font-medium whitespace-nowrap text-kumo-default select-none has-data-checked:text-kumo-inverse has-data-disabled:cursor-not-allowed has-data-disabled:opacity-50 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-kumo-brand before:absolute before:-z-10 before:left-0 first:before:-left-px before:-right-px before:-inset-y-px first:before:rounded-l-[9px] last:before:rounded-r-[9px] hover:not-has-data-disabled:not-has-data-checked:before:bg-kumo-contrast/7 has-data-checked:before:bg-kumo-contrast",
+        "group relative z-0 my-0 mr-0 -ml-px first:ml-0 inline-flex h-8.5 shrink-0 cursor-pointer items-center border-r last:border-r-0 border-kumo-line/60 bg-transparent px-3 first:pl-2.75 last:pr-2.75 first:rounded-l-lg last:rounded-r-lg text-sm font-medium whitespace-nowrap text-kumo-default select-none has-data-checked:text-(--on-action) has-data-disabled:cursor-not-allowed has-data-disabled:opacity-50 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-kumo-brand before:absolute before:-z-10 before:left-0 first:before:-left-px before:-right-px before:-inset-y-px first:before:rounded-l-lg last:before:rounded-r-lg hover:not-has-data-disabled:not-has-data-checked:before:bg-kumo-brand/7 has-data-checked:before:bg-kumo-brand",
       description:
         "Compact grouped-button appearance for short, mutually exclusive options",
     },
@@ -352,9 +352,9 @@ function _RadioItem<T = string>(
         data-kumo-part="item-label"
         className={cn(
           "group relative z-0 my-0 mr-0 -ml-px inline-flex h-8.5 shrink-0 cursor-pointer items-center border-r border-kumo-line/60 bg-transparent first:ml-0 last:border-r-0",
-          "px-3 text-sm font-medium whitespace-nowrap text-kumo-default select-none first:rounded-l-lg first:pl-2.75 last:rounded-r-lg last:pr-2.75 has-data-checked:text-kumo-inverse has-data-disabled:cursor-not-allowed has-data-disabled:opacity-50",
+          "px-3 text-sm font-medium whitespace-nowrap text-kumo-default select-none first:rounded-l-lg first:pl-2.75 last:rounded-r-lg last:pr-2.75 has-data-checked:text-(--on-action) has-data-disabled:cursor-not-allowed has-data-disabled:opacity-50",
           "has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-kumo-brand",
-          "before:absolute before:-inset-y-px before:-right-px before:left-0 before:-z-10 first:before:-left-px first:before:rounded-l-[9px] last:before:rounded-r-[9px] hover:not-has-data-disabled:not-has-data-checked:before:bg-kumo-contrast/7 has-data-checked:before:bg-kumo-contrast",
+          "before:absolute before:-inset-y-px before:-right-px before:left-0 before:-z-10 first:before:-left-px first:before:rounded-l-lg last:before:rounded-r-lg hover:not-has-data-disabled:not-has-data-checked:before:bg-kumo-brand/7 has-data-checked:before:bg-kumo-brand",
           variant === "error" &&
             "ring ring-kumo-danger hover:not-has-data-disabled:ring-kumo-danger has-data-checked:ring-kumo-danger",
           className,
@@ -426,7 +426,7 @@ function _RadioItem<T = string>(
           value={value}
           disabled={disabled}
           className={cn(
-            "relative mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-0 bg-kumo-base ring focus:ring-kumo-focus focus:outline-none focus-visible:ring-2 focus-visible:ring-kumo-brand",
+            "relative mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-circle border-0 bg-kumo-base ring focus:ring-kumo-focus focus:outline-none focus-visible:ring-2 focus-visible:ring-kumo-brand",
             variant === "error" ? "ring-kumo-danger" : "ring-kumo-line",
             !disabled &&
               variant !== "error" &&
@@ -434,14 +434,14 @@ function _RadioItem<T = string>(
             !disabled &&
               variant === "error" &&
               "focus-visible:outline-offset-3",
-            "data-checked:bg-kumo-contrast",
+            "data-checked:bg-kumo-brand",
           )}
         >
           <BaseRadio.Indicator
             keepMounted
             className="flex items-center justify-center"
           >
-            <span className="h-2 w-2 rounded-full bg-kumo-base" />
+            <span className="h-2 w-2 rounded-circle bg-kumo-base" />
           </BaseRadio.Indicator>
         </BaseRadio.Root>
       </label>
@@ -468,7 +468,7 @@ function _RadioItem<T = string>(
         value={value}
         disabled={disabled}
         className={cn(
-          "relative mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-0 bg-kumo-base ring after:absolute after:-inset-x-3 after:-inset-y-2 focus:outline-none",
+          "relative mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-circle border-0 bg-kumo-base ring after:absolute after:-inset-x-3 after:-inset-y-2 focus:outline-none",
           variant === "error" ? "ring-kumo-danger" : "ring-kumo-line",
           !disabled &&
             variant !== "error" &&
@@ -476,14 +476,14 @@ function _RadioItem<T = string>(
           !disabled &&
             variant === "error" &&
             "focus:ring-2 focus:ring-kumo-focus focus-visible:ring-2 focus-visible:ring-kumo-brand focus-visible:outline-offset-3",
-          "data-checked:bg-kumo-contrast",
+          "data-checked:bg-kumo-brand",
         )}
       >
         <BaseRadio.Indicator
           keepMounted
           className="flex items-center justify-center"
         >
-          <span className="h-2 w-2 rounded-full bg-kumo-base" />
+          <span className="h-2 w-2 rounded-circle bg-kumo-base" />
         </BaseRadio.Indicator>
       </BaseRadio.Root>
       <span className="text-base text-kumo-default">{label}</span>

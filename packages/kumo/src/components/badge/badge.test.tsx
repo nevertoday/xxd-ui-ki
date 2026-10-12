@@ -137,7 +137,7 @@ describe("badgeVariants", () => {
   it("returns base styles with no arguments", () => {
     const result = badgeVariants();
     expect(result).toContain("inline-flex");
-    expect(result).toContain("rounded-full");
+    expect(result).toContain("rounded-pill");
   });
 
   it("includes variant classes for filled appearance", () => {

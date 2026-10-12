@@ -15,7 +15,7 @@ import React, {
 } from "react";
 import { ScrollArea as ScrollAreaBase } from "@base-ui/react/scroll-area";
 
-import { CaretRightIcon, XIcon } from "@phosphor-icons/react";
+import { CaretRightIcon, XIcon } from "@xxd/icons/phosphor";
 import { cn } from "../../utils/cn";
 import { useLinkComponent } from "../../utils/link-provider";
 import { SkeletonLine } from "../loader/skeleton-line";
@@ -1080,7 +1080,7 @@ const SidebarContent = forwardRef<
           "group-data-[state=collapsed]/sidebar:hidden",
         )}
       >
-        <ScrollAreaBase.Thumb className="flex-1 rounded-full bg-kumo-line" />
+        <ScrollAreaBase.Thumb className="flex-1 rounded-pill bg-kumo-line" />
       </ScrollAreaBase.Scrollbar>
     </ScrollAreaBase.Root>
   );
@@ -1175,7 +1175,7 @@ const SidebarLoading = forwardRef<
   >
     {SIDEBAR_LOADING_GROUPS.map((widths, groupIndex) => (
       <div key={groupIndex} className="flex flex-col gap-0.5">
-        <SkeletonLine className="mb-1 ml-2 h-2 w-16 rounded-full group-data-[state=collapsed]/sidebar:hidden" />
+        <SkeletonLine className="mb-1 ml-2 h-2 w-16 rounded-pill group-data-[state=collapsed]/sidebar:hidden" />
         {widths.map((width, itemIndex) => (
           <div
             key={itemIndex}
@@ -1184,7 +1184,7 @@ const SidebarLoading = forwardRef<
             <SkeletonLine className="size-4.5 shrink-0 rounded-md" />
             <SkeletonLine
               className={cn(
-                "h-2.5 rounded-full group-data-[state=collapsed]/sidebar:hidden",
+                "h-2.5 rounded-pill group-data-[state=collapsed]/sidebar:hidden",
                 width,
               )}
             />
@@ -1659,7 +1659,7 @@ const SidebarMenuBadge = forwardRef<
     ref={ref}
     data-sidebar="menu-badge"
     className={cn(
-      "inline-flex shrink-0 items-center rounded-full border border-dashed border-kumo-line",
+      "inline-flex shrink-0 items-center rounded-pill border border-dashed border-kumo-line",
       "px-1.5 py-0.5 text-[11px]/none font-medium text-kumo-strong select-none",
       // Hidden when collapsed
       "group-data-[state=collapsed]/sidebar:hidden",

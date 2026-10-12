@@ -31,7 +31,7 @@ export const KUMO_SWITCH_VARIANTS = {
   variant: {
     default: {
       classes: "",
-      description: "Default switch with squircle shape and brand blue color",
+      description: "Default switch: --switch-on track (ink grey, or the accent); square unless corners are rounded",
     },
     neutral: {
       classes: "",
@@ -262,7 +262,7 @@ const SwitchBase = forwardRef<HTMLButtonElement, SwitchProps>(
 
           // Squircle-aware border-radius (used by both variants)
           const squircleRadius =
-            "rounded-[5px] supports-[corner-shape:squircle]:rounded-[10px] [corner-shape:squircle]";
+            "rounded-pill";
 
           // Size styles matching Kyle's stratus implementation
           const sizeStyles = {
@@ -275,20 +275,20 @@ const SwitchBase = forwardRef<HTMLButtonElement, SwitchProps>(
           // Track colors based on variant
           const trackColors = isNeutral
             ? state.checked
-              ? "bg-neutral-500 dark:bg-kumo-base ring-neutral-600 dark:ring-neutral-700"
-              : "bg-neutral-150 dark:bg-kumo-base ring-kumo-hairline"
+              ? "bg-kumo-contrast ring-kumo-contrast"
+              : "bg-kumo-tint ring-kumo-hairline"
             : state.checked
-              ? "bg-blue-500 dark:bg-blue-600 ring-blue-600 dark:ring-blue-500"
-              : "bg-neutral-200 dark:bg-neutral-700 ring-neutral-300 dark:ring-neutral-600";
+              ? "bg-(--switch-on) ring-(--switch-on)"
+              : "bg-kumo-fill ring-kumo-interact";
 
           // Thumb colors based on variant
           const thumbColors = isNeutral
             ? state.checked
-              ? "bg-kumo-base dark:bg-neutral-400"
-              : "bg-kumo-base dark:bg-neutral-850"
+              ? "bg-kumo-base"
+              : "bg-kumo-base"
             : state.checked
-              ? "bg-kumo-base dark:bg-blue-300"
-              : "bg-kumo-base dark:bg-neutral-850";
+              ? "bg-kumo-base"
+              : "bg-kumo-base";
 
           const trackClassName = cn(
             "relative inline-flex cursor-pointer items-center border-none p-0 ring",
@@ -415,7 +415,7 @@ const SwitchItem = forwardRef<HTMLButtonElement, SwitchItemProps>(
 
             // Squircle-aware border-radius (used by both variants)
             const squircleRadius =
-              "rounded-[5px] supports-[corner-shape:squircle]:rounded-[10px] [corner-shape:squircle]";
+              "rounded-pill";
 
             // Size styles matching Kyle's stratus implementation
             const sizeStyles = {
@@ -428,20 +428,20 @@ const SwitchItem = forwardRef<HTMLButtonElement, SwitchItemProps>(
             // Track colors based on variant
             const trackColors = isNeutral
               ? state.checked
-                ? "bg-neutral-500 dark:bg-kumo-base ring-neutral-600 dark:ring-neutral-700"
-                : "bg-neutral-150 dark:bg-kumo-base ring-kumo-hairline"
+                ? "bg-kumo-contrast ring-kumo-contrast"
+                : "bg-kumo-tint ring-kumo-hairline"
               : state.checked
-                ? "bg-blue-500 dark:bg-blue-600 ring-blue-600 dark:ring-blue-500"
-                : "bg-neutral-200 dark:bg-neutral-700 ring-neutral-300 dark:ring-neutral-600";
+                ? "bg-(--switch-on) ring-(--switch-on)"
+                : "bg-kumo-fill ring-kumo-interact";
 
             // Thumb colors based on variant
             const thumbColors = isNeutral
               ? state.checked
-                ? "bg-kumo-base dark:bg-neutral-400"
-                : "bg-kumo-base dark:bg-neutral-850"
+                ? "bg-kumo-base"
+                : "bg-kumo-base"
               : state.checked
-                ? "bg-kumo-base dark:bg-blue-300"
-                : "bg-kumo-base dark:bg-neutral-850";
+                ? "bg-kumo-base"
+                : "bg-kumo-base";
 
             const trackClassName = cn(
               "relative inline-flex cursor-pointer items-center border-none p-0 ring",

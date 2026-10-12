@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@cloudflare/kumo";
 import { GithubLogoIcon } from "@phosphor-icons/react";
 import { ThemeToggle } from "../ThemeToggle";
+import { XxdAppearance } from "../XxdAppearance";
 import { BaseUIIcon } from "./icons/BaseUIIcon";
 
 interface StickyDocHeaderProps {
@@ -150,14 +151,8 @@ export function StickyDocHeader({
               </a>
             )}
           </div>
-          <a
-            href="https://github.com/cloudflare/kumo"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-sm text-kumo-subtle transition-colors hover:text-kumo-default"
-          >
-            @cloudflare/kumo
-          </a>
+          <XxdAppearance />
+          <span className="font-mono text-sm text-kumo-subtle">@xxd/react</span>
         </div>
         <div className="hidden w-12 shrink-0 items-center justify-center lg:flex">
           <ThemeToggle />

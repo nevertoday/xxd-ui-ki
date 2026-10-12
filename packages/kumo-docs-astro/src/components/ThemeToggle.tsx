@@ -60,6 +60,7 @@ export function ThemeToggle() {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
     document.documentElement.setAttribute("data-mode", resolvedTheme);
+    (window as any).XxdTheme?.set({ theme: resolvedTheme });
     window.dispatchEvent(
       new CustomEvent("kumo:theme-change", {
         detail: { theme: newTheme, resolvedTheme },

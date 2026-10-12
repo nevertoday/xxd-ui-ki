@@ -13,7 +13,7 @@ import {
   ArrowRightIcon,
   ArrowSquareOutIcon,
   CaretRightIcon,
-} from "@phosphor-icons/react";
+} from "@xxd/icons/phosphor";
 
 import { LayerCard } from "../layer-card";
 import { Loader } from "../loader";

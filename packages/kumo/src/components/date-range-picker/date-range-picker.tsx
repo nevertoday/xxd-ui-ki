@@ -2,7 +2,7 @@ import {
   CaretLeftIcon,
   CaretRightIcon,
   GlobeHemisphereWestIcon,
-} from "@phosphor-icons/react";
+} from "@xxd/icons/phosphor";
 import { useCallback, useState } from "react";
 import { cn } from "../../utils/cn";
 
@@ -514,9 +514,9 @@ function DateRangeDayCell({
       case DateRangeCellMode.ENABLED:
         return "bg-transparent";
       case DateRangeCellMode.SELECTED_START_NODE:
-        return "!bg-kumo-contrast rounded-tl-[5px] rounded-bl-[5px]";
+        return "!bg-kumo-contrast rounded-tl-md rounded-bl-md";
       case DateRangeCellMode.SELECTED_END_NODE:
-        return "!bg-kumo-contrast rounded-tr-[5px] rounded-br-[5px]";
+        return "!bg-kumo-contrast rounded-tr-md rounded-br-md";
       case DateRangeCellMode.SELECTED:
         return "bg-kumo-interact";
       case DateRangeCellMode.SELECTED_OUT_OF_RANGE:

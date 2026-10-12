@@ -1,4 +1,4 @@
-import { CheckIcon, CopySimpleIcon } from "@phosphor-icons/react";
+import { CheckIcon, CopySimpleIcon } from "@xxd/icons/phosphor";
 import {
   forwardRef,
   useCallback,

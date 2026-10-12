@@ -71,7 +71,7 @@ function LargeItem({
         className={cn("inline-flex min-w-42 flex-col gap-2 py-2", className)}
       >
         <div className="flex items-center gap-2">
-          <span className="inline-block size-2 rounded-full bg-kumo-fill" />
+          <span className="inline-block size-2 rounded-circle bg-kumo-fill" />
           <SkeletonLine className="h-3 w-[8ch]" />
         </div>
         <SkeletonLine className="h-5 w-[5ch]" />
@@ -96,7 +96,7 @@ function LargeItem({
     >
       <div className="flex items-center gap-2">
         <span
-          className={cn("inline-block size-2 rounded-full", {
+          className={cn("inline-block size-2 rounded-circle", {
             "opacity-50": inactive,
           })}
           style={{ backgroundColor: color }}
@@ -148,7 +148,7 @@ function SmallItem({
         aria-hidden="true"
         className={cn("inline-flex h-4 items-center gap-2", className)}
       >
-        <span className="inline-block size-2 rounded-full bg-kumo-fill" />
+        <span className="inline-block size-2 rounded-circle bg-kumo-fill" />
         <SkeletonLine className="h-3 w-[5ch]" />
         <SkeletonLine className="h-3 w-[3ch]" />
       </div>
@@ -171,7 +171,7 @@ function SmallItem({
       onKeyDown={onClick ? onInteractiveKeyDown : undefined}
     >
       <span
-        className={cn("inline-block size-2 rounded-full", {
+        className={cn("inline-block size-2 rounded-circle", {
           "opacity-50": inactive,
         })}
         style={{ backgroundColor: color }}

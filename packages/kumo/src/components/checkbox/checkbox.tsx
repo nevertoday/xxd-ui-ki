@@ -1,5 +1,5 @@
 import { forwardRef, createContext, useContext, type ReactNode } from "react";
-import { CheckIcon, MinusIcon } from "@phosphor-icons/react";
+import { CheckIcon, MinusIcon } from "@xxd/icons/phosphor";
 import { cn } from "../../utils/cn";
 import { resolveVariant } from "../../utils/resolve-variant";
 import { Label } from "../label";
@@ -332,7 +332,7 @@ const CheckboxBase = forwardRef<HTMLButtonElement, CheckboxProps>(
           variant === "error" ? "ring-kumo-danger" : "ring-kumo-hairline",
           !disabled &&
             "hover:ring-kumo-hairline focus:ring-2 focus:ring-kumo-focus focus-visible:ring-2 focus-visible:ring-kumo-brand",
-          "data-[checked]:bg-kumo-contrast data-[checked]:ring-kumo-contrast data-[indeterminate]:bg-kumo-contrast data-[indeterminate]:ring-kumo-contrast",
+          "data-[checked]:bg-kumo-brand data-[checked]:ring-kumo-brand data-[indeterminate]:bg-kumo-brand data-[indeterminate]:ring-kumo-brand",
           disabled && "cursor-not-allowed opacity-50",
           className,
         )}
@@ -340,7 +340,7 @@ const CheckboxBase = forwardRef<HTMLButtonElement, CheckboxProps>(
       >
         <BaseCheckbox.Indicator
           keepMounted
-          className="flex items-center justify-center text-kumo-inverse data-[unchecked]:invisible"
+          className="flex items-center justify-center text-(--on-action) data-[unchecked]:invisible"
           render={(renderProps, state) => (
             <span {...renderProps}>
               {state.indeterminate ? (
@@ -422,7 +422,7 @@ const CheckboxItem = forwardRef<HTMLButtonElement, CheckboxItemProps>(
     const indicator = (
       <BaseCheckbox.Indicator
         keepMounted
-        className="flex items-center justify-center text-kumo-inverse data-[unchecked]:invisible"
+        className="flex items-center justify-center text-(--on-action) data-[unchecked]:invisible"
         render={(renderProps, state) => (
           <span {...renderProps}>
             {state.indeterminate ? (
@@ -496,7 +496,7 @@ const CheckboxItem = forwardRef<HTMLButtonElement, CheckboxItemProps>(
               !disabled &&
                 variant !== "error" &&
                 "group-hover:ring-kumo-hairline",
-              "data-[checked]:bg-kumo-contrast data-[checked]:ring-kumo-contrast data-[indeterminate]:bg-kumo-contrast data-[indeterminate]:ring-kumo-contrast",
+              "data-[checked]:bg-kumo-brand data-[checked]:ring-kumo-brand data-[indeterminate]:bg-kumo-brand data-[indeterminate]:ring-kumo-brand",
             )}
           >
             {indicator}
@@ -533,7 +533,7 @@ const CheckboxItem = forwardRef<HTMLButtonElement, CheckboxItemProps>(
             variant === "error" ? "ring-kumo-danger" : "ring-kumo-hairline",
             !disabled &&
               "group-hover:ring-kumo-hairline hover:ring-kumo-hairline focus:ring-2 focus:ring-kumo-focus focus-visible:ring-2 focus-visible:ring-kumo-brand",
-            "data-[checked]:bg-kumo-contrast data-[checked]:ring-kumo-contrast data-[indeterminate]:bg-kumo-contrast data-[indeterminate]:ring-kumo-contrast",
+            "data-[checked]:bg-kumo-brand data-[checked]:ring-kumo-brand data-[indeterminate]:bg-kumo-brand data-[indeterminate]:ring-kumo-brand",
           )}
         >
           {indicator}

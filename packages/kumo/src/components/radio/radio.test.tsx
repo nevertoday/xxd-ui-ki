@@ -156,7 +156,7 @@ describe("Radio", () => {
     expect(classes).toContain("first:pl-2.75");
     expect(classes).toContain("last:pr-2.75");
     expect(classes).toContain("before:-inset-y-px");
-    expect(classes).toContain("has-data-checked:before:bg-kumo-contrast");
+    expect(classes).toContain("has-data-checked:before:bg-kumo-brand");
   });
 
   it("renders a segmented group with radio semantics and intrinsic layout", () => {
@@ -209,8 +209,8 @@ describe("Radio", () => {
     expect(item?.className).toContain("before:-inset-y-px");
     expect(item?.className).toContain("first:before:-left-px");
     expect(item?.className).toContain("before:-right-px");
-    expect(item?.className).toContain("first:before:rounded-l-[9px]");
-    expect(item?.className).toContain("last:before:rounded-r-[9px]");
+    expect(item?.className).toContain("first:before:rounded-l-lg");
+    expect(item?.className).toContain("last:before:rounded-r-lg");
     expect(item?.className).not.toContain("tabular-nums");
     expect(item?.className).toContain("whitespace-nowrap");
     expect(item?.className).toContain("has-focus-visible:outline-kumo-brand");
@@ -234,12 +234,12 @@ describe("Radio", () => {
       .closest('[data-kumo-part="item-label"]');
 
     expect(item?.className).toContain(
-      "hover:not-has-data-disabled:not-has-data-checked:before:bg-kumo-contrast/7",
+      "hover:not-has-data-disabled:not-has-data-checked:before:bg-kumo-brand/7",
     );
     expect(item?.className).toContain(
-      "has-data-checked:before:bg-kumo-contrast",
+      "has-data-checked:before:bg-kumo-brand",
     );
-    expect(item?.className).toContain("has-data-checked:text-kumo-inverse");
+    expect(item?.className).toContain("has-data-checked:text-(--on-action)");
   });
 
   it("selects segmented items and calls onValueChange once", async () => {

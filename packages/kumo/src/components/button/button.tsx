@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowsClockwise, type Icon } from "@phosphor-icons/react";
+import { ArrowsClockwise, type Icon } from "@xxd/icons/phosphor";
 import { Loader } from "../loader/loader";
 import { Tooltip } from "../tooltip/tooltip";
 import { cn } from "../../utils/cn";
@@ -18,7 +18,7 @@ export const KUMO_BUTTON_VARIANTS = {
       description: "Square button for icon-only actions",
     },
     circle: {
-      classes: "items-center justify-center p-0 rounded-full",
+      classes: "items-center justify-center p-0 rounded-circle",
       description: "Circular button for icon-only actions",
     },
   },
@@ -269,7 +269,7 @@ type ButtonBaseProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children?: React.ReactNode;
   /** Additional CSS classes merged via `cn()`. */
   className?: string;
-  /** Icon from `@phosphor-icons/react` or a React element. Rendered before children. */
+  /** Icon from `@xxd/icons/react` or a React element. Rendered before children. */
   icon?: Icon | React.ReactNode;
   /** Shows a loading spinner and disables interaction. */
   loading?: boolean;
@@ -332,7 +332,7 @@ export type LinkButtonProps = React.AnchorHTMLAttributes<HTMLAnchorElement> &
     className?: string;
     /** When `true`, the button is disabled. We render an actual html button with `disabled` attribute. */
     disabled?: boolean;
-    /** Icon from `@phosphor-icons/react` or a React element. Rendered before children. */
+    /** Icon from `@xxd/icons/react` or a React element. Rendered before children. */
     icon?: Icon | React.ReactNode;
     /** When `true`, opens in a new tab with `rel="noopener noreferrer"`. */
     external?: boolean;

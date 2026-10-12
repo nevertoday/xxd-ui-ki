@@ -13,7 +13,7 @@ import {
   CopyIcon,
   WarningCircleIcon,
   XIcon,
-} from "@phosphor-icons/react";
+} from "@xxd/icons/phosphor";
 import { Banner } from "../../components/banner";
 import { useCopyFeedback } from "../../utils/use-copy-feedback";
 

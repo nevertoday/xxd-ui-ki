@@ -13,6 +13,7 @@
  */
 
 import type { ThemeConfig } from "./types.js";
+import { applyXxdOverrides } from "./xxd-overrides.js";
 
 export const THEME_CONFIG: ThemeConfig = {
   /**
@@ -648,6 +649,9 @@ export const THEME_CONFIG: ThemeConfig = {
     },
   },
 };
+
+// 小小东换皮（见 xxd-overrides.ts）。
+applyXxdOverrides(THEME_CONFIG);
 
 /** List of all available themes */
 export const AVAILABLE_THEMES = ["kumo", "fedramp"] as const;

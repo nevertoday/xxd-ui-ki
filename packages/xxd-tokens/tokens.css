@@ -42,6 +42,10 @@
   --danger-rgb: 180, 35, 24;
   --warning: #b45309;
   --warning-rgb: 180, 83, 9;
+  /* 语义色做底（实心按钮、徽标）：上面放白字 ≥ 4.5，放在暗纸上做标记 ≥ 3 */
+  --success-strong: #15803d;
+  --danger-strong: #b42318;
+  --warning-strong: #b45309;
 
   /* 强调色：墨色（缺省）或主色。正文永远用 --ink，只有强调标记用 --action。 */
   --action: var(--ink);
@@ -75,7 +79,7 @@
   --text-md: 15px;
   --text-lg: 16px;
   --text-xl: 20px;
-  --text-2xl: 28px;
+  --text-display: 28px; /* 展示标题（不叫 --text-2xl，避免和 Tailwind 的同名变量冲突） */
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-strong: 600;
@@ -157,6 +161,7 @@
   --danger-rgb: 248, 113, 113;
   --warning: #f0b35a;
   --warning-rgb: 240, 179, 90;
+  --danger-strong: #d03a2f;
   --shadow-popover: 0 18px 44px rgba(0, 0, 0, 0.42);
   --shadow-dialog: 0 28px 76px rgba(0, 0, 0, 0.5);
 }

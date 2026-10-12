@@ -12,7 +12,7 @@ import {
   CheckIcon,
   CheckIcon as Check,
   type Icon,
-} from "@phosphor-icons/react";
+} from "@xxd/icons/phosphor";
 
 /** Dropdown item variant definitions (default and danger styles). */
 export const KUMO_DROPDOWN_VARIANTS = {

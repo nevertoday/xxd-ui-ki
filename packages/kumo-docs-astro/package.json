@@ -7,8 +7,8 @@
     "./demo-metadata.json": "./dist/demo-metadata.json"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "pnpm run codegen:demos && pnpm run generate-design-skill && astro build",
+    "dev": "pnpm --filter @xxd/tokens build && pnpm run xxd:assets && astro dev",
+    "build": "pnpm --filter @xxd/tokens build && pnpm run xxd:assets && pnpm run codegen:demos && pnpm run generate-design-skill && astro build",
     "codegen:demos": "tsx scripts/extract-demo-examples.ts",
     "generate-design-skill": "node scripts/generate-design-skill.mjs",
     "preview": "astro preview",
@@ -17,7 +17,8 @@
     "test": "vp test run",
     "lint": "vp lint src/ && node ../../lint/lint-astro-colors.js src/",
     "lint:oxlint": "vp lint src/",
-    "lint:astro": "node ../../lint/lint-astro-colors.js src/"
+    "lint:astro": "node ../../lint/lint-astro-colors.js src/",
+    "xxd:assets": "node -e \"const fs=require('fs');fs.mkdirSync('public/xxd',{recursive:true});fs.copyFileSync('../xxd-tokens/dist/boot.js','public/xxd/boot.js')\""
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.2.1",
@@ -27,6 +28,7 @@
     "@phosphor-icons/react": "catalog:",
     "@tailwindcss/typography": "^0.5.19",
     "@types/turndown": "5.0.6",
+    "@xxd/tokens": "workspace:*",
     "astro": "7.2.8",
     "clsx": "catalog:",
     "echarts": "^6.0.0",

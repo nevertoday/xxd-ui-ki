@@ -154,7 +154,7 @@ export function Slider<Value extends SliderValue = SliderValue>({
               >
                 <span
                   aria-hidden
-                  className="absolute top-1/2 left-1/2 h-1/2 w-0.5 -translate-1/2 rounded-full bg-kumo-contrast/25"
+                  className="absolute top-1/2 left-1/2 h-1/2 w-0.5 -translate-1/2 rounded-pill bg-kumo-contrast/25"
                 />
                 <span
                   aria-hidden

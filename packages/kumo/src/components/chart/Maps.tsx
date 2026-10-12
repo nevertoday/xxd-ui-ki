@@ -455,7 +455,7 @@ function BubbleMapRoot<T>(
               color: "var(--text-color-kumo-default)",
               fontSize: 13,
             },
-            extraCssText: "border-radius: 0.5rem;",
+            extraCssText: "border-radius: var(--r-md, 0.5rem);",
             dangerousHtmlFormatter: (params: unknown) => {
               const p = params as {
                 name?: string;
@@ -860,7 +860,7 @@ function ChoroplethMapRoot<T>(
               color: "var(--text-color-kumo-default)",
               fontSize: 13,
             },
-            extraCssText: "border-radius: 0.5rem;",
+            extraCssText: "border-radius: var(--r-md, 0.5rem);",
             dangerousHtmlFormatter: (params: unknown) => {
               const p = params as {
                 name?: string;

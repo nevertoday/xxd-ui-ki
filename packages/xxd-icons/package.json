@@ -7,18 +7,40 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": { "types": "./src/svg.d.ts", "import": "./src/svg.js" },
-    "./react": { "types": "./src/react.d.ts", "import": "./src/react.js" },
-    "./phosphor": { "types": "./src/phosphor.d.ts", "import": "./src/phosphor.js" },
+    ".": {
+      "types": "./src/svg.d.ts",
+      "import": "./src/svg.js"
+    },
+    "./react": {
+      "types": "./src/react.d.ts",
+      "import": "./src/react.js"
+    },
+    "./phosphor": {
+      "types": "./src/phosphor.d.ts",
+      "import": "./src/phosphor.js"
+    },
     "./nodes": "./src/nodes.js",
     "./dist/*": "./dist/*"
   },
-  "files": ["src", "dist"],
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --test test/"
   },
-  "peerDependencies": { "react": "^18.0.0 || ^19.0.0" },
-  "peerDependenciesMeta": { "react": { "optional": true } },
-  "devDependencies": { "esbuild": "0.28.1", "react": "19.2.0" }
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "esbuild": "0.28.1",
+    "react": "19.2.0",
+    "@types/react": "catalog:"
+  }
 }

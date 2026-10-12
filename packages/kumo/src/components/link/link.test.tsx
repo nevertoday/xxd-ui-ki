@@ -87,7 +87,7 @@ describe("Link", () => {
     );
 
     expect(screen.getByRole("link").classList).toContain(
-      "has-[>[data-kumo-component=Badge]]:rounded-full",
+      "has-[>[data-kumo-component=Badge]]:rounded-pill",
     );
   });
 

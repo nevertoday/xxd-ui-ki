@@ -1,5 +1,5 @@
 import { Combobox as ComboboxBase } from "@base-ui/react/combobox";
-import { CaretUpDownIcon, CheckIcon, XIcon } from "@phosphor-icons/react";
+import { CaretUpDownIcon, CheckIcon, XIcon } from "@xxd/icons/phosphor";
 import {
   Fragment,
   createContext,

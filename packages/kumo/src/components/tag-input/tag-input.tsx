@@ -1,4 +1,4 @@
-import { XIcon } from "@phosphor-icons/react";
+import { XIcon } from "@xxd/icons/phosphor";
 import { Field as FieldBase } from "@base-ui/react/field";
 import {
   forwardRef,

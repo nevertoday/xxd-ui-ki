@@ -13,7 +13,7 @@ import {
 import { Drawer as DrawerBase } from "@base-ui/react/drawer";
 import { ScrollArea as ScrollAreaBase } from "@base-ui/react/scroll-area";
 import { useMediaQuery } from "@base-ui/react/unstable-use-media-query";
-import { CaretDownIcon, X } from "@phosphor-icons/react";
+import { CaretDownIcon, X } from "@xxd/icons/phosphor";
 import { Button } from "../button/button";
 import { ButtonGroup } from "../button-group/button-group";
 import { DropdownMenu } from "../dropdown/dropdown";
@@ -317,7 +317,7 @@ function LayerDialogContent({
             <LayerCard className="flex max-h-[85dvh] min-h-0 w-full flex-col overflow-hidden rounded-none bg-kumo-elevated p-1.5 shadow-[0_20px_25px_-5px_rgb(0_0_0/0.03),0_8px_10px_-6px_rgb(0_0_0/0.03)] max-sm:border-t max-sm:border-kumo-hairline max-sm:shadow-xs max-sm:ring-0 sm:max-h-full sm:rounded-xl">
               {!isDesktop && !isAlert && (
                 <div aria-hidden className="flex justify-center pt-1.5 pb-3">
-                  <div className="h-1 w-10 rounded-full bg-kumo-fill" />
+                  <div className="h-1 w-10 rounded-pill bg-kumo-fill" />
                 </div>
               )}
               <DrawerBase.Content className="flex min-h-0 flex-col overflow-visible">
@@ -476,7 +476,7 @@ function LayerDialogBody({ children }: LayerDialogBodyProps) {
           orientation="vertical"
           className="my-1.5 mr-0.5 hidden w-2 p-px opacity-0 transition-opacity data-[has-overflow-y]:block data-[hovering]:opacity-100 data-[scrolling]:opacity-100"
         >
-          <ScrollAreaBase.Thumb className="w-full rounded-full bg-kumo-contrast opacity-10 transition-opacity hover:opacity-20 active:opacity-30" />
+          <ScrollAreaBase.Thumb className="w-full rounded-pill bg-kumo-contrast opacity-10 transition-opacity hover:opacity-20 active:opacity-30" />
         </ScrollAreaBase.Scrollbar>
       </ScrollAreaBase.Root>
       {!isDesktop && actions && (

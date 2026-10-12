@@ -247,7 +247,7 @@ export default defineConfig({
             case id.startsWith("react/"):
             case id === "react-dom":
             case id.startsWith("react-dom/"):
-            case id === "@phosphor-icons/react":
+            // 小小东：图标来自 @xxd/icons（打包进来），不再外置 Phosphor。
             // CJS-only; bundling leaves require("react") calls that break
             // importing the published ESM directly in Node.
             case id === "use-sync-external-store":

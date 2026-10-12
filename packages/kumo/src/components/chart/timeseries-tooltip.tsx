@@ -91,7 +91,7 @@ function MarkerTooltipContent({
           <div key={`${marker.timestamp}-${marker.label}-${index}`}>
             <div className="flex items-center gap-2 text-xs text-kumo-default">
               <span
-                className="h-3 w-3 shrink-0 rounded-full"
+                className="h-3 w-3 shrink-0 rounded-circle"
                 style={{ backgroundColor: marker.color ?? state.color }}
               />
               <span className="font-medium">
@@ -142,7 +142,7 @@ function SeriesTooltipRows({
         >
           <div className="flex min-w-0 items-center gap-2">
             <span
-              className="h-3 w-3 shrink-0 rounded-full"
+              className="h-3 w-3 shrink-0 rounded-circle"
               style={{ backgroundColor: row.color }}
             />
             <span

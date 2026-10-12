@@ -1,5 +1,5 @@
 import { Autocomplete as AutocompleteBase } from "@base-ui/react/autocomplete";
-import { CheckIcon } from "@phosphor-icons/react";
+import { CheckIcon } from "@xxd/icons/phosphor";
 import { createContext, useContext, type ReactNode } from "react";
 import { inputVariants, KUMO_INPUT_VARIANTS } from "../input/input";
 import { cn } from "../../utils/cn";

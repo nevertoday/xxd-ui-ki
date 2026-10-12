@@ -158,7 +158,7 @@ export interface BannerProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
   "children" | "title"
 > {
-  /** Icon element rendered before the banner content (e.g. from `@phosphor-icons/react`). */
+  /** Icon element rendered before the banner content (e.g. from `@xxd/icons/react`). */
   icon?: ReactNode;
   /** Primary heading text for the banner. Use for i18n string injection. */
   title?: string;
