@@ -34,6 +34,19 @@ export function parseBlocks(css) {
   return blocks;
 }
 
+/**
+ * 给已有一套变量的老项目（会员站）用：整份令牌放进 @layer xxd.tokens。
+ * 没进 layer 的样式永远赢过 layer 里的，所以老项目自己的同名变量不受影响（不管选择器优先级），
+ * 只多出它还没有的变量。去掉全局的减少动效规则（老项目有自己的处理，不能替它决定）。
+ */
+export function toLayered(css) {
+  const withoutMotion = css.replace(/\/\* 减少动效[^*]*\*\/\s*@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\n\}\n?/, "");
+  // :root → :where(:root)：layer 里本来就最弱，再去掉优先级；文字上也和老项目自己的 :root[...] 块区分开
+  // （有些老测试按文本找第一个 `:root[data-theme="dark"] {`）。
+  const scoped = withoutMotion.replace(/:root((?:\[[^\]]+\])*)/g, (_, attrs) => `:where(:root${attrs})`);
+  return `/* @xxd/tokens（layered）— Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */\n@layer xxd.tokens {\n${scoped.trim()}\n}\n`;
+}
+
 const MODE_NAMES = {
   ":root": "base",
   ':root[data-theme="dark"]': "dark",
@@ -48,6 +61,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   mkdirSync(dist, { recursive: true });
   writeFileSync(join(dist, "tokens.css"), `/* @xxd/tokens — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). All rights reserved. */\n${source}`);
   writeFileSync(join(dist, "tokens.shadow.css"), toShadow(source));
+  writeFileSync(join(dist, "tokens.layered.css"), toLayered(source));
 
   const blocks = parseBlocks(source);
   const json = {};

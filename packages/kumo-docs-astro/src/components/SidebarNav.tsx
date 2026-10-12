@@ -27,6 +27,10 @@ function isActivePath(activePath: string, href: string) {
 
 const staticPages: NavItem[] = [
   { label: "Home", href: "/" },
+  { label: "小小东 · 原则", href: "/xxd" },
+  { label: "小小东 · 原生组件", href: "/xxd/native" },
+  { label: "小小东 · 换皮总览", href: "/xxd/showcase" },
+  { label: "小小东 · 插件套件", href: "/xxd/extension" },
   { label: "Installation", href: "/installation" },
   { label: "Contributing", href: "/contributing" },
   { label: "Colors", href: "/colors" },

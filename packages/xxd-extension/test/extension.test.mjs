@@ -5,7 +5,8 @@ import { tmpdir } from "node:os";
 import { createAppearanceStore } from "../src/settings.js";
 import { mountXxdUI } from "../src/shadow.js";
 import { applyI18n, t, uiLocale } from "../src/i18n.js";
-import { buildAll, create, status, sync } from "../scripts/cli.mjs";
+import { buildAll, create, docComponent, listComponents, dropDeclarations, findFallbackConflicts, status, sync, upsertRegion } from "../scripts/cli.mjs";
+import { mkdirSync, writeFileSync } from "node:fs";
 
 function mockChrome() {
   const data = {};
@@ -137,4 +138,48 @@ describe("CLI：new / sync / status", () => {
       rmSync(base, { recursive: true, force: true });
     }
   }, 60_000);
+});
+
+describe("upsertRegion", () => {
+  it("第一次插在开头（@import 之后），再次运行替换同一段，不重复", () => {
+    const css = `@import url("a.css");\n:root { --bg: #fff; }\n`;
+    const once = upsertRegion(css, "@layer xxd.tokens { :root { --r-sm: 0px; } }");
+    expect(once.indexOf("@import")).toBe(0);
+    expect(once.indexOf("xxd:tokens:start")).toBeGreaterThan(once.indexOf("@import"));
+    expect(once.indexOf("xxd:tokens:end")).toBeLessThan(once.indexOf("--bg"));
+    const twice = upsertRegion(once, "@layer xxd.tokens { :root { --r-sm: 2px; } }");
+    expect(twice.match(/xxd:tokens:start/g).length).toBe(1);
+    expect(twice).toContain("--r-sm: 2px");
+    expect(twice).not.toContain("--r-sm: 0px");
+    expect(twice.endsWith(":root { --bg: #fff; }\n")).toBe(true);
+  });
+});
+
+describe("老项目保护", () => {
+  it("找出用了但没声明的令牌名，并能从 CSS 里去掉它们", () => {
+    const base = mkdtempSync(join(process.env.TMPDIR || tmpdir(), "xxd-legacy-"));
+    try {
+      mkdirSync(join(base, "public"));
+      writeFileSync(join(base, "public/styles.css"), ":root{--bg:#fff}.a{color:var(--danger,#b91c1c)}.b{outline-color:var(--focus-ring, red)}.c{color:var(--bg)}");
+      const found = findFallbackConflicts(base, ["--bg", "--danger", "--focus-ring", "--r-sm"]);
+      expect(found.sort()).toEqual(["--danger", "--focus-ring"]);
+      const css = ":root {\n  --danger: #b42318;\n  --danger-rgb: 1, 2, 3;\n  --r-sm: 0px;\n}";
+      expect(dropDeclarations(css, found)).toBe(":root {\n  --danger-rgb: 1, 2, 3;\n  --r-sm: 0px;\n}");
+    } finally {
+      rmSync(base, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("ls / doc", () => {
+  it("列出原生和 React 组件；doc 给出类名、示例和规则", () => {
+    const list = listComponents();
+    expect(list).toContain("Dialog");
+    expect(list).toContain("React 组件");
+    const doc = docComponent("dialog");
+    expect(doc).toContain("ui-dialog-cancel");
+    expect(doc).toContain("取消在前");
+    expect(docComponent("Button", { react: true })).toContain('import { Button } from "@xxd/react"');
+    expect(() => docComponent("Nope")).toThrow();
+  });
 });

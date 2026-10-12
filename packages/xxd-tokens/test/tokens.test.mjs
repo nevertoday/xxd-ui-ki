@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { ACCENT_PRESETS, DARK_PAPER, LIGHT_PAPER, accentPalette, contrast, toRgb } from "../src/accent.js";
 import { applySettings, resolveTheme } from "../src/theme.js";
-import { parseBlocks, toShadow } from "../scripts/build.mjs";
+import { parseBlocks, toLayered, toShadow } from "../scripts/build.mjs";
 
 const css = readFileSync(new URL("../tokens.css", import.meta.url), "utf8");
 const blocks = parseBlocks(css);
@@ -128,4 +128,13 @@ test("resolveTheme", () => {
   assert.equal(resolveTheme("dark"), "dark");
   assert.equal(resolveTheme(undefined), "light");
   assert.ok(["light", "dark"].includes(resolveTheme("system")));
+});
+
+test("layered 版本：整份放进 @layer xxd.tokens，不带全局减少动效规则", () => {
+  const layered = toLayered(css);
+  assert.match(layered, /^\/\*[^\n]*\*\/\n@layer xxd\.tokens \{/);
+  assert.ok(!layered.includes("prefers-reduced-motion"));
+  assert.ok(layered.includes(':where(:root[data-theme="dark"])'));
+  assert.ok(!/(^|[^(]):root\[data-theme="dark"\] \{/m.test(layered), "不留下和老项目同形的 :root[...] 块");
+  assert.equal((layered.match(/\{/g) || []).length, (layered.match(/\}/g) || []).length);
 });

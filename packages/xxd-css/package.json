@@ -5,14 +5,25 @@
   "license": "UNLICENSED",
   "description": "小小东原生组件：纯 CSS + 极少行为 JS，不依赖任何框架。给 Chrome 插件和会员站用。",
   "type": "module",
-  "sideEffects": ["*.css", "./src/js/global.js"],
+  "sideEffects": [
+    "*.css",
+    "./src/js/global.js"
+  ],
   "exports": {
-    ".": { "types": "./src/js/index.d.ts", "import": "./src/js/index.js" },
+    ".": {
+      "types": "./src/js/index.d.ts",
+      "import": "./src/js/index.js"
+    },
     "./index.css": "./src/index.css",
     "./css/*": "./src/css/*",
-    "./dist/*": "./dist/*"
+    "./dist/*": "./dist/*",
+    "./registry.json": "./registry.json"
   },
-  "files": ["src", "dist"],
+  "files": [
+    "src",
+    "dist",
+    "registry.json"
+  ],
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "vitest run"
