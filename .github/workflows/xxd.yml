@@ -17,8 +17,8 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @cloudflare/kumo build # @xxd/react 构建要用 Kumo 的产物，先构建
       - run: pnpm xxd:build
       - run: pnpm xxd:test
-      - run: pnpm --filter @cloudflare/kumo build
       - run: pnpm --filter @cloudflare/kumo test
       - run: pnpm lint
