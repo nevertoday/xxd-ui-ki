@@ -1,6 +1,6 @@
 # xxd-ui-ki 开发计划
 
-> 状态：阶段 0 已完成（2026-10-11）。后续每个阶段开工前先读本文件和 `DESIGN-PRINCIPLES.md`，
+> 状态：阶段 0–6 已完成，阶段 7 的准备已完成（2026-10-12）。后续每个阶段开工前先读本文件和 `DESIGN-PRINCIPLES.md`，
 > 完成后在「进度」里打勾并写日期。计划变了就改这里，不另起文档。
 
 ---
@@ -196,7 +196,7 @@ xxd-ui-ki/
 
 验收：`pnpm xxd new 测试插件` 生成的插件能直接「加载已解压的扩展程序」，四种外观组合切换无闪烁；试点插件迁移后功能无回归。
 
-### 阶段 5 · 会员站接入
+### 阶段 5 · 会员站接入 ✅ 2026-10-12
 
 会员站体量大、有大量门禁测试，所以渐进：
 
@@ -206,14 +206,14 @@ xxd-ui-ki/
 
 验收：会员站现有测试全过；桌面/移动截图对比无意外变化。
 
-### 阶段 6 · 文档站与 AI 可查
+### 阶段 6 · 文档站与 AI 可查 ✅ 2026-10-12
 
 1. 文档站改造：首页讲原则；每个组件页有四种外观切换、React 与原生两份代码、注意事项（对应原则条目）。
 2. 组件注册表覆盖原生组件；CLI 改名 `xxd ls / doc / add`，Claude/Codex 写插件时可以直接查 API。
 3. 写一个 `xxd-ui` Skill：新插件、新页面时自动用这套系统、遵守原则、跑合同测试。
 4. 文档站只本地或私有部署（Cloudflare Access 保护），不公开。
 
-### 阶段 7 · 开源准备（以后）
+### 阶段 7 · 开源准备 ✅ 准备完成 2026-10-12
 
 清理内部引用、重新确认许可证、写贡献指南、决定是否与 Kumo 上游脱钩并改内部包名。
 
@@ -232,12 +232,12 @@ xxd-ui-ki/
 | Node/pnpm 版本：Kumo 要求 Node ^24.12，本机是 26.11 | 目前构建和测试都能过；出问题时用 `.node-version` 固定 24 |
 | 会员站迁移影响线上 | 别名过渡 + 现有门禁测试 + 只在 Cloudflare 预览环境验证后再上线 |
 
-## 7. 待你决定
+## 7. 决定（2026-10-12 按默认处理，可以改）
 
-1. 包的 scope 用 `@xxd/*` 可以吗？目录名 `xxd-ui-ki` 保留不改（如果原意是 `xxd-ui-kit`，现在改名成本最低）。
-2. 是否在 GitHub 建**私有**仓库 `nevertoday/xxd-ui-ki` 并推送？（本地已是 git 仓库，上游推送已禁用。）
-3. 「提议」里的三条（密度两档、Shadow DOM 注入、规则做成门禁）是否同意？
-4. 试点插件用「排序链接」还是你更想先迁移的那个？
+1. 包名前缀 `@xxd/*`；目录名 `xxd-ui-ki` 不改。
+2. GitHub 私有仓库：**没有建、没有推送**（对外操作，等你说）。建的话：`gh repo create nevertoday/xxd-ui-ki --private --source . --push`（会推 `main`；`upstream` 的推送已禁用）。
+3. 三条提议都采纳：密度两档（`data-density`）、Shadow DOM 注入（`mountXxdUI`）、规则做成门禁（各包的合同测试）。
+4. 试点：图片排序（排序链接）+ xPoster 的令牌层。
 
 ## 8. 进度
 
@@ -248,6 +248,25 @@ xxd-ui-ki/
 | 2 Kumo 换皮 | ✅ 完成 | 2026-10-11 |
 | 3 原生组件 | ✅ 完成 | 2026-10-11 |
 | 4 插件套件 + 试点 | ✅ 完成 | 2026-10-12 |
-| 5 会员站接入 | 未开始 | |
-| 6 文档站与 AI | 未开始 | |
-| 7 开源准备 | 以后 | |
+| 5 会员站接入 | ✅ 完成（分支 xxd-ui-tokens，未合并、未部署） | 2026-10-12 |
+| 6 文档站与 AI | ✅ 完成 | 2026-10-12 |
+| 7 开源准备 | ✅ 准备完成（是否开源由你决定） | 2026-10-12 |
+
+## 9. 各阶段做了什么（摘要）
+
+- **1 令牌与图标**：`@xxd/tokens`（tokens.css 唯一来源 → shadow / layered / json / d.ts；boot.js 首帧外观；主色 18 预设与对比度提亮；对比度门禁）；`@xxd/icons`（201 个图标，会员站画法，规则门禁，SVG 字符串 / React / Phosphor 兼容层）；`packages/xxd-tokens/preview.html`。
+- **2 Kumo 换皮**：`xxd-overrides.ts` 把 54 个颜色 + 16 个文字 token 指向小小东变量（`docs/token-map.md`）；Tailwind 圆角与阴影映射到令牌；`rounded-full` 拆成 `rounded-pill` / `rounded-circle`；图标换成 `@xxd/icons`；开关 / 复选 / 单选 / 分段选中跟主色；`@xxd/react` 包；合同测试；文档站外观开关与 `/xxd/showcase`。Kumo 1456 个测试全过。
+- **3 原生组件**：`@xxd/css`，43 个组件（P0 / P1 / P2，注册表 `registry.json`），行为 JS（对话框、菜单、tabs、分段、toast、sheet、面板、combobox、标签、搜索、命令面板、外观组），合同测试（圆角、阴影、字重、动效、颜色、对话框层级）+ 行为测试；gzip CSS 9KB、JS 9KB；`packages/xxd-css/playground.html`。
+- **4 插件套件**：`@xxd/extension`（MV3 模板、`chrome.storage` 外观同步、Shadow DOM 挂载、三语 i18n、`pnpm xxd new / sync / status`、`xxd.config.json`）。试点：图片排序分支 `xxd-ui-pilot`（330 个元素样式指纹：暗色全同、亮色只有 muted 对比度修正；打包检查通过）；xPoster 分支 `xxd-ui-pilot`（89 个令牌值全同，`npm test` 前后都通过）。
+- **5 会员站**：分支 `xxd-ui-tokens`：layered 令牌（老变量永远优先，自动跳过 4 个有后备值冲突的名字）、图标改由 `@xxd/icons` 同步（220 个图标渲染逐个相同）；全量测试没有新增失败。详见 `docs/member-site.md`。
+- **6 文档站与 AI**：`/xxd`（原则）、`/xxd/native`（由注册表生成）、`/xxd/extension`；`pnpm xxd ls / doc / add`；`xxd-ui` Skill（`skills/xxd-ui`，已链接到 `~/.claude/skills/xxd-ui`）。部署说明见 `docs/DOCS-SITE.md`（没有部署）。
+- **7 开源准备**：`scripts/open-source-audit.mjs` 自查 + `docs/OPEN-SOURCE-CHECKLIST.md`。
+
+## 10. 留给你的事
+
+- 合并试点分支（都没推送）：
+  - 图片排序：`插件chrome-排序链接` 的 `xxd-ui-pilot`（基于 de316fb；你当前在 `picsort-redesign` 上的未提交改动没有动）。合并前在前台跑一次 `scripts/probe/probes.js`。
+  - xPoster：`xxd-ui-pilot`（基于 b7d65ef）。
+  - 会员站：`小小东-提示词` 的 `xxd-ui-tokens`（基于 main 31ebee75e）。**推 main 会触发 Cloudflare 部署**。
+- 会员站 4 个有冲突的变量（`--danger` 五种红等）要不要统一：见 `docs/member-site.md`。
+- 是否建 GitHub 私有仓库、是否部署文档站（加 Cloudflare Access）。

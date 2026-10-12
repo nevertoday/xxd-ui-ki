@@ -375,6 +375,9 @@ importers:
       '@types/turndown':
         specifier: 5.0.6
         version: 5.0.6
+      '@xxd/css':
+        specifier: workspace:*
+        version: link:../xxd-css
       '@xxd/tokens':
         specifier: workspace:*
         version: link:../xxd-tokens
@@ -8348,6 +8351,18 @@ snapshots:
       - msw
       - utf-8-validate
       - vite
+
+  '@vitest/browser-playwright@4.1.10(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@22.19.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.9.0))(msw@2.12.3(@types/node@22.19.1)(typescript@5.9.3))(vitest@4.1.10)':
+    dependencies:
+      '@vitest/browser': 4.1.10(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@22.19.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.9.0))(msw@2.12.3(@types/node@22.19.1)(typescript@5.9.3))(vitest@4.1.10)
+      '@vitest/mocker': 4.1.10(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@22.19.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.9.0))(msw@2.12.3(@types/node@22.19.1)(typescript@5.9.3))
+      tinyrainbow: 3.1.0
+      vitest: 4.1.10(@types/node@22.19.1)(@vitest/browser-playwright@4.1.10)(@vitest/browser-preview@4.1.10)(@vitest/ui@4.1.10)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@22.19.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.9.0))(happy-dom@20.8.9)(msw@2.12.3(@types/node@22.19.1)(typescript@5.9.3))
+    transitivePeerDependencies:
+      - bufferutil
+      - msw
+      - utf-8-validate
+      - vite
     optional: true
 
   '@vitest/browser-preview@4.1.10(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@22.19.1)(esbuild@0.27.2)(jiti@2.7.0)(publint@0.3.21)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.9.0))(msw@2.12.3(@types/node@22.19.1)(typescript@5.9.3))(vitest@4.1.10)':
@@ -12129,7 +12144,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.19.1
-      '@vitest/browser-playwright': 4.1.10(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@22.19.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.9.0))(msw@2.12.3(@types/node@22.19.1)(typescript@5.9.3))(playwright@1.57.0)(vitest@4.1.10)
+      '@vitest/browser-playwright': 4.1.10(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@22.19.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.9.0))(msw@2.12.3(@types/node@22.19.1)(typescript@5.9.3))(vitest@4.1.10)
       '@vitest/browser-preview': 4.1.10(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@22.19.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.9.0))(msw@2.12.3(@types/node@22.19.1)(typescript@5.9.3))(vitest@4.1.10)
       '@vitest/ui': 4.1.10(vitest@4.1.10)
       happy-dom: 20.8.9

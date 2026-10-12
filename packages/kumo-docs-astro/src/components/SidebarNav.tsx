@@ -385,7 +385,7 @@ export function SidebarNav({ currentPath }: SidebarNavProps) {
         >
           <KumoMenuIcon />
         </Button>
-        <h1 className="text-base font-medium">Kumo</h1>
+        <h1 className="text-base font-medium">小小东 UI</h1>
         <ThemeToggle />
       </div>
 
@@ -398,7 +398,7 @@ export function SidebarNav({ currentPath }: SidebarNavProps) {
         )}
       >
         <div className="flex h-12 flex-none items-center justify-between border-b border-kumo-hairline px-3">
-          <h1 className="text-base font-medium">Kumo</h1>
+          <h1 className="text-base font-medium">小小东 UI</h1>
           <Button
             variant="ghost"
             shape="square"
@@ -442,7 +442,7 @@ export function SidebarNav({ currentPath }: SidebarNavProps) {
 
       {/* Desktop: Kumo brand label - always visible, panel slides behind it */}
       <div className="pointer-events-none fixed top-0 left-12 z-50 hidden h-12 items-center px-3 font-medium select-none lg:flex">
-        <h1 className="text-base">Kumo</h1>
+        <h1 className="text-base">小小东 UI</h1>
       </div>
 
       {/* Desktop: Sliding panel that opens to the right of the rail */}

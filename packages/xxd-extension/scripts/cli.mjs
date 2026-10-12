@@ -9,6 +9,7 @@
 //       看每个插件用的是哪个版本，是否落后
 //   pnpm xxd ls                      列出全部组件（原生 @xxd/css 与 React @xxd/react）
 //   pnpm xxd doc <组件> [--react]     一个组件的用法、属性、规则（--react 看 React 版的 props）
+//   pnpm xxd add <block> [--cwd 项目]  把 React 区块装进项目（转给 Kumo CLI 的 add）
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -302,6 +303,10 @@ async function main() {
     console.log(listComponents());
   } else if (cmd === "doc") {
     console.log(docComponent(args._[0], { react: Boolean(args.react) }));
+  } else if (cmd === "add" || cmd === "blocks") {
+    const kumoCli = join(repo, "packages/kumo/dist/command-line/cli.js");
+    if (!existsSync(kumoCli)) throw new Error("先构建 React 组件库：pnpm --filter @cloudflare/kumo build");
+    execFileSync("node", [kumoCli, cmd, ...rest], { stdio: "inherit", cwd });
   } else if (cmd === "build") {
     await buildAll();
   } else {
