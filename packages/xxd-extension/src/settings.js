@@ -17,7 +17,7 @@ export function createAppearanceStore({ key = "xxd-ui", area = "sync", element, 
   let current = { ...DEFAULT_SETTINGS, ...defaults, ...readSettings(key) };
   const listeners = new Set();
 
-  const pick = (s) => ({ theme: s.theme, corners: s.corners, accent: s.accent, density: s.density });
+  const pick = (s) => ({ theme: s.theme, corners: s.corners, accent: s.accent, density: s.density, finish: s.finish });
   const commit = (next, { notify = true } = {}) => {
     current = { ...current, ...next };
     rememberSettings(pick(current), key);

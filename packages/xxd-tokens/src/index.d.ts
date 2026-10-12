@@ -17,6 +17,7 @@ export interface XxdSettings {
   corners?: "square" | "rounded";
   accent?: string;
   density?: "comfortable" | "compact";
+  finish?: "flat" | "material";
 }
 export declare const DEFAULT_SETTINGS: Readonly<Required<XxdSettings>>;
 export declare const DEFAULT_STORAGE_KEY: string;

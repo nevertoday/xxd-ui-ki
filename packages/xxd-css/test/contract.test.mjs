@@ -27,7 +27,7 @@ describe("圆角只走令牌", () => {
     const bad = [];
     for (const r of all)
       for (const [p, v] of r.decls)
-        if (/radius/.test(p) && !/^(0|inherit|var\(--r-[a-z]+\)|calc\(var\(--r-[a-z]+\) - \d+px\))$/.test(v)) bad.push(`${r.file} ${r.selector} ${p}: ${v}`);
+        if (/radius/.test(p) && !/^(0|inherit|var\(--r-[a-z]+\)|calc\(var\(--r-[a-z]+\) - \d+px\)|var\(--outer-r\)|max\(0px, calc\(var\(--outer-r\) - var\(--pad\)\)\))$/.test(v)) bad.push(`${r.file} ${r.selector} ${p}: ${v}`);
     expect(bad).toEqual([]);
   });
 
@@ -48,6 +48,8 @@ describe("阴影只给浮层", () => {
       for (const [p, v] of r.decls) {
         if (p !== "box-shadow" || v === "none") continue;
         if (FLOATING.test(r.selector)) continue;
+        // 质感模式（D1）：实心按钮顶部 1px 内高光，是材质不是浮起
+        if (r.selector.includes('data-finish="material"') && /^inset 0 1px 0 rgba\(255, 255, 255, 0\.\d+\)$/.test(v)) continue;
         const rings = v.split(/,(?![^(]*\))/).every((part) => /^\s*(inset\s+)?0 0 0 [\d.]+px\b/.test(part.trim()) || /^inset 0 0 0 /.test(part.trim()));
         if (!rings) bad.push(`${r.file} ${r.selector}: ${v}`);
       }
@@ -73,7 +75,7 @@ describe("动效只动 opacity / transform（颜色过渡用于状态变化）",
     const bad = [];
     for (const r of all)
       for (const [p, v] of r.decls) {
-        if (p !== "transition") continue;
+        if (p !== "transition" || v === "none") continue;
         for (const part of v.split(/,(?![^(]*\))/)) {
           const prop = part.trim().split(" ")[0];
           if (!ALLOWED.has(prop)) bad.push(`${r.selector}: ${prop}`);
@@ -125,5 +127,23 @@ describe("每个组件都在入口里", () => {
   it("index.css 引入了 css/ 下的每个文件", () => {
     const index = readFileSync(join(import.meta.dirname, "../src/index.css"), "utf8");
     for (const f of Object.keys(files)) expect(index).toContain(`./css/${f}`);
+  });
+});
+
+describe("hover 进入立即、离开淡回（D2）", () => {
+  it("每个带颜色过渡的组件根类都在 interaction.css 的 :hover 清零列表里", () => {
+    const list = files["interaction.css"].match(/:is\(([\s\S]*?)\):hover\s*\{\s*transition-duration:\s*0s/)[1];
+    const instant = new Set([...list.matchAll(/\.(xxd-[\w-]+)/g)].map((m) => m[1]));
+    const colorTransitions = all
+      .filter((r) => r.decls.some(([p, v]) => p === "transition" && /(background-color|border-color|(^|[\s,])color)\b/.test(v)))
+      .map((r) => r.selector.match(/\.(xxd-[\w-]+)/)?.[1])
+      .filter(Boolean);
+    const missing = [...new Set(colorTransitions)].filter((k) => !instant.has(k) && !["xxd-scrim", "xxd-panel-scrim", "xxd-tooltip", "xxd-bubble"].includes(k));
+    expect(missing).toEqual([]);
+  });
+
+  it("浮层（菜单 / popover / tooltip）出现时只缩放和淡入，原点跟着锚点", () => {
+    expect(files["overlay.css"]).toMatch(/transform-origin: var\(--xxd-origin/);
+    expect(files["overlay.css"]).toMatch(/\.xxd-menu:not\(:popover-open\)[\s\S]*?transform: scale\(0\.96\)/);
   });
 });

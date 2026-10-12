@@ -107,6 +107,13 @@ export function installMenus(root, byId, closestFrom) {
     }
   });
 
+  // 键盘高亮和鼠标悬停是同一个高亮（I4）：鼠标移进哪一项，焦点就移过去
+  root.addEventListener("pointermove", (event) => {
+    if (event.pointerType === "touch") return;
+    const item = closestFrom(event, '.xxd-menu [role^="menuitem"]');
+    if (item && !item.disabled && item.getRootNode().activeElement !== item) item.focus({ preventScroll: true });
+  });
+
   // Popover 自己关闭时（点外面、Esc）同步 aria-expanded
   root.addEventListener(
     "toggle",

@@ -30,6 +30,8 @@ export declare function toast(
 export declare function copyText(text: string): Promise<boolean>;
 export declare function showTooltip(anchor: HTMLElement): void;
 export declare function hideTooltip(): void;
+export declare function showBubble(anchor: Element, text: string, options?: { duration?: number }): HTMLElement;
+export declare function runBusy<T>(button: HTMLElement, task: () => T | Promise<T>, options?: { doneFor?: number }): Promise<T | undefined>;
 
 export declare function openLayer(layer: HTMLElement): void;
 export declare function closeLayer(layer: HTMLElement): void;
@@ -48,7 +50,7 @@ export interface CommandItem { id?: string; label: string; hint?: string; keywor
 export declare function openCommandPalette(options?: { items?: CommandItem[]; placeholder?: string; empty?: string; within?: HTMLElement }): HTMLDialogElement;
 export declare function bindCommandPalette(items: CommandItem[] | (() => CommandItem[]), options?: { key?: string; placeholder?: string; empty?: string }): () => void;
 
-export interface AppearanceSettings { theme?: "light" | "dark" | "system"; corners?: "square" | "rounded"; accent?: string; density?: "comfortable" | "compact" }
+export interface AppearanceSettings { theme?: "light" | "dark" | "system"; corners?: "square" | "rounded"; accent?: string; density?: "comfortable" | "compact"; finish?: "flat" | "material" }
 export declare const APPEARANCE_LABELS: Record<"zh-CN" | "zh-Hant" | "en", Record<string, string>>;
 export declare function mountAppearance(
   container: HTMLElement,
@@ -60,6 +62,7 @@ export declare function mountAppearance(
     presets?: { id: string; name: string; zh?: string }[];
     lockCorners?: boolean;
     showDensity?: boolean;
+    showFinish?: boolean;
     languages?: { value: string; label: string }[];
     language?: string;
     onLanguage?: (value: string) => void;

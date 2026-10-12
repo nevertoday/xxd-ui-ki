@@ -10,6 +10,7 @@
  *   data-corners="rounded"       圆角（缺省 = 直角）
  *   data-accent + --action-custom*  主色（缺省 = 墨色）
  *   data-density="compact"       紧凑（侧边栏 / popup）
+ *   data-finish="material"       实心按钮的质感（顶部 1px 内高光 + 深一点的边 + 按下下沉）；缺省纯平
  *
  * 规则：组件里的任何矩形圆角都只能来自 --r-xs/sm/md/lg/pill；
  * 语义上的圆（状态点、色块、头像）用 --r-circle，不跟开关走。
@@ -97,6 +98,7 @@
   /* ── 控件尺寸：会员站 40px；侧边栏用 data-density="compact" ── */
   --control-h: 40px;
   --control-h-sm: 32px;
+  --control-h-xs: 24px;
   --icon-button: 38px;
   --hit-min: 40px;
 
@@ -134,6 +136,7 @@
 :root[data-density="compact"] {
   --control-h: 32px;
   --control-h-sm: 26px;
+  --control-h-xs: 20px;
   --icon-button: 30px;
 }
 

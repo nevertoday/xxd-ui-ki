@@ -88,6 +88,41 @@
     font-size: var(--text-xs);
   }
 
+  .xxd-input[data-size="xs"],
+  .xxd-select[data-size="xs"] > select {
+    height: var(--control-h-xs);
+    padding-inline: 8px;
+    font-size: var(--text-2xs);
+  }
+
+  .xxd-input[data-size="lg"],
+  .xxd-select[data-size="lg"] > select {
+    height: calc(var(--control-h) + 4px);
+    padding-inline: 14px;
+    font-size: var(--text-base);
+  }
+
+  .xxd-select[data-size="xs"] > select,
+  .xxd-select[data-size="sm"] > select {
+    padding-right: 28px;
+  }
+
+  .xxd-select:is([data-size="xs"], [data-size="sm"])::after {
+    right: 8px;
+    width: 12px;
+    height: 12px;
+  }
+
+  /* 字数：<div class="xxd-field">… <p class="xxd-help" data-counter>30 / 100</p> */
+  .xxd-help[data-counter] {
+    justify-self: end;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .xxd-help[data-counter][data-over] {
+    color: var(--danger);
+  }
+
   .xxd-textarea {
     height: auto;
     min-height: 88px;
@@ -446,5 +481,6 @@
   --xxd-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --xxd-chevron-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E");
   --xxd-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 12 4 4 8-8'/%3E%3C/svg%3E");
+  --xxd-external: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='M11 4H4v16h16v-7M14 4h6v6m-10 4L20 4'/%3E%3C/svg%3E");
   --xxd-minus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M6 12h12'/%3E%3C/svg%3E");
 }

@@ -2,6 +2,7 @@
  * dist/xxd.css 已经把令牌一起打包进来了；只想要组件时用 dist/components.css。 */
 @layer xxd.base, xxd.components;
 @import "./css/base.css";
+@import "./css/text.css";
 @import "./css/button.css";
 @import "./css/form.css";
 @import "./css/navigation.css";
@@ -10,3 +11,4 @@
 @import "./css/feedback.css";
 @import "./css/content.css";
 @import "./css/palette.css";
+@import "./css/interaction.css";

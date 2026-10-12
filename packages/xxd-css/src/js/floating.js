@@ -15,5 +15,9 @@ export function place(anchor, floating, { placement = "bottom-start", offset = 6
   floating.style.top = `${Math.round(top)}px`;
   floating.style.left = `${Math.round(left)}px`;
   floating.dataset.side = side;
+  // 从锚点方向长出来（D4）：缩放原点 = 锚点中心在浮层上的位置；箭头也对着锚点。
+  const anchorX = Math.min(Math.max(a.left + a.width / 2 - left, 8), Math.max(8, f.width - 8));
+  floating.style.setProperty("--xxd-origin", `${Math.round(anchorX)}px ${side === "bottom" ? "0" : "100%"}`);
+  floating.style.setProperty("--xxd-arrow-x", `${Math.round(anchorX)}px`);
   return { top, left, side };
 }

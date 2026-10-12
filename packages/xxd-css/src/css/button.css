@@ -1,10 +1,16 @@
 /* 按钮。按钮文字描述下一次点击会做什么；切换按钮带 aria-pressed。
  *   <button class="xxd-btn" data-variant="primary">写入</button>
- *   variant: primary | secondary（缺省）| ghost | danger | danger-outline
- *   size: sm | md（缺省）| lg；data-icon-only 纯图标（务必加 aria-label）
- *   对话框的取消用 class="xxd-btn ui-dialog-cancel"：内容宽度、视觉安静。 */
+ *   variant: primary | secondary（缺省）| ghost | outline | danger | danger-outline
+ *   size: xs | sm | md（缺省）| lg；data-icon-only 纯图标（务必加 aria-label）；data-shape="round" 圆形图标按钮（跟随圆角开关）
+ *   aria-busy="true" 进行中：文字保留但透明（宽度不跳），转圈居中；Xxd.runBusy(btn, task) 完成后图标变勾一下。
+ *   对话框的取消用 class="xxd-btn ui-dialog-cancel"：内容宽度、视觉安静。
+ *   质感：<html data-finish="material"> 时实心按钮有顶部 1px 内高光、深一点的边、按下下沉 0.5px；缺省纯平。 */
 @layer xxd.components {
   .xxd-btn {
+    --btn-fg: var(--ink);
+    --btn-bg: var(--paper);
+    --btn-bd: var(--line-strong);
+    --btn-bg-hover: var(--wash);
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -12,20 +18,22 @@
     gap: 6px;
     height: var(--control-h);
     padding: 0 14px;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--btn-bd);
     border-radius: var(--r-sm);
-    background: var(--paper);
-    color: var(--ink);
+    background: var(--btn-bg);
+    color: var(--btn-fg);
     font: var(--weight-medium) var(--text-sm) / 1 var(--font-body);
     white-space: nowrap;
     text-decoration: none;
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    /* hover 进入立即变（见 interaction.css），离开时这里的 140ms 淡回 */
     transition:
       background-color var(--motion-quick) ease,
       border-color var(--motion-quick) ease,
       color var(--motion-quick) ease,
+      box-shadow var(--motion-quick) ease,
       opacity var(--motion-quick) ease;
   }
 
@@ -37,40 +45,46 @@
   }
 
   .xxd-btn:hover {
-    background: var(--wash);
+    background: var(--btn-bg-hover);
   }
 
   .xxd-btn[aria-pressed="true"] {
-    background: var(--selected-bg);
-    border-color: color-mix(in srgb, var(--action) 30%, var(--line-strong));
+    --btn-bg: var(--selected-bg);
+    --btn-bg-hover: var(--selected-bg);
+    --btn-bd: color-mix(in srgb, var(--action) 30%, var(--line-strong));
   }
 
   .xxd-btn[data-variant="primary"] {
-    background: var(--action);
-    border-color: var(--action);
-    color: var(--on-action);
+    --btn-fg: var(--on-action);
+    --btn-bg: var(--action);
+    --btn-bd: var(--action);
+    --btn-bg-hover: color-mix(in srgb, var(--action) 86%, var(--paper));
   }
 
   .xxd-btn[data-variant="primary"]:hover {
-    background: color-mix(in srgb, var(--action) 86%, var(--paper));
-    border-color: color-mix(in srgb, var(--action) 86%, var(--paper));
+    border-color: var(--btn-bg-hover);
   }
 
   .xxd-btn[data-variant="ghost"],
   .xxd-btn.ui-dialog-cancel {
-    border-color: transparent;
-    background: transparent;
+    --btn-bd: transparent;
+    --btn-bg: transparent;
   }
 
-  .xxd-btn[data-variant="ghost"]:hover,
-  .xxd-btn.ui-dialog-cancel:hover {
-    background: var(--wash);
+  .xxd-btn[data-variant="outline"] {
+    --btn-bg: transparent;
+    --btn-bd: var(--line-strong);
+    --btn-bg-hover: transparent;
+  }
+
+  .xxd-btn[data-variant="outline"]:hover {
+    border-color: color-mix(in srgb, var(--ink) 45%, var(--line-strong));
   }
 
   .xxd-btn.ui-dialog-cancel {
+    --btn-fg: var(--muted);
     flex: none;
     width: auto;
-    color: var(--muted);
   }
 
   .xxd-btn.ui-dialog-cancel:hover {
@@ -78,22 +92,23 @@
   }
 
   .xxd-btn[data-variant="danger"] {
-    background: var(--danger-strong);
-    border-color: var(--danger-strong);
-    color: #ffffff;
-  }
-
-  .xxd-btn[data-variant="danger"]:hover {
-    background: color-mix(in srgb, var(--danger-strong) 88%, #000000);
+    --btn-fg: #ffffff;
+    --btn-bg: var(--danger-strong);
+    --btn-bd: var(--danger-strong);
+    --btn-bg-hover: color-mix(in srgb, var(--danger-strong) 88%, #000000);
   }
 
   .xxd-btn[data-variant="danger-outline"] {
-    border-color: color-mix(in srgb, var(--danger) 45%, var(--line));
-    color: var(--danger);
+    --btn-fg: var(--danger);
+    --btn-bd: color-mix(in srgb, var(--danger) 45%, var(--line));
+    --btn-bg-hover: color-mix(in srgb, var(--danger) 8%, var(--paper));
   }
 
-  .xxd-btn[data-variant="danger-outline"]:hover {
-    background: color-mix(in srgb, var(--danger) 8%, var(--paper));
+  .xxd-btn[data-size="xs"] {
+    height: var(--control-h-xs);
+    gap: 4px;
+    padding: 0 8px;
+    font-size: var(--text-2xs);
   }
 
   .xxd-btn[data-size="sm"] {
@@ -119,6 +134,16 @@
     height: var(--control-h-sm);
   }
 
+  .xxd-btn[data-icon-only][data-size="xs"] {
+    width: var(--control-h-xs);
+    height: var(--control-h-xs);
+  }
+
+  /* 圆形图标按钮：它不是语义上的圆，所以跟随圆角开关（直角模式下是方的）。 */
+  .xxd-btn[data-shape="round"] {
+    border-radius: var(--r-pill);
+  }
+
   .xxd-btn[data-block] {
     display: flex;
     width: 100%;
@@ -131,22 +156,48 @@
     pointer-events: none;
   }
 
+  /* 进行中：文字和图标保留但透明，宽度不跳；转圈画在正中。 */
   .xxd-btn[aria-busy="true"] {
+    color: transparent;
     cursor: progress;
   }
 
-  .xxd-btn[aria-busy="true"] > .ui-icon {
-    display: none;
+  .xxd-btn[aria-busy="true"] > * {
+    visibility: hidden;
   }
 
   .xxd-btn[aria-busy="true"]::before {
     content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
     width: 12px;
     height: 12px;
-    border: 1.5px solid currentColor;
+    margin: -6px 0 0 -6px;
+    border: 1.5px solid var(--btn-fg);
     border-right-color: transparent;
     border-radius: var(--r-circle);
     animation: xxd-spin 0.7s linear infinite;
+  }
+
+  /* 完成：Xxd.runBusy 把第一个图标换成勾，data-done 让它带上成功色（实心按钮上保持原来的字色）。 */
+  .xxd-btn[data-done]:not([data-variant="primary"], [data-variant="danger"]) > .ui-icon:first-child {
+    color: var(--success);
+  }
+
+  /* 质感（data-finish="material"）：只给实心按钮；这是材质，不是浮起 —— 没有外阴影。 */
+  :root[data-finish="material"] .xxd-btn:is([data-variant="primary"], [data-variant="danger"]) {
+    --btn-bd: color-mix(in srgb, var(--btn-bg) 86%, #000000);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
+
+  :root[data-finish="material"] .xxd-btn:is([data-variant="primary"], [data-variant="danger"]):active {
+    transform: translateY(0.5px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  :root[data-finish="material"] .xxd-btn:not([data-variant="primary"], [data-variant="danger"], [data-variant="ghost"], .ui-dialog-cancel):active {
+    transform: translateY(0.5px);
   }
 
   /* 文字链接式按钮 */
@@ -166,7 +217,33 @@
     text-decoration-color: currentColor;
   }
 
-  /* 按钮组：同一组按钮共享边线 */
+  .xxd-link[data-variant="plain"] {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .xxd-link[data-variant="plain"]:hover {
+    color: var(--action-text);
+  }
+
+  .xxd-link[data-variant="current"] {
+    color: inherit;
+  }
+
+  .xxd-link[target="_blank"]::after,
+  .xxd-link[data-external]::after {
+    content: "";
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    margin-left: 0.2em;
+    vertical-align: -0.05em;
+    background: currentColor;
+    -webkit-mask: var(--xxd-external) center / contain no-repeat;
+    mask: var(--xxd-external) center / contain no-repeat;
+  }
+
+  /* 按钮组：同一组按钮共享边线；拆分按钮 = 主操作 + 一个下拉箭头 */
   .xxd-btn-group {
     display: inline-flex;
   }
@@ -179,6 +256,11 @@
     margin-left: -1px;
   }
 
+  .xxd-btn-group > .xxd-btn[data-variant="primary"] + .xxd-btn[data-variant="primary"] {
+    margin-left: 0;
+    border-left-color: color-mix(in srgb, var(--on-action) 30%, var(--action));
+  }
+
   .xxd-btn-group > .xxd-btn:first-child {
     border-start-start-radius: var(--r-sm);
     border-end-start-radius: var(--r-sm);
@@ -187,6 +269,11 @@
   .xxd-btn-group > .xxd-btn:last-child {
     border-start-end-radius: var(--r-sm);
     border-end-end-radius: var(--r-sm);
+  }
+
+  .xxd-btn-group > .xxd-btn:hover,
+  .xxd-btn-group > .xxd-btn:focus-visible {
+    z-index: 1;
   }
 
   @keyframes xxd-spin {

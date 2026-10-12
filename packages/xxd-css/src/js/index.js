@@ -14,7 +14,7 @@ export { openDialog, closeDialog, confirmDialog } from "./dialog.js";
 export { showFloating, hideFloating } from "./menu.js";
 export { place } from "./floating.js";
 export { selectTab, selectRadio, moveInk } from "./choice.js";
-export { toast, copyText, showTooltip, hideTooltip } from "./feedback.js";
+export { toast, copyText, showTooltip, hideTooltip, showBubble, runBusy } from "./feedback.js";
 export { openSheet, closeSheet, openPanel, closePanel, openLayer, closeLayer } from "./layers.js";
 export { bindSearch, markMatches, clearMarks, addTag, tagValues, openCommandPalette, bindCommandPalette } from "./inputs.js";
 export { mountAppearance, APPEARANCE_LABELS } from "./appearance.js";

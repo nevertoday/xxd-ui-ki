@@ -12,7 +12,7 @@ if (script?.dataset?.lockTheme) lock.theme = script.dataset.lockTheme;
 
 // 页面自己的默认值（用户没设置过时用）：data-default-density="compact" 等
 const defaults = {};
-for (const name of ["theme", "corners", "density", "accent"]) {
+for (const name of ["theme", "corners", "density", "accent", "finish"]) {
   const value = script?.dataset?.[`default${name[0].toUpperCase()}${name.slice(1)}`];
   if (value !== undefined) defaults[name] = value;
 }

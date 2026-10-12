@@ -185,3 +185,63 @@ describe("复制", () => {
     expect(document.querySelector("[data-copy]").hasAttribute("data-done")).toBe(true);
   });
 });
+
+describe("O1 交互基础层", () => {
+  it("sheet 打开时 Tab 在里面循环（焦点陷阱）", () => {
+    html(`<div class="xxd-sheet-host"><div class="xxd-scrim"></div>
+      <section class="xxd-sheet" id="s9"><button id="a">a</button><button id="b">b</button></section>
+      <footer><button id="open9" data-xxd-sheet-open="s9">open</button></footer></div>`);
+    for (const el of document.querySelectorAll("button")) el.getClientRects = () => [{}];
+    document.getElementById("open9").click();
+    const b = document.getElementById("b");
+    b.focus();
+    const ev = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
+    b.dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(true);
+    expect(document.activeElement.id).toBe("a");
+    Xxd.closeSheet(document.getElementById("s9"));
+  });
+
+  it("tooltip 组：刚关掉 300ms 内显示下一个是立即的（data-instant）", () => {
+    html(`<button id="t1" data-tooltip="一">1</button><button id="t2" data-tooltip="二">2</button>`);
+    Xxd.showTooltip(document.getElementById("t1"));
+    const tip = document.querySelector(".xxd-tooltip");
+    expect(tip.hasAttribute("data-instant")).toBe(false);
+    Xxd.hideTooltip();
+    Xxd.showTooltip(document.getElementById("t2"));
+    expect(tip.hasAttribute("data-instant")).toBe(true);
+    expect(tip.textContent).toBe("二");
+    Xxd.hideTooltip();
+  });
+
+  it("runBusy：进行中 aria-busy，完成后图标变勾", async () => {
+    html(`<button class="xxd-btn" id="rb">${Xxd.ICON.copy(16)}保存</button>`);
+    const btn = document.getElementById("rb");
+    let resolve;
+    const p = Xxd.runBusy(btn, () => new Promise((r) => (resolve = r)));
+    expect(btn.getAttribute("aria-busy")).toBe("true");
+    resolve(42);
+    await expect(p).resolves.toBe(42);
+    expect(btn.hasAttribute("aria-busy")).toBe(false);
+    expect(btn.hasAttribute("data-done")).toBe(true);
+    expect(btn.innerHTML).toContain("m6 12 4 4 8-8");
+  });
+
+  it("菜单：鼠标移进哪一项，焦点就在哪一项（只有一个高亮）", () => {
+    html(`<div class="xxd-menu" role="menu"><button class="xxd-menu__item" role="menuitem" id="m1">一</button><button class="xxd-menu__item" role="menuitem" id="m2">二</button></div>`);
+    document.getElementById("m2").dispatchEvent(new PointerEvent("pointermove", { bubbles: true, pointerType: "mouse" }));
+    expect(document.activeElement.id).toBe("m2");
+  });
+
+  it("place 写出缩放原点和箭头位置", () => {
+    html(`<button id="anc">a</button><div id="fl" style="position:fixed"></div>`);
+    const anc = document.getElementById("anc");
+    const fl = document.getElementById("fl");
+    anc.getBoundingClientRect = () => ({ left: 100, right: 140, top: 50, bottom: 70, width: 40, height: 20 });
+    fl.getBoundingClientRect = () => ({ left: 0, right: 200, top: 0, bottom: 100, width: 200, height: 100 });
+    Xxd.place(anc, fl, { placement: "bottom-start" });
+    expect(fl.dataset.side).toBe("bottom");
+    expect(fl.style.getPropertyValue("--xxd-origin")).toBe("20px 0");
+    expect(fl.style.getPropertyValue("--xxd-arrow-x")).toBe("20px");
+  });
+});

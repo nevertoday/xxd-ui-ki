@@ -217,6 +217,7 @@
   }
 
   /* 菜单：<div class="xxd-menu" role="menu" popover>（js/menu.js 负责定位与键盘） */
+  /* 菜单 / popover：从锚点方向长出来（D4）。floating.js 写 --xxd-origin（锚点中心相对浮层的位置）。 */
   .xxd-menu,
   .xxd-popover {
     position: fixed;
@@ -231,6 +232,7 @@
     box-shadow: var(--shadow-popover);
     opacity: 1;
     transform: none;
+    transform-origin: var(--xxd-origin, top left);
     transition:
       opacity var(--motion-quick) ease,
       transform var(--motion-quick) var(--ease-out-expo),
@@ -241,15 +243,59 @@
   .xxd-menu:not(:popover-open),
   .xxd-popover:not(:popover-open) {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: scale(0.96);
+    transition-duration: 100ms;
   }
 
   @starting-style {
     .xxd-menu:popover-open,
     .xxd-popover:popover-open {
       opacity: 0;
-      transform: translateY(-4px);
+      transform: scale(0.96);
     }
+  }
+
+  .xxd-popover__title {
+    margin: 0 0 4px;
+    font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+  }
+
+  .xxd-popover__text {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--text-xs);
+    line-height: 1.6;
+  }
+
+  .xxd-popover__close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+  }
+
+  /* 小箭头（可选）：data-arrow；floating.js 写 --xxd-arrow-x 和 data-side。旋转的小方块，跟随圆角开关。 */
+  :is(.xxd-popover, .xxd-tooltip)[data-arrow]::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--xxd-arrow-x, 50%) - 4px);
+    width: 8px;
+    height: 8px;
+    background: inherit;
+    border: inherit;
+    border-radius: 0;
+    transform: rotate(45deg);
+  }
+
+  :is(.xxd-popover, .xxd-tooltip)[data-arrow][data-side="bottom"]::before {
+    top: -5px;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  :is(.xxd-popover, .xxd-tooltip)[data-arrow][data-side="top"]::before {
+    bottom: -5px;
+    border-top: 0;
+    border-left: 0;
   }
 
   .xxd-menu {
@@ -342,14 +388,21 @@
     font: var(--weight-medium) var(--text-2xs) / 1.4 var(--font-body);
     box-shadow: 0 4px 12px rgba(var(--shadow-rgb), 0.16);
     opacity: 0;
-    transform: translateY(2px);
+    transform: scale(0.96);
+    transform-origin: var(--xxd-origin, bottom center);
     pointer-events: none;
-    transition: opacity var(--motion-quick) ease, transform var(--motion-quick) ease;
+    transition: opacity 100ms ease, transform 100ms var(--ease-out-expo);
   }
 
   .xxd-tooltip[data-open] {
     opacity: 1;
     transform: none;
+    transition-duration: var(--motion-quick);
+  }
+
+  /* 连续出现（tooltip 组）时不再缩放，原地换字 */
+  .xxd-tooltip[data-open][data-instant] {
+    transition: none;
   }
 
   /* Toast：就地出现。在面板里做的操作，toast 出现在面板里，不盖住主内容区。 */

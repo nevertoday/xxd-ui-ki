@@ -1,0 +1,87 @@
+/* 文字层级。字重只有 400 / 500 / 600；不改字距；相关的字靠得更近。
+ *   <h2 class="xxd-text" data-variant="heading2">外观</h2>
+ *   variant: display | heading1 | heading2 | heading3 | body（缺省）| secondary | caption | mono | mono-secondary | success | danger | warning
+ *   size（只用于 body / secondary）: xs | sm | base | lg */
+@layer xxd.components {
+  .xxd-text {
+    margin: 0;
+    color: var(--ink);
+    font: var(--weight-regular) var(--text-sm) / 1.6 var(--font-body);
+  }
+
+  .xxd-text[data-variant="display"] {
+    font: var(--weight-strong) var(--text-display) / 1.25 var(--font-title);
+  }
+
+  .xxd-text[data-variant="heading1"] {
+    font: var(--weight-strong) var(--text-xl) / 1.35 var(--font-body);
+  }
+
+  .xxd-text[data-variant="heading2"] {
+    font: var(--weight-strong) var(--text-lg) / 1.4 var(--font-body);
+  }
+
+  .xxd-text[data-variant="heading3"] {
+    font: var(--weight-medium) var(--text-base) / 1.45 var(--font-body);
+  }
+
+  .xxd-text[data-variant="secondary"] {
+    color: var(--muted);
+  }
+
+  .xxd-text[data-variant="caption"] {
+    color: var(--muted);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  .xxd-text[data-variant="mono"],
+  .xxd-text[data-variant="mono-secondary"] {
+    font-family: var(--font-mono);
+    font-size: 0.92em;
+  }
+
+  .xxd-text[data-variant="mono-secondary"] {
+    color: var(--muted);
+  }
+
+  .xxd-text[data-variant="success"] {
+    color: var(--success);
+  }
+
+  .xxd-text[data-variant="danger"] {
+    color: var(--danger);
+  }
+
+  .xxd-text[data-variant="warning"] {
+    color: var(--warning);
+  }
+
+  .xxd-text[data-size="xs"] {
+    font-size: var(--text-xs);
+  }
+
+  .xxd-text[data-size="sm"] {
+    font-size: var(--text-sm);
+  }
+
+  .xxd-text[data-size="base"] {
+    font-size: var(--text-base);
+  }
+
+  .xxd-text[data-size="lg"] {
+    font-size: var(--text-lg);
+  }
+
+  .xxd-text[data-truncate] {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* 标题和它的说明：说明紧贴标题（相关的字靠得更近） */
+  .xxd-text-pair {
+    display: grid;
+    gap: 2px;
+  }
+}

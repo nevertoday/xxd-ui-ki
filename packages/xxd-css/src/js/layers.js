@@ -64,6 +64,26 @@ export function installLayers(root, byId, closestFrom) {
       closeLayer(layer);
     }
   });
+  // 焦点陷阱（I15）：sheet / 面板打开时，Tab 在里面循环
+  root.addEventListener("keydown", (event) => {
+    if (event.key !== "Tab" || !stack.length) return;
+    const top = stack[stack.length - 1];
+    const items = focusables(top);
+    if (!items.length) return;
+    const active = top.getRootNode().activeElement;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (!top.contains(active)) {
+      event.preventDefault();
+      first.focus();
+    } else if (event.shiftKey && active === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
   root.addEventListener("keydown", (event) => {
     if (event.key !== "Escape" || !stack.length) return;
     if (event.defaultPrevented) return;

@@ -7,6 +7,9 @@ import { ICON } from "./icons-min.js";
 let tip = null;
 let tipTimer = 0;
 let tipAnchor = null;
+let tipHiddenAt = 0;
+// tooltip 组（I5）：刚关掉的 300ms 内移到别的按钮，立即出现、原地换字
+const GROUP_WINDOW = 300;
 
 function ensureTip(doc) {
   if (tip && tip.isConnected) return tip;
@@ -22,16 +25,20 @@ export function showTooltip(anchor) {
   const text = anchor.getAttribute("data-tooltip");
   if (!text) return;
   const el = ensureTip(anchor.ownerDocument);
+  const instant = el.hasAttribute("data-open") || Date.now() - tipHiddenAt < GROUP_WINDOW;
   el.textContent = text;
+  el.toggleAttribute("data-arrow", anchor.hasAttribute("data-tooltip-arrow"));
   tipAnchor = anchor;
   anchor.setAttribute("aria-describedby", el.id);
-  place(anchor, el, { placement: anchor.getAttribute("data-tooltip-placement") || "top", offset: 6 });
+  place(anchor, el, { placement: anchor.getAttribute("data-tooltip-placement") || "top", offset: anchor.hasAttribute("data-tooltip-arrow") ? 9 : 6 });
+  el.toggleAttribute("data-instant", instant);
   el.setAttribute("data-open", "");
 }
 
 export function hideTooltip() {
   clearTimeout(tipTimer);
   if (!tip) return;
+  if (tip.hasAttribute("data-open")) tipHiddenAt = Date.now();
   tip.removeAttribute("data-open");
   if (tipAnchor) tipAnchor.removeAttribute("aria-describedby");
   tipAnchor = null;
@@ -42,7 +49,8 @@ export function installTooltips(root, closestFrom) {
     const anchor = closestFrom(event, "[data-tooltip]");
     if (!anchor || anchor === tipAnchor) return;
     clearTimeout(tipTimer);
-    tipTimer = setTimeout(() => showTooltip(anchor), tip?.hasAttribute("data-open") ? 0 : 400);
+    const grouped = tip?.hasAttribute("data-open") || Date.now() - tipHiddenAt < GROUP_WINDOW;
+    tipTimer = setTimeout(() => showTooltip(anchor), grouped ? 0 : 400);
   });
   root.addEventListener("pointerout", (event) => {
     const anchor = closestFrom(event, "[data-tooltip]");
@@ -157,6 +165,7 @@ export function installCopy(root, closestFrom) {
     const original = icon?.outerHTML;
     if (icon) icon.outerHTML = ICON.check(Number(icon.getAttribute("width")) || 16);
     btn.setAttribute("data-done", "");
+    showBubble(btn, btn.getAttribute("data-copy-done") || "已复制");
     if (btn.hasAttribute("data-copy-toast")) toast(btn.getAttribute("data-copy-toast") || "已复制", { tone: "success" });
     setTimeout(() => {
       btn.removeAttribute("data-done");
@@ -164,4 +173,49 @@ export function installCopy(root, closestFrom) {
       if (now && original) now.outerHTML = original;
     }, 1200);
   });
+}
+
+/* ── 小气泡（复制成功等）：在元素上方淡入 1.2s（I7） ── */
+let bubble = null;
+let bubbleTimer = 0;
+export function showBubble(anchor, text, { duration = 1200 } = {}) {
+  const doc = anchor.ownerDocument;
+  if (!bubble || !bubble.isConnected) {
+    bubble = doc.createElement("div");
+    bubble.className = "xxd-bubble";
+    bubble.setAttribute("role", "status");
+    bubble.setAttribute("aria-live", "polite");
+    doc.body.append(bubble);
+  }
+  clearTimeout(bubbleTimer);
+  bubble.textContent = text;
+  place(anchor, bubble, { placement: "top", offset: 6 });
+  bubble.setAttribute("data-open", "");
+  bubbleTimer = setTimeout(() => bubble.removeAttribute("data-open"), duration);
+  return bubble;
+}
+
+/* ── 进行中的按钮（I9）：await Xxd.runBusy(btn, () => save()) —— 宽度不跳，成功后第一个图标变勾 1s ── */
+export async function runBusy(button, task, { doneFor = 1000 } = {}) {
+  if (button.getAttribute("aria-busy") === "true") return undefined;
+  button.setAttribute("aria-busy", "true");
+  try {
+    const result = await task();
+    button.removeAttribute("aria-busy");
+    const icon = button.querySelector(":scope > .ui-icon");
+    if (icon) {
+      const original = icon.outerHTML;
+      icon.outerHTML = ICON.check(Number(icon.getAttribute("width")) || 16);
+      button.setAttribute("data-done", "");
+      setTimeout(() => {
+        button.removeAttribute("data-done");
+        const now = button.querySelector(":scope > .ui-icon");
+        if (now) now.outerHTML = original;
+      }, doneFor);
+    }
+    return result;
+  } catch (error) {
+    button.removeAttribute("aria-busy");
+    throw error;
+  }
 }
