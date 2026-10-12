@@ -31,8 +31,9 @@
     "typecheck": "pnpm -r typecheck",
     "version": "changeset version",
     "version:beta": "./ci/versioning/version-beta.sh",
-    "xxd:build": "pnpm --filter \"./packages/xxd-*\" -r build",
-    "xxd:test": "pnpm --filter \"./packages/xxd-*\" -r test"
+    "xxd:build": "pnpm --filter @xxd/tokens --filter @xxd/icons build && pnpm --filter @xxd/css build && pnpm --filter @xxd/extension build && pnpm --filter @xxd/react build",
+    "xxd:test": "pnpm --filter \"./packages/xxd-*\" -r test && pnpm --filter @cloudflare/kumo exec vitest run src/xxd-contract.test.ts",
+    "xxd": "node packages/xxd-extension/scripts/cli.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "2.29.7",

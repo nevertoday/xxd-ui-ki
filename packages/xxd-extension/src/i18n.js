@@ -1,0 +1,36 @@
+// 三语（简 / 繁 / 英）：chrome.i18n 优先，没有时用传入的字典。
+//   <span data-i18n="settingsTitle"></span>
+//   <input data-i18n-attr="placeholder:searchPlaceholder,aria-label:searchLabel">
+export function t(key, substitutions, fallback = {}) {
+  const fromChrome = globalThis.chrome?.i18n?.getMessage?.(key, substitutions);
+  if (fromChrome) return fromChrome;
+  const raw = fallback[key] ?? key;
+  const subs = Array.isArray(substitutions) ? substitutions : substitutions == null ? [] : [substitutions];
+  return subs.reduce((text, value, i) => text.replaceAll(`$${i + 1}`, String(value)), raw);
+}
+
+/** 找不到翻译时保留 HTML 里原来的文字（不会把 key 写到界面上）。 */
+export function applyI18n(root = document, fallback = {}) {
+  const lookup = (key) => {
+    const text = t(key, undefined, fallback);
+    return text === key ? null : text;
+  };
+  for (const el of root.querySelectorAll("[data-i18n]")) {
+    const text = lookup(el.dataset.i18n);
+    if (text != null) el.textContent = text;
+  }
+  for (const el of root.querySelectorAll("[data-i18n-attr]")) {
+    for (const pair of el.dataset.i18nAttr.split(",")) {
+      const [attr, key] = pair.split(":").map((s) => s.trim());
+      const text = attr && key ? lookup(key) : null;
+      if (text != null) el.setAttribute(attr, text);
+    }
+  }
+}
+
+/** chrome 的 UI 语言 → 小小东的三种界面语言 */
+export function uiLocale(lang = globalThis.chrome?.i18n?.getUILanguage?.() || globalThis.navigator?.language || "zh-CN") {
+  const l = lang.toLowerCase();
+  if (l.startsWith("zh")) return /tw|hk|mo|hant/.test(l) ? "zh-Hant" : "zh-CN";
+  return "en";
+}

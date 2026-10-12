@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__APP_NAME__</title>
+  <!-- 首帧前应用主题 / 圆角 / 主色（读 localStorage 镜像），侧边栏用紧凑密度 -->
+  <script src="vendor/xxd/boot.js" data-key="__SLUG__-ui" data-default-density="compact"></script>
+  <link rel="stylesheet" href="vendor/xxd/xxd.css">
+  <link rel="stylesheet" href="sidepanel.css">
+  <script src="vendor/xxd/icons.js"></script>
+  <script src="vendor/xxd/xxd.js"></script>
+  <script src="vendor/xxd/extension.js"></script>
+</head>
+<body class="xxd-page">
+  <div class="app xxd-sheet-host">
+    <!-- tab 在最上面，没有顶栏；tab 的基线就是那条线 -->
+    <nav class="xxd-tabs app-tabs" data-xxd-tabs aria-label="主导航">
+      <button role="tab" id="tab-main" aria-controls="panel-main" aria-selected="true" data-i18n="tabMain">主页</button>
+      <button role="tab" id="tab-history" aria-controls="panel-history" data-i18n="tabHistory">记录</button>
+      <button role="tab" id="tab-settings" aria-controls="panel-settings" data-i18n="tabSettings">设置</button>
+    </nav>
+
+    <main class="app-body">
+      <section id="panel-main" class="xxd-read app-panel">
+        <div class="xxd-empty">
+          <i data-xxd-icon="Sparkles"></i>
+          <p class="xxd-empty__title" data-i18n="emptyTitle">从这里开始</p>
+          <p class="xxd-empty__text" data-i18n="emptyText">这是用小小东 UI Kit 生成的插件模板。</p>
+        </div>
+      </section>
+      <section id="panel-history" class="xxd-read app-panel">
+        <div class="xxd-empty"><i data-xxd-icon="History"></i><p class="xxd-empty__title" data-i18n="historyEmpty">还没有记录</p></div>
+      </section>
+      <section id="panel-settings" class="xxd-read app-panel">
+        <div class="xxd-settings" id="settings"></div>
+      </section>
+    </main>
+
+    <!-- 底部 dock：状态在开头，下一步在末尾 -->
+    <footer class="xxd-dock">
+      <div class="xxd-dock__status" id="status" aria-live="polite"></div>
+      <div class="xxd-dock__primary"><button class="xxd-btn" data-variant="primary" id="primary" data-i18n="primaryAction">开始</button></div>
+    </footer>
+  </div>
+  <script src="sidepanel.js"></script>
+</body>
+</html>

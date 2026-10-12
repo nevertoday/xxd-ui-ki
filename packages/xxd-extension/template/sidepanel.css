@@ -1,0 +1,26 @@
+/* 只写这个插件自己的布局；颜色、圆角、字号一律用 @xxd/tokens 的变量。 */
+html,
+body {
+  height: 100%;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-tabs {
+  flex: none;
+  padding: 0 14px;
+}
+
+.app-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.app-panel {
+  padding: 14px;
+}

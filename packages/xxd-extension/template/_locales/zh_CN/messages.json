@@ -1,0 +1,38 @@
+{
+  "appName": {
+    "message": "__APP_NAME__"
+  },
+  "appDescription": {
+    "message": "__APP_DESC__"
+  },
+  "actionTitle": {
+    "message": "打开 __APP_NAME__"
+  },
+  "tabMain": {
+    "message": "主页"
+  },
+  "tabHistory": {
+    "message": "记录"
+  },
+  "tabSettings": {
+    "message": "设置"
+  },
+  "emptyTitle": {
+    "message": "从这里开始"
+  },
+  "emptyText": {
+    "message": "这是用小小东 UI Kit 生成的插件模板。"
+  },
+  "historyEmpty": {
+    "message": "还没有记录"
+  },
+  "primaryAction": {
+    "message": "开始"
+  },
+  "doneToast": {
+    "message": "完成了"
+  },
+  "searchPlaceholder": {
+    "message": "搜索设置（⌘F）"
+  }
+}

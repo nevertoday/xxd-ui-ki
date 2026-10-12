@@ -1,0 +1,27 @@
+{
+  "name": "@xxd/extension",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "小小东 Chrome 插件套件：MV3 模板、外观设置同步（chrome.storage）、Shadow DOM 挂载、三语 i18n、vendor 同步命令。",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./dist/*": "./dist/*"
+  },
+  "bin": { "xxd": "./scripts/cli.mjs" },
+  "files": ["src", "dist", "template", "scripts"],
+  "scripts": {
+    "build": "node scripts/cli.mjs build",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@xxd/css": "workspace:*",
+    "@xxd/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.1",
+    "happy-dom": "catalog:",
+    "vitest": "catalog:"
+  }
+}

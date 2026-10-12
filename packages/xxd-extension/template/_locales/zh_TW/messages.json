@@ -1,0 +1,38 @@
+{
+  "appName": {
+    "message": "__APP_NAME_HANT__"
+  },
+  "appDescription": {
+    "message": "__APP_DESC__"
+  },
+  "actionTitle": {
+    "message": "打開 __APP_NAME_HANT__"
+  },
+  "tabMain": {
+    "message": "主頁"
+  },
+  "tabHistory": {
+    "message": "記錄"
+  },
+  "tabSettings": {
+    "message": "設定"
+  },
+  "emptyTitle": {
+    "message": "從這裡開始"
+  },
+  "emptyText": {
+    "message": "這是用小小東 UI Kit 產生的擴充功能範本。"
+  },
+  "historyEmpty": {
+    "message": "還沒有記錄"
+  },
+  "primaryAction": {
+    "message": "開始"
+  },
+  "doneToast": {
+    "message": "完成了"
+  },
+  "searchPlaceholder": {
+    "message": "搜尋設定（⌘F）"
+  }
+}
