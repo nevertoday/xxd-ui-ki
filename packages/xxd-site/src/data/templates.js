@@ -88,7 +88,7 @@ const detailPanel = `
   <aside class="xxd-panel" data-open style="position:absolute" aria-label="提示词详情">
     <div class="xxd-panel__head"><h2 class="xxd-panel__title">编辑式海报 001</h2><button class="xxd-btn" data-variant="ghost" data-icon-only aria-label="复制提示词" data-tooltip="复制提示词">${I("Copy")}</button><button class="xxd-btn" data-variant="ghost" data-icon-only aria-label="关闭">${I("X")}</button></div>
     <div class="xxd-panel__body"><div class="xxd-card__media" style="--ratio:4/3;background:#d65f32;border-radius:var(--r-md)"></div>
-      <div class="xxd-prose" style="margin-top:16px"><h3>提示词</h3><p>克制的编辑式粗野主义：纸色背景、清晰的黑线、衬线标题、密但好读的中文。</p></div>
+      <div class="xxd-prose" style="margin-top:16px"><h3>提示词</h3><p>克制的编辑式粗野主义：纸色背景、清晰的黑线、干净的无衬线字、密但好读的中文。</p></div>
       <div class="xxd-cluster" style="margin-top:12px"><button class="xxd-chip" aria-pressed="true">海报</button><button class="xxd-chip">编辑式</button></div>
     </div>
     <footer class="xxd-dock" style="position:static"><div class="xxd-dock__status">2,410 次使用</div><div class="xxd-dock__tools"><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="上一个">${I("ChevronLeft")}</button><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="下一个">${I("ChevronRight")}</button></div><div class="xxd-dock__primary"><button class="xxd-btn" data-variant="primary" data-size="sm">用这个风格生成</button></div></footer>
@@ -136,6 +136,10 @@ const deleteConfirm = `
   <button class="xxd-btn" data-variant="danger-outline" onclick="Xxd.confirmDelete({ name: '长文发布', what: '这个插件的全部记录和设置' }).then((ok) => ok && Xxd.toast('已删除', { tone: 'success' }))">删除插件…</button>
   <p class="xxd-text" data-variant="caption">没那么严重的，用「两次确认」（模式）。</p>
 </div>`;
+
+import { templates as templatesEn } from "./templates.en.js";
+
+export const templatesFor = (lang = "zh") => (lang === "en" ? templatesEn.map((t) => ({ ...t, label: t.title })) : templates.map((t) => ({ ...t, label: t.zh })));
 
 export const templates = [
   { slug: "extension-sidepanel", zh: "插件侧边栏", summary: "紧凑密度：tab 在最上面（没有顶栏）、拖放区和取图方式、记录、设置、状态行、底部 dock。", markup: sidepanel, width: 380, height: 720, where: "Chrome 侧边栏" },

@@ -72,10 +72,14 @@
   --shadow-sheet: -18px 0 54px rgba(var(--shadow-rgb), 0.14);
   --backdrop: rgba(5, 5, 5, 0.52);
 
-  /* ── 字体：不加载网络字体；字重只用 400 / 500 / 600 ── */
-  --font-body: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-title: "Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, Georgia, serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* ── 字体：只用系统里已有的无衬线字体，不加载网络字体；字重只用 400 / 500 / 600 ──
+   * 顺序有讲究：先英文字体，再中文字体。浏览器逐字找字体，英文字母落在 Avenir Next / Segoe UI，
+   * 中文落在苹方 / 微软雅黑 / 思源黑体。把中文字体放前面，Windows 上的英文就会用雅黑的西文，难看。
+   *   macOS / iOS：Avenir Next + 苹方    Windows：Segoe UI + 微软雅黑    Android / Linux：思源黑体（Noto Sans CJK）
+   * 标题和正文同一家族，层级只靠字号和字重。繁体页面换成繁体字形，见文件末尾的 :lang(zh-Hant)。 */
+  --font-body: "Avenir Next", "Segoe UI", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", system-ui, sans-serif;
+  --font-title: var(--font-body);
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", "PingFang SC", "Microsoft YaHei", monospace;
   --text-2xs: 11px; /* tooltip、角标 */
   --text-xs: 12px;  /* 菜单、次要信息 */
   --text-sm: 13px;  /* 导航、控件（最常用） */
@@ -258,4 +262,13 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* 繁体中文页面（<html lang="zh-Hant"> 或 zh-TW / zh-HK）：同一套字体的繁体字形。
+ * 只写在根上（Shadow 里是 host）：老项目自己在 :root 上声明的字体照样优先。 */
+:root:lang(zh-Hant),
+:root:lang(zh-TW),
+:root:lang(zh-HK) {
+  --font-body: "Avenir Next", "Segoe UI", -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Source Han Sans TC", system-ui, sans-serif;
+  --font-title: var(--font-body); /* 在这一层重新取一次，局部写 lang 的元素也跟着换 */
 }

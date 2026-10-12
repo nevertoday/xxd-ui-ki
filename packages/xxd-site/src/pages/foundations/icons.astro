@@ -1,31 +1,6 @@
 ---
-import Site from "../../layouts/Site.astro";
-import { ICON_NAMES, ICON_ALIASES, icon } from "../../lib/data.js";
+// 正文在 src/views/Icons.astro（中文 / 英文共用，语言看路径）。
+import Icons from "../../views/Icons.astro";
 ---
 
-<Site title="图标" wide>
-  <header class="site-head" style="max-width:760px">
-    <p class="xxd-text" data-variant="caption">基础</p>
-    <h1 class="xxd-text" data-variant="display">图标</h1>
-    <p class="site-lead">{ICON_NAMES.length} 个，同一种画法：24 网格、1.5 线宽、圆头、斜接角、方角；只有本身是圆的才画圆。点一个复制它的用法。</p>
-    <div class="xxd-input-wrap" style="margin-top:var(--space-4);max-width:360px">
-      <Fragment set:html={icon("Search", 16)} />
-      <input class="xxd-input" type="search" id="icon-search" placeholder={`搜索 ${ICON_NAMES.length} 个图标`} aria-label="搜索图标" />
-    </div>
-    <p class="xxd-text" data-variant="caption" style="margin-top:8px">别名：{Object.keys(ICON_ALIASES).slice(0, 12).join("、")}… 都能用。</p>
-  </header>
-  <div class="site-icons" id="icon-grid">
-    {ICON_NAMES.map((n) => (
-      <button type="button" data-name={n} title={n} data-copy={`<i data-xxd-icon="${n}"></i>`} data-copy-done={`已复制 ${n}`}>
-        <Fragment set:html={icon(n, 24)} /><span class="site-icons__name">{n}</span>
-      </button>
-    ))}
-  </div>
-  <script is:inline>
-    const input = document.getElementById("icon-search");
-    input.addEventListener("input", () => {
-      const q = input.value.trim().toLowerCase();
-      for (const b of document.querySelectorAll("#icon-grid button")) b.hidden = Boolean(q) && !b.dataset.name.toLowerCase().includes(q);
-    });
-  </script>
-</Site>
+<Icons />

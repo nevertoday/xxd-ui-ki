@@ -2,6 +2,8 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import * as registryEn from "../registry.en.js";
+import { patterns as patternsEn } from "../patterns.en.js";
 
 const root = join(import.meta.dirname, "..");
 const registry = JSON.parse(readFileSync(join(root, "registry.json"), "utf8"));
@@ -48,3 +50,54 @@ describe("registry.json", () => {
     expect(unlisted).toEqual([]);
   });
 });
+
+// 英文版（展示站 /en/）：中文里有汉字的字段，英文版都要有，而且英文里没有汉字；结构（条数、示例数）和中文一致。
+const han = /\p{Script=Han}/u;
+const hasHan = (v) => han.test(JSON.stringify(v ?? ""));
+const SKIP = new Set(["zh", "name", "slug", "category", "classes", "react", "states"]);
+function englishGaps(items, en) {
+  const gaps = [];
+  for (const item of items) {
+    const e = en[item.name];
+    if (!e) {
+      gaps.push(`${item.name}: 没有英文`);
+      continue;
+    }
+    if (!e.title) gaps.push(`${item.name}.title`);
+    for (const [k, v] of Object.entries(item)) if (!SKIP.has(k) && hasHan(v) && e[k] === undefined) gaps.push(`${item.name}.${k} 缺英文`);
+    for (const [k, v] of Object.entries(e)) if (hasHan(v)) gaps.push(`${item.name}.${k} 英文里有汉字`);
+    for (const k of ["rules", "a11y", "anatomy", "examples"]) if (item[k] && e[k] && item[k].length !== e[k].length) gaps.push(`${item.name}.${k} 条数不同`);
+    if (item.attributes && e.attributes && Object.keys(item.attributes).length !== Object.keys(e.attributes).length) gaps.push(`${item.name}.attributes 条数不同`);
+  }
+  for (const k of Object.keys(en)) if (!items.some((i) => i.name === k)) gaps.push(`多出来的英文：${k}`);
+  return gaps;
+}
+const classesIn = (markup) => [...markup.matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((k) => k.startsWith("xxd-"));
+
+describe("英文版（registry.en.js / patterns.en.js）", () => {
+  it("每个组件都有英文，英文里没有汉字", () => {
+    expect(englishGaps(registry.components, registryEn.components)).toEqual([]);
+    const cats = [...new Set(registry.components.map((c) => c.category))];
+    expect(cats.filter((c) => !registryEn.categories[c])).toEqual([]);
+  });
+
+  it("每个模式都有英文，英文里没有汉字", () => {
+    expect(englishGaps(patternsFile.patterns, patternsEn)).toEqual([]);
+  });
+
+  it("英文示例里用到的类都存在，而且和中文示例用的是同一组类", () => {
+    const bad = [];
+    for (const c of [...registry.components, ...patternsFile.patterns]) {
+      const e = registryEn.components[c.name] ?? patternsEn[c.name];
+      if (!e?.markup) continue;
+      const zhSet = new Set(classesIn(c.markup));
+      for (const k of classesIn(e.markup)) {
+        if (!defined.has(k)) bad.push(`${c.name}: ${k} 不存在`);
+        else if (!zhSet.has(k)) bad.push(`${c.name}: ${k} 中文示例里没有`);
+      }
+      for (const k of zhSet) if (!classesIn(e.markup).includes(k)) bad.push(`${c.name}: 英文示例少了 ${k}`);
+    }
+    expect(bad).toEqual([]);
+  });
+});
+

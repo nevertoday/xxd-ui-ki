@@ -1,0 +1,51 @@
+---
+// 首页：组件墙。每格一个真的组件（能点、能切外观），点名字进组件页。中文 / 英文共用。
+import Site from "../layouts/Site.astro";
+import { componentsFor } from "../lib/data.js";
+import { embed } from "../lib/markup.js";
+import { langOf, t, withLang } from "../i18n/index.js";
+const lang = langOf(Astro.url.pathname);
+const L = t(lang);
+const T = {
+  zh: {
+    lead: "小小东提示词和每一个小小东插件共用的设计系统。黑白灰、默认直角、强调靠墨色；右上角切换主题、圆角、主色、密度和按钮质感，下面每一格都跟着变。",
+    start: "开始使用",
+    principles: "设计原则",
+    cli: "命令行",
+    wall: "全部组件",
+  },
+  en: {
+    lead: "The design system shared by the XXD member site and every XXD Chrome extension. Black, white and gray, square corners by default, emphasis in ink. Switch the theme, corners, accent, density and button finish in the top right — every cell below follows.",
+    start: "Get started",
+    principles: "Design principles",
+    cli: "CLI",
+    wall: "All components",
+  },
+}[lang];
+const wall = componentsFor(lang).filter((c) => c.wall !== false);
+---
+
+<Site title={L.brand} wide>
+  <header class="site-head" style="max-width:760px">
+    <h1 class="xxd-text" data-variant="display">{L.brand}</h1>
+    <p class="site-lead">{T.lead}</p>
+    <div class="xxd-cluster" style="margin-top:var(--space-5)">
+      <a class="xxd-btn" data-variant="primary" href={withLang("/start", lang)}>{T.start}</a>
+      <a class="xxd-btn" href={withLang("/principles", lang)}>{T.principles}</a>
+      <a class="xxd-btn" data-variant="ghost" href={withLang("/tools", lang)}>{T.cli}</a>
+    </div>
+  </header>
+  <section class="site-wall" aria-label={T.wall}>
+    {
+      wall.map((c) => (
+        <div class="site-wall__cell">
+          <div class="site-wall__stage xxd-page" set:html={embed(c.wall ?? c.markup)} />
+          <a class="site-wall__name" href={withLang(`/components/${c.slug}`, lang)}>
+            {c.label}
+            {lang !== "en" && <span>{c.name}</span>}
+          </a>
+        </div>
+      ))
+    }
+  </section>
+</Site>

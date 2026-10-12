@@ -4,6 +4,8 @@ import { icon } from "../lib/data.js";
 import { embed, extractFunction, nextId } from "../lib/markup.js";
 import ReactDemo from "../react/ReactDemo.tsx";
 import demoSource from "../react/demos.tsx?raw";
+import demoSourceEn from "../react/demos.en.tsx?raw";
+import { langOf, t } from "../i18n/index.js";
 
 interface Props {
   markup: string;
@@ -13,8 +15,10 @@ interface Props {
   title?: string;
 }
 const { markup, react, align = "center", block = false, title } = Astro.props;
+const lang = langOf(Astro.url.pathname);
+const L = t(lang);
 const id = nextId("demo");
-const reactCode = react ? extractFunction(demoSource, `${react}Demo`) : "";
+const reactCode = react ? extractFunction(lang === "en" ? demoSourceEn : demoSource, `${react}Demo`) : "";
 const hasReact = Boolean(reactCode);
 ---
 
@@ -26,22 +30,22 @@ const hasReact = Boolean(reactCode);
     hasReact && (
       <div id={`${id}-react`} hidden>
         <div class="site-demo__stage" data-align={align} data-block={block ? "" : undefined}>
-          <ReactDemo client:visible name={react} />
+          <ReactDemo client:visible name={react} lang={lang} />
         </div>
       </div>
     )
   }
   <div class="site-demo__bar">
-    <div class="xxd-tabs" data-xxd-tabs data-size="sm" aria-label="实现">
-      <button role="tab" id={`${id}-t1`} aria-controls={`${id}-native ${id}-code1`} aria-selected="true">原生 HTML</button>
+    <div class="xxd-tabs" data-xxd-tabs data-size="sm" aria-label={L.impl}>
+      <button role="tab" id={`${id}-t1`} aria-controls={`${id}-native ${id}-code1`} aria-selected="true">{L.native}</button>
       {hasReact && <button role="tab" id={`${id}-t2`} aria-controls={`${id}-react ${id}-code2`}>React</button>}
     </div>
     <button class="xxd-btn" data-variant="ghost" data-size="sm" data-site-code-toggle aria-expanded="false">
-      <Fragment set:html={icon("Code", 14)} />代码
+      <Fragment set:html={icon("Code", 14)} />{L.code}
     </button>
   </div>
-  <pre class="site-code" tabindex="0" id={`${id}-code1`} hidden><code>{markup.trim()}</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="复制" data-copy-target={`#${id}-code1 code`} set:html={icon("Copy", 14)} /></pre>
-  {hasReact && <pre class="site-code" tabindex="0" id={`${id}-code2`} hidden><code>{reactCode}</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="复制" data-copy-target={`#${id}-code2 code`} set:html={icon("Copy", 14)} /></pre>}
+  <pre class="site-code" tabindex="0" id={`${id}-code1`} hidden><code>{markup.trim()}</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label={L.copy} data-copy-target={`#${id}-code1 code`} set:html={icon("Copy", 14)} /></pre>
+  {hasReact && <pre class="site-code" tabindex="0" id={`${id}-code2`} hidden><code>{reactCode}</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label={L.copy} data-copy-target={`#${id}-code2 code`} set:html={icon("Copy", 14)} /></pre>}
 </div>
 
 <script is:inline>

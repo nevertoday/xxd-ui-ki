@@ -51,8 +51,9 @@
   --shadow-xl: var(--shadow-dialog, 0 28px 76px rgba(17, 17, 17, 0.24));
   --shadow-2xl: var(--shadow-dialog, 0 28px 76px rgba(17, 17, 17, 0.24));
 
-  --font-sans: var(--font-body, "Avenir Next", "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif);
-  --font-serif: var(--font-title, "Noto Serif SC", "Songti SC", Georgia, serif);
+  --font-sans: var(--font-body, "Avenir Next", "Segoe UI", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif);
+  /* 小小东不用衬线：Tailwind 的 font-serif 也落到同一套无衬线上 */
+  --font-serif: var(--font-title, var(--font-sans));
 }
 
 @utility rounded-pill {

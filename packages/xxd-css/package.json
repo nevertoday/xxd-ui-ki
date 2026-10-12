@@ -18,13 +18,17 @@
     "./css/*": "./src/css/*",
     "./dist/*": "./dist/*",
     "./registry.json": "./registry.json",
-    "./patterns.json": "./patterns.json"
+    "./patterns.json": "./patterns.json",
+    "./registry.en.js": "./registry.en.js",
+    "./patterns.en.js": "./patterns.en.js"
   },
   "files": [
     "src",
     "dist",
     "registry.json",
-    "patterns.json"
+    "patterns.json",
+    "registry.en.js",
+    "patterns.en.js"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",

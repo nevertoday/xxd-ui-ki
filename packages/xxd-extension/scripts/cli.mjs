@@ -56,13 +56,14 @@ export async function buildAll({ quiet = false } = {}) {
   });
 }
 
-const REGION_START = "/* xxd:tokens:start —— 由 xxd-ui-ki 生成（pnpm xxd sync），这一段请勿手改 */";
+const REGION_START = "/* xxd:tokens:start —— 由 xxd-ui-kit 生成（pnpm xxd sync），这一段请勿手改 */";
 const REGION_END = "/* xxd:tokens:end */";
 
 /** 把一段内容放进文件开头的标记区域里（已有就替换）。 */
 export function upsertRegion(text, body) {
   const block = `${REGION_START}\n${body.trim()}\n${REGION_END}\n`;
-  const start = text.indexOf(REGION_START);
+  // 只认固定的开头：标记里的说明文字改过（比如项目改名前写的是 xxd-ui-ki），老项目里的那一段也要认得出来
+  const start = text.search(/\/\* xxd:tokens:start\b[^]*?\*\//);
   const end = text.indexOf(REGION_END);
   if (start !== -1 && end > start) return text.slice(0, start) + block + text.slice(end + REGION_END.length).replace(/^\n/, "");
   // @charset / @import 必须在最前面：放在它们后面
@@ -179,7 +180,7 @@ export function sync(target, { quiet = false } = {}) {
   // xxd-chrome-publish 把 vendor/ 下的文件当第三方代码检查许可：放一份整个目录的 LICENSE。
   if (vendor) writeFileSync(
     join(vendor, "LICENSE"),
-    "小小东 UI Kit（xxd-ui-ki）的构建产物：设计令牌、原生组件、图标与插件套件。\n\n" +
+    "小小东 UI Kit（xxd-ui-kit）的构建产物：设计令牌、原生组件、图标与插件套件。\n\n" +
       readFileSync(join(repo, "LICENSE"), "utf8"),
   );
   const v = currentVersion();
@@ -189,7 +190,7 @@ export function sync(target, { quiet = false } = {}) {
   for (const rel of config.tokensTargets ?? []) {
     const out = join(dir, rel);
     mkdirSync(dirname(out), { recursive: true });
-    writeFileSync(out, `/* 由 xxd-ui-ki 生成（pnpm xxd sync），请勿手改；来源 packages/xxd-tokens/tokens.css @ ${v.commit} */\n${tokens}`);
+    writeFileSync(out, `/* 由 xxd-ui-kit 生成（pnpm xxd sync），请勿手改；来源 packages/xxd-tokens/tokens.css @ ${v.commit} */\n${tokens}`);
   }
   if (config.layeredTokensRegions?.length) {
     const names = Object.keys(JSON.parse(readFileSync(join(repo, "packages/xxd-tokens/dist/tokens.json"), "utf8")).base);
@@ -198,7 +199,7 @@ export function sync(target, { quiet = false } = {}) {
     const layered = dropDeclarations(readFileSync(join(repo, "packages/xxd-tokens/dist/tokens.layered.css"), "utf8"), skip);
     for (const rel of config.layeredTokensRegions) {
       const out = join(dir, rel);
-      const note = skip.length ? `/* 跳过：${skip.join(" ")}（见 xxd-ui-ki docs/member-site.md） */\n` : "";
+      const note = skip.length ? `/* 跳过：${skip.join(" ")}（见 xxd-ui-kit docs/member-site.md） */\n` : "";
       writeFileSync(out, upsertRegion(readFileSync(out, "utf8"), `/* @xxd ${v.version} ${v.commit} */\n${note}${layered}`));
     }
   }
@@ -206,7 +207,7 @@ export function sync(target, { quiet = false } = {}) {
     const out = join(dir, rel);
     mkdirSync(dirname(out), { recursive: true });
     const nodes = readFileSync(join(repo, "packages/xxd-icons/src/nodes.js"), "utf8");
-    writeFileSync(out, `// 由 xxd-ui-ki 生成（pnpm xxd sync），请勿手改；来源 packages/xxd-icons/src/nodes.js @ ${v.commit}\n${nodes}`);
+    writeFileSync(out, `// 由 xxd-ui-kit 生成（pnpm xxd sync），请勿手改；来源 packages/xxd-icons/src/nodes.js @ ${v.commit}\n${nodes}`);
   }
   if (!vendor) {
     if (!quiet) console.log(`✓ ${basename(dir)} ← @xxd ${v.version} (${v.commit})`);
@@ -214,7 +215,7 @@ export function sync(target, { quiet = false } = {}) {
   }
   writeFileSync(
     join(vendor, "VERSION"),
-    `@xxd/css ${v.version}\ncommit ${v.commit}\nsynced ${new Date().toISOString()}\nsource xxd-ui-ki（请勿手改这个目录，用 pnpm xxd sync 更新）\n`,
+    `@xxd/css ${v.version}\ncommit ${v.commit}\nsynced ${new Date().toISOString()}\nsource xxd-ui-kit（请勿手改这个目录，用 pnpm xxd sync 更新）\n`,
   );
   if (!quiet) console.log(`✓ ${basename(dir)} ← @xxd ${v.version} (${v.commit})`);
   return v;
@@ -271,7 +272,7 @@ export async function create(target, { name, nameEn, slug, desc, descEn } = {}) 
   });
   writeFileSync(
     join(dir, "README.md"),
-    `# ${name}\n\n用小小东 UI Kit（xxd-ui-ki）生成。\n\n- 在 chrome://extensions 打开「开发者模式」→「加载已解压的扩展程序」→ 选这个目录\n- 更新组件：在 xxd-ui-ki 里运行 \`pnpm xxd sync ${dir}\`\n- 设计原则：xxd-ui-ki/docs/DESIGN-PRINCIPLES.md\n- 图标：manifest 里还没有 icons，上架前补上（16/32/48/128）\n`,
+    `# ${name}\n\n用小小东 UI Kit（xxd-ui-kit）生成。\n\n- 在 chrome://extensions 打开「开发者模式」→「加载已解压的扩展程序」→ 选这个目录\n- 更新组件：在 xxd-ui-kit 里运行 \`pnpm xxd sync ${dir}\`\n- 设计原则：xxd-ui-kit/docs/DESIGN-PRINCIPLES.md\n- 图标：manifest 里还没有 icons，上架前补上（16/32/48/128）\n`,
   );
   sync(dir, { quiet: true });
   console.log(`✓ 新建 ${name} → ${dir}`);

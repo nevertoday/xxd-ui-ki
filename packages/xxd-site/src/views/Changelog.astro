@@ -1,0 +1,31 @@
+---
+import Site from "../layouts/Site.astro";
+import { execSync } from "node:child_process";
+import { langOf } from "../i18n/index.js";
+const en = langOf(Astro.url.pathname) === "en";
+let entries = [];
+try {
+  const raw = execSync('git log --date=short --pretty=format:"%ad%x09%h%x09%s" --grep="xxd" -n 80', { encoding: "utf8" });
+  entries = raw.split("\n").filter(Boolean).map((l) => { const [date, hash, ...s] = l.split("\t"); return { date, hash, subject: s.join("\t") }; });
+} catch {}
+const byDate = Object.entries(entries.reduce((m, e) => ((m[e.date] ||= []).push(e), m), {}));
+const T = en
+  ? { title: "Changelog", caption: "Tools", lead: "Generated from the commit history (XXD UI Kit commits only). Commit messages are written in Chinese." }
+  : { title: "更新日志", caption: "工具", lead: "从提交记录生成（只列小小东 UI Kit 的提交）。" };
+---
+
+<Site title={T.title} headings={byDate.map(([d]) => ({ slug: `d${d}`, text: d }))}>
+  <header class="site-head">
+    <p class="xxd-text" data-variant="caption">{T.caption}</p>
+    <h1 class="xxd-text" data-variant="display">{T.title}</h1>
+    <p class="site-lead">{T.lead}</p>
+  </header>
+  {byDate.map(([date, list]) => (
+    <section>
+      <h2 class="site-h2" id={`d${date}`}>{date}</h2>
+      <ul class="xxd-list xxd-group__body">
+        {list.map((e) => (<li class="xxd-list__item"><span class="xxd-text" data-variant="mono-secondary">{e.hash}</span><span class="xxd-list__main" lang="zh-CN">{e.subject}</span></li>))}
+      </ul>
+    </section>
+  ))}
+</Site>

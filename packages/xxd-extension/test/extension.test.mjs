@@ -155,6 +155,15 @@ describe("upsertRegion", () => {
     expect(twice).not.toContain("--r-sm: 0px");
     expect(twice.endsWith(":root { --bg: #fff; }\n")).toBe(true);
   });
+
+  it("标记里的说明文字变过（项目改名前写的 xxd-ui-ki）也认得出来：替换那一段，不重复", () => {
+    const old = `/* xxd:tokens:start —— 由 xxd-ui-ki 生成（pnpm xxd sync），这一段请勿手改 */\n@layer xxd.tokens { :root { --r-sm: 0px; } }\n/* xxd:tokens:end */\n:root { --bg: #fff; }\n`;
+    const next = upsertRegion(old, "@layer xxd.tokens { :root { --r-sm: 2px; } }");
+    expect(next.match(/xxd:tokens:start/g).length).toBe(1);
+    expect(next).toContain("xxd-ui-kit");
+    expect(next).not.toContain("--r-sm: 0px");
+    expect(next.endsWith(":root { --bg: #fff; }\n")).toBe(true);
+  });
 });
 
 describe("老项目保护", () => {

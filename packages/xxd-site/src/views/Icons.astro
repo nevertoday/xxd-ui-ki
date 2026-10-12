@@ -1,0 +1,46 @@
+---
+import Site from "../layouts/Site.astro";
+import { ICON_NAMES, ICON_ALIASES, icon } from "../lib/data.js";
+import { langOf } from "../i18n/index.js";
+const en = langOf(Astro.url.pathname) === "en";
+const n = ICON_NAMES.length;
+const aliases = Object.keys(ICON_ALIASES).slice(0, 12).join(en ? ", " : "、");
+const T = en
+  ? {
+      title: "Icons", caption: "Foundations",
+      lead: `${n} icons, one drawing style: 24 grid, 1.5 stroke, round caps, miter joins, square corners; only things that are round get drawn round. Click one to copy its usage.`,
+      search: `Search ${n} icons`, searchLabel: "Search icons", aliases: `Aliases: ${aliases}… all work.`, copied: (x) => `Copied ${x}`,
+    }
+  : {
+      title: "图标", caption: "基础",
+      lead: `${n} 个，同一种画法：24 网格、1.5 线宽、圆头、斜接角、方角；只有本身是圆的才画圆。点一个复制它的用法。`,
+      search: `搜索 ${n} 个图标`, searchLabel: "搜索图标", aliases: `别名：${aliases}… 都能用。`, copied: (x) => `已复制 ${x}`,
+    };
+---
+
+<Site title={T.title} wide>
+  <header class="site-head" style="max-width:760px">
+    <p class="xxd-text" data-variant="caption">{T.caption}</p>
+    <h1 class="xxd-text" data-variant="display">{T.title}</h1>
+    <p class="site-lead">{T.lead}</p>
+    <div class="xxd-input-wrap" style="margin-top:var(--space-4);max-width:360px">
+      <Fragment set:html={icon("Search", 16)} />
+      <input class="xxd-input" type="search" id="icon-search" placeholder={T.search} aria-label={T.searchLabel} />
+    </div>
+    <p class="xxd-text" data-variant="caption" style="margin-top:8px">{T.aliases}</p>
+  </header>
+  <div class="site-icons" id="icon-grid">
+    {ICON_NAMES.map((name) => (
+      <button type="button" data-name={name} title={name} data-copy={`<i data-xxd-icon="${name}"></i>`} data-copy-done={T.copied(name)}>
+        <Fragment set:html={icon(name, 24)} /><span class="site-icons__name">{name}</span>
+      </button>
+    ))}
+  </div>
+  <script is:inline>
+    const input = document.getElementById("icon-search");
+    input.addEventListener("input", () => {
+      const q = input.value.trim().toLowerCase();
+      for (const b of document.querySelectorAll("#icon-grid button")) b.hidden = Boolean(q) && !b.dataset.name.toLowerCase().includes(q);
+    });
+  </script>
+</Site>

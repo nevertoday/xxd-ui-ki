@@ -1,10 +1,12 @@
-# xxd-ui-ki · 小小东 UI Kit
+# xxd-ui-kit · 小小东 UI Kit
+
+**中文** · [English](README.en.md)
 
 小小东自己的界面组件库。会员站和所有 Chrome 插件都用它，所以看起来是同一家的东西。
 
 它基于 Cloudflare 的开源组件库 [Kumo](https://github.com/cloudflare/kumo) 改造：Kumo 负责键盘操作、焦点、读屏这些不容易做对的地方，我们换上小小东的样子。以 [MIT 许可](LICENSE) 开源。
 
-**在线看全部组件：<https://ui.xiaoxiaodong.ai>**
+**在线看全部组件：<https://ui.xiaoxiaodong.ai>**（英文版：<https://ui.xiaoxiaodong.ai/en/>）
 
 **默认长这样：**
 
@@ -12,6 +14,7 @@
 - 亮色和暖黑暗色两种主题
 - 默认用墨色强调，也可以换成 18 种主色之一
 - 中文简体、繁体、英文三种语言
+- 只用系统自带的无衬线字体，不加载网络字体
 
 ## 它由哪几部分组成
 
@@ -110,7 +113,7 @@ pnpm xxd doc Dialog --react
 pnpm --filter @xxd/site dev     # 打开 http://localhost:4400
 ```
 
-展示站的每页都有对应的 `.md` 版本，另有 `llms.txt` 和组件清单接口，方便 AI 助手读取。
+展示站有中文和英文两套（英文在 `/en/` 下，右上角切换）。每页都有对应的 `.md` 版本，另有 `llms.txt` 和组件清单接口，方便 AI 助手读取。
 
 ## 开发
 
@@ -129,7 +132,7 @@ pnpm lint
 ```bash
 pnpm --filter @xxd/site build
 pnpm --filter @xxd/site visual   # 截图对比：每页 × 4 种外观，和上次比有没有走样
-pnpm --filter @xxd/site audit    # 压力测试：无障碍零问题、超长文字不撑破、恶意网页干扰不到、高对比模式看得清
+pnpm --filter @xxd/site audit    # 压力测试：无障碍零问题、超长文字不撑破、恶意网页干扰不到、高对比模式看得清、英文页没有漏翻
 ```
 
 这两道检查都要用无头 Chrome，需要设置 `CHROME_EXE`。截图基线只存在本机。
@@ -145,7 +148,7 @@ pnpm --filter @xxd/site run release   # 构建，再部署到 Cloudflare（ui.xi
 ### 改东西去哪改
 
 - **样子不对**：改令牌 `packages/xxd-tokens/tokens.css`，组件里不写死颜色。
-- **组件不对**：改 `packages/xxd-css/src/`，然后同步更新 `registry.json` 里的说明。
+- **组件不对**：改 `packages/xxd-css/src/`，然后同步更新 `registry.json` 里的说明，英文版在旁边的 `registry.en.js`（漏了测试会报错）。
 - **React 组件里来自 Kumo 的部分**：改 `packages/kumo` 里的源配置，再跑 codegen 生成。`theme-kumo.css` 这类生成文件不要手改。
 
 完整对照表在 [参与指南](CONTRIBUTING.md)。

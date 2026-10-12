@@ -4,7 +4,9 @@
 //   2. 长内容：注册表里每个组件、每个小小东模式的示例放进 320px 宽的格子，文字换成长中文 / 长链接，任何元素都不许伸出格子。
 //   3. 恶意宿主页：Shadow DOM 里的组件不受宿主页继承样式和同名变量影响；tooltip / toast 留在 Shadow 里。
 //   4. 高对比模式（forced-colors）：开关、勾选、分段、tab 的选中态和未选中态看得出差别。
-// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site audit [--only=axe|long|shadow|forced]
+//   5. 英文版：/en/ 下每一页 <html lang="en">，看得见的字和 aria-label / placeholder / title / tooltip 里没有汉字
+//      （标了 lang="zh…" 的地方除外：切换语言的按钮、中文提交记录、语言本名），中文页和英文页互相链到对方。
+// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site audit [--only=axe|long|shadow|forced|en]
 // 需要 Chromium：CHROME_EXE=<chrome-headless-shell 路径>（缺省用 Playwright 自带的）。
 import { createServer } from "node:http";
 import { createReadStream, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -85,7 +87,7 @@ async function axeAudit() {
 /* ── 2. 长内容 ── */
 function longPage() {
   return `<!doctype html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="/xxd/xxd.css"><style>.cell{width:320px;margin:0 0 24px}</style></head>
+<link rel="stylesheet" href="/xxd/xxd.css"><style>.cell{width:var(--cell,320px);margin:0 0 24px}</style></head>
 <body class="xxd-page" style="margin:0"><div id="app"></div><script src="/xxd/icons.js"></script><script src="/xxd/xxd.js"></script></body></html>`;
 }
 
@@ -101,16 +103,19 @@ async function longAudit() {
     ...JSON.parse(readFileSync(join(pkgs, "xxd-css/registry.json"), "utf8")).components,
     ...JSON.parse(readFileSync(join(pkgs, "xxd-css/patterns.json"), "utf8")).patterns.map((p) => ({ ...p, name: `模式 ${p.name}` })),
   ].filter((c) => typeof c.markup === "string");
-  for (const [label, text] of [["原文", null], ...Object.entries(TEXTS)]) {
+  for (const [label, text, cellWidth] of [["原文", null, 320], ["原文 · 260px", null, 260], ...Object.entries(TEXTS).map(([k, v]) => [k, v, 320])]) {
     const ctx = await browser.newContext({ viewport: { width: 360, height: 800 }, reducedMotion: "reduce" });
     const tab = await ctx.newPage();
     const errors = [];
     tab.on("pageerror", (e) => errors.push(e.message));
     await tab.goto(`${origin}/__audit/long`);
-    const bad = await tab.evaluate(({ registry, text, exempt }) => {
+    const bad = await tab.evaluate(({ registry, text, exempt, cellWidth }) => {
       const app = document.getElementById("app");
+      app.style.setProperty("--cell", `${cellWidth}px`);
       for (const c of registry) {
         if (exempt.includes(c.name)) continue;
+        // 侧栏本身就是 232px 的桌面组件：比它还窄的地方应当折叠（data-collapsed），不在 260px 格子里测
+        if (cellWidth < 300 && c.name === "Sidebar") continue;
         const cell = document.createElement("section");
         cell.className = "cell";
         cell.dataset.name = c.name;
@@ -145,19 +150,30 @@ async function longAudit() {
               break;
             }
           }
+          const tag = `${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? "." + el.className.trim().split(/\s+/).join(".") : ""}`;
           if (!clipped && r.right > box.right + 1) {
-            out.push(`${cell.dataset.name}: ${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? "." + el.className.trim().split(/\s+/).join(".") : ""} 伸出 ${Math.round(r.right - box.right)}px`);
+            out.push(`${cell.dataset.name}: ${tag} 伸出 ${Math.round(r.right - box.right)}px`);
             break;
+          }
+          // 被挤窄：标题、名字、按钮的字被旁边的东西挤到不到 3 个字宽，折成好几行（一字一行）
+          if (!text && el.matches("h1, h2, h3, h4, [class*='__title'], [class*='__name'], .xxd-btn, .xxd-chip, .xxd-badge")) {
+            const own = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.nodeValue.trim()).join("");
+            const size = parseFloat(cs.fontSize);
+            const lines = Math.round(r.height / (parseFloat(cs.lineHeight) || size * 1.4));
+            if ([...own].length >= 4 && r.width < size * 3 && lines >= 2) {
+              out.push(`${cell.dataset.name}: ${tag} 被挤成 ${Math.round(r.width)}px 宽、${lines} 行`);
+              break;
+            }
           }
         }
       }
       return out;
-    }, { registry, text, exempt: [...LONG_EXEMPT] });
+    }, { registry, text, exempt: [...LONG_EXEMPT], cellWidth });
     for (const b of bad) fail("长内容", `${label} · ${b}`);
     for (const e of errors) fail("长内容", `${label} · 脚本错误 ${e}`);
     await ctx.close();
   }
-  console.log(`长内容：${registry.length - LONG_EXEMPT.size} 个组件和模式 × 3 种文字`);
+  console.log(`长内容：${registry.length - LONG_EXEMPT.size} 个组件和模式 × 3 种文字（另加 260px 窄格子），不溢出、不被挤成一字一行`);
 }
 
 /* ── 3. 恶意宿主页 ── */
@@ -272,7 +288,38 @@ async function forcedAudit() {
   console.log("高对比：7 组状态");
 }
 
-const sections = { axe: axeAudit, long: longAudit, shadow: hostileAudit, forced: forcedAudit };
+/* ── 5. 英文版 ── */
+async function englishAudit() {
+  const enPages = pages.filter((p) => p.startsWith("/en/"));
+  const zhPages = pages.filter((p) => !p.startsWith("/en/"));
+  if (enPages.length !== zhPages.length) fail("英文", `中文 ${zhPages.length} 页、英文 ${enPages.length} 页，数量不一样`);
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
+  const tab = await ctx.newPage();
+  for (const page of enPages) {
+    await tab.goto(origin + page, { waitUntil: "networkidle" });
+    await tab.waitForTimeout(100);
+    const r = await tab.evaluate(() => {
+      const han = /\p{Script=Han}/u;
+      const found = [];
+      const skip = "[lang|=zh], script, style, template, [hidden]";
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) if (n.parentElement && !n.parentElement.closest(skip) && han.test(n.textContent)) found.push(n.textContent.trim().slice(0, 30));
+      for (const el of document.querySelectorAll("[aria-label],[placeholder],[title],[data-tooltip]")) {
+        if (el.closest("[lang|=zh]")) continue;
+        for (const a of ["aria-label", "placeholder", "title", "data-tooltip"]) if (han.test(el.getAttribute(a) ?? "")) found.push(`${a}="${el.getAttribute(a).slice(0, 20)}"`);
+      }
+      return { lang: document.documentElement.lang, found: [...new Set(found)], other: document.querySelector(".site-lang")?.getAttribute("href") };
+    });
+    if (r.lang !== "en") fail("英文", `${page} <html lang="${r.lang}">`);
+    for (const f of r.found.slice(0, 3)) fail("英文", `${page} 有汉字：${f}`);
+    const zh = page.replace(/^\/en/, "") || "/";
+    if ((r.other ?? "").replace(/\/$/, "") !== zh.replace(/\/$/, "")) fail("英文", `${page} 的语言切换指向 ${r.other}，应当是 ${zh}`);
+  }
+  await ctx.close();
+  console.log(`英文：${enPages.length} 页`);
+}
+
+const sections = { axe: axeAudit, long: longAudit, shadow: hostileAudit, forced: forcedAudit, en: englishAudit };
 for (const [name, run] of Object.entries(sections)) if (!only || only === name) await run();
 await browser.close();
 server.close();

@@ -1,0 +1,38 @@
+---
+import Site from "../layouts/Site.astro";
+import { tokens } from "../lib/data.js";
+import { langOf } from "../i18n/index.js";
+const en = langOf(Astro.url.pathname) === "en";
+const space = Object.entries(tokens.base).filter(([k]) => k.startsWith("--space-"));
+const controls = [["--control-h-xs", "xs"], ["--control-h-sm", "sm"], ["--control-h", "md"]];
+const T = en
+  ? {
+      title: "Spacing and sizing", caption: "Foundations", space: "Spacing", controls: "Control height and density",
+      controlsLong: "Control height and density (switch density under Accent in the top right)",
+      lead: "A 4px base. Controls come in two densities: the member site uses standard (40px), side panels and popups use compact (32px); hit areas are always ≥ 40px (44px for coarse pointers).",
+      input: "Input",
+    }
+  : {
+      title: "间距与尺寸", caption: "基础", space: "间距", controls: "控件高度与密度",
+      controlsLong: "控件高度与密度（右上角「主色」里切换密度）",
+      lead: "4px 基准。控件有标准和紧凑两档密度：会员站用标准（40px），侧边栏和 popup 用紧凑（32px）；点击区永远 ≥ 40px（粗指针 44px）。",
+      input: "输入框",
+    };
+---
+
+<Site title={T.title} headings={[{ slug: "space", text: T.space }, { slug: "controls", text: T.controls }]}>
+  <header class="site-head">
+    <p class="xxd-text" data-variant="caption">{T.caption}</p>
+    <h1 class="xxd-text" data-variant="display">{T.title}</h1>
+    <p class="site-lead">{T.lead}</p>
+  </header>
+  <h2 class="site-h2" id="space">{T.space}</h2>
+  <div class="xxd-group__body">
+    {space.map(([k, v]) => (<div class="xxd-row"><div class="xxd-row__text xxd-text" data-variant="mono">{k}</div><div class="xxd-row__control"><span style={`display:block;width:${v};height:12px;background:var(--action)`}></span><span class="xxd-text" data-variant="caption" style="width:40px">{v}</span></div></div>))}
+  </div>
+  <h2 class="site-h2" id="controls">{T.controlsLong}</h2>
+  <div class="site-demo"><div class="site-demo__stage">
+    {controls.map(([k, size]) => (<button class="xxd-btn" data-size={size === "md" ? undefined : size}>{size} · var({k})</button>))}
+    <input class="xxd-input" style="width:160px" placeholder={T.input} aria-label={T.input} />
+  </div></div>
+</Site>

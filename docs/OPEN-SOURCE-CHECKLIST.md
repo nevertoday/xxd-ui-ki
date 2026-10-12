@@ -1,6 +1,6 @@
 # 开源清单
 
-> 本项目以 **MIT 许可**开源（2026-10-12），公开仓库：<https://github.com/nevertoday/xxd-ui-ki>。这份清单记录公开时检查过什么、还剩什么。
+> 本项目以 **MIT 许可**开源（2026-10-12），公开仓库：<https://github.com/nevertoday/xxd-ui-kit>。这份清单记录公开时检查过什么、还剩什么。
 > 自查脚本：`node scripts/open-source-audit.mjs`（只读，列出不该公开的内部引用）。推送前跑一次。
 
 ## 1. 已经定了
@@ -26,7 +26,7 @@
 
 ## 3. 公开之后
 
-- [x] 建 GitHub 公开仓库并推送 `main`（2026-10-12）：<https://github.com/nevertoday/xxd-ui-ki>。`upstream` 的推送仍然禁用。
+- [x] 建 GitHub 公开仓库并推送 `main`（2026-10-12）：<https://github.com/nevertoday/xxd-ui-kit>。`upstream` 的推送仍然禁用。
 - [ ] CI：`.github/workflows/xxd.yml`（构建 + 小小东测试 + Kumo 测试 + lint）推上去后会自动运行，看第一次是否全绿。
 - [x] 历史：保留了 Kumo 的完整 git 历史（MIT 允许）。
 - [ ] **发不发 npm**：开源不等于要发 npm。插件靠 `pnpm xxd sync` 拷文件，不需要 npm；只有别人的 React 项目才需要。

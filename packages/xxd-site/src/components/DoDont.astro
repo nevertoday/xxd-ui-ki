@@ -5,16 +5,18 @@ interface Props {
   doText: string;
   dontText: string;
 }
+import { langOf, t } from "../i18n/index.js";
 const { doMarkup, dontMarkup, doText, dontText } = Astro.props;
+const L = t(langOf(Astro.url.pathname));
 ---
 
 <div class="site-dodont">
   <figure data-kind="do">
     <div class="site-dodont__stage" set:html={doMarkup} />
-    <figcaption><b>好</b>{doText}</figcaption>
+    <figcaption><b>{L.do}</b>{doText}</figcaption>
   </figure>
   <figure data-kind="dont">
     <div class="site-dodont__stage" set:html={dontMarkup} />
-    <figcaption><b>不好</b>{dontText}</figcaption>
+    <figcaption><b>{L.dont}</b>{dontText}</figcaption>
   </figure>
 </div>

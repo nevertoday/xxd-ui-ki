@@ -110,9 +110,10 @@
     display: flex;
   }
 
+  /* 正文栏最宽 1200px，目录紧跟在正文后面（不再贴到屏幕最右边、中间空一大片）；更宽的屏幕只在最右边留白 */
   .site-body {
     display: grid;
-    grid-template-columns: 232px minmax(0, 1fr) 200px;
+    grid-template-columns: 232px minmax(0, 1200px) 200px;
     align-items: start;
   }
 
@@ -173,12 +174,12 @@
 
   .site-main {
     min-width: 0;
-    max-width: 880px;
     padding: var(--space-8) var(--space-8) 120px;
   }
 
+  /* 整页宽的页面（首页组件墙、图标、模板）没有目录：占满正文和目录两栏 */
   .site-main--wide {
-    max-width: none;
+    grid-column: 2 / -1;
   }
 
   .site-toc {
@@ -257,6 +258,7 @@
   }
 
   .site-rules {
+    max-width: 680px;
     margin: 0 0 var(--space-4);
     padding: 0;
     list-style: none;
@@ -572,6 +574,49 @@
 
     .site-toc {
       display: none;
+    }
+  }
+
+  .site-lang__short {
+    display: none;
+  }
+
+  /* 手机：顶栏放不下全部文字 —— 品牌名和「主色」只留给读屏，语言按钮缩成 EN / 中，间距收紧（320px 也不溢出） */
+  @media (max-width: 560px) {
+    .site-top {
+      gap: var(--space-2);
+    }
+
+    .site-brand__name,
+    .site-accent__label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .site-appearance {
+      gap: var(--space-1);
+    }
+
+    .site-appearance .xxd-segmented > button {
+      padding: 0 6px;
+    }
+
+    .site-accent {
+      min-width: var(--control-h-sm);
+      padding: 0;
+      justify-content: center;
+    }
+
+    .site-lang__full {
+      display: none;
+    }
+
+    .site-lang__short {
+      display: inline;
     }
   }
 

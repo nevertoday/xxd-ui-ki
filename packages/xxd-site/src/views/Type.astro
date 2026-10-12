@@ -1,0 +1,45 @@
+---
+import Site from "../layouts/Site.astro";
+import { langOf } from "../i18n/index.js";
+const en = langOf(Astro.url.pathname) === "en";
+const scale = en
+  ? [["display", "28 / 600", "Page titles"], ["heading1", "20 / 600", "First-level headings"], ["heading2", "16 / 600", "Section headings"], ["heading3", "14 / 500", "Small headings, settings row titles"], ["body", "13 / 400", "Body text, controls (most common in extensions)"], ["secondary", "13 / 400 / muted", "Secondary descriptions"], ["caption", "12 / 400 / muted", "Notes, metadata"], ["mono", "monospace 0.92em", "Code, variable names"]]
+  : [["display", "28 / 600", "页面大标题"], ["heading1", "20 / 600", "一级标题"], ["heading2", "16 / 600", "区块标题"], ["heading3", "14 / 500", "小标题、设置行标题"], ["body", "13 / 400", "正文、控件（插件里最常用）"], ["secondary", "13 / 400 / muted", "次要说明"], ["caption", "12 / 400 / muted", "注释、元数据"], ["mono", "等宽 0.92em", "代码、变量名"]];
+const T = en
+  ? {
+      title: "Typography", caption: "Foundations", scale: "Scale", prose: "Reading typography (.xxd-prose)",
+      lead: "System sans-serif fonts only: Avenir Next / Segoe UI for Latin text, PingFang / Microsoft YaHei / Source Han Sans for Chinese. Titles and body share one family; no web fonts; weights 400 / 500 / 600 only; selection changes color, never weight; letter spacing is never changed.",
+      sample: "XXD UI makes every extension look like family",
+      h2: "Editorial poster", p: "Restrained editorial brutalism: a paper background, crisp black lines, clean sans-serif type, dense but readable text.", link: "A link", code: "inline code",
+      li: ["List markers use the accent", "Quote lines at 40%"], quote: "Motion is for revealing hierarchy and giving feedback, not decoration.", toast: 'toast("Saved", { tone: "success" })',
+    }
+  : {
+      title: "字体与层级", caption: "基础", scale: "层级", prose: "阅读排版（.xxd-prose）",
+      lead: "只用系统无衬线字体：英文 Avenir Next / Segoe UI，中文苹方 / 微软雅黑 / 思源黑体；标题和正文同一家族；不加载网络字体；字重只有 400 / 500 / 600；选中改颜色，不加粗；不改字距。",
+      sample: "小小东 UI 让每个插件看起来是一家人",
+      h2: "编辑式海报", p: "克制的编辑式粗野主义：纸色背景、清晰的黑线、干净的无衬线字、密但好读的中文。", link: "一个链接", code: "行内代码",
+      li: ["列表的点用主色", "引用的线 40%"], quote: "动效用来揭示层级和给反馈，不是装饰。", toast: 'toast("已保存", { tone: "success" })',
+    };
+---
+
+<Site title={T.title} headings={[{ slug: "scale", text: T.scale }, { slug: "prose", text: T.prose.replace(/（.*）| \(.*\)/, "") }]}>
+  <header class="site-head">
+    <p class="xxd-text" data-variant="caption">{T.caption}</p>
+    <h1 class="xxd-text" data-variant="display">{T.title}</h1>
+    <p class="site-lead">{T.lead}</p>
+  </header>
+  <h2 class="site-h2" id="scale">{T.scale}</h2>
+  <div class="xxd-group__body">
+    {scale.map(([v, spec, use]) => (
+      <div class="xxd-row"><div class="xxd-row__text"><p class="xxd-text" data-variant={v}>{T.sample}</p></div><div class="xxd-row__control xxd-text" data-variant="caption" style="width:220px">{v} · {spec}<br />{use}</div></div>
+    ))}
+  </div>
+  <h2 class="site-h2" id="prose">{T.prose}</h2>
+  <article class="xxd-prose" style="border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--space-6);background:var(--paper)">
+    <h2>{T.h2}</h2>
+    <p>{T.p}<a href="#">{T.link}</a>{en ? ", " : "，"}{T.code} <code>--r-sm</code>{en ? "." : "。"}</p>
+    <ul>{T.li.map((x) => <li>{x}</li>)}</ul>
+    <blockquote>{T.quote}</blockquote>
+    <pre><code>{T.toast}</code></pre>
+  </article>
+</Site>

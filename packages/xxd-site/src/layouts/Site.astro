@@ -1,7 +1,8 @@
 ---
 // 展示站的外壳：顶栏（外观开关 + 搜索）、左侧导航、正文、右侧目录。界面本身全部用 @xxd/css。
-import { nav, flatPages } from "../data/nav.js";
-import { icon } from "../lib/data.js";
+import { navFor, flatPagesFor } from "../data/nav.js";
+import { icon, ACCENT_PRESETS } from "../lib/data.js";
+import { HTML_LANG, counterpart, langOf, mdHref as mdOf, t, withLang } from "../i18n/index.js";
 
 interface Props {
   /** 这页要用 ECharts（图表组件页） */
@@ -11,20 +12,32 @@ interface Props {
   headings?: { slug: string; text: string; depth?: number }[];
   wide?: boolean;
 }
-const { title, description = "小小东 UI Kit：小小东提示词与 Chrome 插件共用的设计系统。", headings = [], wide = false, charts = false } = Astro.props;
+const lang = langOf(Astro.url.pathname);
+const L = t(lang);
+const { title, description = L.description, headings = [], wide = false, charts = false } = Astro.props;
+// 当前页（不带结尾斜杠）；导航里的 href 也是这个形式，英文首页是 /en
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
-const searchIndex = JSON.stringify(flatPages.map((p) => ({ label: p.label, hint: p.sub ? `${p.sub} · ${p.group}` : p.group, href: p.href })));
-const mdHref = path === "/" ? "/md/index.md" : `/md${path}.md`;
+const isCurrent = (href) => (href.replace(/\/$/, "") || "/") === path;
+const nav = navFor(lang);
+const searchIndex = JSON.stringify(flatPagesFor(lang).map((p) => ({ label: p.label, hint: p.sub ? `${p.sub} · ${p.group}` : p.group, href: p.href })));
+const mdHref = mdOf(path, lang);
+const other = counterpart(path, lang);
+const otherLang = lang === "en" ? "zh" : "en";
+const site = Astro.site ? Astro.site.href.replace(/\/$/, "") : "";
+const accentNames = JSON.stringify(Object.fromEntries(ACCENT_PRESETS.map((p) => [p.id, lang === "en" ? p.name : p.zh])));
+const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.searchEmpty });
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang={HTML_LANG[lang]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title === "小小东 UI" ? title : `${title} · 小小东 UI`}</title>
+    <title>{title === L.brand ? title : `${title} · ${L.brand}`}</title>
     <meta name="description" content={description} />
     <link rel="alternate" type="text/markdown" href={mdHref} />
+    <link rel="alternate" hreflang="zh-CN" href={`${site}${lang === "zh" ? path : other}`} />
+    <link rel="alternate" hreflang="en" href={`${site}${lang === "en" ? (path === "/en" ? "/en/" : path) : other}`} />
     <!-- 层顺序：Tailwind（React 演示用）在前，小小东在后 —— 小小东的组件永远赢过 Tailwind 的重置 -->
     <style is:inline>@layer properties, theme, base, components, utilities, xxd.base, xxd.components, site;</style>
     <script is:inline src="/xxd/boot.js" data-key="xxd-site"></script>
@@ -37,44 +50,45 @@ const mdHref = path === "/" ? "/md/index.md" : `/md${path}.md`;
     {charts && <script is:inline src="/xxd/echarts.js"></script>}
   </head>
   <body class="xxd-page">
-    <a class="site-skip xxd-sr-only" href="#main">跳到正文</a>
+    <a class="site-skip xxd-sr-only" href="#main">{L.skip}</a>
     <header class="site-top">
-      <button class="xxd-btn site-menu" data-variant="ghost" data-icon-only aria-label="打开导航" id="site-menu" set:html={icon("Menu", 18)} />
-      <a class="site-brand" href="/"><span class="site-mark" aria-hidden="true"></span>小小东 UI</a>
+      <button class="xxd-btn site-menu" data-variant="ghost" data-icon-only aria-label={L.openNav} id="site-menu" set:html={icon("Menu", 18)} />
+      <a class="site-brand" href={withLang("/", lang)}><span class="site-mark" aria-hidden="true"></span><span class="site-brand__name">{L.brand}</span></a>
       <button class="site-search" id="site-search" type="button">
-        <Fragment set:html={icon("Search", 14)} /><span>搜索组件、模式…</span><kbd class="xxd-kbd">⌘K</kbd>
+        <Fragment set:html={icon("Search", 14)} /><span>{L.search}</span><kbd class="xxd-kbd">⌘K</kbd>
       </button>
-      <div class="site-appearance" id="site-appearance" aria-label="外观">
-        <div class="xxd-segmented" data-xxd-segmented data-name="theme" aria-label="主题">
-          <button role="radio" data-value="light" aria-label="亮" data-tooltip="亮" set:html={icon("Sun", 14)} />
-          <button role="radio" data-value="dark" aria-label="暗" data-tooltip="暗" set:html={icon("Moon", 14)} />
-          <button role="radio" data-value="system" aria-label="跟随系统" data-tooltip="跟随系统" set:html={icon("Contrast", 14)} />
+      <div class="site-appearance" id="site-appearance" aria-label={L.appearance}>
+        <div class="xxd-segmented" data-xxd-segmented data-name="theme" aria-label={L.theme}>
+          <button role="radio" data-value="light" aria-label={L.light} data-tooltip={L.light} set:html={icon("Sun", 14)} />
+          <button role="radio" data-value="dark" aria-label={L.dark} data-tooltip={L.dark} set:html={icon("Moon", 14)} />
+          <button role="radio" data-value="system" aria-label={L.system} data-tooltip={L.system} set:html={icon("Contrast", 14)} />
         </div>
-        <div class="xxd-segmented" data-xxd-segmented data-name="corners" aria-label="圆角">
-          <button role="radio" data-value="square">直角</button>
-          <button role="radio" data-value="rounded">圆角</button>
+        <div class="xxd-segmented" data-xxd-segmented data-name="corners" aria-label={L.corners}>
+          <button role="radio" data-value="square">{L.square}</button>
+          <button role="radio" data-value="rounded">{L.rounded}</button>
         </div>
-        <button class="xxd-btn site-accent" data-size="sm" data-variant="ghost" data-xxd-popover="site-accents" aria-label="主色">
-          <span class="site-accent-dot" aria-hidden="true"></span>主色
+        <button class="xxd-btn site-accent" data-size="sm" data-variant="ghost" data-xxd-popover="site-accents" aria-label={L.accent}>
+          <span class="site-accent-dot" aria-hidden="true"></span><span class="site-accent__label">{L.accent}</span>
         </button>
         <div class="xxd-popover site-accents" id="site-accents" popover data-placement="bottom-end">
-          <div class="xxd-swatches" role="radiogroup" aria-label="主色" id="site-swatches"></div>
+          <div class="xxd-swatches" role="radiogroup" aria-label={L.accent} id="site-swatches"></div>
           <div class="site-more">
-            <div class="xxd-segmented" data-xxd-segmented data-name="density" aria-label="密度">
-              <button role="radio" data-value="comfortable">标准</button>
-              <button role="radio" data-value="compact">紧凑</button>
+            <div class="xxd-segmented" data-xxd-segmented data-name="density" aria-label={L.density}>
+              <button role="radio" data-value="comfortable">{L.comfortable}</button>
+              <button role="radio" data-value="compact">{L.compact}</button>
             </div>
-            <div class="xxd-segmented" data-xxd-segmented data-name="finish" aria-label="按钮质感">
-              <button role="radio" data-value="flat">纯平</button>
-              <button role="radio" data-value="material">质感</button>
+            <div class="xxd-segmented" data-xxd-segmented data-name="finish" aria-label={L.finish}>
+              <button role="radio" data-value="flat">{L.flat}</button>
+              <button role="radio" data-value="material">{L.material}</button>
             </div>
           </div>
         </div>
+        <a class="xxd-btn site-lang" data-size="sm" data-variant="ghost" href={other} hreflang={HTML_LANG[otherLang]} lang={HTML_LANG[otherLang]} aria-label={L.switchLangLabel}><span class="site-lang__full">{L.switchLang}</span><span class="site-lang__short" aria-hidden="true">{lang === "en" ? "中" : "EN"}</span></a>
       </div>
     </header>
 
     <div class="site-body">
-      <nav class="site-nav" id="site-nav" aria-label="导航">
+      <nav class="site-nav" id="site-nav" aria-label={L.nav}>
         {
           nav.map((group) => (
             <section class="site-nav__group">
@@ -82,7 +96,7 @@ const mdHref = path === "/" ? "/md/index.md" : `/md${path}.md`;
               <ul>
                 {group.items.map((item) => (
                   <li>
-                    <a href={item.href} aria-current={path === item.href ? "page" : undefined}>
+                    <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>
                       {item.label}
                       {item.sub && <span>{item.sub}</span>}
                     </a>
@@ -100,8 +114,8 @@ const mdHref = path === "/" ? "/md/index.md" : `/md${path}.md`;
 
       {
         headings.length > 1 && (
-          <aside class="site-toc" aria-label="本页">
-            <h2>本页</h2>
+          <aside class="site-toc" aria-label={L.onThisPage}>
+            <h2>{L.onThisPage}</h2>
             <ul>
               {headings.map((h) => (
                 <li class={h.depth === 3 ? "is-sub" : undefined}>
@@ -109,19 +123,21 @@ const mdHref = path === "/" ? "/md/index.md" : `/md${path}.md`;
                 </li>
               ))}
             </ul>
-            <a class="site-toc__md" href={mdHref}>本页的 Markdown（给 AI）</a>
+            <a class="site-toc__md" href={mdHref}>{L.mdLink}</a>
           </aside>
         )
       }
     </div>
     <div class="site-nav-scrim" id="site-nav-scrim"></div>
 
-    <script is:inline define:vars={{ searchIndex }}>
+    <script is:inline define:vars={{ searchIndex, accentNames, strings }}>
       (() => {
         const T = window.XxdTheme;
         const X = window.Xxd;
         if (!T || !X) return;
         const pages = JSON.parse(searchIndex);
+        const names = JSON.parse(accentNames);
+        const S = JSON.parse(strings);
         const current = () => ({ ...T.DEFAULT_SETTINGS, ...T.read() });
 
         // 外观开关：读当前设置，改了就写回（boot.js 已在首帧前应用）
@@ -145,8 +161,8 @@ const mdHref = path === "/" ? "/md/index.md" : `/md${path}.md`;
           b.className = "xxd-swatch";
           b.setAttribute("role", "radio");
           b.dataset.value = p.id;
-          b.dataset.tooltip = p.zh;
-          b.setAttribute("aria-label", p.zh);
+          b.dataset.tooltip = names[p.id];
+          b.setAttribute("aria-label", names[p.id]);
           if (p.id) b.style.setProperty("--swatch", p.id);
           b.addEventListener("click", () => { T.set({ accent: p.id }); sync(); });
           sw.append(b);
@@ -161,9 +177,9 @@ const mdHref = path === "/" ? "/md/index.md" : `/md${path}.md`;
 
         // 搜索：⌘K / 点按钮，用小小东自己的命令面板
         const items = pages.map((p) => ({ label: p.label, hint: p.hint, run: () => { location.href = p.href; } }));
-        const open = () => X.openCommandPalette({ items, placeholder: "搜索组件、模式、页面…", empty: "没有找到" });
+        const open = () => X.openCommandPalette({ items, placeholder: S.placeholder, empty: S.empty });
         document.getElementById("site-search").addEventListener("click", open);
-        X.bindCommandPalette(items, { placeholder: "搜索组件、模式、页面…", empty: "没有找到" });
+        X.bindCommandPalette(items, { placeholder: S.placeholder, empty: S.empty });
 
         // 窄屏导航抽屉
         const nav = document.getElementById("site-nav");

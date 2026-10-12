@@ -1,4 +1,8 @@
 // 原则页的「好 / 不好」对照。每条对应 docs/DESIGN-PRINCIPLES.md 的一节；示例都是真的组件，跟着外观开关变。
+import { principles as principlesEn } from "./principles.en.js";
+
+export const principlesFor = (lang = "zh") => (lang === "en" ? principlesEn : principles);
+
 export const principles = [
   {
     id: "ink",

@@ -105,6 +105,25 @@ test("字重只有 400 / 500 / 600", () => {
   assert.deepEqual(weights.sort(), ["400", "500", "600"]);
 });
 
+test("字体：只用无衬线；标题和正文同一家族；先英文字体再中文字体；繁体页面换繁体字形", () => {
+  const stacks = { body: base["--font-body"], mono: base["--font-mono"] };
+  assert.equal(base["--font-title"], "var(--font-body)");
+  for (const [name, stack] of Object.entries(stacks)) {
+    assert.doesNotMatch(stack, /(^|[\s,"])serif\b|Song|STSong|Serif|Georgia|Mincho/, `${name} 里不能有衬线 / 宋体`);
+  }
+  const fonts = stacks.body.split(",").map((f) => f.trim().replace(/"/g, ""));
+  const latin = Math.max(fonts.indexOf("Avenir Next"), fonts.indexOf("Segoe UI"));
+  const firstCjk = fonts.findIndex((f) => /PingFang|YaHei|Hiragino|Noto Sans SC|Source Han/.test(f));
+  assert.ok(latin >= 0 && latin < firstCjk, `英文字体要排在中文字体前面：${fonts.join(", ")}`);
+  const hant = blocks[":root:lang(zh-Hant),\n:root:lang(zh-TW),\n:root:lang(zh-HK)"] ?? Object.entries(blocks).find(([k]) => k.includes("zh-Hant"))?.[1];
+  assert.match(hant?.["--font-body"] ?? "", /PingFang TC.*Microsoft JhengHei/);
+  // Shadow 里写在 host 上：:host(:lang(zh-Hant))，并在顶层元素上再声明一次
+  const shadow = toShadow(css);
+  assert.match(shadow, /:host\(:lang\(zh-Hant\)\),\n:host\(:lang\(zh-Hant\)\) > \*/);
+  // layered 版本：老项目自己在 :root 上的字体优先（不写到每个元素上）
+  assert.match(toLayered(css), /:where\(:root\):lang\(zh-Hant\)/);
+});
+
 test("暗色是暖黑", () => {
   assert.equal(dark["--bg"], "#171612");
   assert.equal(dark["--paper"], "#201f1a");

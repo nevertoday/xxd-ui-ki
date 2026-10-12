@@ -6,7 +6,7 @@
 ## 新建一个插件
 
 ```bash
-cd xxd-ui-ki
+cd xxd-ui-kit
 pnpm xxd new ~/js/插件-今日待办 --name 今日待办 --name-en "Today" --slug today
 ```
 

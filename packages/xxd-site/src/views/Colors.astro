@@ -1,0 +1,76 @@
+---
+import Site from "../layouts/Site.astro";
+import { tokens, ACCENT_PRESETS, accentPalette, contrast, toRgb } from "../lib/data.js";
+import { langOf } from "../i18n/index.js";
+const lang = langOf(Astro.url.pathname);
+const en = lang === "en";
+const surfaces = ["--bg", "--paper", "--wash", "--wash-strong", "--selected-bg", "--line", "--line-strong"];
+const inks = ["--ink", "--muted", "--muted-2", "--on-ink"];
+const meaning = ["--success", "--danger", "--warning", "--success-strong", "--danger-strong", "--warning-strong"];
+const dark = { ...tokens.base, ...tokens.dark };
+const ratio = (fg, bg) => contrast(toRgb(fg), toRgb(bg)).toFixed(2);
+const accents = ACCENT_PRESETS.slice(1).map((p) => {
+  const pal = accentPalette(p.id);
+  return { ...p, label: en ? p.name : p.zh, light: pal["--action-custom"], text: pal["--action-text-custom"], darkMark: pal["--action-custom-dark"], darkText: pal["--action-text-custom-dark"],
+    fill: pal["--action-fill-custom"], on: pal["--on-action-custom"], fillDark: pal["--action-fill-custom-dark"], onDark: pal["--on-action-custom-dark"],
+    lr: ratio(pal["--action-text-custom"], "#ffffff"), dr: ratio(pal["--action-text-custom-dark"], "#201f1a"),
+    fr: ratio(pal["--on-action-custom"], pal["--action-fill-custom"]), fdr: ratio(pal["--on-action-custom-dark"], pal["--action-fill-custom-dark"]) };
+});
+const T = en
+  ? {
+      title: "Color", caption: "Foundations",
+      lead: "Black / white / gray, with emphasis in ink; color is reserved for meaning and the optional accent. Swatches show the color in the current appearance; the light and dark values are written below.",
+      groups: ["Paper and lines", "Ink and text", "Meaning colors"], accent: "18 accents", light: "Light", dark: "Dark",
+      gate: "Contrast (enforced by tests): body and secondary text ≥ 4.5 on paper / bg / wash; meaning colors ≥ 4.5; white text on *-strong fills ≥ 4.5.",
+      accentNote: "Accents are lightened or darkened automatically: marks (switches, tab underlines, focus) ≥ 3:1; text ≥ 4.5:1; solid fills (primary buttons, solid badges) are darkened a little more so white text on them is ≥ 4.5:1. This holds on both light and dark paper. The first one is ink, the default.",
+      cols: ["Accent", "Light · mark", "Light · text (contrast)", "Dark · mark", "Dark · text (contrast)", "Solid button light / dark"],
+    }
+  : {
+      title: "颜色", caption: "基础",
+      lead: "黑 / 白 / 灰，强调靠墨色；颜色只留给意义和可选的主色。色块显示当前外观下的颜色，下面写着亮 / 暗两套值。",
+      groups: ["纸与线", "墨与文字", "语义色"], accent: "18 个主色", light: "亮", dark: "暗",
+      gate: "对比度（测试门禁）：正文与次要文字在 paper / bg / wash 上 ≥ 4.5；语义色 ≥ 4.5；*-strong 做底时白字 ≥ 4.5。",
+      accentNote: "主色会被自动提亮或加深：标记（开关、tab 下划线、焦点）≥ 3:1；文字 ≥ 4.5:1；实心底（主按钮、实心徽标）单独压暗一点，让上面的白字 ≥ 4.5:1。亮暗两种纸上都成立。第一个是墨色，也是默认。",
+      cols: ["主色", "亮 · 标记", "亮 · 文字（对比度）", "暗 · 标记", "暗 · 文字（对比度）", "实心按钮 亮 / 暗"],
+    };
+const sections = [["surfaces", T.groups[0], surfaces], ["ink", T.groups[1], inks], ["meaning", T.groups[2], meaning]];
+const headings = [...sections.map(([slug, text]) => ({ slug, text })), { slug: "accent", text: T.accent }];
+const swatch = (name) => ({ name, light: tokens.base[name], dark: dark[name] });
+---
+
+<Site title={T.title} headings={headings}>
+  <header class="site-head">
+    <p class="xxd-text" data-variant="caption">{T.caption}</p>
+    <h1 class="xxd-text" data-variant="display">{T.title}</h1>
+    <p class="site-lead">{T.lead}</p>
+  </header>
+  {sections.map(([id, title, names]) => (
+    <section>
+      <h2 class="site-h2" id={id}>{title}</h2>
+      <div class="site-swatches">
+        {names.map((n) => { const s = swatch(n); return (
+          <div class="site-swatch"><i style={`background:var(${n})`}></i><div><b class="xxd-text" data-variant="mono" style="font-size:11px">{n}</b><code>{T.light} {s.light}</code><code>{T.dark} {s.dark}</code></div></div>
+        ); })}
+      </div>
+    </section>
+  ))}
+  <p class="site-p" style="margin-top:var(--space-4)">{T.gate}</p>
+
+  <h2 class="site-h2" id="accent">{T.accent}</h2>
+  <p class="site-p">{T.accentNote}</p>
+  <div class="xxd-table-wrap"><table class="site-props">
+    <thead><tr>{T.cols.map((c) => <th>{c}</th>)}</tr></thead>
+    <tbody>
+      {accents.map((a) => (
+        <tr>
+          <td><span class="xxd-dot" style={`background:${a.id};width:10px;height:10px`}></span> {a.label} <span class="xxd-text" data-variant="mono-secondary">{a.id}</span></td>
+          <td><span class="xxd-dot" style={`background:${a.light}`}></span> {a.light}</td>
+          <td><span style={`background:#ffffff;color:${a.text};padding:1px 6px`}>{a.text} · {a.lr}</span></td>
+          <td><span class="xxd-dot" style={`background:${a.darkMark}`}></span> {a.darkMark}</td>
+          <td><span style={`background:#201f1a;color:${a.darkText};padding:1px 6px`}>{a.darkText} · {a.dr}</span></td>
+          <td><span style={`background:${a.fill};color:${a.on};padding:1px 6px`}>{a.fr}</span> <span style={`background:${a.fillDark};color:${a.onDark};padding:1px 6px`}>{a.fdr}</span></td>
+        </tr>
+      ))}
+    </tbody>
+  </table></div>
+</Site>

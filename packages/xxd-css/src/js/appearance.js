@@ -159,7 +159,11 @@ export function mountAppearance(container, options = {}) {
     wrap.dataset.variant = "bare";
     const sel = doc.createElement("select");
     sel.setAttribute("aria-label", L.language);
-    for (const lang of languages) sel.append(new Option(lang.label, lang.value, false, lang.value === language));
+    for (const lang of languages) {
+      const opt = new Option(lang.label, lang.value, false, lang.value === language);
+      opt.lang = lang.value; // 语言的本名（简体中文、English）按它自己的语言读
+      sel.append(opt);
+    }
     sel.addEventListener("change", () => onLanguage?.(sel.value));
     wrap.append(sel);
     body.append(row(doc, L.language, "", wrap));

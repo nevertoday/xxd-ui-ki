@@ -1,23 +1,6 @@
 ---
-import Site from "../layouts/Site.astro";
-import DoDont from "../components/DoDont.astro";
-import { principles } from "../data/principles.js";
-const headings = principles.map((p) => ({ slug: p.id, text: p.title }));
+// 正文在 src/views/Principles.astro（中文 / 英文共用，语言看路径）。
+import Principles from "../views/Principles.astro";
 ---
 
-<Site title="设计原则" headings={headings}>
-  <header class="site-head">
-    <p class="xxd-text" data-variant="caption">开始</p>
-    <h1 class="xxd-text" data-variant="display">设计原则</h1>
-    <p class="site-lead">每条都配一对「好 / 不好」，都是真的组件：右上角切换主题、圆角、主色，看它们怎么变。完整原文在仓库 <code class="xxd-code-inline">docs/DESIGN-PRINCIPLES.md</code>。</p>
-  </header>
-  {
-    principles.map((p) => (
-      <section>
-        <h2 class="site-h2" id={p.id}>{p.title} <span class="xxd-text" data-variant="caption">{p.ref}</span></h2>
-        {p.note && <p class="site-p">{p.note}</p>}
-        <DoDont doMarkup={p.doMarkup} dontMarkup={p.dontMarkup} doText={p.doText} dontText={p.dontText} />
-      </section>
-    ))
-  }
-</Site>
+<Principles />

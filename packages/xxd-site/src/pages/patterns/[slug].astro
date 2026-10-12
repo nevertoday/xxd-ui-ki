@@ -1,23 +1,11 @@
 ---
-import Site from "../../layouts/Site.astro";
-import Demo from "../../components/Demo.astro";
-import { patterns } from "../../data/patterns.js";
+// 正文在 src/views/Pattern.astro（中文 / 英文共用）。
+import Pattern from "../../views/Pattern.astro";
+import { patternsFor } from "../../data/patterns.js";
 export function getStaticPaths() {
-  return patterns.map((p) => ({ params: { slug: p.slug }, props: { p } }));
+  return patternsFor("zh").map((p) => ({ params: { slug: p.slug }, props: { p } }));
 }
 const { p } = Astro.props;
-const headings = [{ slug: "demo", text: "演示" }, ...(p.anatomy ? [{ slug: "anatomy", text: "结构" }] : []), ...(p.rules?.length ? [{ slug: "rules", text: "规则" }] : []), ...(p.js ? [{ slug: "js", text: "JS" }] : [])];
 ---
 
-<Site title={p.zh} description={p.summary} headings={headings}>
-  <header class="site-head">
-    <p class="xxd-text" data-variant="caption">模式 · 来自 {p.from}</p>
-    <h1 class="xxd-text" data-variant="display">{p.zh}</h1>
-    <p class="site-lead">{p.summary}</p>
-  </header>
-  <h2 class="site-h2" id="demo">演示</h2>
-  <Demo markup={p.markup} block={p.block ?? true} align="start" />
-  {p.anatomy && (<><h2 class="site-h2" id="anatomy">结构</h2><ul class="site-rules">{p.anatomy.map((a) => <li>{a}</li>)}</ul></>)}
-  {p.rules?.length > 0 && (<><h2 class="site-h2" id="rules">规则</h2><ul class="site-rules">{p.rules.map((r) => <li>{r}</li>)}</ul></>)}
-  {p.js && (<><h2 class="site-h2" id="js">JS</h2><pre class="site-code" tabindex="0" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{p.js}</code></pre></>)}
-</Site>
+<Pattern p={p} />

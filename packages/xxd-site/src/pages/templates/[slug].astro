@@ -1,26 +1,11 @@
 ---
-import Site from "../../layouts/Site.astro";
-import { templates } from "../../data/templates.js";
-import { icon } from "../../lib/data.js";
-import { embed } from "../../lib/markup.js";
+// 正文在 src/views/Template.astro（中文 / 英文共用）。
+import Template from "../../views/Template.astro";
+import { templatesFor } from "../../data/templates.js";
 export function getStaticPaths() {
-  return templates.map((t) => ({ params: { slug: t.slug }, props: { t } }));
+  return templatesFor("zh").map((x) => ({ params: { slug: x.slug }, props: { x } }));
 }
-const { t } = Astro.props;
+const { x } = Astro.props;
 ---
 
-<Site title={t.zh} description={t.summary} wide>
-  <header class="site-head" style="max-width:760px">
-    <p class="xxd-text" data-variant="caption">模板</p>
-    <h1 class="xxd-text" data-variant="display">{t.zh}</h1>
-    <p class="site-lead">{t.summary}</p>
-    <div class="xxd-cluster" style="margin-top:var(--space-4)">
-      <button class="xxd-btn" data-copy-target="#tpl-src" data-copy-done="已复制整页 HTML"><Fragment set:html={icon("Copy", 14)} />复制整页 HTML</button>
-      {t.width && <span class="xxd-text" data-variant="caption">按 {t.width}px 宽设计（{t.where}）</span>}
-    </div>
-  </header>
-  <div class="site-template" style={`border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:var(--bg);${t.width ? `max-width:${t.width}px;` : ""}${t.height ? `height:${t.height}px;` : ""}`}>
-    <div class="xxd-page" style="height:100%;position:relative" set:html={embed(t.markup)} />
-  </div>
-  <pre id="tpl-src" hidden><code>{t.markup.trim()}</code></pre>
-</Site>
+<Template x={x} />

@@ -227,7 +227,7 @@ export const ICON_NODES = {
   UserRoundPen: draw(circle(9, 7, 3.5), "M3.5 20v-3a5.5 5.5 0 0 1 8-5", "m14 16 5-5 3 3-5 5-4 1Z"),
   Volume2: draw("M3.5 9H7l5-5v16l-5-5H3.5Z", "M16 8a6 6 0 0 1 0 8M19 5a10 10 0 0 1 0 14"),
   WandSparkles: draw("m4 17 12-12 3 3L7 20Z", "m13 8 3 3M6 3v5M3.5 5.5h5M19 15v6m-3-3h6"),
-  // Added for xxd-ui-ki (same grid, stroke and square joins).
+  // Added for xxd-ui-kit (same grid, stroke and square joins).
   Minus: draw("M5 12h14"),
   ChevronsLeft: draw("m12 6-6 6 6 6", "m18 6-6 6 6 6"),
   ChevronsRight: draw("m6 6 6 6-6 6", "m12 6 6 6-6 6"),

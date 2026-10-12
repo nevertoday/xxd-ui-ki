@@ -9,6 +9,10 @@ pnpm --filter @xxd/site dev            # 本机 http://localhost:4400
 pnpm --filter @xxd/site run release    # 构建并部署（先 wrangler login）
 ```
 
+中文在根路径，英文在 `/en/` 下（91 页，一一对应）。页面正文在 `src/views/*.astro`，中英共用，语言看路径（`src/i18n/index.js`）；
+`src/pages/` 和 `src/pages/en/` 下都只是一行入口。界面文字在 `src/i18n/index.js`；组件和模式的英文在 `packages/xxd-css/registry.en.js` / `patterns.en.js`；
+模板、原则、React 演示的英文在 `src/data/*.en.js`、`src/react/demos.en.tsx`。加新页时两边都要加（测试会检查）。
+
 推送 GitHub 不会自动部署；要自动部署的话，在仓库 Secrets 里加 `CLOUDFLARE_API_TOKEN`，再在 CI 里加一步 `release`。
 
 ## Kumo 原版文档站（`packages/kumo-docs-astro`）

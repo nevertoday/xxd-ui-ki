@@ -1,26 +1,6 @@
 ---
-import Site from "../layouts/Site.astro";
-import { execSync } from "node:child_process";
-let entries = [];
-try {
-  const raw = execSync('git log --date=short --pretty=format:"%ad%x09%h%x09%s" --grep="xxd" -n 80', { encoding: "utf8" });
-  entries = raw.split("\n").filter(Boolean).map((l) => { const [date, hash, ...s] = l.split("\t"); return { date, hash, subject: s.join("\t") }; });
-} catch {}
-const byDate = Object.entries(entries.reduce((m, e) => ((m[e.date] ||= []).push(e), m), {}));
+// 正文在 src/views/Changelog.astro（中文 / 英文共用，语言看路径）。
+import Changelog from "../views/Changelog.astro";
 ---
 
-<Site title="更新日志" headings={byDate.map(([d]) => ({ slug: `d${d}`, text: d }))}>
-  <header class="site-head">
-    <p class="xxd-text" data-variant="caption">工具</p>
-    <h1 class="xxd-text" data-variant="display">更新日志</h1>
-    <p class="site-lead">从提交记录生成（只列小小东 UI Kit 的提交）。</p>
-  </header>
-  {byDate.map(([date, list]) => (
-    <section>
-      <h2 class="site-h2" id={`d${date}`}>{date}</h2>
-      <ul class="xxd-list xxd-group__body">
-        {list.map((e) => (<li class="xxd-list__item"><span class="xxd-text" data-variant="mono-secondary">{e.hash}</span><span class="xxd-list__main">{e.subject}</span></li>))}
-      </ul>
-    </section>
-  ))}
-</Site>
+<Changelog />

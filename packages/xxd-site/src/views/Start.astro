@@ -1,0 +1,97 @@
+---
+// 三种用法。中文 / 英文共用；代码块里只有注释和示例名字随语言变。
+import Site from "../layouts/Site.astro";
+import { langOf, withLang } from "../i18n/index.js";
+const lang = langOf(Astro.url.pathname);
+const en = lang === "en";
+const code = (s) => s.trim();
+const T = en
+  ? {
+      title: "Three ways to use it",
+      caption: "Get started",
+      lead: "One set of tokens, one set of components — pick the layer that fits each project.",
+      h: ["Chrome extension", "Member site (an existing project)", "React project", "Rules to keep while coding"],
+    }
+  : {
+      title: "三种用法",
+      caption: "开始",
+      lead: "同一份令牌、同一套组件，按项目选一层用。",
+      h: ["Chrome 插件", "会员站（已有项目）", "React 项目", "写代码时守住"],
+    };
+const ext = en ? "~/js/today-extension" : "~/js/插件-今日待办";
+const headings = ["extension", "member", "react", "rules"].map((slug, i) => ({ slug, text: T.h[i] }));
+const pre = "border:1px solid var(--line);border-radius:var(--r-md)";
+---
+
+<Site title={T.title} headings={headings}>
+  <header class="site-head">
+    <p class="xxd-text" data-variant="caption">{T.caption}</p>
+    <h1 class="xxd-text" data-variant="display">{T.title}</h1>
+    <p class="site-lead">{T.lead}</p>
+  </header>
+
+  <h2 class="site-h2" id="extension">{T.h[0]}</h2>
+  {
+    en ? (
+      <p class="site-p">Create an extension in a minute. The components are copied into the extension's own <code class="xxd-code-inline">vendor/xxd/</code> (MV3 can't load remote code).</p>
+    ) : (
+      <p class="site-p">一分钟新建一个插件，组件拷进插件自己的 <code class="xxd-code-inline">vendor/xxd/</code>（MV3 不能加载远程代码）。</p>
+    )
+  }
+  <pre class="site-code" tabindex="0" style={pre}><code>{code(`
+cd xxd-ui-kit
+pnpm xxd new ${ext} ${en ? '--name "Today"' : '--name 今日待办 --name-en "Today"'} --slug today
+pnpm xxd sync ${ext}     # ${en ? "update the components later" : "以后更新组件"}
+pnpm xxd status ~/js/*          # ${en ? "who is behind" : "谁落后了"}`)}</code></pre>
+  <pre class="site-code" tabindex="0" style={`${pre};margin-top:var(--space-3)`}><code>{code(`
+<script src="vendor/xxd/boot.js" data-key="today-ui" data-default-density="compact"></script>
+<link rel="stylesheet" href="vendor/xxd/xxd.css">
+<script src="vendor/xxd/icons.js"></script>
+<script src="vendor/xxd/xxd.js"></script>
+<script src="vendor/xxd/extension.js"></script>
+<body class="xxd-page">…</body>`)}</code></pre>
+
+  <h2 class="site-h2" id="member">{en ? "Member site (a project with its own variables)" : "会员站（已有一套变量的项目）"}</h2>
+  <p class="site-p">
+    {
+      en
+        ? "Adopt it without changing how anything looks: layered tokens (old variables always win), identical declarations handed over to the tokens, icons synced from @xxd/icons."
+        : "不改样子地接入：layered 令牌（老变量永远优先）、相同的声明改由令牌提供、图标从 @xxd/icons 同步。"
+    }
+  </p>
+  <pre class="site-code" tabindex="0" style={pre}><code>{code(`
+// member-cloudflare/xxd.config.json
+{ "vendorDir": false, "layeredTokensRegions": ["public/styles.css"], "iconNodesTargets": ["src/lib/xxd-icon-nodes.js"],
+  "adopt": { "file": "public/styles.css", "aliases": { "--ui-backdrop": "var(--backdrop)" } } }
+
+pnpm xxd sync  …/member-cloudflare
+pnpm xxd adopt …/member-cloudflare
+CHROME_EXE=… node scripts/verify/css-vars-diff.cjs before.css after.css   # ${en ? "should show zero changes" : "应当零变化"}`)}</code></pre>
+
+  <h2 class="site-h2" id="react">{T.h[2]}</h2>
+  <pre class="site-code" tabindex="0" style={pre}><code>{code(`
+import { Button, Dialog, DialogActions, XxdAppearanceProvider } from "@xxd/react";
+import "@xxd/react/standalone.css";       // ${en ? "without Tailwind" : "不用 Tailwind"}
+// ${en ? "or with Tailwind v4" : "或 Tailwind v4"}: @import "tailwindcss"; @import "@xxd/react/styles.css";`)}</code></pre>
+
+  <h2 class="site-h2" id="rules">{T.h[3]}</h2>
+  {
+    en ? (
+      <ul class="site-rules">
+        <li>Colors, radii, shadows and font sizes come from tokens only; rectangles use only --r-xs/sm/md/lg/pill, semantic circles use --r-circle.</li>
+        <li>Cards, rows and buttons have no shadow; weights are 400 / 500 / 600 only; selection changes color, never weight.</li>
+        <li>Hover changes instantly on enter and fades back on leave; motion animates opacity / transform only.</li>
+        <li>In dialogs Cancel comes first and stays quiet; a button's label says what the next click will do.</li>
+        <li>Look up a component: <code class="xxd-code-inline">pnpm xxd doc Dialog</code>; read the <a class="xxd-link" href={withLang("/principles", lang)}>design principles</a>.</li>
+      </ul>
+    ) : (
+      <ul class="site-rules">
+        <li>颜色、圆角、阴影、字号只用令牌；矩形圆角只用 --r-xs/sm/md/lg/pill，语义圆用 --r-circle。</li>
+        <li>卡片、行、按钮没有阴影；字重只有 400 / 500 / 600；选中改颜色不加粗。</li>
+        <li>hover 进入立即、离开淡回；动效只动 opacity / transform。</li>
+        <li>对话框取消在前、安静；按钮文字说下一次点击会做什么。</li>
+        <li>查组件：<code class="xxd-code-inline">pnpm xxd doc Dialog</code>；看原则：<a class="xxd-link" href="/principles">设计原则</a>。</li>
+      </ul>
+    )
+  }
+</Site>

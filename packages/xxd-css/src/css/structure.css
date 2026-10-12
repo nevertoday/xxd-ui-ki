@@ -354,9 +354,10 @@
     gap: var(--space-3);
   }
 
+  /* 标题至少留 12 个字宽：放不下时操作按钮整体换到下一行，标题不会被挤成一字一行 */
   .xxd-page-header__title {
-    flex: 1;
-    min-width: 0;
+    flex: 1 1 12em;
+    min-width: min(100%, 12em);
     margin: 0;
     font: var(--weight-strong) var(--text-xl) / 1.35 var(--font-body);
   }

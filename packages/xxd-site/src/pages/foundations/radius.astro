@@ -1,33 +1,6 @@
 ---
-import Site from "../../layouts/Site.astro";
-const steps = [["--r-xs", "4px", "小标记：复选框、kbd、tooltip"], ["--r-sm", "6px", "控件：按钮、输入框、选择"], ["--r-md", "10px", "面：卡片、菜单、设置组"], ["--r-lg", "14px", "大面：对话框、sheet"], ["--r-pill", "999px", "状态标签、开关（直角下也是方的）"], ["--r-circle", "50%", "语义圆：单选、状态点、头像、色块（永远是圆）"]];
+// 正文在 src/views/Radius.astro（中文 / 英文共用，语言看路径）。
+import Radius from "../../views/Radius.astro";
 ---
 
-<Site title="圆角" headings={[{ slug: "scale", text: "刻度" }, { slug: "compare", text: "直角 / 圆角并排" }]}>
-  <header class="site-head">
-    <p class="xxd-text" data-variant="caption">基础</p>
-    <h1 class="xxd-text" data-variant="display">圆角</h1>
-    <p class="site-lead">默认直角（会员站的硬规则）；插件可以在「外观」里切成圆角。所有矩形圆角都只能用这五档；语义圆不跟开关走。</p>
-  </header>
-  <h2 class="site-h2" id="scale">刻度（当前模式）</h2>
-  <div class="site-swatches">
-    {steps.map(([n, v, use]) => (
-      <div class="site-swatch"><i style={`border-radius:var(${n});margin:12px;height:48px;border:1px solid var(--line-strong);background:var(--wash)`}></i><div><b class="xxd-text" data-variant="mono" style="font-size:11px">{n}</b><code>圆角模式 {v}</code><span class="xxd-text" data-variant="caption">{use}</span></div></div>
-    ))}
-  </div>
-  <h2 class="site-h2" id="compare">直角 / 圆角并排</h2>
-  <div class="site-dodont">
-    {["square", "rounded"].map((mode) => (
-      <figure data-kind="do">
-        <div class="site-dodont__stage" data-corners-preview={mode} style={mode === "rounded" ? "--r-xs:4px;--r-sm:6px;--r-md:10px;--r-lg:14px;--r-pill:999px" : "--r-xs:0px;--r-sm:0px;--r-md:0px;--r-lg:0px;--r-pill:0px"}>
-          <button class="xxd-btn" data-variant="primary">写入 X</button>
-          <input type="checkbox" role="switch" class="xxd-switch" checked aria-label="开关" />
-          <span class="xxd-badge">草稿</span>
-          <label class="xxd-choice"><input type="radio" class="xxd-radio" checked />单选</label>
-          <span class="xxd-avatar">东</span>
-        </div>
-        <figcaption><b>{mode === "square" ? "直角" : "圆角"}</b>{mode === "square" ? "缺省；会员站锁定这一种。" : "插件里可选。单选、头像在两边都是圆。"}</figcaption>
-      </figure>
-    ))}
-  </div>
-</Site>
+<Radius />

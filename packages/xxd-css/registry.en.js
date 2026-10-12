@@ -1,0 +1,978 @@
+// registry.json 的英文版（展示站 /en/ 用）。按组件名对应；只写需要翻译的字段，没写的沿用 registry.json
+// （类名、data-* 取值这些本来就是英文）。测试保证：中文里有汉字的字段，这里都有英文，而且英文里没有汉字。
+export const categories = {
+  基础: "Basics",
+  操作: "Actions",
+  表单: "Forms",
+  导航: "Navigation",
+  设置: "Settings",
+  浮层: "Overlays",
+  反馈: "Feedback",
+  内容: "Content",
+  展示: "Data display",
+};
+
+export const components = {
+  Text: {
+    title: "Text styles",
+    summary: "A fixed set of sizes for titles, body, captions and monospace. Hierarchy comes from size and weight, not color.",
+    attributes: {
+      "data-variant": "display | heading1 | heading2 | heading3 | body | secondary | caption | mono | mono-secondary | success | danger | warning",
+      "data-size": "xs | sm | base | lg",
+      "data-truncate": "Truncate to one line",
+    },
+    markup: `<div class="xxd-text-pair">
+  <h2 class="xxd-text" data-variant="heading2">Appearance</h2>
+  <p class="xxd-text" data-variant="caption">Only affects this extension</p>
+</div>
+<p class="xxd-text">Body 13px <span class="xxd-text" data-variant="mono">--r-sm</span></p>`,
+    rules: ["Weights are 400 / 500 / 600 only", "Related text sits closer together", "Never change letter spacing", "Inline monospace is 0.92em"],
+    a11y: [
+      "Use real h1–h3 in page order (no skipped levels); never fake a heading with a bold p",
+      "Captions use --muted (≥ 4.5:1), nothing lighter",
+    ],
+  },
+  Interaction: {
+    title: "Interaction helpers",
+    summary: "Small interaction helpers: actions that appear on hover (.xxd-reveal), whole-row click targets, press-down feedback.",
+    markup: `<div class="xxd-row" style="border:1px solid var(--line)"><div class="xxd-row__text">Hover this row</div><button class="xxd-btn xxd-reveal" data-size="xs">Edit</button></div>
+<div class="xxd-concentric" style="--pad:4px;border:1px solid var(--line)"><button class="xxd-btn" data-size="sm">Concentric corners</button></div>`,
+    js: `Xxd.showBubble(button, "Copied")`,
+    rules: [
+      "Hover changes instantly on enter and fades back over 140ms on leave",
+      "Hover-only actions: always visible on touch, reachable by keyboard",
+      "Concentric corners: outer = inner + padding",
+    ],
+    a11y: [
+      "Hover-only buttons also appear on keyboard focus (:focus-within) and stay visible on touch screens",
+      "When a whole row is clickable, put only one main link in it; other buttons stay separately focusable",
+    ],
+  },
+  Button: {
+    title: "Button",
+    summary: "A button's label says what the next click will do. One solid button per area.",
+    attributes: {
+      "data-variant": "primary | secondary (default) | ghost | outline | danger | danger-outline",
+      "data-size": "xs | sm | md | lg",
+      "data-icon-only": "Icon only (aria-label required)",
+      "aria-pressed": "Toggle state",
+      "aria-busy": "In progress: width stays put, spinner centered; Xxd.runBusy(btn, task) shows a check when done",
+      "data-block": "Fill the row",
+      "data-shape": "round: circular icon button (follows the corners switch)",
+    },
+    markup: `<button class="xxd-btn" data-variant="primary">Post to X</button>
+<button class="xxd-btn">Save draft</button>
+<button class="xxd-btn" data-variant="ghost">Later</button>
+<button class="xxd-btn" data-variant="danger">Delete</button>
+<button class="xxd-btn" data-variant="outline">Export</button>
+<button class="xxd-btn" data-size="xs">xs</button>`,
+    sample: `<button class="xxd-btn" data-variant="primary">Post to X</button>`,
+    rules: [
+      "The label describes what the next click will do",
+      "Only one solid button per area",
+      "Spell out destructive actions; don't rely on color alone",
+      "§9",
+      "Long labels only get an ellipsis when wrapped in a <span> (or given .xxd-label-text). A button never pushes out of its container; bare text that is too long is clipped.",
+    ],
+    examples: [
+      {
+        title: "Sizes",
+        markup: `<button class="xxd-btn" data-size="xs">xs</button>
+<button class="xxd-btn" data-size="sm">sm</button>
+<button class="xxd-btn">md</button>
+<button class="xxd-btn" data-size="lg">lg</button>`,
+      },
+      {
+        title: "Icon buttons",
+        markup: `<button class="xxd-btn" data-icon-only aria-label="Search" data-tooltip="Search ⌘F"><i data-xxd-icon="Search"></i></button>
+<button class="xxd-btn" data-icon-only data-shape="round" aria-label="New" data-tooltip="New"><i data-xxd-icon="Plus"></i></button>
+<button class="xxd-btn" data-variant="ghost" data-icon-only aria-label="More" data-tooltip="More"><i data-xxd-icon="Ellipsis"></i></button>`,
+        text: "Icon-only buttons need an aria-label. Moving across them, tooltips show up one after another without delay. Round icon buttons follow the corners switch.",
+      },
+      {
+        title: "Flat / material (D1 comparison)",
+        markup: `<div class="xxd-cluster" data-finish-preview="flat"><button class="xxd-btn" data-variant="primary">Post to X</button><button class="xxd-btn" data-variant="danger">Delete</button></div>`,
+        text: "Under Accent in the top right, switch the button finish to Material: solid buttons get a 1px inner highlight on top and a slightly darker edge, and sink 0.5px when pressed.",
+      },
+      {
+        title: "Busy and done",
+        markup: `<button class="xxd-btn" data-variant="primary" onclick="Xxd.runBusy(this, () => new Promise((r) => setTimeout(r, 1200)))"><i data-xxd-icon="Save" data-size="16"></i>Save</button>`,
+        text: "Click it: the width doesn't jump and the spinner stays centered; when done, the icon turns into a check for one second.",
+      },
+    ],
+    a11y: [
+      "Icon-only buttons must have an aria-label (a tooltip is not a name)",
+      "While busy, set aria-busy=\"true\": the label hides and a spinner shows, but screen readers still read the button name",
+      "Toggle buttons use aria-pressed; pressed, disabled and focus states never rely on color alone",
+      "In compact density buttons get shorter, but the hit area stays at least --hit-min (40px, 44px on touch)",
+    ],
+  },
+  Link: {
+    title: "Link button",
+    summary: "A button that looks like a link: a secondary action inside a sentence, such as “Start a new post instead”.",
+    attributes: {
+      "data-variant": "inline (default) | plain | current",
+      "data-external / target=_blank": "Adds an external-link icon after the text",
+    },
+    markup: `<button class="xxd-link">Start a new post instead</button>`,
+    sample: `<a class="xxd-link" href="#">Start a new post instead</a>`,
+    rules: ["Underline at 40%, solid on hover"],
+    a11y: [
+      "Navigation uses <a href>; actions use <button class=\"xxd-link\"> — that's how screen readers tell users what will happen",
+      "The underline is always there; color is never the only cue",
+    ],
+  },
+  ButtonGroup: {
+    title: "Button group",
+    summary: "A few buttons joined into one strip: different ways to do the same thing.",
+    markup: `<div class="xxd-btn-group"><button class="xxd-btn" data-size="sm">Left</button><button class="xxd-btn" data-size="sm">Right</button></div>`,
+    a11y: [
+      "For mutually exclusive options use the segmented control (radiogroup), not a button group",
+      "When needed, give the wrapper role=\"group\" and an aria-label",
+    ],
+  },
+  Field: {
+    title: "Field",
+    summary: "Label + input + help or error: one row of a form.",
+    attributes: {
+      "aria-invalid": "Border turns danger color on error",
+      "data-optional": "On the label: appends “Optional”",
+      "data-autosize": "Textarea grows with its content",
+    },
+    markup: `<div class="xxd-field">
+  <label class="xxd-label" for="title">Title</label>
+  <input class="xxd-input" id="title" placeholder="Give this post a name">
+  <p class="xxd-help">Up to 100 characters</p>
+</div>`,
+    sample: `<input class="xxd-input" style="width:100%;max-width:120px" placeholder="Title">`,
+    rules: ["One box is one box: on focus the border darkens once — no outer ring, no inner frame", "§4"],
+    a11y: [
+      "The label's for points at the input; help and error text are linked with aria-describedby",
+      "On error set aria-invalid=\"true\" and say how to fix it — don't just turn it red",
+    ],
+  },
+  Select: {
+    title: "Select",
+    summary: "A restyled native <select>: use it for a few options that need no descriptions or groups.",
+    attributes: { "data-variant": "bare: “a value + a chevron” inside a settings row" },
+    markup: `<label class="xxd-select"><select aria-label="Image quality"><option>High</option><option>Standard</option></select></label>`,
+    sample: `<label class="xxd-select"><select aria-label="Quality"><option>High</option></select></label>`,
+    rules: ["Native <select>; the dropdown is never rebuilt", "Inside settings rows use bare: a value + chevron, not a box"],
+    a11y: ["Without a visible label, give the <select> an aria-label", "Keyboard and screen reader behavior is the browser's own"],
+  },
+  Picker: {
+    title: "Custom select",
+    summary: "What a native <select> can't do: groups, per-option descriptions, icons, multiple selection. For simple cases keep using Select (native).",
+    attributes: {
+      "data-multiple": "Multiple selection (checkmarks; the list stays open)",
+      "data-placeholder": "Text shown when nothing is selected",
+      "data-size": "sm",
+      "aria-invalid": "Error",
+      "data-disabled": "Disabled",
+    },
+    markup: `<div class="xxd-picker" data-xxd-picker style="width:100%;max-width:220px">
+  <button class="xxd-picker__trigger"><span class="xxd-picker__value"></span></button>
+  <div class="xxd-listbox">
+    <div class="xxd-option-group" role="group" aria-label="Quality">
+      <div class="xxd-option-group__label">Quality</div>
+      <div class="xxd-option" data-value="high" aria-selected="true"><span>High<small>2K, a bit slower</small></span></div>
+      <div class="xxd-option" data-value="standard"><span>Standard<small>1K, fastest</small></span></div>
+    </div>
+    <div class="xxd-option-group" role="group" aria-label="Other">
+      <div class="xxd-option" data-value="auto">Follow my plan</div>
+      <div class="xxd-option" data-value="x" aria-disabled="true">4K (coming soon)</div>
+    </div>
+  </div>
+</div>
+<div class="xxd-picker" data-xxd-picker data-multiple data-placeholder="Choose tags" style="width:100%;max-width:220px">
+  <button class="xxd-picker__trigger"><span class="xxd-picker__value"></span></button>
+  <div class="xxd-listbox">
+    <div class="xxd-option" data-value="poster" aria-selected="true">Poster</div>
+    <div class="xxd-option" data-value="cover">Cover</div>
+    <div class="xxd-option" data-value="card">Card</div>
+  </div>
+</div>`,
+    js: `picker.addEventListener("xxd:change", (e) => e.detail.value)  // an array when multiple; picker.dataset.value is comma-separated`,
+    a11y: [
+      "The button has aria-haspopup=listbox; the list's aria-activedescendant follows the highlight",
+      "↑ ↓ Home End move, Enter / Space select, Esc closes, typing a letter jumps to it",
+    ],
+  },
+  Search: {
+    title: "Search box",
+    summary: "A search box with a magnifier and a clear button. Esc clears first; press it again to leave.",
+    markup: `<div class="xxd-input-wrap">
+  <i data-xxd-icon="Search" data-size="16"></i>
+  <input class="xxd-input" type="search" placeholder="Search settings (⌘F)">
+  <button class="xxd-input-clear" aria-label="Clear"><i data-xxd-icon="X" data-size="14"></i></button>
+</div>`,
+    rules: ["⌘F / Ctrl+F jumps to it, Esc clears", "Matching text is marked with mark.xxd-hit"],
+    a11y: [
+      "type=\"search\"; without a visible label, add an aria-label",
+      "The clear button has an aria-label; Esc clears when there is text and passes through when empty",
+    ],
+  },
+  InputGroup: {
+    title: "Input group",
+    summary: "Prefixes, suffixes and inline buttons. The whole group is one box; on focus its border darkens once.",
+    attributes: { "data-size": "sm", "aria-invalid": "Error" },
+    markup: `<div class="xxd-input-group" style="width:100%;max-width:320px">
+  <span class="xxd-input-group__addon">https://</span>
+  <input aria-label="Subdomain" value="today">
+  <span class="xxd-input-group__suffix">.xiaoxiaodong.ai</span>
+  <button class="xxd-btn" data-variant="ghost" data-size="sm">Check</button>
+</div>`,
+    rules: ["One box is one box: prefix and suffix live inside it, not two boxes stuck together"],
+    a11y: ["Prefixes and suffixes are plain text; the input still needs its own label or aria-label", "Buttons in the group are separate Tab stops"],
+  },
+  SecretInput: {
+    title: "Secret input",
+    summary: "API keys and tokens: masked by default, can be shown or hidden, copied in one click. Used for the member site's API settings and the extensions' AI service keys.",
+    markup: `<div class="xxd-field" style="width:100%;max-width:340px">
+  <label class="xxd-label" for="k1">API key</label>
+  <div class="xxd-input-group xxd-secret" data-xxd-secret>
+    <input id="k1" type="password" value="sk_live_4f8a2c91d7e3b6a0" readonly>
+    <button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-toggle aria-label="Show" aria-pressed="false"><i data-xxd-icon="Eye" data-size="16"></i></button>
+    <button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-copy aria-label="Copy"><i data-xxd-icon="Copy" data-size="16"></i></button>
+  </div>
+  <p class="xxd-help">Stored on this computer only.</p>
+</div>`,
+    rules: ["Masked by default; once shown, never re-mask automatically (the user decides)"],
+    a11y: ["The show / hide button is a toggle (aria-pressed) and its label changes with it", "The “Copied” confirmation is announced through a live region"],
+  },
+  ClipboardText: {
+    title: "Copyable value",
+    summary: "A read-only value with a copy button. After copying, “Copied” pops up above the button and the icon briefly turns into a check.",
+    attributes: { "data-size": "sm" },
+    markup: `<div class="xxd-clipboard" style="width:100%;max-width:300px">
+  <code>pnpm xxd new ~/js/today-extension</code>
+  <button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="Copy" data-copy="pnpm xxd new ~/js/today-extension"><i data-xxd-icon="Copy" data-size="14"></i></button>
+</div>`,
+    js: `[data-copy="text"] or [data-copy-target="#selector"]; data-copy-done sets the bubble text`,
+    a11y: [
+      "The copy button has an aria-label; “Copied” is announced through a live region (role=status)",
+      "The copied value is selectable text, so keyboard users can copy it themselves",
+    ],
+  },
+  InlineCopy: {
+    title: "Inline copy",
+    summary: "A piece of copyable text inside a sentence (a command, an ID): click to copy, and “Copied” pops up.",
+    markup: `<p class="xxd-text">Run <button class="xxd-inline-copy" data-copy="pnpm xxd ls" data-copy-done="Command copied">pnpm xxd ls<i data-xxd-icon="Copy" data-size="12"></i></button> — one click copies it.</p>`,
+    rules: ["The copy icon only shows on hover / focus; always visible on touch"],
+    a11y: [
+      "It is a <button>, so screen readers read its text; use data-copy-done for a more specific confirmation when needed",
+      "The result is announced through a live region",
+    ],
+  },
+  Switch: {
+    title: "Switch",
+    summary: "On / off that takes effect immediately. For options that need a Save to apply, use a checkbox.",
+    attributes: { "data-size": "sm | (default) | lg", "role=\"switch\"": "Required" },
+    markup: `<label class="xxd-choice"><input type="checkbox" role="switch" class="xxd-switch" checked>Completion sound</label>`,
+    sample: `<input type="checkbox" role="switch" class="xxd-switch" aria-label="Switch">`,
+    rules: ["In square mode the switch is square too (--r-pill)", "On = --switch-on: gray with ink, the accent when an accent is set"],
+    a11y: [
+      "<input type=\"checkbox\" role=\"switch\">; screen readers announce on / off",
+      "Label it with what is on (“Completion sound”), not “Turn on completion sound”",
+    ],
+  },
+  Checkbox: {
+    title: "Checkbox",
+    summary: "Multiple choice, or a single option that applies only after confirming. Supports indeterminate.",
+    attributes: { "aria-invalid": "Error", "indeterminate (JS)": "Partially selected" },
+    markup: `<label class="xxd-choice"><input type="checkbox" class="xxd-check" checked>Smart punctuation</label>`,
+    sample: `<input type="checkbox" class="xxd-check" aria-label="Checkbox">`,
+    a11y: [
+      "Native checkbox, Space toggles; indeterminate is the property, not just a visual style",
+      "The whole label is clickable, and the hit area is at least --hit-min",
+    ],
+  },
+  Radio: {
+    title: "Radio",
+    summary: "Pick exactly one in a group. Use it for 2–5 options that should all be visible; for more, use a select.",
+    markup: `<fieldset class="xxd-choices">
+  <legend>How to write</legend>
+  <label class="xxd-choice"><input type="radio" class="xxd-radio" name="w" checked>This post only</label>
+  <label class="xxd-choice"><input type="radio" class="xxd-radio" name="w">Write all</label>
+</fieldset>`,
+    sample: `<input type="radio" class="xxd-radio" aria-label="Radio">`,
+    rules: ["A radio is a semantic circle and always stays round", "A set of options is one list, not a stack of boxes"],
+    a11y: [
+      "Wrap it in <fieldset> + <legend> so screen readers read the group name first",
+      "Same name per group: ↑ ↓ move and select, Tab stops only once",
+    ],
+  },
+  Range: {
+    title: "Slider",
+    summary: "Drag to pick a number; with data-fill the left part fills with the accent. For a range use two sliders (.xxd-range-pair).",
+    attributes: {
+      "data-fill": "Fill the selected part with the accent",
+      "data-ticks + --ticks": "Tick marks",
+      ".xxd-range-pair": "Two-handle range (min never passes max)",
+    },
+    markup: `<div class="xxd-field" style="width:100%;max-width:260px"><label class="xxd-label">Generate at once</label><input type="range" class="xxd-range" data-fill min="1" max="4" value="2" aria-label="Generate at once"></div>
+<div class="xxd-field" style="width:100%;max-width:260px"><span class="xxd-label">Price range <span class="xxd-range-value"></span></span><div class="xxd-range-pair"><input type="range" class="xxd-range" min="0" max="100" value="20" aria-label="Minimum"><input type="range" class="xxd-range" min="0" max="100" value="70" aria-label="Maximum"></div></div>`,
+    a11y: [
+      "Native range: ← → nudge, Page Up / Down take big steps, Home / End jump to the ends",
+      "Show the current value as text too (aria-valuetext or a number next to it), not just the thumb position",
+    ],
+  },
+  TagInput: {
+    title: "Tag input",
+    summary: "Enter or a comma turns the text into a tag; Backspace removes the last one.",
+    markup: `<div class="xxd-taginput" data-xxd-taginput><input placeholder="Press Enter to add" aria-label="Tags"></div>`,
+    js: `box.addEventListener("xxd:change", (e) => e.detail.value)  // an array of strings; Xxd.addTag(box, "Poster")`,
+    a11y: [
+      "Each tag's remove button has an aria-label (change it with data-remove-label)",
+      "Without a visible label give the input an aria-label; changes dispatch xxd:change",
+    ],
+  },
+  Combobox: {
+    title: "Combobox",
+    summary: "A dropdown you can type into to filter. data-multiple turns picks into chips; data-creatable lets you add new ones.",
+    attributes: {
+      "data-multiple": "Multiple: picks become chips in front (.xxd-taginput wraps the input)",
+      "data-creatable": "Shows “Create “xx”” when nothing matches exactly",
+      "data-create-label": "Custom text for “Create”",
+      ".xxd-option-group": "Groups (a group hides when all of it is filtered out)",
+    },
+    markup: `<div data-xxd-combobox style="width:100%;max-width:240px"><input class="xxd-input" placeholder="Type to filter" aria-label="Accent"><ul class="xxd-listbox"><li class="xxd-option" data-value="ink">Ink</li><li class="xxd-option" data-value="#1d9bf0">X blue</li><li class="xxd-option" data-value="#3b74b8">Lake blue</li><li class="xxd-option" data-value="#5a8a3c">Moss</li></ul></div>
+<div data-xxd-combobox data-multiple data-creatable style="width:100%;max-width:280px"><div class="xxd-taginput"><input placeholder="Pick or create a tag" aria-label="Tags"></div><ul class="xxd-listbox"><li class="xxd-option">Poster</li><li class="xxd-option">Cover</li><li class="xxd-option">Card</li></ul></div>`,
+    a11y: [
+      "The input has role=combobox + aria-expanded, the list role=listbox, and the highlighted option uses aria-activedescendant",
+      "↑ ↓ move, Enter selects, Esc closes",
+    ],
+  },
+  Tabs: {
+    title: "Tabs",
+    summary: "Switch between several panels in the same place; the ink line slides to the selected tab.",
+    markup: `<div class="xxd-tabs" data-xxd-tabs>
+  <button role="tab" id="t1" aria-controls="p1" aria-selected="true">Write</button>
+  <button role="tab" id="t2" aria-controls="p2">History</button>
+</div>
+<div id="p1">…</div><div id="p2">…</div>`,
+    rules: [
+      "Text on a baseline + a short sliding ink line",
+      "Selection changes color, never weight",
+      "No second line under the tabs",
+      "When they don't fit, both ends fade and the selected tab scrolls into view",
+    ],
+    a11y: [
+      "JS fills in role=tablist / tab / tabpanel; the selected tab has aria-selected and panels have aria-labelledby",
+      "← → Home End switch tabs; Tab stops only on the selected one (roving tabindex)",
+    ],
+  },
+  Segmented: {
+    title: "Segmented control",
+    summary: "2–4 mutually exclusive options in one strip: switching views, picking a type.",
+    markup: `<div class="xxd-segmented" role="radiogroup" data-xxd-segmented aria-label="Type">
+  <button role="radio" aria-checked="true">Text</button>
+  <button role="radio" aria-checked="false">Image</button>
+</div>`,
+    rules: ["One tray; the selected segment rises like paper — not a box inside a box"],
+    a11y: [
+      "role=radiogroup + aria-label; each segment is role=radio + aria-checked",
+      "← → switch, Tab stops once; the selected segment is outlined in high-contrast mode",
+    ],
+  },
+  Breadcrumbs: {
+    title: "Breadcrumbs",
+    summary: "Where this page is: one line of path. With data-collapse=\"4\" the middle levels fold into a “…” menu.",
+    attributes: { "data-collapse": "Fold the middle into a “…” menu beyond N items (default 4)", "data-size": "sm" },
+    markup: `<ol class="xxd-breadcrumbs" data-collapse="4"><li><a href="#">Home</a></li><li><a href="#">Extensions</a></li><li><a href="#">Long-form publisher</a></li><li><a href="#">Versions</a></li><li><a href="#">1.8</a></li><li aria-current="page">1.8.2</li></ol>`,
+    a11y: [
+      "Wrap it in <nav aria-label=\"Breadcrumbs\">; mark the current page with aria-current=\"page\" and don't make it a link",
+      "The fold button's aria-label says how many levels it hides; menu items work with arrow keys",
+    ],
+  },
+  Pagination: {
+    title: "Pagination",
+    summary: "Page numbers, previous / next and page size. JS builds the buttons from data-total and dispatches xxd:change.",
+    attributes: {
+      "data-xxd-pagination": "Builds buttons from data-page / data-total / data-per-page",
+      "data-simple": "Only previous / next",
+    },
+    markup: `<div class="xxd-pagination-bar">
+  <span class="xxd-pagination__info"></span>
+  <nav class="xxd-pagination" data-xxd-pagination data-page="3" data-total="230" data-per-page="20" aria-label="Pagination"></nav>
+  <label class="xxd-pagination__size">Per page<span class="xxd-select" data-size="sm"><select><option>20</option><option>50</option></select></span></label>
+</div>
+<nav class="xxd-pagination" data-simple aria-label="Pagination (simple)"><button aria-label="Previous page"><i data-xxd-icon="ChevronLeft" data-size="14"></i></button><button aria-current="page">2</button><button aria-label="Next page"><i data-xxd-icon="ChevronRight" data-size="14"></i></button></nav>`,
+    a11y: [
+      "<nav> has an aria-label; the current page has aria-current=\"page\"; previous / next have text labels (three languages)",
+      "On the first and last page the matching button is disabled",
+    ],
+  },
+  Rail: {
+    title: "Rail",
+    summary: "A narrow icon navigation rail (the strip on the left of an extension side panel).",
+    markup: `<nav class="xxd-rail" aria-label="Main navigation"><a href="#" aria-current="page"><i data-xxd-icon="House"></i>Home</a><a href="#"><i data-xxd-icon="Bookmark"></i>Saved</a></nav>`,
+    rules: ["Icons 20px, labels 10px", "Active changes color and background, never stroke width"],
+    a11y: ["<nav aria-label>; the current item has aria-current=\"page\"", "Icon-only items each need an aria-label and a tooltip"],
+  },
+  Sidebar: {
+    title: "Sidebar",
+    summary: "A full sidebar: groups, submenus, badges, collapsing to a 56px icon bar (labels fade out, tooltips on hover), resizable width; floating and inset variants.",
+    attributes: {
+      "data-collapsed": "Collapse to an icon bar",
+      "data-variant": "floating | inset",
+      "--sidebar-w": "Width (updated while dragging)",
+      "data-min / data-max": "Drag range (default 200–400)",
+      "[data-xxd-sidebar-toggle=\"id\"]": "Collapse / expand button",
+      "data-sidebar-sub=\"id\"": "An item with a submenu",
+    },
+    markup: `<div style="display:flex;height:420px;border:1px solid var(--line)">
+<aside class="xxd-sidebar" data-xxd-sidebar id="sb1" style="--sidebar-w:232px">
+  <div class="xxd-sidebar__head"><span class="xxd-logo"><span class="xxd-logo__mark"></span><span data-sidebar-hide>XXD</span></span></div>
+  <nav class="xxd-sidebar__body">
+    <div class="xxd-sidebar__group">
+      <div class="xxd-sidebar__label">Content</div>
+      <a class="xxd-sidebar__item" href="#" aria-current="page"><i data-xxd-icon="House" data-size="18"></i><span>Home</span></a>
+      <a class="xxd-sidebar__item" href="#"><i data-xxd-icon="Bookmark" data-size="18"></i><span>Saved</span><span class="xxd-badge">12</span></a>
+      <button class="xxd-sidebar__item" aria-expanded="true" data-sidebar-sub="sb1-sub"><i data-xxd-icon="Folder" data-size="18"></i><span>Style library</span></button>
+      <div class="xxd-sidebar__sub" id="sb1-sub">
+        <a class="xxd-sidebar__item" href="#"><span>Posters</span></a>
+        <a class="xxd-sidebar__item" href="#"><span>Covers</span></a>
+      </div>
+    </div>
+    <div class="xxd-sidebar__group">
+      <div class="xxd-sidebar__label">Account</div>
+      <a class="xxd-sidebar__item" href="#"><i data-xxd-icon="Settings" data-size="18"></i><span>Settings</span></a>
+    </div>
+  </nav>
+  <div class="xxd-sidebar__foot"><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-xxd-sidebar-toggle="sb1" aria-label="Collapse sidebar"><i data-xxd-icon="PanelsTopLeft" data-size="16"></i></button></div>
+  <div class="xxd-sidebar__resize" data-sidebar-resize></div>
+</aside>
+<main style="flex:1;min-width:0;padding:16px" class="xxd-muted">Content area</main>
+</div>`,
+    rules: [
+      "Collapsing is instant: labels fade out, icons stay put (only opacity animates)",
+      "Active changes color and background, never stroke width or weight",
+    ],
+    a11y: ["When collapsed, each item's name becomes its aria-label and tooltip automatically", "Submenu buttons carry aria-expanded"],
+  },
+  Topbar: {
+    title: "Top bar",
+    summary: "One strip across the top of a page: a title + a few icon buttons.",
+    markup: `<header class="xxd-topbar"><span class="xxd-topbar__title">Prompts</span><button class="xxd-btn" data-variant="ghost" data-icon-only aria-label="Search"><i data-xxd-icon="Search"></i></button></header>`,
+    rules: ["56px; the divider belongs to this row"],
+    a11y: ["Every icon-only button needs an aria-label", "With only one top bar on the page it can be a <header> (banner)"],
+  },
+  Toolbar: {
+    title: "Toolbar",
+    summary: "Like an editor's formatting bar: a set of small buttons; ← → move between them (roving tabindex).",
+    attributes: {
+      "role=\"toolbar\"": "Enables arrow-key movement",
+      "data-framed": "With a frame",
+      "data-size": "sm | lg",
+      "aria-pressed": "Toggle state (bold, etc.)",
+    },
+    markup: `<div class="xxd-toolbar" role="toolbar" aria-label="Formatting" data-framed>
+  <button class="xxd-toolbar__item" aria-label="Bold" aria-pressed="true" data-tooltip="Bold ⌘B"><i data-xxd-icon="Bold" data-size="16"></i></button>
+  <button class="xxd-toolbar__item" aria-label="Italic" data-tooltip="Italic ⌘I"><i data-xxd-icon="Italic" data-size="16"></i></button>
+  <button class="xxd-toolbar__item" aria-label="Heading" data-tooltip="Heading"><i data-xxd-icon="Heading1" data-size="16"></i></button>
+  <span class="xxd-toolbar__sep"></span>
+  <button class="xxd-toolbar__item" aria-label="Link" data-tooltip="Link ⌘K"><i data-xxd-icon="Link" data-size="16"></i></button>
+  <button class="xxd-toolbar__item" aria-label="Image" data-tooltip="Image"><i data-xxd-icon="Image" data-size="16"></i></button>
+  <span class="xxd-toolbar__spacer"></span>
+  <button class="xxd-toolbar__item"><i data-xxd-icon="Eye" data-size="14"></i>Preview</button>
+</div>`,
+    a11y: ["← → Home End move between items; Tab enters and leaves the whole toolbar in one stop"],
+  },
+  PageHeader: {
+    title: "Page header",
+    summary: "Breadcrumbs, title, description, actions, tabs — the top of a resource or settings page.",
+    markup: `<header class="xxd-page-header">
+  <ol class="xxd-breadcrumbs"><li><a href="#">Extensions</a></li><li aria-current="page">Long-form publisher</li></ol>
+  <div class="xxd-page-header__row">
+    <h1 class="xxd-page-header__title">Long-form publisher</h1>
+    <div class="xxd-page-header__actions"><button class="xxd-btn">Open store page</button><button class="xxd-btn" data-variant="primary">Publish new version</button></div>
+  </div>
+  <p class="xxd-page-header__desc">Writes Markdown into X Articles. v1.8.2 · 2,410 users</p>
+  <div class="xxd-tabs" role="tablist" aria-label="Extension" data-xxd-tabs><button role="tab" aria-selected="true">Overview</button><button role="tab">Versions</button><button role="tab">Settings</button></div>
+</header>`,
+    a11y: [
+      "The title is the page's h1; breadcrumbs and tabs carry their own semantics (nav / tablist)",
+      "Actions go left to right by importance; the primary action comes last",
+    ],
+  },
+  SettingsGroup: {
+    title: "Settings group",
+    summary: "One group on a settings page: a group name + rows (title, description, control).",
+    markup: `<section class="xxd-group">
+  <h2 class="xxd-group__title">Writing</h2>
+  <div class="xxd-group__body">
+    <div class="xxd-row">
+      <div class="xxd-row__text"><div class="xxd-row__title">Write the title</div><div class="xxd-row__desc">Use the first # heading as the post title</div></div>
+      <div class="xxd-row__control"><input type="checkbox" role="switch" class="xxd-switch" aria-label="Write the title"></div>
+    </div>
+  </div>
+</section>`,
+    rules: [
+      "A small gray title + one framed body, thin lines between rows",
+      "No frame around the whole tab",
+      "a.xxd-row makes the whole row clickable and adds a chevron",
+      "§5",
+    ],
+    a11y: [
+      "The group name is an h2 (under the page h1); a control's aria-label matches its row title",
+      "The description can be linked to the control with aria-describedby",
+    ],
+  },
+  Appearance: {
+    title: "Appearance settings",
+    summary: "A ready-made settings group for theme, corners, accent, density and finish: Xxd.mountAppearance(container).",
+    js: `Xxd.mountAppearance(el, { locale: "en", showDensity: false, lockCorners: false, languages, onLanguage })
+// In an extension: wire get/set to XxdExtension.createAppearanceStore({ key })`,
+    rules: [
+      "Theme · corners · accent · (density) · (language) — the group every extension needs",
+      "The member site uses lockCorners: true",
+    ],
+    a11y: [
+      "Every option is a segmented control or a switch with an aria-label; swatches are radios with readable names",
+      "Text follows <html lang> or the locale option, in three languages",
+    ],
+  },
+  List: {
+    title: "List",
+    summary: "A column of clickable rows: title, description, trailing actions. Mark the current item with aria-current.",
+    attributes: { "data-interactive": "Rows are clickable (hover background)", "aria-selected": "Selected row: a light tint" },
+    markup: `<ul class="xxd-list" data-interactive>
+  <li class="xxd-list__item"><div class="xxd-list__main"><div class="xxd-list__title">A long post</div><div class="xxd-list__meta">Today 14:02</div></div></li>
+  <li class="xxd-list__item" aria-current="true"><div class="xxd-list__main"><div class="xxd-list__title">Another one</div></div></li>
+</ul>`,
+    rules: [
+      "Lines only between rows — none above the first or below the last",
+      "Selection is a light tint, no colored border or side bar",
+    ],
+    a11y: [
+      "Mark the selected row with aria-current=\"true\" (not aria-selected — that's for listbox options)",
+      "When a whole row is clickable, wrap the main area in one link / button; other actions stay separately focusable",
+    ],
+  },
+  Glyphs: {
+    title: "Glyph grid",
+    summary: "A grid with one symbol per cell to pick from (numbers, punctuation, emoji).",
+    rules: ["Bare characters; filled only on hover"],
+    a11y: [
+      "Give each button an aria-label with the symbol's name (“circled digit one”), not just the character",
+      "Mark the selected symbol with aria-pressed=\"true\"",
+    ],
+  },
+  Dialog: {
+    title: "Dialog",
+    summary: "A question that must be answered before going on: a confirmation, a choice, a short form.",
+    attributes: {
+      "data-light-dismiss": "Click the backdrop to close (don't use it for confirmations)",
+      "data-size": "sm | (default 440) | lg | xl",
+      "role=\"alertdialog\"": "A confirmation that must be answered: no data-light-dismiss",
+    },
+    markup: `<dialog class="xxd-dialog" id="d1" aria-labelledby="d1-title">
+  <div class="xxd-dialog__head"><h2 class="xxd-dialog__title" id="d1-title">Which post should this go into?</h2></div>
+  <div class="xxd-dialog__body"><p>Existing content is never replaced by default.</p></div>
+  <div class="xxd-dialog__actions">
+    <button class="xxd-btn ui-dialog-cancel" data-xxd-dialog-close>Cancel</button>
+    <button class="xxd-btn" data-variant="primary" data-xxd-dialog-close="new">Write as a new post</button>
+  </div>
+</dialog>
+<button class="xxd-btn" data-xxd-dialog-open="d1">Open</button>`,
+    js: `await Xxd.confirmDialog({ title, message, confirmLabel: "Delete", tone: "danger" })  // → true / false
+await Xxd.confirmDelete({ name: "Long-form publisher", what: "all records of this extension" })  // type the name to delete`,
+    rules: [
+      "Cancel comes first (DOM order), content-width and quiet; the primary action is last, on the right",
+      "Destructive confirmations focus Cancel by default",
+      "§10",
+    ],
+    a11y: [
+      "Native <dialog> + showModal: the page behind is inert, Esc closes, focus is trapped inside",
+      "On close, focus returns to the button that opened it; destructive actions focus “Cancel” by default",
+    ],
+  },
+  Dock: {
+    title: "Dock",
+    summary: "The strip pinned to the bottom of an extension side panel: status + tools + the primary button.",
+    markup: `<footer class="xxd-dock">
+  <div class="xxd-dock__status">30 characters · Saved</div>
+  <div class="xxd-dock__tools"><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="Cover"><i data-xxd-icon="Image"></i></button></div>
+  <div class="xxd-dock__primary"><button class="xxd-btn" data-variant="primary" data-size="sm">Post to X</button></div>
+</footer>`,
+    rules: [
+      "Status first · undoable tools in one group · the step with the biggest consequence last",
+      "It is not a second navigation bar",
+    ],
+    a11y: ["Status changes are announced via role=status (e.g. “Saved”)", "Only one primary button, and it says what it does (“Post to X”)"],
+  },
+  Sheet: {
+    title: "Sheet",
+    summary: "A panel that rises from the dock: secondary content such as settings or pickers.",
+    markup: `<div class="xxd-sheet-host">
+  …
+  <div class="xxd-scrim"></div>
+  <section class="xxd-sheet" id="s1" aria-labelledby="s1-title"><div class="xxd-sheet__head"><h3 class="xxd-sheet__title" id="s1-title">Cover</h3><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-xxd-sheet-close aria-label="Close"><i data-xxd-icon="X"></i></button></div><div class="xxd-sheet__body">…</div></section>
+  <footer class="xxd-dock">… <button class="xxd-btn" data-xxd-sheet-open="s1">Cover</button></footer>
+</div>`,
+    rules: ["Rises 10px + fades in over 200ms, retracts in 120ms", "While open, the dock's primary action is hidden"],
+    a11y: [
+      "On open, focus moves to the first focusable element in the sheet; Tab stays inside, Esc closes",
+      "On close, focus returns to the button that opened it; the sheet's aria-labelledby points at its title",
+    ],
+  },
+  Panel: {
+    title: "Side panel",
+    summary: "A details panel that slides in from the right (resource details on the member site).",
+    markup: `<aside class="xxd-panel" id="pd" aria-labelledby="pd-title"><div class="xxd-panel__head"><h2 class="xxd-panel__title" id="pd-title">Details</h2><button class="xxd-btn" data-variant="ghost" data-icon-only data-xxd-panel-close aria-label="Close"><i data-xxd-icon="X"></i></button></div><div class="xxd-panel__body">…</div></aside>
+<button class="xxd-btn" data-xxd-panel-open="pd">Details</button>`,
+    js: `Xxd.openPanel(el); Xxd.toast("Saved", { within: el.querySelector(".xxd-panel__body") })`,
+    rules: ["For actions inside the panel, the toast appears inside the panel"],
+    a11y: [
+      "aria-labelledby points at the title; on open focus moves into the panel, Esc closes and returns focus",
+      "The close button has an aria-label",
+    ],
+  },
+  Menu: {
+    title: "Menu",
+    summary: "A column of actions: more, export, sort. Supports submenus, radio groups and checkable items.",
+    markup: `<button class="xxd-btn" data-xxd-menu="m1">More<i data-xxd-icon="ChevronDown" data-size="14"></i></button>
+<div class="xxd-menu" id="m1" role="menu" popover>
+  <button class="xxd-menu__item" role="menuitem"><i data-xxd-icon="Pen" data-size="14"></i>Rename<span class="xxd-menu__kbd">F2</span></button>
+  <button class="xxd-menu__item" role="menuitem" data-submenu="m1-export" aria-haspopup="menu"><i data-xxd-icon="Download" data-size="14"></i>Export as</button>
+  <div class="xxd-menu" id="m1-export" role="menu" popover="manual">
+    <button class="xxd-menu__item" role="menuitem">Markdown</button>
+    <button class="xxd-menu__item" role="menuitem">Image (PNG)</button>
+  </div>
+  <div class="xxd-menu__sep" role="separator"></div>
+  <div class="xxd-menu__label">Sort</div>
+  <div role="group" aria-label="Sort">
+    <button class="xxd-menu__item" role="menuitemradio" aria-checked="true">Newest first</button>
+    <button class="xxd-menu__item" role="menuitemradio" aria-checked="false">Oldest first</button>
+  </div>
+  <button class="xxd-menu__item" role="menuitemcheckbox" aria-checked="true">Smart punctuation</button>
+  <div class="xxd-menu__sep" role="separator"></div>
+  <button class="xxd-menu__item" role="menuitem" data-tone="danger"><i data-xxd-icon="Trash2" data-size="14"></i>Delete</button>
+</div>`,
+    js: `group.addEventListener("xxd:change", (e) => e.detail.value)  // radio group`,
+    rules: [
+      "Arrow keys / Home / End / Esc; clicking outside closes (Popover API)",
+      "Submenus live inside the parent menu with popover=\"manual\"; → opens, ← / Esc goes back to the parent item",
+      "Focus follows the mouse (only one highlight at a time)",
+    ],
+    a11y: [
+      "The trigger has aria-haspopup + aria-expanded; ↓ ↑ open it and focus the first / last item",
+      "↑ ↓ move, → enters a submenu, ← / Esc leaves, focus returns to the trigger",
+    ],
+  },
+  Popover: {
+    title: "Popover",
+    summary: "An explanation or a small form you click to open: holds more than a tooltip, lighter than a dialog.",
+    attributes: { "data-arrow": "Small arrow (follows the anchor)", "data-placement": "top | bottom | *-start | *-end" },
+    markup: `<button class="xxd-btn" data-xxd-popover="p1">What is this?</button>
+<div class="xxd-popover" id="p1" popover>Accent colors are lightened or darkened automatically.</div>`,
+    a11y: [
+      "Native popover: click outside or Esc closes; the trigger's aria-expanded stays in sync",
+      "When it holds interactive content, focus moves into it on open; after Esc, focus returns to the trigger",
+    ],
+  },
+  Tooltip: {
+    title: "Tooltip",
+    summary: "One line of explanation shown on hover or keyboard focus. Explanations only — never actions.",
+    attributes: {
+      "data-tooltip": "Tooltip text",
+      "data-tooltip-placement": "top (default) | bottom | top-start …",
+      "data-tooltip-arrow": "Small arrow",
+    },
+    markup: `<button class="xxd-btn" data-icon-only aria-label="Search" data-tooltip="Search ⌘F"><i data-xxd-icon="Search"></i></button>`,
+    rules: [
+      "11px, small shadow; 400ms on hover, instant on focus",
+      "In a row: within 300ms of closing, moving to another button shows its tooltip instantly (tooltip group)",
+    ],
+    a11y: [
+      "Also shows on keyboard focus, Esc dismisses; linked to the button with aria-describedby",
+      "Icon-only buttons still need an aria-label — the tooltip adds to the name, it isn't the name",
+    ],
+  },
+  Toast: {
+    title: "Toast",
+    summary: "One sentence about an outcome: saved, copied, failed and can retry. When the same sentence comes again it only nudges.",
+    markup: `<button class="xxd-btn" onclick="Xxd.toast('Draft saved', { tone: 'success' })">Save</button>
+<button class="xxd-btn" onclick="Xxd.toast('Moved to trash', { action: { label: 'Undo', onClick() { Xxd.toast('Restored', { tone: 'success' }) } } })">Delete (undoable)</button>
+<button class="xxd-btn" onclick="Xxd.toast('Message ' + (window.__n = (window.__n || 0) + 1), { tone: 'info' })">Send a few</button>`,
+    js: `Xxd.toast(message, { tone: "success" | "danger" | "warning" | "info", within, duration, action: { label: "Undo", onClick }, stack: true })`,
+    rules: [
+      "Appears where the action happened (within)",
+      "Stacking: several fold into a pile that fans out on hover; a repeated message adds nothing new, it just nudges",
+      "Swipe sideways to dismiss",
+      "Green only means done",
+    ],
+    a11y: [
+      "The region is role=status + aria-live=polite, so it never interrupts what is being read",
+      "Toasts with an action (undo, retry) stay 6 seconds by default; the timer pauses on hover or keyboard focus inside",
+    ],
+  },
+  CommandPalette: {
+    title: "Command palette",
+    summary: "⌘K: search commands and jump to pages; supports groups, recent items and async loading.",
+    markup: `<button class="xxd-btn" onclick="Xxd.openCommandPalette({ recentKey: 'xxd-site-demo-en', items: [{ label: 'New post', hint: '⌘N', group: 'Writing', run(){} }, { label: 'Post to X', group: 'Writing', run(){} }, { label: 'Toggle theme', group: 'Appearance', run(){ XxdTheme.set({ theme: XxdTheme.read().theme === 'dark' ? 'light' : 'dark' }) } }, { label: 'Toggle corners', group: 'Appearance', run(){ XxdTheme.set({ corners: XxdTheme.read().corners === 'rounded' ? 'square' : 'rounded' }) } }] })">Command palette ⌘K</button>`,
+    js: `Xxd.openCommandPalette({ items: [{ label, hint, group, run }], recentKey: "my-ext-recent", loading: false })
+Xxd.bindCommandPalette(items)  // ⌘K / Ctrl+K`,
+    rules: [
+      "Grouped by group, with group titles",
+      "recentKey: with no input, “Recent” comes first",
+      "loading: shows “Loading…” first, then call setItems",
+    ],
+    a11y: [
+      "The input is role=combobox, the list role=listbox, and the highlight uses aria-activedescendant",
+      "↑ ↓ move, Enter runs, Esc closes and returns focus",
+    ],
+  },
+  Badge: {
+    title: "Badge",
+    summary: "A small label for a status or a count: Draft, Posted, 12.",
+    attributes: { "data-tone": "action | success | danger | warning", "data-variant": "solid | outline | new", "data-appearance": "dot: dot + text" },
+    markup: `<span class="xxd-badge">Draft</span> <span class="xxd-badge" data-tone="success">Posted</span> <span class="xxd-badge" data-tone="warning">Needs update</span> <span class="xxd-badge" data-appearance="dot" data-tone="success">Running</span> <span class="xxd-badge" data-variant="new">New</span>`,
+    a11y: [
+      "There is always text besides color; for a bare number add a description (aria-label=\"12 unread\")",
+      "Text on tinted badges stays ≥ 4.5:1",
+    ],
+  },
+  Chip: {
+    title: "Chip",
+    summary: "A tag you can toggle: filters, multi-select markers.",
+    markup: `<button class="xxd-chip" aria-pressed="true">Poster</button> <button class="xxd-chip">Cover</button>`,
+    sample: `<button class="xxd-chip">Poster</button>`,
+    a11y: ["It is a <button aria-pressed>; screen readers announce “pressed”", "The selected state is outlined in high-contrast mode, not just tinted"],
+  },
+  Dot: {
+    title: "Status dot",
+    summary: "A small dot that shows a status (running, error).",
+    rules: ["A semantic circle; always round"],
+    a11y: [
+      "The dot is decoration only (aria-hidden, or text next to it); the status must also be written out",
+      "Never tell two statuses apart by color alone",
+    ],
+  },
+  Banner: {
+    title: "Banner",
+    summary: "One notice at the top of a page or panel: quota, updates, errors.",
+    attributes: {
+      "data-tone": "warning | danger | success",
+      "data-size": "sm",
+      "[data-banner-close]": "Close button (fades out, then removes itself and dispatches xxd:banner-close)",
+    },
+    markup: `<div class="xxd-banner" data-tone="warning" style="max-width:520px"><i data-xxd-icon="TriangleAlert"></i><div><p class="xxd-banner__title">1 post left today</p><p class="xxd-banner__text">Resets at midnight; unlimited for members.</p></div><div class="xxd-banner__actions"><button class="xxd-btn" data-size="sm">Become a member</button></div><button class="xxd-btn xxd-banner__close" data-variant="ghost" data-icon-only data-size="xs" data-banner-close aria-label="Close"><i data-xxd-icon="X" data-size="14"></i></button></div>`,
+    a11y: [
+      "Important notices use role=status (errors use role=alert); the icon is aria-hidden",
+      "The close button has an aria-label; on close, focus moves to the nearest focusable element after it instead of dropping to body",
+    ],
+  },
+  Empty: {
+    title: "Empty state",
+    summary: "When there is nothing yet: say why it's empty and what to do next.",
+    attributes: { "data-size": "sm | lg" },
+    markup: `<div class="xxd-empty" data-size="sm"><i data-xxd-icon="FileText"></i><p class="xxd-empty__title">No history yet</p></div>
+<div class="xxd-empty"><i data-xxd-icon="Package"></i><p class="xxd-empty__title">No extensions yet</p><p class="xxd-empty__text">Create one with a single command.</p><div class="xxd-clipboard" data-size="sm"><code>pnpm xxd new ~/js/today-extension</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="xs" aria-label="Copy" data-copy="pnpm xxd new ~/js/today-extension"><i data-xxd-icon="Copy" data-size="14"></i></button></div></div>`,
+    rules: ["An explanation + one clear next step"],
+    a11y: ["The icon is decoration (aria-hidden); the title states the fact, the text gives the next step", "The next step is a button or a link, reachable by keyboard"],
+  },
+  Progress: {
+    title: "Progress",
+    summary: "Known progress uses <progress>; unknown progress uses a load bar or a spinner.",
+    markup: `<progress class="xxd-progress" value="60" max="100"></progress>
+<div class="xxd-loadbar" role="progressbar" aria-label="Loading"></div>
+<span class="xxd-spinner"></span>`,
+    rules: ["Animates transform only"],
+    a11y: [
+      "<progress> has progress semantics built in; the load bar needs role=progressbar + aria-label",
+      "A decorative spinner is aria-hidden, with text next to it saying what is happening",
+    ],
+  },
+  Table: {
+    title: "Table",
+    summary: "Aligned data: sorting, select all, resizable columns, sticky columns, footer totals.",
+    attributes: {
+      "data-interactive": "Rows highlight on hover",
+      "data-density": "compact: compact",
+      "data-sticky-head": "Sticky header",
+      "data-sticky (th/td)": "start | end: pin the first / last column",
+      "aria-sort (th)": "none | ascending | descending; put a .xxd-th-sort inside",
+      "[data-select-all] / [data-select-row]": "Select all and row selection (indeterminate is automatic)",
+      ".xxd-th-resize": "Drag to resize the column",
+    },
+    markup: `<div class="xxd-table-wrap" style="max-width:560px">
+<table class="xxd-table" data-interactive>
+  <thead><tr>
+    <th class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-all aria-label="Select all"></th>
+    <th aria-sort="ascending" data-key="name" data-sticky="start"><button class="xxd-th-sort">Extension</button><span class="xxd-th-resize"></span></th>
+    <th>Version</th>
+    <th aria-sort="none" data-key="users" data-align="end"><button class="xxd-th-sort">Users</button></th>
+    <th class="xxd-table__actions"><span class="xxd-sr-only">Actions</span></th>
+  </tr></thead>
+  <tbody>
+    <tr><td class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-row aria-label="Select Long-form publisher"></td><td data-sticky="start">Long-form publisher</td><td>1.8.2</td><td data-align="end">2,410</td><td class="xxd-table__actions"><button class="xxd-btn xxd-reveal" data-variant="ghost" data-size="xs">Edit</button></td></tr>
+    <tr><td class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-row checked aria-label="Select Link sorter"></td><td data-sticky="start">Link sorter</td><td>0.9.0</td><td data-align="end">830</td><td class="xxd-table__actions"><button class="xxd-btn xxd-reveal" data-variant="ghost" data-size="xs">Edit</button></td></tr>
+    <tr><td class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-row aria-label="Select Bulk image saver"></td><td data-sticky="start">Bulk image saver</td><td>2.1.0</td><td data-align="end">5,102</td><td class="xxd-table__actions"><button class="xxd-btn xxd-reveal" data-variant="ghost" data-size="xs">Edit</button></td></tr>
+  </tbody>
+  <tfoot><tr><td></td><td colspan="2">3 extensions</td><td data-align="end">8,342</td><td></td></tr></tfoot>
+</table></div>`,
+    a11y: [
+      "Headers are <th>; sortable columns set aria-sort and put the header text inside a button",
+      "The select-all box has an aria-label and uses indeterminate for partial selection; the horizontally scrolling wrapper is keyboard-focusable",
+    ],
+  },
+  Collapsible: {
+    title: "Collapsible",
+    summary: "Native <details>: FAQs and optional advanced settings. With a shared name only one stays open.",
+    attributes: { "name (details)": "Only one open per group with the same name (accordion, native to the browser)" },
+    markup: `<details class="xxd-collapse" name="faq" open><summary>Why square corners by default?</summary><p>It's a hard rule on the member site: no rounded dialogs, cards, buttons or inputs.</p></details>
+<details class="xxd-collapse" name="faq"><summary>How do I pick an accent?</summary><p>There are 18 presets; ink is the first one and the default.</p></details>
+<details class="xxd-collapse" name="faq"><summary>Can I use React?</summary><p>@xxd/react, with the same tokens.</p></details>`,
+    rules: ["Expanding only fades in with a small shift — no height animation"],
+    a11y: [
+      "<summary> is a button already: Enter / Space toggle it and screen readers announce the state",
+      "Don't hide information people must see inside a collapsible",
+    ],
+  },
+  Code: {
+    title: "Code",
+    summary: "Code blocks: light syntax highlighting, line numbers, a copy button.",
+    attributes: {
+      "data-highlight": "Light highlighting (js / ts / json / css / html / bash, via data-lang)",
+      "data-lines": "Line numbers",
+      ".xxd-code__head": "File name + copy",
+    },
+    markup: `<div class="xxd-code-block" style="max-width:520px">
+  <div class="xxd-code__head">sidepanel.js<button class="xxd-btn" data-variant="ghost" data-icon-only data-size="xs" aria-label="Copy" data-copy-target="#code-demo code"><i data-xxd-icon="Copy" data-size="14"></i></button></div>
+  <pre class="xxd-code" id="code-demo" tabindex="0" data-highlight data-lines><code data-lang="js">// Appearance settings live in chrome.storage
+const store = createAppearanceStore({ key: "today-ui" });
+await store.load();
+Xxd.toast("Saved", { tone: "success" });</code></pre>
+</div>
+<p>Inline code <code class="xxd-code-inline">--r-sm</code>, keys <kbd class="xxd-kbd">⌘</kbd><kbd class="xxd-kbd">K</kbd></p>`,
+    rules: ["Inline code at 12%, code blocks at 6%"],
+    a11y: [
+      "Code blocks that scroll sideways are keyboard-focusable (JS adds tabindex=\"0\") and scroll with arrow keys",
+      "The copy button has an aria-label; highlight colors stay ≥ 4.5:1 in both light and dark",
+    ],
+  },
+  Avatar: {
+    title: "Avatar",
+    summary: "A person's picture or initial; members get a small marker.",
+    markup: `<span class="xxd-avatar">D</span> <span class="xxd-avatar" data-member>X</span>`,
+    a11y: [
+      "Avatar images have alt (the person's name); for an initial only, give it an aria-label or show the name next to it",
+      "The member marker can't rely on color — say it in nearby text or in the aria-label",
+    ],
+  },
+  Card: {
+    title: "Card",
+    summary: "One card in a masonry or grid: image, title, description; the whole card is clickable.",
+    markup: `<div class="xxd-grid" style="--grid-min:200px">
+  <a class="xxd-card" href="#"><div class="xxd-card__media" style="--ratio:3/4"></div><div class="xxd-card__body"><p class="xxd-card__title">Editorial poster</p><span class="xxd-card__meta">xxd-panel-001</span></div></a>
+</div>`,
+    rules: ["Cards have no shadow; hover only darkens the border", "Corner labels hug the corner (they read as UI)"],
+    a11y: ["When the whole card is clickable it is one <a> — no links inside it", "Images have alt; purely decorative ones use alt=\"\""],
+  },
+  LayerCard: {
+    title: "Layer card",
+    summary: "A body (paper) + a secondary strip (wash): a note or action above or below the card. Don't nest them.",
+    markup: `<div class="xxd-layer" style="width:100%;max-width:300px">
+  <div class="xxd-layer__secondary">Next step<button class="xxd-btn" data-variant="ghost" data-icon-only data-size="xs" aria-label="Go" style="margin-left:auto"><i data-xxd-icon="ArrowRight" data-size="14"></i></button></div>
+  <div class="xxd-layer__primary">Build your first extension with XXD UI</div>
+</div>`,
+    rules: ["Never put a layer card inside a layer card"],
+    a11y: [
+      "Buttons in the secondary strip have text or an aria-label",
+      "Layers are shown with background and a divider; screen readers follow DOM order, body first",
+    ],
+  },
+  Layout: {
+    title: "Layout presets",
+    summary: "Common two- and three-column layouts that stack into one column below 720px. Surfaces have three levels: base (paper), sunken (wash), raised (overlays only).",
+    attributes: {
+      "data-cols": "2up | 3up | 4up | 1-2 | 2-1 | 1-3 | side",
+      "--layout-gap": "Gap",
+      "data-level (.xxd-surface)": "base | sunken | raised",
+    },
+    markup: `<div class="xxd-layout" data-cols="1-2">
+  <div class="xxd-surface" data-level="sunken" style="padding:16px">Side 1</div>
+  <div class="xxd-surface" style="padding:16px">Main 2</div>
+</div>`,
+    a11y: [
+      "Layouts are plain divs with no semantics; your own wrappers decide main / nav / aside",
+      "When it stacks on narrow screens, DOM order is reading order",
+    ],
+  },
+  TableOfContents: {
+    title: "Table of contents",
+    summary: "A contents list for long pages: the item for the section you've scrolled to is highlighted (data-spy).",
+    attributes: { "data-spy": "Highlights the current section while scrolling", "data-depth=\"3\" (li)": "Second-level indent" },
+    markup: `<nav aria-label="On this page"><p class="xxd-toc__title">On this page</p>
+<ul class="xxd-toc" data-spy>
+  <li><a href="#demo" aria-current="true">Demo</a></li>
+  <li data-depth="3"><a href="#props">Attributes and classes</a></li>
+  <li><a href="#rules">Rules</a></li>
+</ul></nav>`,
+    a11y: [
+      "Wrap it in <nav aria-label=\"On this page\">; the current section has aria-current=\"true\"",
+      "Links point at heading ids; the headings themselves are real h2 / h3",
+    ],
+  },
+  Logo: {
+    title: "XXD logo",
+    summary: "Four small squares fading from full to light on a warm-black square — one mark for every extension. Follows the theme (inverted in dark).",
+    attributes: { "data-size": "sm | (default 20px) | lg", "--logo-size": "Any size" },
+    markup: `<span class="xxd-logo" data-size="sm"><span class="xxd-logo__mark"></span>XXD</span>
+<span class="xxd-logo"><span class="xxd-logo__mark"></span>Long-form publisher</span>
+<span class="xxd-logo" data-size="lg"><span class="xxd-logo__mark"></span>XXD UI</span>`,
+    a11y: ["The square mark is decoration (aria-hidden); the name is text", "Inside a link, the link's name is the product name"],
+  },
+  Prose: {
+    title: "Prose",
+    summary: "Long-form typography: headings, paragraphs, quotes, lists, code, at reading width.",
+    markup: `<article class="xxd-prose"><h2>Editorial poster</h2><p>Restrained editorial brutalism.</p><blockquote>Motion reveals hierarchy.</blockquote></article>`,
+    rules: ["One color at four strengths: 100% for pointing, 40% for lines and marks, 12% for inline code, 6% for code blocks", "Reading width 680px"],
+    a11y: ["Use real h2 / h3, ul / ol and blockquote so screen readers can jump by structure", "Links are underlined; accent-colored list markers are decoration only"],
+  },
+  Stat: {
+    title: "Stat",
+    summary: "Label · number (tabular figures) · change from last period · sparkline. Change uses only two meaning colors: up (success) and down (danger).",
+    markup: `<div class="xxd-stats" style="width:100%;max-width:640px">
+  <div class="xxd-stat"><p class="xxd-stat__label">Posts this week</p><p class="xxd-stat__value">1,284<span class="xxd-stat__unit">posts</span></p><span class="xxd-stat__delta" data-tone="up">↑ 12.4% vs last week</span><span class="xxd-stat__spark" data-spark="8,9,7,11,10,13,15"></span></div>
+  <div class="xxd-stat"><p class="xxd-stat__label">New members</p><p class="xxd-stat__value">86</p><span class="xxd-stat__delta" data-tone="down">↓ 3 vs last week</span><span class="xxd-stat__spark" data-spark="12,11,13,10,9,10,8"></span></div>
+  <div class="xxd-stat"><p class="xxd-stat__label">Average write time</p><p class="xxd-stat__value">2.4<span class="xxd-stat__unit">s</span></p><span class="xxd-stat__delta">Flat</span><span class="xxd-stat__spark" data-spark="5,5,6,5,5,4,5"></span></div>
+</div>`,
+    js: `el.innerHTML = Xxd.sparkline([3, 5, 4, 8])  // or data-spark="3,5,4,8" and then Xxd.init()`,
+    a11y: ["The sparkline is aria-hidden decoration; write the change as text (↑ 12.4% vs last week), never color alone."],
+  },
+  Chart: {
+    title: "Chart",
+    summary: "ECharts + Xxd.chartOptions(): one highlighted line in the accent, the rest in shades of ink; hairline grid; redraws automatically when the theme or accent changes. Also works straight in Kumo's <Chart options>.",
+    markup: `<div style="display:grid;gap:16px;width:100%;max-width:720px">
+<div class="xxd-chart-card">
+  <div class="xxd-chart-card__head"><h3 class="xxd-chart-card__title">Posts per day</h3><span class="xxd-chart-card__meta">Last 14 days</span></div>
+  <div class="xxd-chart" id="chart-line"></div>
+</div>
+<div class="xxd-chart-card">
+  <div class="xxd-chart-card__head"><h3 class="xxd-chart-card__title">Users per extension</h3></div>
+  <div class="xxd-chart" id="chart-bar" style="--chart-h:220px"></div>
+</div>
+</div>
+<script>
+  if (window.echarts) {
+    const days = Array.from({ length: 14 }, (_, i) => \`Day \${i + 1}\`);
+    const line = echarts.init(document.getElementById("chart-line"));
+    const lineOpt = () => Xxd.chartOptions({ legend: {}, xAxis: { type: "category", data: days, boundaryGap: false }, yAxis: { type: "value" }, series: [{ name: "Long-form publisher", type: "line", data: [42, 48, 45, 60, 58, 66, 71, 69, 80, 78, 85, 90, 88, 96] }, { name: "Image sorter", type: "line", data: [20, 22, 25, 24, 28, 27, 30, 33, 31, 35, 34, 36, 38, 40] }] });
+    line.setOption(lineOpt());
+    Xxd.watchChartTheme(line, lineOpt);
+    const bar = echarts.init(document.getElementById("chart-bar"));
+    const barOpt = () => Xxd.chartOptions({ xAxis: { type: "category", data: ["Long-form publisher", "Link sorter", "Bulk image saver", "Today"] }, yAxis: { type: "value" }, series: [{ type: "bar", data: [2410, 830, 5102, 312] }] });
+    bar.setOption(barOpt());
+    Xxd.watchChartTheme(bar, barOpt);
+    new ResizeObserver(() => { line.resize(); bar.resize(); }).observe(document.getElementById("chart-line").parentElement.parentElement);
+  }
+</script>`,
+    js: `chart.setOption(Xxd.chartOptions(option))
+Xxd.watchChartTheme(chart, () => Xxd.chartOptions(option))
+// React: <Chart echarts={echarts} options={Xxd.chartOptions(option)} />`,
+    a11y: ["Put a one-sentence conclusion or a table next to the chart; besides color, line width also marks the highlighted line."],
+  },
+};

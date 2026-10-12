@@ -30,3 +30,76 @@ test("embed：示例里的 main / aside 换成 div（不和站点的 main 打架
   assert.equal(embed('<main class="a"><aside id="s">x</aside></main>'), '<div data-landmark="main" class="a"><div data-landmark="aside" id="s">x</div></div>');
   assert.equal(embed("<mainly>"), "<mainly>");
 });
+
+// ── 英文版 ─────────────────────────────────────────────
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join, relative } from "node:path";
+import { counterpart, langOf, mdHref, stripLang, withLang } from "../src/i18n/index.js";
+import { templates } from "../src/data/templates.js";
+import { templates as templatesEn } from "../src/data/templates.en.js";
+import { principles } from "../src/data/principles.js";
+import { principles as principlesEn } from "../src/data/principles.en.js";
+
+const han = /\p{Script=Han}/u;
+// 语言的本名（语言选择器里）按它自己的语言写，允许出现
+const ENDONYMS = /简体中文|繁體中文/g;
+const hanOutsideEndonyms = (s) => han.test(s.replace(ENDONYMS, ""));
+
+test("语言路径：/en 前缀、去前缀、另一种语言、Markdown 地址", () => {
+  assert.equal(langOf("/en"), "en");
+  assert.equal(langOf("/en/components/button"), "en");
+  assert.equal(langOf("/enterprise"), "zh");
+  assert.equal(langOf("/"), "zh");
+  assert.equal(withLang("/", "en"), "/en/");
+  assert.equal(withLang("/tools#ai", "en"), "/en/tools#ai");
+  assert.equal(withLang("/en/start", "en"), "/en/start");
+  assert.equal(withLang("https://x.com/a", "en"), "https://x.com/a");
+  assert.equal(withLang("/start", "zh"), "/start");
+  assert.equal(stripLang("/en"), "/");
+  assert.equal(stripLang("/en/components/button"), "/components/button");
+  assert.equal(counterpart("/components/button", "zh"), "/en/components/button");
+  assert.equal(counterpart("/en/components/button", "en"), "/components/button");
+  assert.equal(counterpart("/", "zh"), "/en/");
+  assert.equal(counterpart("/en", "en"), "/");
+  assert.equal(mdHref("/", "zh"), "/md/index.md");
+  assert.equal(mdHref("/en", "en"), "/en/md/index.md");
+  assert.equal(mdHref("/en/components/button", "en"), "/en/md/components/button.md");
+});
+
+test("每个中文页都有对应的英文页（src/pages/en/ 下同名文件）", () => {
+  const root = new URL("../src/pages/", import.meta.url).pathname;
+  const files = [];
+  (function walk(d) {
+    for (const n of readdirSync(d)) {
+      const p = join(d, n);
+      if (statSync(p).isDirectory()) walk(p);
+      else files.push(relative(root, p));
+    }
+  })(root);
+  const zh = files.filter((f) => !f.startsWith("en/"));
+  const en = new Set(files.filter((f) => f.startsWith("en/")).map((f) => f.slice(3)));
+  assert.deepEqual(zh.filter((f) => !en.has(f)), []);
+  assert.deepEqual([...en].filter((f) => !zh.includes(f)), []);
+});
+
+test("模板、原则：英文版和中文版一一对应，英文里没有汉字", () => {
+  assert.deepEqual(templatesEn.map((t) => t.slug), templates.map((t) => t.slug));
+  for (const t of templatesEn) {
+    assert.ok(t.title, t.slug);
+    for (const k of ["title", "summary", "markup", "where"]) assert.ok(!hanOutsideEndonyms(String(t[k] ?? "")), `${t.slug}.${k}`);
+  }
+  for (const [i, t] of templates.entries()) assert.equal(templatesEn[i].width, t.width, `${t.slug} 宽度`);
+  assert.deepEqual(principlesEn.map((p) => [p.id, p.ref]), principles.map((p) => [p.id, p.ref]));
+  for (const p of principlesEn) for (const [k, v] of Object.entries(p)) assert.ok(!han.test(String(v)), `${p.id}.${k}`);
+});
+
+test("React 演示：demos.en.tsx 和 demos.tsx 导出同样的函数，函数里没有汉字", () => {
+  const src = (f) => readFileSync(new URL(`../src/react/${f}`, import.meta.url), "utf8");
+  const names = (s) => [...s.matchAll(/export function (\w+)/g)].map((m) => m[1]);
+  const zh = src("demos.tsx");
+  const en = src("demos.en.tsx");
+  assert.deepEqual(names(en), names(zh));
+  const body = en.slice(en.indexOf("export function"));
+  const bad = body.split("\n").filter((l) => han.test(l));
+  assert.deepEqual(bad, []);
+});

@@ -1,0 +1,104 @@
+---
+// 每个组件一页（从 packages/xxd-css/registry.json 生成，英文叠上 registry.en.js）。
+// 固定结构：演示 · 状态 · 属性 · JS · 规则 · 相关。中文 / 英文共用，c 由页面的 getStaticPaths 传进来。
+import Site from "../layouts/Site.astro";
+import Demo from "../components/Demo.astro";
+import StateMatrix from "../components/StateMatrix.astro";
+import PropsTable from "../components/PropsTable.astro";
+import { componentsFor } from "../lib/data.js";
+import { langOf, t, withLang } from "../i18n/index.js";
+import * as reactDemos from "../react/demos.tsx";
+
+const { c } = Astro.props;
+const lang = langOf(Astro.url.pathname);
+const L = t(lang);
+const hasReact = `${c.name}Demo` in reactDemos;
+const related = componentsFor(lang).filter((x) => x.category === c.category && x.slug !== c.slug);
+const extraDemos = c.examples ?? [];
+const headings = [
+  { slug: "demo", text: L.demo },
+  ...extraDemos.map((e, i) => ({ slug: `example-${i}`, text: e.title, depth: 3 })),
+  ...(c.sample && c.states ? [{ slug: "states", text: L.states }] : []),
+  { slug: "props", text: L.props },
+  ...(c.js ? [{ slug: "js", text: "JS" }] : []),
+  ...(c.a11y ? [{ slug: "a11y", text: L.a11y }] : []),
+  ...(c.rules?.length ? [{ slug: "rules", text: L.rules }] : []),
+  ...(related.length ? [{ slug: "related", text: L.related }] : []),
+];
+const title = lang === "en" ? c.label : `${c.label} ${c.name}`;
+const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI component` : `${c.label}（${c.name}）—— 小小东 UI 组件`);
+---
+
+<Site title={title} description={description} headings={headings} charts={c.name === "Chart"}>
+  <header class="site-head">
+    <p class="xxd-text" data-variant="caption">{L.componentCaption} · {c.categoryLabel}{hasReact && ` · ${L.bothImpl}`}</p>
+    <h1 class="xxd-text" data-variant="display">{c.label} {(lang !== "en" || c.label !== c.name) && <span class="xxd-text" data-variant="mono-secondary">{c.name}</span>}</h1>
+    {c.summary && <p class="site-lead">{c.summary}</p>}
+  </header>
+
+  <h2 class="site-h2" id="demo">{L.demo}</h2>
+  <Demo markup={c.markup} react={hasReact ? c.name : undefined} align={c.align} block={c.block} title={c.name} />
+
+  {
+    extraDemos.map((e, i) => (
+      <>
+        <h3 class="site-h3" id={`example-${i}`}>{e.title}</h3>
+        {e.text && <p class="site-p">{e.text}</p>}
+        <Demo markup={e.markup} align={e.align} block={e.block} />
+      </>
+    ))
+  }
+
+  {
+    c.sample && c.states && (
+      <>
+        <h2 class="site-h2" id="states">{L.states}</h2>
+        <p class="site-p">{L.statesNote}</p>
+        <StateMatrix sample={c.sample} states={c.states} />
+      </>
+    )
+  }
+
+  <h2 class="site-h2" id="props">{L.props}</h2>
+  <PropsTable attributes={c.attributes} classes={c.classes} />
+
+  {
+    c.js && (
+      <>
+        <h2 class="site-h2" id="js">JS</h2>
+        <pre class="site-code" tabindex="0" style="border:1px solid var(--line);border-radius:var(--r-md)"><code>{c.js}</code></pre>
+      </>
+    )
+  }
+
+  {
+    c.a11y && (
+      <>
+        <h2 class="site-h2" id="a11y">{L.a11y}</h2>
+        <ul class="site-rules">{c.a11y.map((r) => <li>{r}</li>)}</ul>
+      </>
+    )
+  }
+
+  {
+    c.rules?.length > 0 && (
+      <>
+        <h2 class="site-h2" id="rules">{L.rules}</h2>
+        <ul class="site-rules">{c.rules.map((r) => <li>{r}</li>)}</ul>
+      </>
+    )
+  }
+
+  {
+    related.length > 0 && (
+      <>
+        <h2 class="site-h2" id="related">{L.related}</h2>
+        <div class="xxd-cluster">
+          {related.map((r) => (
+            <a class="xxd-chip" href={withLang(`/components/${r.slug}`, lang)}>{r.label}</a>
+          ))}
+        </div>
+      </>
+    )
+  }
+</Site>

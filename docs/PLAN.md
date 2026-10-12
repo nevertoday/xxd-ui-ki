@@ -1,4 +1,4 @@
-# xxd-ui-ki 开发计划
+# xxd-ui-kit 开发计划
 
 > 状态：阶段 0–6 已完成，阶段 7 的准备已完成（2026-10-12）。后续每个阶段开工前先读本文件和 `DESIGN-PRINCIPLES.md`，
 > 完成后在「进度」里打勾并写日期。计划变了就改这里，不另起文档。
@@ -56,7 +56,7 @@
 ## 3. 架构
 
 ```
-xxd-ui-ki/
+xxd-ui-kit/
 ├── packages/
 │   ├── xxd-tokens/        L0  令牌唯一来源：tokens.css（已有种子）→ 生成 tokens.shadow.css / tokens.json / tokens.ts
 │   │                          + boot.js（首帧前写 data-theme/corners/accent）+ accent.js（18 预设 + 对比度提亮）
@@ -82,7 +82,7 @@ xxd-ui-ki/
 
 **分发方式（不发 npm）**
 
-- 有构建的项目（会员站、esbuild 插件、React 项目）：`"@xxd/tokens": "file:../xxd-ui-ki/packages/xxd-tokens"` 或 `link:`。
+- 有构建的项目（会员站、esbuild 插件、React 项目）：`"@xxd/tokens": "file:../xxd-ui-kit/packages/xxd-tokens"` 或 `link:`。
 - 无构建的插件：`pnpm xxd sync <插件目录>` 把编译好的 `xxd.css / xxd.js / icons` 拷进 `<插件>/vendor/xxd/`，
   并写 `vendor/xxd/VERSION`（版本 + commit），这样每个插件锁定自己用的版本，打包上架不依赖本仓库。
 - 要给别人的 React 项目用时，再决定发不发 npm。
@@ -234,8 +234,8 @@ xxd-ui-ki/
 
 ## 7. 决定（2026-10-12 按默认处理，可以改）
 
-1. 包名前缀 `@xxd/*`；目录名 `xxd-ui-ki` 不改。
-2. GitHub 仓库：2026-10-12 按你的要求建了**公开**仓库并推送 `main`：<https://github.com/nevertoday/xxd-ui-ki>（`upstream` 的推送仍然禁用）。
+1. 包名前缀 `@xxd/*`；目录名 `xxd-ui-kit` 不改。
+2. GitHub 仓库：2026-10-12 按你的要求建了**公开**仓库并推送 `main`：<https://github.com/nevertoday/xxd-ui-kit>（`upstream` 的推送仍然禁用）。
 3. 三条提议都采纳：密度两档（`data-density`）、Shadow DOM 注入（`mountXxdUI`）、规则做成门禁（各包的合同测试）。
 4. 试点：图片排序（排序链接）+ xPoster 的令牌层。
 
@@ -272,7 +272,7 @@ xxd-ui-ki/
 计划的 0–7 阶段都已完成（各阶段的验收见上）。下面这些不是计划的任务，而是需要你本人决定的对外 / 不可逆操作：
 **你的决定（2026-10-12）：三个试点分支先不合并，由你看过后自己合并；项目定为 MIT 开源。**
 
-项目以 MIT 许可开源，公开在 <https://github.com/nevertoday/xxd-ui-ki>；试点的验收是「在分支上迁移并用测试证明无回归」，合并进你正在工作的分支、推送、部署都由你来做。
+项目以 MIT 许可开源，公开在 <https://github.com/nevertoday/xxd-ui-kit>；试点的验收是「在分支上迁移并用测试证明无回归」，合并进你正在工作的分支、推送、部署都由你来做。
 
 - 合并试点分支（都没推送）：
   - 图片排序：`插件chrome-排序链接` 的 `xxd-ui-pilot`（基于 de316fb；你当前在 `picsort-redesign` 上的未提交改动没有动）。

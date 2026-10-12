@@ -25,14 +25,14 @@ export function extractFunction(source, name) {
 
 /** 状态矩阵的状态：每个都是「怎么改示例元素」 */
 export const STATES = {
-  default: { label: "默认", attrs: "" },
-  hover: { label: "悬停", attrs: 'data-force="hover"' },
-  focus: { label: "键盘聚焦", attrs: 'data-force="focus"' },
-  active: { label: "按下", attrs: 'data-force="active hover"' },
-  pressed: { label: "选中", attrs: 'aria-pressed="true"' },
-  checked: { label: "选中", attrs: "checked" },
-  disabled: { label: "禁用", attrs: "disabled" },
-  busy: { label: "进行中", attrs: 'aria-busy="true"' },
-  error: { label: "出错", attrs: 'aria-invalid="true"' },
-  readonly: { label: "只读", attrs: "readonly" },
+  default: { label: "默认", en: "Default", attrs: "" },
+  hover: { label: "悬停", en: "Hover", attrs: 'data-force="hover"' },
+  focus: { label: "键盘聚焦", en: "Keyboard focus", attrs: 'data-force="focus"' },
+  active: { label: "按下", en: "Pressed", attrs: 'data-force="active hover"' },
+  pressed: { label: "选中", en: "Selected", attrs: 'aria-pressed="true"' },
+  checked: { label: "选中", en: "Checked", attrs: "checked" },
+  disabled: { label: "禁用", en: "Disabled", attrs: "disabled" },
+  busy: { label: "进行中", en: "Busy", attrs: 'aria-busy="true"' },
+  error: { label: "出错", en: "Error", attrs: 'aria-invalid="true"' },
+  readonly: { label: "只读", en: "Read-only", attrs: "readonly" },
 };

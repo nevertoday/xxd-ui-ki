@@ -1,4 +1,4 @@
-# 参与 xxd-ui-ki
+# 参与 xxd-ui-kit
 
 > 这是 MIT 开源项目，欢迎提 issue 和 PR。日常主要由小小东和他的 AI 助手（Claude / Codex）在改。
 > Kumo 上游的贡献指南在 `docs/upstream/KUMO-CONTRIBUTING.md`，改 `packages/kumo` 内部时仍然有效。

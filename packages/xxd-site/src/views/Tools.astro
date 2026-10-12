@@ -1,0 +1,77 @@
+---
+import Site from "../layouts/Site.astro";
+import { Content as Kit } from "../../../../docs/EXTENSION-KIT.md";
+import { Content as KitEn } from "../../../../docs/en/EXTENSION-KIT.md";
+import { langOf, withLang } from "../i18n/index.js";
+const lang = langOf(Astro.url.pathname);
+const en = lang === "en";
+const T = en
+  ? {
+      title: "CLI and tools", caption: "Tools", cli: "CLI (from the xxd-ui-kit root)", kit: "Extension kit", visual: "Visual regression", ai: "For AI",
+      cmd: "Command", what: "What it does",
+      rows: [
+        ["pnpm xxd new <dir> --name Name", "Create an MV3 extension from the template, with the components copied into vendor/xxd/"],
+        ["pnpm xxd sync <dir…>", "Copy the latest build; write tokens / icons as xxd.config.json says"],
+        ["pnpm xxd status <dir…>", "Which version each project uses, and who is behind"],
+        ["pnpm xxd adopt <dir>", "Switch an existing project to the tokens, keeping old names as aliases"],
+        ["pnpm xxd ls / doc <component> [--react]", "Look up components"],
+        ["pnpm xxd add <block>", "Install a React block into a project"],
+        ["pnpm --filter @xxd/site visual", "Visual regression: every page × 4 appearances, compared with the baseline"],
+      ],
+    }
+  : {
+      title: "命令行与工具", caption: "工具", cli: "命令行（在 xxd-ui-kit 根目录）", kit: "插件套件", visual: "截图回归", ai: "给 AI 看",
+      cmd: "命令", what: "做什么",
+      rows: [
+        ["pnpm xxd new <目录> --name 名字", "从模板新建 MV3 插件，组件拷进 vendor/xxd/"],
+        ["pnpm xxd sync <目录…>", "拷最新构建；按 xxd.config.json 写令牌 / 图标"],
+        ["pnpm xxd status <目录…>", "每个项目用的版本，谁落后"],
+        ["pnpm xxd adopt <目录>", "老项目改为引入令牌、旧名做别名"],
+        ["pnpm xxd ls / doc <组件> [--react]", "查组件"],
+        ["pnpm xxd add <block>", "把 React 区块装进项目"],
+        ["pnpm --filter @xxd/site visual", "截图回归：每个页面 × 4 种外观，对比基线"],
+      ],
+    };
+const headings = [{ slug: "cli", text: en ? "CLI" : "命令行" }, { slug: "kit", text: T.kit }, { slug: "visual", text: T.visual }, { slug: "ai", text: T.ai }];
+const md = en ? "/en/md/components/button.md" : "/md/components/button.md";
+---
+
+<Site title={T.title} headings={headings}>
+  <header class="site-head">
+    <p class="xxd-text" data-variant="caption">{T.caption}</p>
+    <h1 class="xxd-text" data-variant="display">{T.title}</h1>
+  </header>
+  <h2 class="site-h2" id="cli">{T.cli}</h2>
+  <div class="xxd-table-wrap"><table class="xxd-table">
+    <thead><tr><th>{T.cmd}</th><th>{T.what}</th></tr></thead>
+    <tbody>{T.rows.map(([c, w]) => <tr><td class="xxd-mono">{c}</td><td>{w}</td></tr>)}</tbody>
+  </table></div>
+  <h2 class="site-h2" id="kit">{T.kit}</h2>
+  <div class="xxd-prose" style="max-width:none">{en ? <KitEn /> : <Kit />}</div>
+  <h2 class="site-h2" id="visual">{T.visual}</h2>
+  {
+    en ? (
+      <p class="site-p">Every component, pattern and template page is captured in four appearances (light / dark × square / rounded) and stored in <code class="xxd-code-inline">packages/xxd-site/visual/baseline/</code>. After changing a component, run <code class="xxd-code-inline">pnpm --filter @xxd/site visual</code>; diff images go to <code class="xxd-code-inline">visual/diff/</code>. Once you've confirmed a change is intended, run <code class="xxd-code-inline">visual:update</code>.</p>
+    ) : (
+      <p class="site-p">每个组件页、模式页、模板页在亮 / 暗 × 直角 / 圆角四种外观下截图，存在 <code class="xxd-code-inline">packages/xxd-site/visual/baseline/</code>；改了组件后运行 <code class="xxd-code-inline">pnpm --filter @xxd/site visual</code>，差异图写到 <code class="xxd-code-inline">visual/diff/</code>。确认是有意的改动再 <code class="xxd-code-inline">visual:update</code>。</p>
+    )
+  }
+  <h2 class="site-h2" id="ai">{T.ai}</h2>
+  {
+    en ? (
+      <ul class="site-rules">
+        <li><a class="xxd-link" href="/en/llms.txt">/en/llms.txt</a>: the whole site's index, one line per page.</li>
+        <li>“This page as Markdown” on the right of every page: the same page as .md (<code class="xxd-code-inline">{md}</code>).</li>
+        <li><a class="xxd-link" href="/en/api/registry.json">/en/api/registry.json</a>: the native component registry (classes, attributes, examples, rules), in English.</li>
+        <li>CLI: <code class="xxd-code-inline">pnpm xxd doc Dialog</code>; Skill: <code class="xxd-code-inline">xxd-ui</code>.</li>
+      </ul>
+    ) : (
+      <ul class="site-rules">
+        <li><a class="xxd-link" href="/llms.txt">/llms.txt</a>：全站目录，每页一行。</li>
+        <li>每页右侧「本页的 Markdown」：同一页的 .md 版本（<code class="xxd-code-inline">{md}</code>）。</li>
+        <li><a class="xxd-link" href="/api/registry.json">/api/registry.json</a>：原生组件注册表（类名、属性、示例、规则）。</li>
+        <li>命令行：<code class="xxd-code-inline">pnpm xxd doc Dialog</code>；Skill：<code class="xxd-code-inline">xxd-ui</code>。</li>
+      </ul>
+    )
+  }
+</Site>

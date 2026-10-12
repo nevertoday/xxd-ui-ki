@@ -41,7 +41,7 @@ function shadowSelector(list) {
     out.push(sel);
     // 令牌块：host 上的值可能被宿主页面的规则盖掉（页面里 `div { --ink: … }` 会打到 host 上，
     // 而且外面的规则永远赢过 :host），所以在 Shadow 内部的顶层元素上再声明一次——那里宿主页面够不着。
-    if (/^:host(\([^()]*\))?$/.test(sel)) out.push(`${sel} > *`);
+    if (/^:host(\((?:[^()]|\([^()]*\))*\))?$/.test(sel)) out.push(`${sel} > *`);
     // `[data-finish=material] .xxd-btn` 这类：属性写在 host 上时也生效
     const attr = sel.match(ROOT_ATTR);
     if (attr && /^\s/.test(sel.slice(attr[0].length))) out.push(`:host(${attr[0]})${sel.slice(attr[0].length)}`);
@@ -75,11 +75,11 @@ export const SHADOW_RESET = `@layer xxd.reset {
 }
 `;
 
-/** :root → :host；:root[...] → :host([...])；令牌在 Shadow 内部再声明一次；外观属性选择器加 :host() 版本；继承属性重置。 */
+/** :root → :host；:root[...] / :root:lang(...) → :host([...])；令牌在 Shadow 内部再声明一次；外观属性选择器加 :host() 版本；继承属性重置。 */
 export function toShadow(css) {
   const hosted = css
     .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/:root((?:\[[^\]]+\])*)/g, (_, attrs) => (attrs ? `:host(${attrs})` : ":host"));
+    .replace(/:root((?:\[[^\]]+\]|:lang\([^)]*\))*)/g, (_, attrs) => (attrs ? `:host(${attrs})` : ":host"));
   // 只改规则的选择器（前面是 { } ; 或开头），不碰 @规则
   const body = hosted.replace(/(^|[{};])(\s*)([^{}@;\s][^{};]*?)(\s*)\{/g, (_, pre, ws, sel, ws2) =>
     /^(from|to|\d+(\.\d+)?%)(\s*,\s*(from|to|\d+(\.\d+)?%))*$/.test(sel) ? `${pre}${ws}${sel}${ws2}{` : `${pre}${ws}${shadowSelector(sel)}${ws2}{`,

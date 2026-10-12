@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
 import { useState } from "react";
 import { readFileSync, readdirSync } from "node:fs";
@@ -68,6 +69,23 @@ describe("O5 语言", () => {
       </XxdLocaleProvider>,
     );
     expect(screen.getByRole("button", { name: "Clear" })).toBeTruthy();
+  });
+
+  it("Rail 的默认名字跟着语言走；传了 label 就用 label", () => {
+    const { rerender } = render(
+      <XxdLocaleProvider locale="en">
+        <Rail items={[{ href: "/", label: "Home" }]} />
+      </XxdLocaleProvider>,
+    );
+    expect(screen.getByRole("navigation", { name: "Main navigation" })).toBeTruthy();
+    rerender(
+      <XxdLocaleProvider locale="zh-CN">
+        <Rail items={[{ href: "/", label: "首页" }]} />
+      </XxdLocaleProvider>,
+    );
+    expect(screen.getByRole("navigation", { name: "主导航" })).toBeTruthy();
+    rerender(<Rail label="会员站" items={[{ href: "/", label: "首页" }]} />);
+    expect(screen.getByRole("navigation", { name: "会员站" })).toBeTruthy();
   });
 });
 

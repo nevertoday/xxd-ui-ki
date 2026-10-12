@@ -15,7 +15,7 @@
 }
 ```
 
-在 xxd-ui-ki 里运行 `pnpm xxd sync <会员站>/member-cloudflare`：
+在 xxd-ui-kit 里运行 `pnpm xxd sync <会员站>/member-cloudflare`：
 
 1. **令牌**：`public/styles.css` 开头多了一段 `/* xxd:tokens:start */ … /* xxd:tokens:end */`，内容是
    `@layer xxd.tokens { … }` 里的小小东令牌（选择器写成 `:where(:root…)`）。
@@ -31,7 +31,7 @@
    - 阴影不做别名：会员站暗色里沿用亮色阴影，令牌的暗色阴影更深，做别名会变样。
 3. **图标**：`src/lib/site-icons.js` 不再自己画，改为从 `src/lib/xxd-icon-nodes.js`（`@xxd/icons` 的同步副本）取；
    只取会员站一直重画的 184 个名字（`SITE_ICON_NAMES`），以后加名字就能把对应的 Lucide 图标换成统一画法。
-   **图标的唯一来源从此是 xxd-ui-ki 的 `packages/xxd-icons/src/nodes.js`。**
+   **图标的唯一来源从此是 xxd-ui-kit 的 `packages/xxd-icons/src/nodes.js`。**
 
 ## 自动跳过的 4 个令牌（按阶段 5 的「零视觉变化」要求保持原样）
 
@@ -53,8 +53,8 @@
 | --- | --- | --- | --- |
 | 亮 | `--paper` | `#fcfcfc` | `#ffffff` |
 | 亮 | `--muted` | `#777777`（白底 4.48:1，略低于小字的 4.5） | `#6b6b6b` |
-| 亮 | `--font-body` | 少了 `-apple-system, BlinkMacSystemFont, "Segoe UI"` | 系统字体兜底更全 |
-| 亮 | `--font-title` | 少了 `Georgia` | 有 `Georgia` 兜底 |
+| 亮 | `--font-body` | 中文字体排在 Segoe UI 前面 | 先英文字体再中文字体（2026-10-12 调整） |
+| 亮 | `--font-title` | 宋体标题 | 和正文同一套无衬线（2026-10-12 不再用宋体） |
 
 暗色完全一致。
 
@@ -76,6 +76,6 @@
 
 ## 合并之后
 
-- 改令牌：在 xxd-ui-ki 改 `packages/xxd-tokens/tokens.css` → `pnpm xxd sync …/member-cloudflare` → 跑会员站测试 → 提交。
-- 改图标：在 xxd-ui-ki 改 `packages/xxd-icons/src/nodes.js` → 同上。会员站的图标测试（`test/site-icons.test.mjs`）继续当门禁。
+- 改令牌：在 xxd-ui-kit 改 `packages/xxd-tokens/tokens.css` → `pnpm xxd sync …/member-cloudflare` → 跑会员站测试 → 提交。
+- 改图标：在 xxd-ui-kit 改 `packages/xxd-icons/src/nodes.js` → 同上。会员站的图标测试（`test/site-icons.test.mjs`）继续当门禁。
 - 新组件可以直接用 `@xxd/css` 的类（把 `components.css` 拷进 public 并在 stamp 列表里登记）；旧组件按页面逐个替换。

@@ -1,26 +1,6 @@
 ---
-import Site from "../../layouts/Site.astro";
-const scale = [["display", "28 / 600 / 衬线", "页面大标题"], ["heading1", "20 / 600", "一级标题"], ["heading2", "16 / 600", "区块标题"], ["heading3", "14 / 500", "小标题、设置行标题"], ["body", "13 / 400", "正文、控件（插件里最常用）"], ["secondary", "13 / 400 / muted", "次要说明"], ["caption", "12 / 400 / muted", "注释、元数据"], ["mono", "等宽 0.92em", "代码、变量名"]];
+// 正文在 src/views/Type.astro（中文 / 英文共用，语言看路径）。
+import Type from "../../views/Type.astro";
 ---
 
-<Site title="字体与层级" headings={[{ slug: "scale", text: "层级" }, { slug: "prose", text: "阅读排版" }]}>
-  <header class="site-head">
-    <p class="xxd-text" data-variant="caption">基础</p>
-    <h1 class="xxd-text" data-variant="display">字体与层级</h1>
-    <p class="site-lead">正文 Avenir Next / 苹方，编辑式标题思源宋体；不加载网络字体；字重只有 400 / 500 / 600；选中改颜色，不加粗；不改字距。</p>
-  </header>
-  <h2 class="site-h2" id="scale">层级</h2>
-  <div class="xxd-group__body">
-    {scale.map(([v, spec, use]) => (
-      <div class="xxd-row"><div class="xxd-row__text"><p class="xxd-text" data-variant={v}>小小东 UI 让每个插件看起来是一家人</p></div><div class="xxd-row__control xxd-text" data-variant="caption" style="width:220px">{v} · {spec}<br />{use}</div></div>
-    ))}
-  </div>
-  <h2 class="site-h2" id="prose">阅读排版（.xxd-prose）</h2>
-  <article class="xxd-prose" style="border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--space-6);background:var(--paper)">
-    <h2>编辑式海报</h2>
-    <p>克制的编辑式粗野主义：纸色背景、清晰的黑线、衬线标题、密但好读的中文。<a href="#">一个链接</a>，行内代码 <code>--r-sm</code>。</p>
-    <ul><li>列表的点用主色</li><li>引用的线 40%</li></ul>
-    <blockquote>动效用来揭示层级和给反馈，不是装饰。</blockquote>
-    <pre><code>toast("已保存", {"{"} tone: "success" {"}"})</code></pre>
-  </article>
-</Site>
+<Type />

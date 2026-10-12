@@ -1,0 +1,181 @@
+// 展示站的两种语言：中文在根路径，英文在 /en/ 下。页面文字、导航、数据都按 lang 取。
+export const LANGS = ["zh", "en"];
+export const HTML_LANG = { zh: "zh-CN", en: "en" };
+
+/** 从路径判断语言：/en、/en/… 是英文，其余是中文 */
+export const langOf = (pathname) => (pathname === "/en" || pathname.startsWith("/en/") ? "en" : "zh");
+
+/** 站内链接加上语言前缀（只处理以 / 开头的站内地址） */
+export function withLang(href, lang) {
+  if (lang !== "en" || !href.startsWith("/") || href.startsWith("/en/") || href === "/en") return href;
+  return href === "/" ? "/en/" : `/en${href}`;
+}
+
+/** 去掉语言前缀，得到中文版的路径 */
+export const stripLang = (path) => path.replace(/^\/en(?=\/|$)/, "") || "/";
+
+/** 同一页的另一种语言 */
+export const counterpart = (path, lang) => (lang === "en" ? stripLang(path) : withLang(stripLang(path), "en"));
+
+/** 这一页的 Markdown 版本地址 */
+export function mdHref(path, lang) {
+  const p = stripLang(path).replace(/\/$/, "") || "/";
+  const base = lang === "en" ? "/en/md" : "/md";
+  return p === "/" ? `${base}/index.md` : `${base}${p}.md`;
+}
+
+const zh = {
+  brand: "小小东 UI",
+  kit: "小小东 UI Kit",
+  description: "小小东 UI Kit：小小东提示词与 Chrome 插件共用的设计系统。",
+  skip: "跳到正文",
+  openNav: "打开导航",
+  search: "搜索组件、模式…",
+  searchPlaceholder: "搜索组件、模式、页面…",
+  searchEmpty: "没有找到",
+  appearance: "外观",
+  theme: "主题",
+  light: "亮",
+  dark: "暗",
+  system: "跟随系统",
+  corners: "圆角",
+  square: "直角",
+  rounded: "圆角",
+  accent: "主色",
+  density: "密度",
+  comfortable: "标准",
+  compact: "紧凑",
+  finish: "按钮质感",
+  flat: "纯平",
+  material: "质感",
+  nav: "导航",
+  onThisPage: "本页",
+  mdLink: "本页的 Markdown（给 AI）",
+  switchLang: "English",
+  switchLangLabel: "Switch to English",
+  // 组件页
+  componentCaption: "组件",
+  bothImpl: "原生 HTML 与 React",
+  demo: "演示",
+  states: "状态",
+  statesNote: "同一个元素的各种状态并排。悬停、聚焦、按下用的是组件 CSS 里真实的规则（构建时复制成强制状态），不是手画的。",
+  props: "属性与类名",
+  a11y: "键盘与读屏",
+  rules: "规则",
+  related: "同类组件",
+  propsHead: "属性 / 类名",
+  propsDesc: "说明",
+  classes: "类名",
+  impl: "实现",
+  native: "原生 HTML",
+  code: "代码",
+  copy: "复制",
+  do: "好",
+  dont: "不好",
+  // 模式 / 模板
+  patternCaption: "模式 · 来自",
+  anatomy: "结构",
+  templateCaption: "模板",
+  copyPage: "复制整页 HTML",
+  copiedPage: "已复制整页 HTML",
+  designedFor: (w, where) => `按 ${w}px 宽设计（${where}）`,
+  // 导航
+  navStart: "开始",
+  navFoundations: "基础",
+  navComponents: "组件",
+  navPatterns: "模式",
+  navTemplates: "模板",
+  navTools: "工具",
+  pageHome: "首页",
+  pageStart: "三种用法",
+  pagePrinciples: "设计原则",
+  pageColors: "颜色",
+  pageRadius: "圆角",
+  pageType: "字体与层级",
+  pageSpacing: "间距与尺寸",
+  pageMotion: "动效",
+  pageFinish: "质感（平面 / 立体）",
+  pageIcons: "图标",
+  pageTools: "命令行与同步",
+  pageVisual: "截图回归",
+  pageAi: "给 AI 看",
+  pageChangelog: "更新日志",
+};
+
+const en = {
+  brand: "XXD UI",
+  kit: "XXD UI Kit",
+  description: "XXD UI Kit (小小东 UI): the design system shared by the XXD member site and Chrome extensions.",
+  skip: "Skip to content",
+  openNav: "Open navigation",
+  search: "Search components, patterns…",
+  searchPlaceholder: "Search components, patterns, pages…",
+  searchEmpty: "Nothing found",
+  appearance: "Appearance",
+  theme: "Theme",
+  light: "Light",
+  dark: "Dark",
+  system: "System",
+  corners: "Corners",
+  square: "Square",
+  rounded: "Rounded",
+  accent: "Accent",
+  density: "Density",
+  comfortable: "Standard",
+  compact: "Compact",
+  finish: "Button finish",
+  flat: "Flat",
+  material: "Material",
+  nav: "Navigation",
+  onThisPage: "On this page",
+  mdLink: "This page as Markdown (for AI)",
+  switchLang: "中文",
+  switchLangLabel: "切换到中文",
+  componentCaption: "Component",
+  bothImpl: "native HTML and React",
+  demo: "Demo",
+  states: "States",
+  statesNote: "Every state of the same element side by side. Hover, focus and pressed use the real rules from the component CSS (copied into forced states at build time), not hand-drawn ones.",
+  props: "Attributes and classes",
+  a11y: "Keyboard and screen readers",
+  rules: "Rules",
+  related: "Related components",
+  propsHead: "Attribute / class",
+  propsDesc: "Description",
+  classes: "Classes",
+  impl: "Implementation",
+  native: "Native HTML",
+  code: "Code",
+  copy: "Copy",
+  do: "Do",
+  dont: "Don't",
+  patternCaption: "Pattern · from",
+  anatomy: "Anatomy",
+  templateCaption: "Template",
+  copyPage: "Copy the whole page's HTML",
+  copiedPage: "Page HTML copied",
+  designedFor: (w, where) => `Designed at ${w}px wide (${where})`,
+  navStart: "Get started",
+  navFoundations: "Foundations",
+  navComponents: "Components",
+  navPatterns: "Patterns",
+  navTemplates: "Templates",
+  navTools: "Tools",
+  pageHome: "Home",
+  pageStart: "Three ways to use it",
+  pagePrinciples: "Design principles",
+  pageColors: "Color",
+  pageRadius: "Corners",
+  pageType: "Typography",
+  pageSpacing: "Spacing and sizing",
+  pageMotion: "Motion",
+  pageFinish: "Finish (flat / material)",
+  pageIcons: "Icons",
+  pageTools: "CLI and sync",
+  pageVisual: "Visual regression",
+  pageAi: "For AI",
+  pageChangelog: "Changelog",
+};
+
+export const UI = { zh, en };
+export const t = (lang) => UI[lang] ?? zh;

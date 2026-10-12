@@ -187,9 +187,10 @@ export function Segmented<T extends string>({ value, onValueChange, options, lab
 }
 
 /* ── Rail：会员站左侧的竖排导航 ── */
-export function Rail({ items, current, label = "主导航" }: { items: { href: string; label: ReactNode; icon?: string; key?: string }[]; current?: string; label?: string }) {
+export function Rail({ items, current, label }: { items: { href: string; label: ReactNode; icon?: string; key?: string }[]; current?: string; label?: string }) {
+  const { t } = useXxdLocale();
   return (
-    <nav className="xxd-rail" aria-label={label}>
+    <nav className="xxd-rail" aria-label={label ?? t.mainNav}>
       {items.map((it) => (
         <a key={it.key ?? it.href} href={it.href} aria-current={(it.key ?? it.href) === current ? "page" : undefined}>
           {it.icon && <Icon name={it.icon} size={20} />}
