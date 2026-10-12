@@ -9,9 +9,11 @@ import { initChoices, installChoices } from "./choice.js";
 import { installCopy, installTooltips } from "./feedback.js";
 import { installLayers } from "./layers.js";
 import { initComboboxes, installComboboxes, installTagInputs } from "./inputs.js";
+import { initPickers, installPickers, installSecrets } from "./picker.js";
 
 export { openDialog, closeDialog, confirmDialog } from "./dialog.js";
-export { showFloating, hideFloating } from "./menu.js";
+export { showFloating, hideFloating, openSubmenu, closeSubmenu } from "./menu.js";
+export { openPicker, closePicker, choose as choosePickerOption } from "./picker.js";
 export { place } from "./floating.js";
 export { selectTab, selectRadio, moveInk } from "./choice.js";
 export { toast, copyText, showTooltip, hideTooltip, showBubble, runBusy } from "./feedback.js";
@@ -34,6 +36,8 @@ export function install(root = document) {
     installLayers(root, byId, closestFrom);
     installTagInputs(root, closestFrom);
     installComboboxes(root, closestFrom);
+    installPickers(root, closestFrom);
+    installSecrets(root, closestFrom);
   }
   init(root);
   return root;
@@ -43,5 +47,6 @@ export function install(root = document) {
 export function init(root = document) {
   initChoices(root);
   initComboboxes(root);
+  initPickers(root);
   globalThis.XxdIcons?.hydrateIcons?.(root);
 }

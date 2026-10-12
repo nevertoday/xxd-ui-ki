@@ -5,6 +5,7 @@
 //   </div>
 //   <button data-xxd-popover="p1">说明</button> <div class="xxd-popover" id="p1" popover>…</div>
 import { place } from "./floating.js";
+import { emit } from "./dom.js";
 
 const ITEM = '[role="menuitem"]:not([disabled]):not([aria-disabled="true"]), [role="menuitemcheckbox"]:not([disabled]), [role="menuitemradio"]:not([disabled])';
 const openers = new WeakMap();
@@ -43,7 +44,8 @@ export function hideFloating(floating, { restoreFocus = false } = {}) {
 }
 
 function moveFocus(menu, step) {
-  const items = [...menu.querySelectorAll(ITEM)];
+  // 只在这一层里移动（子菜单嵌在父菜单里面，它的项不算）
+  const items = [...menu.querySelectorAll(ITEM)].filter((el) => el.closest(".xxd-menu") === menu);
   if (!items.length) return;
   const root = menu.getRootNode();
   const index = items.indexOf(root.activeElement);
@@ -51,7 +53,53 @@ function moveFocus(menu, step) {
   items[next].focus();
 }
 
+/* ── 子菜单：<button class="xxd-menu__item" role="menuitem" data-submenu="id">；
+ *    子菜单本身是 <div class="xxd-menu" id popover="manual">，**放在父菜单里面**（顶层渲染，不影响布局；
+ *    这样点子菜单不会被当成「点了外面」把父菜单关掉）。 ── */
+const subTimers = new WeakMap();
+
+export function openSubmenu(item, { focusFirst = false } = {}) {
+  const sub = item.getRootNode().getElementById?.(item.dataset.submenu) || document.getElementById(item.dataset.submenu);
+  if (!sub) return null;
+  // 同一层只开一个
+  for (const sib of item.closest(".xxd-menu").querySelectorAll('[data-submenu][aria-expanded="true"]')) if (sib !== item) closeSubmenu(sib);
+  if (typeof sub.showPopover === "function" && !isOpen(sub)) sub.showPopover();
+  else sub.setAttribute("data-open", "");
+  item.setAttribute("aria-expanded", "true");
+  openers.set(sub, item);
+  place(item, sub, { placement: "right-start", offset: 2 });
+  if (focusFirst) sub.querySelector(ITEM)?.focus();
+  return sub;
+}
+
+export function closeSubmenu(item, { focusItem = false } = {}) {
+  const sub = document.getElementById(item.dataset.submenu) || item.getRootNode().getElementById?.(item.dataset.submenu);
+  if (sub) {
+    for (const inner of sub.querySelectorAll('[data-submenu][aria-expanded="true"]')) closeSubmenu(inner);
+    if (typeof sub.hidePopover === "function" && isOpen(sub)) sub.hidePopover();
+    else sub.removeAttribute("data-open");
+  }
+  item.setAttribute("aria-expanded", "false");
+  if (focusItem) item.focus();
+}
+
+function closeAllSubmenus(menu) {
+  for (const item of menu.querySelectorAll('[data-submenu][aria-expanded="true"]')) closeSubmenu(item);
+}
+
 export function installMenus(root, byId, closestFrom) {
+  // 鼠标停在有子菜单的项上 120ms 打开；移到同一层别的项上就关
+  root.addEventListener("pointerover", (event) => {
+    if (event.pointerType === "touch") return;
+    const item = closestFrom(event, '.xxd-menu [role^="menuitem"]');
+    if (!item) return;
+    const menu = item.closest(".xxd-menu");
+    clearTimeout(subTimers.get(menu));
+    subTimers.set(menu, setTimeout(() => {
+      if (item.dataset.submenu) openSubmenu(item);
+      else for (const sib of menu.querySelectorAll(':scope [data-submenu][aria-expanded="true"]')) if (sib.closest(".xxd-menu") === menu) closeSubmenu(sib);
+    }, 120));
+  });
   root.addEventListener("click", (event) => {
     const trigger = closestFrom(event, "[data-xxd-menu], [data-xxd-popover]");
     if (trigger) {
@@ -65,12 +113,31 @@ export function installMenus(root, byId, closestFrom) {
       return;
     }
     const item = closestFrom(event, '.xxd-menu [role^="menuitem"]');
-    if (item && !item.disabled && item.getAttribute("aria-disabled") !== "true" && !item.closest("[data-keep-open]")) {
-      const menu = item.closest(".xxd-menu");
-      if (item.getAttribute("role") === "menuitemcheckbox") {
-        item.setAttribute("aria-checked", String(item.getAttribute("aria-checked") !== "true"));
+    if (item?.dataset.submenu) {
+      openSubmenu(item, { focusFirst: event.detail === 0 });
+      return;
+    }
+    if (item && !item.disabled && item.getAttribute("aria-disabled") !== "true") {
+      const role = item.getAttribute("role");
+      if (role === "menuitemcheckbox") item.setAttribute("aria-checked", String(item.getAttribute("aria-checked") !== "true"));
+      if (role === "menuitemradio") {
+        const group = item.closest('[role="group"]') || item.closest(".xxd-menu");
+        for (const r of group.querySelectorAll('[role="menuitemradio"]')) r.setAttribute("aria-checked", String(r === item));
+        emit(group, "xxd:change", { value: item.dataset.value ?? item.textContent.trim() });
       }
-      hideFloating(menu, { restoreFocus: true });
+      if (item.closest("[data-keep-open]")) return;
+      // 关掉整条菜单链（子菜单与它的父菜单）
+      let menu = item.closest(".xxd-menu");
+      let top = menu;
+      while (menu) {
+        const opener = openers.get(menu);
+        if (opener?.dataset?.submenu) {
+          closeSubmenu(opener);
+          top = opener.closest(".xxd-menu");
+          menu = top;
+        } else menu = null;
+      }
+      hideFloating(top, { restoreFocus: true });
     }
   });
 
@@ -96,11 +163,20 @@ export function installMenus(root, byId, closestFrom) {
     const menu = closestFrom(event, ".xxd-menu");
     if (!menu) return;
     const keys = { ArrowDown: 1, ArrowUp: -1, Home: "first", End: "last" };
+    const parentItem = openers.get(menu)?.dataset?.submenu ? openers.get(menu) : null;
+    const focused = closestFrom(event, '[role^="menuitem"]');
     if (event.key in keys) {
       event.preventDefault();
       moveFocus(menu, keys[event.key]);
+    } else if (event.key === "ArrowRight" && focused?.dataset.submenu) {
+      event.preventDefault();
+      openSubmenu(focused, { focusFirst: true });
+    } else if ((event.key === "ArrowLeft" || event.key === "Escape") && parentItem) {
+      event.preventDefault();
+      closeSubmenu(parentItem, { focusItem: true });
     } else if (event.key === "Escape") {
       event.preventDefault();
+      closeAllSubmenus(menu);
       hideFloating(menu, { restoreFocus: true });
     } else if (event.key === "Tab") {
       hideFloating(menu);
@@ -121,6 +197,8 @@ export function installMenus(root, byId, closestFrom) {
       const el = event.target;
       if (event.newState === "closed" && el?.classList && (el.classList.contains("xxd-menu") || el.classList.contains("xxd-popover"))) {
         openers.get(el)?.setAttribute("aria-expanded", "false");
+        // 父菜单关了，子菜单一起关
+        if (el.classList.contains("xxd-menu")) closeAllSubmenus(el);
       }
     },
     true,

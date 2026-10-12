@@ -546,3 +546,111 @@
     visibility: hidden;
   }
 }
+
+/* O2：对话框尺寸与说明、菜单子菜单 / 单选组、toast 堆叠与滑动。 */
+@layer xxd.components {
+  .xxd-dialog[data-size="sm"] {
+    width: min(360px, calc(100vw - 32px));
+  }
+
+  .xxd-dialog[data-size="xl"] {
+    width: min(880px, calc(100vw - 32px));
+  }
+
+  .xxd-dialog__desc {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: var(--text-xs);
+    line-height: 1.6;
+  }
+
+  /* 子菜单：<button class="xxd-menu__item" role="menuitem" aria-haspopup="menu" data-submenu="id">导出</button> */
+  .xxd-menu__item[data-submenu]::after {
+    content: "";
+    width: 12px;
+    height: 12px;
+    margin-left: auto;
+    background: var(--muted);
+    -webkit-mask: var(--xxd-chevron-right) center / contain no-repeat;
+    mask: var(--xxd-chevron-right) center / contain no-repeat;
+  }
+
+  .xxd-menu__item[aria-expanded="true"] {
+    background: var(--wash);
+  }
+
+  /* 单选组：<div role="group" aria-label="排序"><button class="xxd-menu__item" role="menuitemradio" aria-checked="true">…</button></div> */
+  .xxd-menu__item[role="menuitemradio"]::before {
+    content: "";
+    flex: none;
+    width: 6px;
+    height: 6px;
+    margin: 0 4px 0 2px;
+    border-radius: var(--r-circle);
+    background: transparent;
+  }
+
+  .xxd-menu__item[role="menuitemradio"][aria-checked="true"]::before {
+    background: var(--action);
+  }
+
+  /* 单选项只用左边的点，不再画右边的勾 */
+  .xxd-menu__item[role="menuitemradio"][aria-checked="true"]::after {
+    content: none;
+  }
+
+  /* Toast 堆叠：最多叠 3 张，旧的往上缩一点；hover / 聚焦展开。同一句话再来时不加新的，只轻轻动一下。 */
+  .xxd-toast-region[data-stack] {
+    display: grid;
+    grid-template-areas: "stack";
+    align-items: end;
+  }
+
+  .xxd-toast-region[data-stack] > .xxd-toast {
+    grid-area: stack;
+    transform: translateY(calc(var(--i, 0) * -8px)) scale(calc(1 - var(--i, 0) * 0.04));
+    transform-origin: bottom center;
+    transition: transform var(--motion-medium) var(--ease-out-expo), opacity var(--motion-quick) ease;
+  }
+
+  .xxd-toast-region[data-stack] > .xxd-toast[data-hidden-in-stack] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .xxd-toast-region[data-stack]:is(:hover, :focus-within) {
+    grid-template-areas: none;
+    gap: 8px;
+  }
+
+  .xxd-toast-region[data-stack]:is(:hover, :focus-within) > .xxd-toast {
+    grid-area: auto;
+    transform: none;
+  }
+
+  .xxd-toast-region[data-stack]:is(:hover, :focus-within) > .xxd-toast[data-hidden-in-stack] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .xxd-toast[data-bump] {
+    animation: xxd-bump var(--motion-medium) var(--ease-out-expo);
+  }
+
+  .xxd-toast-region > .xxd-toast[data-swiping],
+  .xxd-toast-region[data-stack] > .xxd-toast[data-swiping] {
+    transition: none;
+    transform: translateX(var(--swipe-x, 0px));
+    opacity: calc(1 - min(1, var(--swipe-p, 0)));
+  }
+
+  .xxd-toast[data-tone="info"] > .ui-icon {
+    color: var(--muted);
+  }
+
+  @keyframes xxd-bump {
+    40% {
+      transform: translateY(-2px);
+    }
+  }
+}

@@ -17,6 +17,11 @@ export declare function confirmDialog(options?: {
 
 export declare function showFloating(trigger: HTMLElement, floating: HTMLElement, options?: { placement?: string; focusFirst?: boolean }): void;
 export declare function hideFloating(floating: HTMLElement, options?: { restoreFocus?: boolean }): void;
+export declare function openSubmenu(item: HTMLElement, options?: { focusFirst?: boolean }): HTMLElement | null;
+export declare function closeSubmenu(item: HTMLElement, options?: { focusItem?: boolean }): void;
+export declare function openPicker(picker: HTMLElement): void;
+export declare function closePicker(picker: HTMLElement, options?: { focus?: boolean }): void;
+export declare function choosePickerOption(picker: HTMLElement, option: HTMLElement): void;
 export declare function place(anchor: Element, floating: HTMLElement, options?: { placement?: string; offset?: number; padding?: number }): { top: number; left: number; side: string };
 
 export declare function selectTab(list: HTMLElement, tab: HTMLElement, options?: { focus?: boolean }): void;
@@ -25,7 +30,7 @@ export declare function moveInk(list: HTMLElement): void;
 
 export declare function toast(
   message: string,
-  options?: { tone?: Tone; within?: HTMLElement; duration?: number; action?: { label: string; onClick?: () => void } },
+  options?: { tone?: Tone | "info"; within?: HTMLElement; duration?: number; action?: { label: string; onClick?: () => void }; stack?: boolean },
 ): { element: HTMLElement; dismiss: () => void };
 export declare function copyText(text: string): Promise<boolean>;
 export declare function showTooltip(anchor: HTMLElement): void;

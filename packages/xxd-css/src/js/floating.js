@@ -5,6 +5,22 @@ export function place(anchor, floating, { placement = "bottom-start", offset = 6
   const vw = globalThis.innerWidth || document.documentElement.clientWidth;
   const vh = globalThis.innerHeight || document.documentElement.clientHeight;
   let [side, align = "center"] = placement.split("-");
+  if (side === "right" || side === "left") {
+    // 侧向（子菜单）：放不下就翻到另一边
+    const roomRight = vw - a.right - offset - padding;
+    const roomLeft = a.left - offset - padding;
+    if (side === "right" && f.width > roomRight && roomLeft > roomRight) side = "left";
+    else if (side === "left" && f.width > roomLeft && roomRight > roomLeft) side = "right";
+    let left = side === "right" ? a.right + offset : a.left - offset - f.width;
+    let top = align === "end" ? a.bottom - f.height : a.top - 4;
+    left = Math.min(Math.max(padding, left), Math.max(padding, vw - f.width - padding));
+    top = Math.min(Math.max(padding, top), Math.max(padding, vh - f.height - padding));
+    floating.style.top = `${Math.round(top)}px`;
+    floating.style.left = `${Math.round(left)}px`;
+    floating.dataset.side = side;
+    floating.style.setProperty("--xxd-origin", `${side === "right" ? "0" : "100%"} ${Math.round(a.top + a.height / 2 - top)}px`);
+    return { top, left, side };
+  }
   const room = { bottom: vh - a.bottom - offset - padding, top: a.top - offset - padding };
   if (side === "bottom" && f.height > room.bottom && room.top > room.bottom) side = "top";
   else if (side === "top" && f.height > room.top && room.bottom > room.top) side = "bottom";

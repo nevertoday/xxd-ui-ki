@@ -89,16 +89,45 @@ function regionFor(within) {
   return region;
 }
 
+/** 叠放：最新的在最前，后面两张往上缩一点；超过 3 张的藏起来（hover 展开时都出来）。 */
+function restack(region) {
+  if (!region.hasAttribute("data-stack")) return;
+  const list = [...region.querySelectorAll(":scope > .xxd-toast:not([data-leaving])")];
+  list.forEach((t, n) => {
+    const i = list.length - 1 - n;
+    t.style.setProperty("--i", String(i));
+    t.toggleAttribute("data-hidden-in-stack", i >= 3);
+    t.setAttribute("aria-hidden", String(i > 0 && !region.matches(":hover, :focus-within")));
+  });
+}
+
+const timers = new WeakMap();
+
 /**
  * toast("已保存")；toast("写入失败", { tone: "danger", within: panelEl, action: { label: "重试", onClick } })
  * within：在哪个容器里出现（右侧面板里的操作，toast 就出现在面板里）。
+ * 堆叠（I6）：多张叠成一摞，hover 展开；同一句话再来时不加新的，只轻轻动一下并重新计时；横向滑动关闭。
+ * stack: false 时一张张排开（旧行为）。
  */
-export function toast(message, { tone = "neutral", within, duration = 2600, action } = {}) {
+export function toast(message, { tone = "neutral", within, duration = 2600, action, stack = true } = {}) {
   const region = regionFor(within);
+  region.toggleAttribute("data-stack", stack);
+  const key = `${tone}\u0000${message}`;
+  const existing = [...region.querySelectorAll(":scope > .xxd-toast:not([data-leaving])")].find((t) => t.dataset.key === key);
+  if (existing) {
+    existing.removeAttribute("data-bump");
+    void existing.offsetWidth;
+    existing.setAttribute("data-bump", "");
+    region.append(existing);
+    restack(region);
+    timers.get(existing)?.restart();
+    return { element: existing, dismiss: () => timers.get(existing)?.dismiss() };
+  }
   const el = region.ownerDocument.createElement("div");
   el.className = "xxd-toast";
   el.dataset.tone = tone;
-  const icon = { success: ICON.success, danger: ICON.danger, warning: ICON.warning }[tone];
+  el.dataset.key = key;
+  const icon = { success: ICON.success, danger: ICON.danger, warning: ICON.warning, info: ICON.info }[tone];
   if (icon) el.insertAdjacentHTML("beforeend", icon(16));
   const text = region.ownerDocument.createElement("span");
   text.textContent = message;
@@ -116,17 +145,57 @@ export function toast(message, { tone = "neutral", within, duration = 2600, acti
     el.append(btn);
   }
   region.append(el);
-  let timer = duration > 0 ? setTimeout(dismiss, duration) : 0;
+  restack(region);
+
+  let timer = 0;
+  const restart = (ms = duration) => {
+    clearTimeout(timer);
+    if (ms > 0) timer = setTimeout(dismiss, ms);
+  };
+  restart();
   el.addEventListener("pointerenter", () => clearTimeout(timer));
-  el.addEventListener("pointerleave", () => {
-    if (duration > 0) timer = setTimeout(dismiss, 1200);
+  el.addEventListener("pointerleave", () => restart(1200));
+  region.addEventListener("pointerenter", () => restack(region));
+  region.addEventListener("pointerleave", () => restack(region));
+
+  // 横向滑动关闭
+  let startX = null;
+  el.addEventListener("pointerdown", (event) => {
+    if (event.target.closest("button")) return;
+    startX = event.clientX;
+    el.setPointerCapture?.(event.pointerId);
   });
+  el.addEventListener("pointermove", (event) => {
+    if (startX === null) return;
+    const dx = event.clientX - startX;
+    if (Math.abs(dx) < 4) return;
+    el.setAttribute("data-swiping", "");
+    el.style.setProperty("--swipe-x", `${dx}px`);
+    el.style.setProperty("--swipe-p", String(Math.abs(dx) / 160));
+  });
+  const end = (event) => {
+    if (startX === null) return;
+    const dx = event.clientX - startX;
+    startX = null;
+    if (Math.abs(dx) > 80) return dismiss();
+    el.removeAttribute("data-swiping");
+    el.style.removeProperty("--swipe-x");
+    el.style.removeProperty("--swipe-p");
+  };
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", end);
+
   function dismiss() {
     clearTimeout(timer);
-    if (!el.isConnected) return;
+    if (!el.isConnected || el.hasAttribute("data-leaving")) return;
     el.setAttribute("data-leaving", "");
-    setTimeout(() => el.remove(), 140);
+    restack(region);
+    setTimeout(() => {
+      el.remove();
+      restack(region);
+    }, 140);
   }
+  timers.set(el, { restart, dismiss });
   return { element: el, dismiss };
 }
 

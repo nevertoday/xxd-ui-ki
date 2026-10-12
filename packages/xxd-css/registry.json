@@ -190,6 +190,33 @@
       ]
     },
     {
+      "name": "Picker",
+      "zh": "自绘选择",
+      "category": "表单",
+      "classes": [
+        "xxd-picker",
+        "xxd-picker__trigger",
+        "xxd-picker__value",
+        "xxd-option-group",
+        "xxd-option-group__label"
+      ],
+      "summary": "原生 <select> 做不到的：分组、每项说明、图标、多选。简单场景继续用 Select（原生）。",
+      "attributes": {
+        "data-multiple": "多选（勾选，列表不关）",
+        "data-placeholder": "没选时显示的字",
+        "data-size": "sm",
+        "aria-invalid": "出错",
+        "data-disabled": "禁用"
+      },
+      "markup": "<div class=\"xxd-picker\" data-xxd-picker style=\"width:220px\">\n  <button class=\"xxd-picker__trigger\"><span class=\"xxd-picker__value\"></span></button>\n  <div class=\"xxd-listbox\">\n    <div class=\"xxd-option-group\" role=\"group\" aria-label=\"画质\">\n      <div class=\"xxd-option-group__label\">画质</div>\n      <div class=\"xxd-option\" data-value=\"high\" aria-selected=\"true\"><span>高<small>2K，慢一点</small></span></div>\n      <div class=\"xxd-option\" data-value=\"standard\"><span>标准<small>1K，最快</small></span></div>\n    </div>\n    <div class=\"xxd-option-group\" role=\"group\" aria-label=\"其他\">\n      <div class=\"xxd-option\" data-value=\"auto\">跟随会员计划</div>\n      <div class=\"xxd-option\" data-value=\"x\" aria-disabled=\"true\">4K（即将推出）</div>\n    </div>\n  </div>\n</div>\n<div class=\"xxd-picker\" data-xxd-picker data-multiple data-placeholder=\"选择标签\" style=\"width:220px\">\n  <button class=\"xxd-picker__trigger\"><span class=\"xxd-picker__value\"></span></button>\n  <div class=\"xxd-listbox\">\n    <div class=\"xxd-option\" data-value=\"poster\" aria-selected=\"true\">海报</div>\n    <div class=\"xxd-option\" data-value=\"cover\">封面</div>\n    <div class=\"xxd-option\" data-value=\"card\">卡片</div>\n  </div>\n</div>",
+      "js": "picker.addEventListener(\"xxd:change\", (e) => e.detail.value)  // 多选时是数组；picker.dataset.value 逗号分隔",
+      "react": "Select",
+      "a11y": [
+        "按钮 aria-haspopup=listbox，列表 aria-activedescendant 跟随高亮",
+        "↑ ↓ Home End 移动，Enter / 空格选择，Esc 关，输入首字跳转"
+      ]
+    },
+    {
       "name": "Search",
       "zh": "搜索框",
       "category": "表单",
@@ -202,6 +229,72 @@
       "rules": [
         "⌘F / Ctrl+F 跳到它，Esc 清空",
         "匹配的字用 mark.xxd-hit 标出来"
+      ]
+    },
+    {
+      "name": "InputGroup",
+      "zh": "输入组",
+      "category": "表单",
+      "classes": [
+        "xxd-input-group",
+        "xxd-input-group__addon",
+        "xxd-input-group__suffix"
+      ],
+      "summary": "前后缀、内嵌按钮。整组是一个框，聚焦时整组边框变深一次。",
+      "attributes": {
+        "data-size": "sm",
+        "aria-invalid": "出错"
+      },
+      "markup": "<div class=\"xxd-input-group\" style=\"width:320px\">\n  <span class=\"xxd-input-group__addon\">https://</span>\n  <input aria-label=\"子域名\" value=\"today\">\n  <span class=\"xxd-input-group__suffix\">.xiaoxiaodong.ai</span>\n  <button class=\"xxd-btn\" data-variant=\"ghost\" data-size=\"sm\">检查</button>\n</div>",
+      "react": "InputGroup",
+      "rules": [
+        "一个框只有一个框：前后缀在框里面，不是两个框拼起来"
+      ]
+    },
+    {
+      "name": "SecretInput",
+      "zh": "密钥输入",
+      "category": "表单",
+      "classes": [
+        "xxd-secret"
+      ],
+      "summary": "API 密钥、令牌：默认遮住，可以显示 / 隐藏、一键复制。会员站的 API 设置和插件的 AI 服务密钥都用它。",
+      "markup": "<div class=\"xxd-field\" style=\"width:340px\">\n  <label class=\"xxd-label\" for=\"k1\">API 密钥</label>\n  <div class=\"xxd-input-group xxd-secret\" data-xxd-secret>\n    <input id=\"k1\" type=\"password\" value=\"sk_live_4f8a2c91d7e3b6a0\" readonly>\n    <button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"sm\" data-secret-toggle aria-label=\"显示\" aria-pressed=\"false\"><i data-xxd-icon=\"Eye\" data-size=\"16\"></i></button>\n    <button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"sm\" data-secret-copy aria-label=\"复制\"><i data-xxd-icon=\"Copy\" data-size=\"16\"></i></button>\n  </div>\n  <p class=\"xxd-help\">只保存在这台电脑上。</p>\n</div>",
+      "react": "SensitiveInput",
+      "a11y": [
+        "显示 / 隐藏按钮是切换按钮（aria-pressed），文字跟着变",
+        "复制成功的「已复制」通过 live region 读出"
+      ],
+      "rules": [
+        "默认遮住；显示后不要自动再遮住（用户自己决定）"
+      ]
+    },
+    {
+      "name": "ClipboardText",
+      "zh": "可复制的值",
+      "category": "表单",
+      "classes": [
+        "xxd-clipboard"
+      ],
+      "summary": "只读的值加一个复制按钮；复制后按钮上方冒出「已复制」，图标变勾一下。",
+      "attributes": {
+        "data-size": "sm"
+      },
+      "markup": "<div class=\"xxd-clipboard\" style=\"width:300px\">\n  <code>pnpm xxd new ~/js/插件-今日待办</code>\n  <button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"sm\" aria-label=\"复制\" data-copy=\"pnpm xxd new ~/js/插件-今日待办\"><i data-xxd-icon=\"Copy\" data-size=\"14\"></i></button>\n</div>",
+      "react": "ClipboardText",
+      "js": "[data-copy=\"文本\"] 或 [data-copy-target=\"#选择器\"]；data-copy-done 自定义气泡文字"
+    },
+    {
+      "name": "InlineCopy",
+      "zh": "正文里可复制的字",
+      "category": "表单",
+      "classes": [
+        "xxd-inline-copy"
+      ],
+      "markup": "<p class=\"xxd-text\">命令 <button class=\"xxd-inline-copy\" data-copy=\"pnpm xxd ls\" data-copy-done=\"已复制命令\">pnpm xxd ls<i data-xxd-icon=\"Copy\" data-size=\"12\"></i></button>，一点就复制。</p>",
+      "react": "InlineCopyText",
+      "rules": [
+        "hover / 聚焦时才出复制图标；触屏常显"
       ]
     },
     {
@@ -469,11 +562,13 @@
         "xxd-dialog__title",
         "xxd-dialog__body",
         "xxd-dialog__actions",
-        "ui-dialog-cancel"
+        "ui-dialog-cancel",
+        "xxd-dialog__desc"
       ],
       "attributes": {
-        "data-light-dismiss": "点遮罩关闭",
-        "data-size": "lg"
+        "data-light-dismiss": "点遮罩关闭（确认类对话框不要加）",
+        "data-size": "sm | （缺省 440）| lg | xl",
+        "role=\"alertdialog\"": "必须回答的确认：不加 data-light-dismiss"
       },
       "markup": "<dialog class=\"xxd-dialog\" id=\"d1\" aria-labelledby=\"d1-title\">\n  <div class=\"xxd-dialog__head\"><h2 class=\"xxd-dialog__title\" id=\"d1-title\">写入哪篇文章？</h2></div>\n  <div class=\"xxd-dialog__body\"><p>默认不会替换已有内容。</p></div>\n  <div class=\"xxd-dialog__actions\">\n    <button class=\"xxd-btn ui-dialog-cancel\" data-xxd-dialog-close>取消</button>\n    <button class=\"xxd-btn\" data-variant=\"primary\" data-xxd-dialog-close=\"new\">写入为新文章</button>\n  </div>\n</dialog>\n<button class=\"xxd-btn\" data-xxd-dialog-open=\"d1\">打开</button>",
       "js": "await Xxd.confirmDialog({ title, message, confirmLabel: \"删除\", tone: \"danger\" })  // → true / false",
@@ -549,11 +644,14 @@
         "xxd-menu__sep",
         "xxd-menu__kbd"
       ],
-      "markup": "<button class=\"xxd-btn\" data-xxd-menu=\"m1\">更多</button>\n<div class=\"xxd-menu\" id=\"m1\" role=\"menu\" popover>\n  <button class=\"xxd-menu__item\" role=\"menuitem\">重命名</button>\n  <div class=\"xxd-menu__sep\" role=\"separator\"></div>\n  <button class=\"xxd-menu__item\" role=\"menuitem\" data-tone=\"danger\">删除</button>\n</div>",
+      "markup": "<button class=\"xxd-btn\" data-xxd-menu=\"m1\">更多<i data-xxd-icon=\"ChevronDown\" data-size=\"14\"></i></button>\n<div class=\"xxd-menu\" id=\"m1\" role=\"menu\" popover>\n  <button class=\"xxd-menu__item\" role=\"menuitem\"><i data-xxd-icon=\"Pen\" data-size=\"14\"></i>重命名<span class=\"xxd-menu__kbd\">F2</span></button>\n  <button class=\"xxd-menu__item\" role=\"menuitem\" data-submenu=\"m1-export\" aria-haspopup=\"menu\"><i data-xxd-icon=\"Download\" data-size=\"14\"></i>导出为</button>\n  <div class=\"xxd-menu\" id=\"m1-export\" role=\"menu\" popover=\"manual\">\n    <button class=\"xxd-menu__item\" role=\"menuitem\">Markdown</button>\n    <button class=\"xxd-menu__item\" role=\"menuitem\">图片（PNG）</button>\n  </div>\n  <div class=\"xxd-menu__sep\" role=\"separator\"></div>\n  <div class=\"xxd-menu__label\">排序</div>\n  <div role=\"group\" aria-label=\"排序\">\n    <button class=\"xxd-menu__item\" role=\"menuitemradio\" aria-checked=\"true\">最新在前</button>\n    <button class=\"xxd-menu__item\" role=\"menuitemradio\" aria-checked=\"false\">最早在前</button>\n  </div>\n  <button class=\"xxd-menu__item\" role=\"menuitemcheckbox\" aria-checked=\"true\">智能标点</button>\n  <div class=\"xxd-menu__sep\" role=\"separator\"></div>\n  <button class=\"xxd-menu__item\" role=\"menuitem\" data-tone=\"danger\"><i data-xxd-icon=\"Trash2\" data-size=\"14\"></i>删除</button>\n</div>",
       "react": "DropdownMenu",
       "rules": [
-        "方向键 / Home / End / Esc；点外面关闭（Popover API）"
-      ]
+        "方向键 / Home / End / Esc；点外面关闭（Popover API）",
+        "子菜单放在父菜单里面，popover=\"manual\"；→ 打开、← / Esc 回到父项",
+        "鼠标移进哪一项焦点就在哪一项（只有一个高亮）"
+      ],
+      "js": "group.addEventListener(\"xxd:change\", (e) => e.detail.value)  // 单选组"
     },
     {
       "name": "Popover",
@@ -601,11 +699,13 @@
         "xxd-toast-region",
         "xxd-toast__action"
       ],
-      "markup": "<button class=\"xxd-btn\" onclick=\"Xxd.toast('已保存草稿', { tone: 'success' })\">弹个 toast</button>",
-      "js": "Xxd.toast(message, { tone: \"success\" | \"danger\" | \"warning\", within, duration, action: { label, onClick } })",
+      "markup": "<button class=\"xxd-btn\" onclick=\"Xxd.toast('已保存草稿', { tone: 'success' })\">保存</button>\n<button class=\"xxd-btn\" onclick=\"Xxd.toast('已移到废纸篓', { action: { label: '撤销', onClick() { Xxd.toast('已恢复', { tone: 'success' }) } } })\">删除（可撤销）</button>\n<button class=\"xxd-btn\" onclick=\"Xxd.toast('第 ' + (window.__n = (window.__n || 0) + 1) + ' 条消息', { tone: 'info' })\">连发几条</button>",
+      "js": "Xxd.toast(message, { tone: \"success\" | \"danger\" | \"warning\" | \"info\", within, duration, action: { label: \"撤销\", onClick }, stack: true })",
       "react": "Toast",
       "rules": [
         "就地出现（within）",
+        "堆叠：多张叠成一摞，hover 展开；同一句话再来时不加新的，只轻轻动一下",
+        "横向滑动关闭",
         "绿色只表示完成"
       ]
     },

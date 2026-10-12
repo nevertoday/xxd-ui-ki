@@ -245,3 +245,93 @@ describe("O1 交互基础层", () => {
     expect(fl.style.getPropertyValue("--xxd-arrow-x")).toBe("20px");
   });
 });
+
+describe("O2 组件", () => {
+  const pickerHtml = (multi = "") => `<div class="xxd-picker" data-xxd-picker ${multi} data-placeholder="请选择">
+    <button class="xxd-picker__trigger"><span class="xxd-picker__value"></span></button>
+    <div class="xxd-listbox">
+      <div class="xxd-option" data-value="high"><span>高<small>2K，慢一点</small></span></div>
+      <div class="xxd-option" data-value="std">标准</div>
+      <div class="xxd-option" data-value="no" aria-disabled="true">不可选</div>
+    </div></div>`;
+
+  it("Picker：点开、选择、派发 xxd:change、显示选中的字", () => {
+    html(pickerHtml());
+    const picker = document.querySelector("[data-xxd-picker]");
+    const trigger = picker.querySelector(".xxd-picker__trigger");
+    expect(picker.querySelector(".xxd-picker__value").textContent).toBe("请选择");
+    const seen = vi.fn();
+    picker.addEventListener("xxd:change", (e) => seen(e.detail.value));
+    trigger.click();
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    picker.querySelector('[data-value="std"]').click();
+    expect(seen).toHaveBeenCalledWith("std");
+    expect(picker.dataset.value).toBe("std");
+    expect(picker.querySelector(".xxd-picker__value").textContent).toBe("标准");
+    picker.querySelector(".xxd-picker__trigger").click();
+    picker.querySelector('[data-value="high"]').click();
+    expect(picker.querySelector(".xxd-picker__value").textContent).toBe("高");
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("Picker：键盘 ↓ 打开、跳过禁用项、Enter 选择；多选不关", () => {
+    html(pickerHtml("data-multiple"));
+    const picker = document.querySelector("[data-xxd-picker]");
+    const trigger = picker.querySelector(".xxd-picker__trigger");
+    key(trigger, "ArrowDown");
+    expect(picker.querySelector(".xxd-listbox").hidden).toBe(false);
+    key(trigger, "Enter");
+    key(trigger, "ArrowDown");
+    key(trigger, "ArrowDown");
+    expect(picker.querySelector(".xxd-option[data-active]").dataset.value).toBe("high");
+    key(trigger, "ArrowDown");
+    key(trigger, "Enter");
+    expect(picker.dataset.value).toBe("high,std");
+    expect(picker.querySelector(".xxd-listbox").hidden).toBe(false);
+  });
+
+  it("密钥输入：显示 / 隐藏切换 type 和 aria-pressed", () => {
+    html(`<div class="xxd-input-group xxd-secret" data-xxd-secret><input type="password" value="sk_1"><button data-secret-toggle aria-label="显示"></button></div>`);
+    const btn = document.querySelector("[data-secret-toggle]");
+    btn.click();
+    expect(document.querySelector("input").type).toBe("text");
+    expect(btn.getAttribute("aria-pressed")).toBe("true");
+    expect(btn.getAttribute("aria-label")).toBe("隐藏");
+    btn.click();
+    expect(document.querySelector("input").type).toBe("password");
+  });
+
+  it("Toast：同一句话不重复加，只动一下；多张时写出叠放序号", () => {
+    html(`<aside id="tp"></aside>`);
+    const within = document.getElementById("tp");
+    Xxd.toast("已保存", { within, duration: 0 });
+    Xxd.toast("已保存", { within, duration: 0 });
+    expect(within.querySelectorAll(".xxd-toast").length).toBe(1);
+    expect(within.querySelector(".xxd-toast").hasAttribute("data-bump")).toBe(true);
+    Xxd.toast("第二条", { within, duration: 0 });
+    Xxd.toast("第三条", { within, duration: 0 });
+    Xxd.toast("第四条", { within, duration: 0 });
+    const list = [...within.querySelectorAll(".xxd-toast")];
+    expect(list.map((t) => t.style.getPropertyValue("--i"))).toEqual(["3", "2", "1", "0"]);
+    expect(list[0].hasAttribute("data-hidden-in-stack")).toBe(true);
+  });
+
+  it("菜单：单选组互斥；→ 打开子菜单并聚焦第一项，← 回到父项", () => {
+    html(`<div class="xxd-menu" id="pm" role="menu">
+      <button class="xxd-menu__item" role="menuitem" id="ex" data-submenu="sm">导出为</button>
+      <div class="xxd-menu" id="sm" role="menu"><button class="xxd-menu__item" role="menuitem" id="md">Markdown</button></div>
+      <div role="group"><button class="xxd-menu__item" role="menuitemradio" aria-checked="true" id="r1">新</button><button class="xxd-menu__item" role="menuitemradio" aria-checked="false" id="r2">旧</button></div>
+    </div>`);
+    document.getElementById("r2").click();
+    expect(document.getElementById("r1").getAttribute("aria-checked")).toBe("false");
+    expect(document.getElementById("r2").getAttribute("aria-checked")).toBe("true");
+    const ex = document.getElementById("ex");
+    ex.focus();
+    key(ex, "ArrowRight");
+    expect(ex.getAttribute("aria-expanded")).toBe("true");
+    expect(document.activeElement.id).toBe("md");
+    key(document.getElementById("md"), "ArrowLeft");
+    expect(ex.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement.id).toBe("ex");
+  });
+});

@@ -23,7 +23,9 @@
       .xxd-row,
       .xxd-list__item,
       .xxd-pagination > *,
-      .xxd-rail > *
+      .xxd-rail > *,
+      .xxd-picker__trigger,
+      .xxd-input-group
     ):hover {
     transition-duration: 0s;
   }

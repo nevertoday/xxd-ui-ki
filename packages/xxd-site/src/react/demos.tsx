@@ -15,7 +15,9 @@ import {
   DropdownMenu,
   Empty,
   Icon,
+  InlineCopyText,
   Input,
+  InputGroup,
   LayerCard,
   Link,
   Loader,
@@ -24,6 +26,7 @@ import {
   Popover,
   Radio,
   Select,
+  SensitiveInput,
   Slider,
   Switch,
   Table,
@@ -323,5 +326,63 @@ export function CardDemo() {
       <LayerCard.Secondary>下一步</LayerCard.Secondary>
       <LayerCard.Primary>用小小东 UI 做第一个插件</LayerCard.Primary>
     </LayerCard>
+  );
+}
+
+export function InputGroupDemo() {
+  return (
+    <InputGroup className="w-80">
+      <InputGroup.Input aria-label="子域名" defaultValue="today" />
+      <InputGroup.Suffix>.xiaoxiaodong.ai</InputGroup.Suffix>
+    </InputGroup>
+  );
+}
+
+export function SecretInputDemo() {
+  return (
+    <div className="w-80">
+      <SensitiveInput label="API 密钥" defaultValue="sk_live_4f8a2c91d7e3b6a0" />
+    </div>
+  );
+}
+
+export function ClipboardTextDemo() {
+  return <ClipboardText text="pnpm xxd new ~/js/插件-今日待办" />;
+}
+
+export function InlineCopyDemo() {
+  return (
+    <p>
+      命令 <InlineCopyText labels={{ copyAction: "复制命令", copied: "已复制命令" }}>pnpm xxd ls</InlineCopyText>，一点就复制。
+    </p>
+  );
+}
+
+type Quality = { value: string; label: string };
+const qualities = { pic: [{ value: "high", label: "高" }, { value: "standard", label: "标准" }], other: [{ value: "auto", label: "跟随会员计划" }] };
+export function PickerDemo() {
+  const [value, setValue] = useState<Quality | null>(qualities.pic[0]);
+  return (
+    <Select
+      label="图片质量"
+      className="w-56"
+      value={value}
+      onValueChange={(v) => setValue(v as Quality | null)}
+      isItemEqualToValue={(a: Quality, b: Quality) => a.value === b.value}
+      renderValue={(v: Quality | null) => v?.label ?? "请选择"}
+    >
+      <Select.Group>
+        <Select.GroupLabel>画质</Select.GroupLabel>
+        {qualities.pic.map((q) => (
+          <Select.Option key={q.value} value={q}>{q.label}</Select.Option>
+        ))}
+      </Select.Group>
+      <Select.Separator />
+      <Select.Group>
+        {qualities.other.map((q) => (
+          <Select.Option key={q.value} value={q}>{q.label}</Select.Option>
+        ))}
+      </Select.Group>
+    </Select>
   );
 }
