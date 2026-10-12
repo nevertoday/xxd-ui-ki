@@ -1,0 +1,95 @@
+/* 命令面板与下拉选择列表（combobox）。 */
+@layer xxd.components {
+  .xxd-palette {
+    width: min(560px, calc(100vw - 32px));
+    margin-top: min(14vh, 120px);
+    padding: 0;
+  }
+
+  .xxd-palette__search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .xxd-palette__search > .ui-icon {
+    color: var(--muted);
+  }
+
+  .xxd-palette__search > input {
+    flex: 1;
+    height: 48px;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: var(--text-base) var(--font-body);
+    outline: none;
+  }
+
+  .xxd-palette__list {
+    max-height: min(360px, 50vh);
+    margin: 0;
+    padding: 4px;
+    overflow: auto;
+    list-style: none;
+  }
+
+  .xxd-palette__empty {
+    padding: 24px 14px;
+    color: var(--muted);
+    font-size: var(--text-xs);
+    text-align: center;
+  }
+
+  .xxd-listbox {
+    position: fixed;
+    z-index: var(--z-popover);
+    margin: 0;
+    padding: 4px;
+    max-height: 280px;
+    overflow: auto;
+    list-style: none;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--paper);
+    box-shadow: var(--shadow-popover);
+  }
+
+  .xxd-listbox[hidden] {
+    display: none;
+  }
+
+  .xxd-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: var(--r-xs);
+    color: var(--ink);
+    font-size: var(--text-xs);
+    cursor: pointer;
+  }
+
+  .xxd-option[data-active] {
+    background: var(--wash);
+  }
+
+  .xxd-option[aria-selected="true"]::after {
+    content: "";
+    width: 14px;
+    height: 14px;
+    margin-left: auto;
+    background: var(--action);
+    -webkit-mask: var(--xxd-check) center / contain no-repeat;
+    mask: var(--xxd-check) center / contain no-repeat;
+  }
+
+  .xxd-option__hint {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: var(--text-2xs);
+  }
+}

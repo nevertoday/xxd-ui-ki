@@ -1,0 +1,203 @@
+/* 设置组与列表。
+ * 设置组 = 一个灰色小标题 + 一个带框的主体，里面的行用细线分开；整个 tab 外面不画框。
+ * 列表只在行之间画线，第一行上面、最后一行下面都不画。选中行是一层淡色，不加彩色边或竖条。
+ *
+ *   <section class="xxd-group">
+ *     <h3 class="xxd-group__title">外观</h3>
+ *     <div class="xxd-group__body">
+ *       <div class="xxd-row">
+ *         <div class="xxd-row__text"><div class="xxd-row__title">圆角</div><div class="xxd-row__desc">只影响这个插件</div></div>
+ *         <div class="xxd-row__control"><input type="checkbox" role="switch" class="xxd-switch"></div>
+ *       </div>
+ *     </div>
+ *   </section> */
+@layer xxd.components {
+  .xxd-settings {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .xxd-group {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .xxd-group__title {
+    margin: 0;
+    padding: 0 2px;
+    color: var(--muted);
+    font: var(--weight-medium) var(--text-xs) / 1.4 var(--font-body);
+  }
+
+  .xxd-group__body {
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--paper);
+    overflow: hidden;
+  }
+
+  .xxd-group__note {
+    margin: 2px 2px 0;
+    color: var(--muted);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  .xxd-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px var(--space-3);
+    min-height: 48px;
+    padding: 10px 14px;
+  }
+
+  .xxd-row + .xxd-row {
+    border-top: 1px solid var(--line);
+  }
+
+  .xxd-row[data-stack] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .xxd-row[data-stack] > .xxd-row__text {
+    flex: none;
+  }
+
+  /* 窄的时候控件换到下一行，而不是把标题挤成一列字 */
+  .xxd-row__text {
+    flex: 1 1 7em;
+    min-width: 0;
+  }
+
+  .xxd-row__title {
+    color: var(--ink);
+    font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+  }
+
+  .xxd-row__desc {
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  .xxd-row__control {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  /* 整行可点（跳转、打开） */
+  a.xxd-row,
+  button.xxd-row,
+  label.xxd-row {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  a.xxd-row:hover,
+  button.xxd-row:hover,
+  label.xxd-row:hover {
+    background: var(--wash);
+  }
+
+  a.xxd-row::after,
+  button.xxd-row[data-chevron]::after {
+    content: "";
+    flex: none;
+    width: 14px;
+    height: 14px;
+    background: var(--muted-2);
+    -webkit-mask: var(--xxd-chevron-right) center / contain no-repeat;
+    mask: var(--xxd-chevron-right) center / contain no-repeat;
+  }
+
+  .xxd-row[data-tone="danger"] .xxd-row__title {
+    color: var(--danger);
+  }
+
+  /* 列表 */
+  .xxd-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .xxd-list > .xxd-list__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: 8px 14px;
+    color: var(--ink);
+  }
+
+  .xxd-list > .xxd-list__item + .xxd-list__item {
+    border-top: 1px solid var(--line);
+  }
+
+  .xxd-list[data-interactive] > .xxd-list__item {
+    cursor: pointer;
+  }
+
+  .xxd-list[data-interactive] > .xxd-list__item:hover {
+    background: var(--wash);
+  }
+
+  .xxd-list > .xxd-list__item[aria-selected="true"],
+  .xxd-list > .xxd-list__item[data-selected] {
+    background: var(--selected-bg);
+  }
+
+  .xxd-list__main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .xxd-list__title {
+    overflow: hidden;
+    font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .xxd-list__meta {
+    color: var(--muted);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .xxd-list__item[data-dragging] {
+    opacity: 0.6;
+  }
+
+  /* 一格符号是裸字符，hover 时才填色 */
+  .xxd-glyphs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  }
+
+  .xxd-glyphs > button {
+    height: 36px;
+    border: 0;
+    border-radius: var(--r-xs);
+    background: transparent;
+    color: var(--ink);
+    font-size: var(--text-lg);
+    cursor: pointer;
+  }
+
+  .xxd-glyphs > button:hover {
+    background: var(--wash);
+  }
+}

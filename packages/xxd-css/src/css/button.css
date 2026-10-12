@@ -1,0 +1,197 @@
+/* 按钮。按钮文字描述下一次点击会做什么；切换按钮带 aria-pressed。
+ *   <button class="xxd-btn" data-variant="primary">写入</button>
+ *   variant: primary | secondary（缺省）| ghost | danger | danger-outline
+ *   size: sm | md（缺省）| lg；data-icon-only 纯图标（务必加 aria-label）
+ *   对话框的取消用 class="xxd-btn ui-dialog-cancel"：内容宽度、视觉安静。 */
+@layer xxd.components {
+  .xxd-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: var(--control-h);
+    padding: 0 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-sm);
+    background: var(--paper);
+    color: var(--ink);
+    font: var(--weight-medium) var(--text-sm) / 1 var(--font-body);
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color var(--motion-quick) ease,
+      border-color var(--motion-quick) ease,
+      color var(--motion-quick) ease,
+      opacity var(--motion-quick) ease;
+  }
+
+  /* 点击区至少 --hit-min（紧凑模式下控件变矮，点击区不变）。 */
+  .xxd-btn::after {
+    content: "";
+    position: absolute;
+    inset: min(0px, calc((var(--control-h) - var(--hit-min)) / 2)) 0;
+  }
+
+  .xxd-btn:hover {
+    background: var(--wash);
+  }
+
+  .xxd-btn[aria-pressed="true"] {
+    background: var(--selected-bg);
+    border-color: color-mix(in srgb, var(--action) 30%, var(--line-strong));
+  }
+
+  .xxd-btn[data-variant="primary"] {
+    background: var(--action);
+    border-color: var(--action);
+    color: var(--on-action);
+  }
+
+  .xxd-btn[data-variant="primary"]:hover {
+    background: color-mix(in srgb, var(--action) 86%, var(--paper));
+    border-color: color-mix(in srgb, var(--action) 86%, var(--paper));
+  }
+
+  .xxd-btn[data-variant="ghost"],
+  .xxd-btn.ui-dialog-cancel {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .xxd-btn[data-variant="ghost"]:hover,
+  .xxd-btn.ui-dialog-cancel:hover {
+    background: var(--wash);
+  }
+
+  .xxd-btn.ui-dialog-cancel {
+    flex: none;
+    width: auto;
+    color: var(--muted);
+  }
+
+  .xxd-btn.ui-dialog-cancel:hover {
+    color: var(--ink);
+  }
+
+  .xxd-btn[data-variant="danger"] {
+    background: var(--danger-strong);
+    border-color: var(--danger-strong);
+    color: #ffffff;
+  }
+
+  .xxd-btn[data-variant="danger"]:hover {
+    background: color-mix(in srgb, var(--danger-strong) 88%, #000000);
+  }
+
+  .xxd-btn[data-variant="danger-outline"] {
+    border-color: color-mix(in srgb, var(--danger) 45%, var(--line));
+    color: var(--danger);
+  }
+
+  .xxd-btn[data-variant="danger-outline"]:hover {
+    background: color-mix(in srgb, var(--danger) 8%, var(--paper));
+  }
+
+  .xxd-btn[data-size="sm"] {
+    height: var(--control-h-sm);
+    padding: 0 10px;
+    font-size: var(--text-xs);
+  }
+
+  .xxd-btn[data-size="lg"] {
+    height: calc(var(--control-h) + 4px);
+    padding: 0 18px;
+    font-size: var(--text-base);
+  }
+
+  .xxd-btn[data-icon-only] {
+    width: var(--icon-button);
+    height: var(--icon-button);
+    padding: 0;
+  }
+
+  .xxd-btn[data-icon-only][data-size="sm"] {
+    width: var(--control-h-sm);
+    height: var(--control-h-sm);
+  }
+
+  .xxd-btn[data-block] {
+    display: flex;
+    width: 100%;
+  }
+
+  .xxd-btn:disabled,
+  .xxd-btn[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .xxd-btn[aria-busy="true"] {
+    cursor: progress;
+  }
+
+  .xxd-btn[aria-busy="true"] > .ui-icon {
+    display: none;
+  }
+
+  .xxd-btn[aria-busy="true"]::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid currentColor;
+    border-right-color: transparent;
+    border-radius: var(--r-circle);
+    animation: xxd-spin 0.7s linear infinite;
+  }
+
+  /* 文字链接式按钮 */
+  .xxd-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--action-text);
+    font: inherit;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .xxd-link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* 按钮组：同一组按钮共享边线 */
+  .xxd-btn-group {
+    display: inline-flex;
+  }
+
+  .xxd-btn-group > .xxd-btn {
+    border-radius: 0;
+  }
+
+  .xxd-btn-group > .xxd-btn + .xxd-btn {
+    margin-left: -1px;
+  }
+
+  .xxd-btn-group > .xxd-btn:first-child {
+    border-start-start-radius: var(--r-sm);
+    border-end-start-radius: var(--r-sm);
+  }
+
+  .xxd-btn-group > .xxd-btn:last-child {
+    border-start-end-radius: var(--r-sm);
+    border-end-end-radius: var(--r-sm);
+  }
+
+  @keyframes xxd-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}

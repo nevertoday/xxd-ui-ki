@@ -1,0 +1,109 @@
+/* 基础：页面底色、正文、焦点、图标。低优先级（:where），宿主项目可以轻松覆盖。 */
+@layer xxd.base {
+  :where(html) {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  :where(body.xxd-page, .xxd-page) {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: var(--weight-regular) var(--text-sm) / 1.55 var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :where(.xxd-page) :where(*, *::before, *::after) {
+    box-sizing: border-box;
+  }
+
+  :where(.xxd-page) :where(button, input, select, textarea) {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* 焦点环只给键盘（boot.js 写 data-input）。 */
+  :where(.xxd-page, [class*="xxd-"]) :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--action) 60%, transparent);
+    outline-offset: 2px;
+  }
+
+  :root[data-input="pointer"] :where(.xxd-page, [class*="xxd-"]) :focus-visible:not(input, textarea, select, [contenteditable]) {
+    outline: none;
+  }
+
+  :where(.ui-icon) {
+    flex: none;
+    display: inline-block;
+    vertical-align: -0.125em;
+  }
+
+  :where(.xxd-page) ::selection {
+    background: color-mix(in srgb, var(--action) 18%, transparent);
+  }
+
+  /* 只给读屏 */
+  .xxd-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* 文字层级 */
+  .xxd-title {
+    margin: 0;
+    font: var(--weight-strong) var(--text-display) / 1.25 var(--font-title);
+    color: var(--ink);
+  }
+
+  .xxd-heading {
+    margin: 0;
+    font: var(--weight-strong) var(--text-lg) / 1.4 var(--font-body);
+    color: var(--ink);
+  }
+
+  .xxd-muted {
+    color: var(--muted);
+  }
+
+  .xxd-small {
+    font-size: var(--text-xs);
+  }
+
+  .xxd-mono {
+    font-family: var(--font-mono);
+  }
+
+  .xxd-divider {
+    height: 1px;
+    margin: 0;
+    border: 0;
+    background: var(--line);
+  }
+
+  /* 阅读列：被阅读的东西居中成一列；工具条、dock 可以全宽。 */
+  .xxd-read {
+    width: 100%;
+    max-width: var(--read-width);
+    margin-inline: auto;
+  }
+
+  .xxd-stack {
+    display: grid;
+    gap: var(--stack-gap, var(--space-3));
+  }
+
+  .xxd-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--cluster-gap, var(--space-2));
+  }
+}

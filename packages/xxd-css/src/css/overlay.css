@@ -1,0 +1,495 @@
+/* 浮层：对话框、dock + sheet、菜单、popover、tooltip、toast、右侧详情面板。
+ * 只有浮层有阴影；浮层保留一条安静的边（--line），因为阴影已经把它托起来了。 */
+@layer xxd.components {
+  .xxd-surface-float {
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: var(--shadow-popover);
+  }
+
+  /* 对话框：<dialog class="xxd-dialog">（js/dialog.js）。
+   * 底部按钮：取消在前（ui-dialog-cancel，内容宽度、安静），主操作在后、最右。 */
+  .xxd-dialog {
+    width: min(440px, calc(100vw - 32px));
+    max-height: min(680px, calc(100dvh - 48px));
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: var(--shadow-dialog);
+    overflow: auto;
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--motion-medium) var(--ease-out-expo),
+      transform var(--motion-medium) var(--ease-out-expo),
+      overlay var(--motion-medium) allow-discrete,
+      display var(--motion-medium) allow-discrete;
+  }
+
+  .xxd-dialog:not([open]) {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  @starting-style {
+    .xxd-dialog[open] {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  .xxd-dialog::backdrop {
+    background: var(--backdrop);
+  }
+
+  .xxd-dialog[data-size="lg"] {
+    width: min(640px, calc(100vw - 32px));
+  }
+
+  .xxd-dialog__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 16px 16px 0 20px;
+  }
+
+  .xxd-dialog__title {
+    flex: 1;
+    margin: 0;
+    font: var(--weight-strong) var(--text-lg) / 1.4 var(--font-body);
+  }
+
+  .xxd-dialog__body {
+    padding: 8px 20px 4px;
+    color: var(--muted);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+
+  .xxd-dialog__body > * + * {
+    margin-top: var(--space-3);
+  }
+
+  .xxd-dialog__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    padding: 16px 20px 20px;
+  }
+
+  .xxd-dialog__actions > .xxd-btn {
+    min-height: var(--hit-min);
+  }
+
+  @media (max-width: 480px) {
+    .xxd-dialog__actions > .xxd-btn:last-child:not(.ui-dialog-cancel) {
+      flex: 1;
+    }
+  }
+
+  /* 底部 dock：紧凑的任务控制台。
+   *   上下文和实时状态在开头 · 可撤销的选择工具成一组 · 后果最大的下一步在末尾。 */
+  .xxd-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: var(--z-dock);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 56px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--line);
+    background: color-mix(in srgb, var(--paper) 96%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .xxd-dock__status {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: var(--text-xs);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .xxd-dock__status[data-tone="danger"] {
+    color: var(--danger);
+  }
+
+  .xxd-dock__status[data-tone="warning"] {
+    color: var(--warning);
+  }
+
+  .xxd-dock__tools {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .xxd-dock__primary {
+    flex: none;
+  }
+
+  /* 破坏性操作单独放，并写清楚 */
+  .xxd-dock__danger {
+    padding-right: var(--space-3);
+    border-right: 1px solid var(--line);
+  }
+
+  /* Sheet：从 dock 升起 10px 并淡入（200ms），收回 120ms。
+   *   <div class="xxd-sheet-host">…内容… <div class="xxd-scrim"></div> <section class="xxd-sheet">…</section> <footer class="xxd-dock">…</footer></div> */
+  .xxd-sheet-host {
+    position: relative;
+  }
+
+  .xxd-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: calc(var(--z-dock) + 1);
+    background: rgba(var(--shadow-rgb), 0.12);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--motion-sheet-out) ease;
+  }
+
+  .xxd-scrim[data-open] {
+    opacity: 1;
+    pointer-events: auto;
+    transition-duration: var(--motion-sheet);
+  }
+
+  .xxd-sheet {
+    position: absolute;
+    right: 8px;
+    bottom: 64px;
+    left: 8px;
+    z-index: calc(var(--z-dock) + 2);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100% - 96px);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--paper);
+    box-shadow: var(--shadow-popover);
+    opacity: 0;
+    transform: translateY(10px);
+    visibility: hidden;
+    transition:
+      opacity var(--motion-sheet-out) ease,
+      transform var(--motion-sheet-out) ease,
+      visibility 0s linear var(--motion-sheet-out);
+  }
+
+  .xxd-sheet[data-open] {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+    transition:
+      opacity var(--motion-sheet) var(--ease-out-expo),
+      transform var(--motion-sheet) var(--ease-out-expo),
+      visibility 0s;
+  }
+
+  .xxd-sheet__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 12px 10px 8px 16px;
+  }
+
+  .xxd-sheet__title {
+    flex: 1;
+    margin: 0;
+    font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+  }
+
+  .xxd-sheet__body {
+    flex: 1;
+    min-height: 0;
+    padding: 0 16px 16px;
+    overflow: auto;
+  }
+
+  /* 菜单：<div class="xxd-menu" role="menu" popover>（js/menu.js 负责定位与键盘） */
+  .xxd-menu,
+  .xxd-popover {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    min-width: 180px;
+    max-width: min(320px, calc(100vw - 16px));
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: var(--shadow-popover);
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--motion-quick) ease,
+      transform var(--motion-quick) var(--ease-out-expo),
+      overlay var(--motion-quick) allow-discrete,
+      display var(--motion-quick) allow-discrete;
+  }
+
+  .xxd-menu:not(:popover-open),
+  .xxd-popover:not(:popover-open) {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  @starting-style {
+    .xxd-menu:popover-open,
+    .xxd-popover:popover-open {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  .xxd-menu {
+    padding: 4px;
+  }
+
+  .xxd-popover {
+    padding: 12px 14px;
+    font-size: var(--text-sm);
+  }
+
+  .xxd-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 32px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: var(--r-xs);
+    background: transparent;
+    color: var(--ink);
+    font: var(--weight-medium) var(--text-xs) / 1.3 var(--font-body);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .xxd-menu__item:hover,
+  .xxd-menu__item:focus-visible {
+    background: var(--wash);
+    outline: none;
+  }
+
+  .xxd-menu__item > .ui-icon {
+    color: var(--muted);
+  }
+
+  .xxd-menu__item[aria-checked="true"]::after {
+    content: "";
+    width: 14px;
+    height: 14px;
+    margin-left: auto;
+    background: var(--action);
+    -webkit-mask: var(--xxd-check) center / contain no-repeat;
+    mask: var(--xxd-check) center / contain no-repeat;
+  }
+
+  .xxd-menu__item[data-tone="danger"] {
+    color: var(--danger);
+  }
+
+  .xxd-menu__item[data-tone="danger"] > .ui-icon {
+    color: inherit;
+  }
+
+  .xxd-menu__item:disabled,
+  .xxd-menu__item[aria-disabled="true"] {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .xxd-menu__kbd {
+    margin-left: auto;
+    color: var(--muted);
+    font: var(--text-2xs) var(--font-mono);
+  }
+
+  .xxd-menu__label {
+    padding: 8px 10px 4px;
+    color: var(--muted);
+    font-size: var(--text-2xs);
+  }
+
+  .xxd-menu__sep {
+    height: 1px;
+    margin: 4px -4px;
+    background: var(--line);
+  }
+
+  /* Tooltip：11px，小阴影（js/tooltip.js，挂在 [data-tooltip] 上） */
+  .xxd-tooltip {
+    position: fixed;
+    z-index: var(--z-toast);
+    max-width: 240px;
+    padding: 4px 8px;
+    border-radius: var(--r-xs);
+    background: var(--ink);
+    color: var(--on-ink);
+    font: var(--weight-medium) var(--text-2xs) / 1.4 var(--font-body);
+    box-shadow: 0 4px 12px rgba(var(--shadow-rgb), 0.16);
+    opacity: 0;
+    transform: translateY(2px);
+    pointer-events: none;
+    transition: opacity var(--motion-quick) ease, transform var(--motion-quick) ease;
+  }
+
+  .xxd-tooltip[data-open] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Toast：就地出现。在面板里做的操作，toast 出现在面板里，不盖住主内容区。 */
+  .xxd-toast-region {
+    position: fixed;
+    right: 0;
+    bottom: 16px;
+    left: 0;
+    z-index: var(--z-toast);
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    pointer-events: none;
+  }
+
+  .xxd-toast-region[data-scoped] {
+    position: absolute;
+    bottom: var(--toast-offset, 16px);
+  }
+
+  .xxd-toast {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: min(420px, 100%);
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    box-shadow: var(--shadow-popover);
+    pointer-events: auto;
+    animation: xxd-rise var(--motion-medium) var(--ease-out-expo);
+  }
+
+  .xxd-toast[data-leaving] {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity var(--motion-sheet-out) ease, transform var(--motion-sheet-out) ease;
+  }
+
+  .xxd-toast[data-tone="success"] > .ui-icon {
+    color: var(--success);
+  }
+
+  .xxd-toast[data-tone="danger"] > .ui-icon {
+    color: var(--danger);
+  }
+
+  .xxd-toast[data-tone="warning"] > .ui-icon {
+    color: var(--warning);
+  }
+
+  .xxd-toast__action {
+    margin-left: 4px;
+  }
+
+  /* 右侧详情面板（会员站同一个详情壳）。手机上变成全宽 sheet。 */
+  .xxd-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-dialog);
+    display: flex;
+    flex-direction: column;
+    width: min(560px, 100vw);
+    border-left: 1px solid var(--line);
+    background: var(--paper);
+    box-shadow: var(--shadow-sheet);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform var(--motion-panel) var(--ease-out-quart),
+      visibility 0s linear var(--motion-panel);
+  }
+
+  .xxd-panel[data-open] {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--motion-panel) var(--ease-out-quart), visibility 0s;
+  }
+
+  .xxd-panel__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 56px;
+    padding: 0 var(--space-3) 0 var(--space-5);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .xxd-panel__title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font: var(--weight-medium) var(--text-sm) / 1.3 var(--font-body);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .xxd-panel__body {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    padding: var(--space-5);
+    overflow: auto;
+  }
+
+  .xxd-panel-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-dialog) - 1);
+    background: rgba(var(--shadow-rgb), 0.18);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--motion-panel) ease;
+  }
+
+  .xxd-panel-scrim[data-open] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @keyframes xxd-rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+}
+
+/* sheet 打开时，dock 上的主操作藏起来，免得从 sheet 和 dock 之间的缝里露出来。 */
+@layer xxd.components {
+  .xxd-sheet-host[data-sheet-open] .xxd-dock__primary {
+    visibility: hidden;
+  }
+}
