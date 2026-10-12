@@ -1,0 +1,13 @@
+{
+  "name": "@xxd/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "小小东设计令牌：颜色、圆角（直角/圆角）、主色、字体、间距、动效。纯 CSS，任何项目都能直接用。",
+  "type": "module",
+  "sideEffects": ["*.css"],
+  "exports": {
+    "./tokens.css": "./tokens.css"
+  },
+  "files": ["tokens.css"]
+}

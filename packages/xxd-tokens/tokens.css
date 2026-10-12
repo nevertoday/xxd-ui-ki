@@ -1,0 +1,226 @@
+/*
+ * @xxd/tokens — 小小东设计语言的唯一来源（seed v0）
+ *
+ * 来源：xPoster src/xxd-theme.css（已与会员站 vip.xiaoxiaodong.ai 统一）+ 会员站 styles.css。
+ * 黑 / 白 / 灰，秩序，内容优先；默认直角；强调靠墨色而不是颜色。
+ * 颜色只留给意义（成功、危险、警告）和可选的「主色」。
+ *
+ * 三个开关，全部挂在 <html> 上，由 boot.js 在首帧前写入：
+ *   data-theme="light|dark"      主题
+ *   data-corners="rounded"       圆角（缺省 = 直角）
+ *   data-accent + --action-custom*  主色（缺省 = 墨色）
+ *   data-density="compact"       紧凑（侧边栏 / popup）
+ *
+ * 规则：组件里的任何矩形圆角都只能来自 --r-xs/sm/md/lg/pill；
+ * 语义上的圆（状态点、色块、头像）用 --r-circle，不跟开关走。
+ */
+:root {
+  color-scheme: light;
+
+  /* ── 颜色：纸 / 墨 / 线 ───────────────────────── */
+  --bg: #fcfcfc;
+  --paper: #ffffff;
+  --wash: #f4f4f5;
+  --wash-strong: #ececee;
+  --selected-bg: #ededed;
+  --switch-on: #56565b;
+  --ink: #111111;
+  --ink-rgb: 17, 17, 17;
+  --on-ink: #ffffff;
+  /* #777 在白底只有 4.48:1，小字需要 4.5；#6f6f6f 是 5.0（wash 上 4.6）。 */
+  --muted: #6f6f6f;
+  --muted-2: #9a968d;
+  --line: #e7e7ea;
+  --line-strong: #c9c9ce;
+  --paper-rgb: 255, 255, 255;
+  --shadow-rgb: 17, 17, 17;
+
+  /* 语义色：只表达意义 */
+  --success: #15803d;
+  --success-rgb: 21, 128, 61;
+  --danger: #b42318;
+  --danger-rgb: 180, 35, 24;
+  --warning: #b45309;
+  --warning-rgb: 180, 83, 9;
+
+  /* 强调色：墨色（缺省）或主色。正文永远用 --ink，只有强调标记用 --action。 */
+  --action: var(--ink);
+  --action-rgb: var(--ink-rgb);
+  --on-action: var(--on-ink);
+  --action-text: var(--ink);
+  --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 24%, transparent);
+
+  /* ── 圆角：直角（缺省）/ 圆角 ─────────────────── */
+  --r-xs: 0px;   /* 小标记 */
+  --r-sm: 0px;   /* 控件：按钮、输入框 */
+  --r-md: 0px;   /* 面：卡片、菜单、面板 */
+  --r-lg: 0px;   /* 大面：对话框、sheet */
+  --r-pill: 0px; /* 状态标签、开关：直角模式下开关也是方的 */
+  --r-circle: 50%; /* 语义圆：状态点、色块、头像 —— 不跟开关走 */
+
+  /* ── 阴影：只给浮层（tooltip / 菜单 / toast / 对话框 / sheet），卡片、行、按钮没有阴影 ── */
+  --shadow-popover: 0 18px 44px rgba(var(--shadow-rgb), 0.16);
+  --shadow-dialog: 0 28px 76px rgba(var(--shadow-rgb), 0.24);
+  --shadow-sheet: -18px 0 54px rgba(var(--shadow-rgb), 0.14);
+  --backdrop: rgba(5, 5, 5, 0.52);
+
+  /* ── 字体：不加载网络字体；字重只用 400 / 500 / 600 ── */
+  --font-body: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-title: "Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --text-2xs: 11px; /* tooltip、角标 */
+  --text-xs: 12px;  /* 菜单、次要信息 */
+  --text-sm: 13px;  /* 导航、控件（最常用） */
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 28px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-strong: 600;
+  --read-width: 680px; /* 阅读列：正文、预览、列表 */
+
+  /* ── 间距：4px 基准 ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* ── 控件尺寸：会员站 40px；侧边栏用 data-density="compact" ── */
+  --control-h: 40px;
+  --control-h-sm: 32px;
+  --icon-button: 38px;
+  --hit-min: 40px;
+
+  /* ── 图标：24 网格、1.5 线宽、圆头、斜接角（方角） ── */
+  --ui-icon-stroke: 1.5;
+  --icon-sm: 12px; /* 小字旁的 chevron */
+  --icon-md: 14px; /* 与文字同行 */
+  --icon-lg: 16px; /* 按钮、控件内 */
+  --icon-nav: 18px; /* 工具栏 */
+  --icon-rail: 20px; /* 侧栏导航 */
+
+  /* ── 动效：只动 opacity / transform；不弹跳 ── */
+  --motion-quick: 140ms;  /* 状态变化：hover、颜色、淡入淡出、完成勾 */
+  --motion-panel: 180ms;
+  --motion-sheet: 200ms;  /* sheet 升起 */
+  --motion-medium: 220ms; /* 小型进入：行、筛选、进度 */
+  --motion-sheet-out: 120ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ── 层级 ── */
+  --z-dock: 20;
+  --z-popover: 50;
+  --z-dialog: 60;
+  --z-toast: 70;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --hit-min: 44px;
+  }
+}
+
+:root[data-density="compact"] {
+  --control-h: 32px;
+  --control-h-sm: 26px;
+  --icon-button: 30px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  /* 暖黑，不是蓝黑 */
+  --bg: #171612;
+  --paper: #201f1a;
+  --wash: #2a2822;
+  --wash-strong: #312f28;
+  --selected-bg: #38362e;
+  --switch-on: #cfc9bd;
+  --ink: #f3f0ea;
+  --ink-rgb: 243, 240, 234;
+  --on-ink: #171612;
+  --muted: #a7a194;
+  --muted-2: #837d72;
+  --line: #34322b;
+  --line-strong: #4c483f;
+  --paper-rgb: 32, 31, 26;
+  --shadow-rgb: 0, 0, 0;
+  --success: #4ade80;
+  --success-rgb: 74, 222, 128;
+  --danger: #f87171;
+  --danger-rgb: 248, 113, 113;
+  --warning: #f0b35a;
+  --warning-rgb: 240, 179, 90;
+  --shadow-popover: 0 18px 44px rgba(0, 0, 0, 0.42);
+  --shadow-dialog: 0 28px 76px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-corners="rounded"] {
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-pill: 999px;
+}
+
+/* 主色：一个颜色定整个界面的调子，而不是灰底上一个彩色按钮。
+   accent.js 写入 --action-custom*（颜色、rgb、其上文字、加深后的文字；亮/暗各一套）。
+   - 强调（主按钮、开关、tab 下划线、选中项、焦点）用这个颜色；
+   - 选中与 hover 的底色是它的淡层，而不是灰；
+   - 背景、wash、线条掺 3–12% 的它，让灰色和它同调。
+   正文 --ink、纸色、成功/危险/警告保持不变。 */
+:root[data-accent] {
+  --action: var(--action-custom);
+  --action-rgb: var(--action-rgb-custom);
+  --on-action: var(--on-action-custom);
+  --action-text: var(--action-text-custom);
+  --switch-on: var(--action);
+  --selected-bg: color-mix(in srgb, var(--action) 13%, #ffffff);
+  --bg: color-mix(in srgb, #fcfcfc 97%, var(--action));
+  --wash: color-mix(in srgb, #f4f4f5 92%, var(--action));
+  --wash-strong: color-mix(in srgb, #ececee 90%, var(--action));
+  --line: color-mix(in srgb, #e7e7ea 90%, var(--action));
+  --line-strong: color-mix(in srgb, #c9c9ce 88%, var(--action));
+  --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 45%, transparent);
+}
+
+:root[data-theme="dark"][data-accent] {
+  --action: var(--action-custom-dark);
+  --action-rgb: var(--action-rgb-custom-dark);
+  --on-action: var(--on-action-custom-dark);
+  --action-text: var(--action-text-custom-dark);
+  --selected-bg: color-mix(in srgb, var(--action) 18%, #201f1a);
+  --bg: color-mix(in srgb, #171612 97%, var(--action));
+  --wash: color-mix(in srgb, #2a2822 94%, var(--action));
+  --wash-strong: color-mix(in srgb, #312f28 92%, var(--action));
+  --line: color-mix(in srgb, #34322b 90%, var(--action));
+  --line-strong: color-mix(in srgb, #4c483f 88%, var(--action));
+  --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 55%, transparent);
+}
+
+/* 选中文字和输入光标也跟主色 */
+:root[data-accent] ::selection {
+  background: color-mix(in srgb, var(--action) 24%, transparent);
+}
+
+:root[data-accent] :is(input, textarea) {
+  caret-color: var(--action);
+}
+
+/* 减少动效：一次性全部静止，组件不各自例外 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

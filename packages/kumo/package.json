@@ -1,7 +1,7 @@
 {
   "name": "@cloudflare/kumo",
   "version": "2.14.0",
-  "private": false,
+  "private": true,
   "description": "Kumo - Cloudflare's component library for building modern web applications",
   "keywords": [
     "cloudflare",
@@ -10,7 +10,7 @@
     "react",
     "ui"
   ],
-  "license": "MIT",
+  "license": "UNLICENSED",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cloudflare/kumo.git",
