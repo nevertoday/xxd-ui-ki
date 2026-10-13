@@ -45,7 +45,7 @@ describe("registry.json", () => {
 
   it("CSS 里的类都登记在某个组件下（工具类除外）", () => {
     const listed = new Set([...registry.components.flatMap((c) => c.classes), ...patternsFile.patterns.flatMap((p) => p.classes)]);
-    const utilities = new Set(["xxd-page", "xxd-sr-only", "xxd-title", "xxd-heading", "xxd-muted", "xxd-small", "xxd-mono", "xxd-divider", "xxd-read", "xxd-stack", "xxd-cluster"]);
+    const utilities = new Set(["xxd-page", "xxd-sr-only", "xxd-sr-only-focusable", "xxd-title", "xxd-heading", "xxd-muted", "xxd-small", "xxd-mono", "xxd-divider", "xxd-read", "xxd-stack", "xxd-cluster"]);
     const unlisted = [...defined].filter((k) => !listed.has(k) && !utilities.has(k));
     expect(unlisted).toEqual([]);
   });

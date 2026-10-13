@@ -66,14 +66,21 @@ export function renderPagination(nav, { page = Number(nav.dataset.page) || 1, to
   nav.dataset.page = String(current);
   nav.dataset.total = String(total);
   nav.dataset.perPage = String(perPage);
-  const prev = `<button type="button" data-page-to="${current - 1}" aria-label="${t("prevPage", null, nav)}" ${current === 1 ? "disabled" : ""}>${CHEV("m15 6-6 6 6 6")}</button>`;
-  const next = `<button type="button" data-page-to="${current + 1}" aria-label="${t("nextPage", null, nav)}" ${current === pages ? "disabled" : ""}>${CHEV("m9 6 6 6-6 6")}</button>`;
+  const prev = `<button type="button" data-page-to="${current - 1}" data-role="prev" aria-label="${t("prevPage", null, nav)}" ${current === 1 ? "disabled" : ""}>${CHEV("m15 6-6 6 6 6")}</button>`;
+  const next = `<button type="button" data-page-to="${current + 1}" data-role="next" aria-label="${t("nextPage", null, nav)}" ${current === pages ? "disabled" : ""}>${CHEV("m9 6 6 6-6 6")}</button>`;
   const middle = pageList(current, pages)
     .map((p) => (p === "…" ? `<span class="xxd-pagination__gap">…</span>` : `<button type="button" data-page-to="${p}" ${p === current ? 'aria-current="page"' : ""}>${p}</button>`))
     .join("");
   // 窄的时候只显示这一段（CSS 的容器查询）：「3 / 12」，读屏也读得到当前页
   const status = `<span class="xxd-pagination__status">${current} / ${pages}</span>`;
+  // 整段重建会把焦点丢到 body：记下焦点在哪个按钮上，重建后放回去（变成禁用的话放到当前页）
+  const had = nav.contains(document.activeElement) ? document.activeElement : null;
+  const role = had?.dataset.role;
   nav.innerHTML = prev + status + middle + next;
+  if (had) {
+    const again = role ? nav.querySelector(`[data-role="${role}"]:not(:disabled)`) : null;
+    (again || nav.querySelector('[aria-current="page"]'))?.focus();
+  }
   const info = nav.parentElement?.querySelector(".xxd-pagination__info");
   if (info) info.textContent = total ? `${(current - 1) * perPage + 1}–${Math.min(total, current * perPage)} / ${total}` : "0 / 0";
   return { page: current, pages };

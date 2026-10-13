@@ -44,7 +44,7 @@ export function distance(a, b) {
   return d[b.length];
 }
 
-/** 从候选里找最像的几个：先看包含关系，再看编辑距离（不超过长度的四成）。 */
+/** 从候选里找最像的几个：先看包含关系，再看编辑距离（不超过长度的三分之一，至少 1）。 */
 export function suggest(word, candidates, max = 3) {
   const w = String(word).toLowerCase();
   if (!w) return [];
@@ -54,7 +54,7 @@ export function suggest(word, candidates, max = 3) {
     if (l === w) return [cand];
     const dist = distance(w, l);
     const score = l.includes(w) || w.includes(l) ? Math.abs(l.length - w.length) / 10 : dist;
-    if (score <= Math.max(2, Math.ceil(w.length * 0.4))) scored.push([score, cand]);
+    if (score <= Math.max(1, Math.ceil(w.length / 3))) scored.push([score, cand]);
   }
   return scored.sort((a, b) => a[0] - b[0] || a[1].length - b[1].length).slice(0, max).map(([, cand]) => cand);
 }

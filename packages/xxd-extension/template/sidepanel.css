@@ -4,6 +4,7 @@ body {
   height: 100%;
 }
 
+/* xxd:account */
 /* 没登录只显示登录页；登录后只显示应用 */
 :root[data-account="signed-out"] .app,
 :root[data-account="signed-in"] .view-signin {
@@ -15,6 +16,7 @@ body {
   min-height: 100%;
   place-items: center;
 }
+/* /xxd:account */
 
 .app {
   display: flex;

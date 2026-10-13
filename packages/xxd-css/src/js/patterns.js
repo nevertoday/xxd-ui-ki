@@ -1,5 +1,5 @@
 // 小小东模式的行为（优化计划 O4）。
-import { emit, layerRoot, reducedMotion } from "./dom.js";
+import { defaultLayerRoot, emit, layerRoot, reducedMotion } from "./dom.js";
 import { openDialog } from "./dialog.js";
 import { bindSearch, markMatches, clearMarks } from "./inputs.js";
 import { t } from "./i18n.js";
@@ -73,7 +73,7 @@ export function bindDrop(target, { onFiles, onText, veil = t("dropVeil", null, t
  * ← → 翻，Esc 回到同一张（焦点回到打开它的缩略图），点背景关。 */
 const ARROW = (d) => `<svg class="ui-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="miter" aria-hidden="true"><path d="${d}"/></svg>`;
 
-export function openViewer(items, start = 0, { actions = [], within = document.body, labels = {} } = {}) {
+export function openViewer(items, start = 0, { actions = [], within = defaultLayerRoot(), labels = {} } = {}) {
   if (!items?.length) return null;
   const L = { prev: t("prevImage", null, within), next: t("nextImage", null, within), close: t("close", null, within), title: t("imageViewer", null, within), ...labels };
   const doc = within.ownerDocument;

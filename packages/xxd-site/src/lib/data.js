@@ -1,5 +1,6 @@
 // 展示站的数据：全部来自各个包的「唯一来源」，页面不手抄。英文版从 registry.en.js / patterns.en.js 叠上去。
 import registry from "../../../xxd-css/registry.json";
+import cssPkg from "../../../xxd-css/package.json";
 import * as registryEn from "../../../xxd-css/registry.en.js";
 import tokens from "../../../xxd-tokens/dist/tokens.json";
 import { ACCENT_PRESETS, accentPalette, contrast, toRgb } from "@xxd/tokens";
@@ -7,6 +8,9 @@ import { ICON_NAMES, ICON_ALIASES, iconSVG } from "@xxd/icons";
 import { ICON_GROUPS, ICON_KEYWORDS } from "@xxd/icons/meta";
 
 export { registry, tokens, ACCENT_PRESETS, accentPalette, contrast, toRgb, ICON_NAMES, ICON_ALIASES, ICON_GROUPS, ICON_KEYWORDS, iconSVG };
+
+/** 展示站上带版本号的构建文件 /v/<版本>/（scripts/assets.mjs 拷过去） */
+export const CDN_VERSION = cssPkg.version;
 
 export const slug = (name) => name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 

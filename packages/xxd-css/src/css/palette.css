@@ -2,7 +2,7 @@
 @layer xxd.components {
   .xxd-palette {
     width: min(560px, calc(100vw - 32px));
-    margin-top: min(14vh, 120px);
+    margin: min(14vh, 120px) auto auto;
     padding: 0;
   }
 

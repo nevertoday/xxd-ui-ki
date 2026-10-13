@@ -1,6 +1,6 @@
 // Tooltip、Toast、复制。
 import { place } from "./floating.js";
-import { layerRoot, nextId } from "./dom.js";
+import { defaultLayerRoot, layerRoot, nextId } from "./dom.js";
 import { ICON } from "./icons-min.js";
 import { t } from "./i18n.js";
 
@@ -24,6 +24,8 @@ function ensureTip(anchor) {
     el.className = "xxd-tooltip";
     el.id = nextId("xxd-tip");
     el.setAttribute("role", "tooltip");
+    // 进顶层：对话框里的按钮、注入到别人网页里的界面，提示都不会被盖住
+    if (typeof el.showPopover === "function") el.popover = "manual";
     container.append(el);
     tips.set(container, el);
   }
@@ -41,6 +43,7 @@ export function showTooltip(anchor) {
   el.toggleAttribute("data-arrow", anchor.hasAttribute("data-tooltip-arrow"));
   tipAnchor = anchor;
   anchor.setAttribute("aria-describedby", el.id);
+  toTop(el);
   place(anchor, el, { placement: anchor.getAttribute("data-tooltip-placement") || "top", offset: anchor.hasAttribute("data-tooltip-arrow") ? 9 : 6 });
   el.toggleAttribute("data-instant", instant);
   el.setAttribute("data-open", "");
@@ -54,6 +57,22 @@ export function hideTooltip() {
   tip.removeAttribute("data-open");
   if (tipAnchor) tipAnchor.removeAttribute("aria-describedby");
   tipAnchor = null;
+  // 淡出之后再离开顶层
+  const el = tip;
+  setTimeout(() => !el.hasAttribute("data-open") && el.matches?.(":popover-open") && el.hidePopover(), 120);
+}
+
+/** 放到顶层的最上面（后打开的对话框会盖住先放进顶层的东西：每次重新放一次）。 */
+function toTop(el) {
+  if (!el.popover || typeof el.showPopover !== "function") return;
+  // 焦点在里面（Alt+T 跳进来了）就不动它：重新放会把焦点弄丢
+  if (el.matches(":popover-open") && el.contains(el.getRootNode().activeElement)) return;
+  try {
+    if (el.matches(":popover-open")) el.hidePopover();
+    el.showPopover();
+  } catch {
+    // 不在文档里、或浏览器不支持：留在原处
+  }
 }
 
 export function installTooltips(root, closestFrom) {
@@ -75,7 +94,11 @@ export function installTooltips(root, closestFrom) {
   root.addEventListener("focusout", hideTooltip);
   root.addEventListener("pointerdown", hideTooltip);
   root.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") hideTooltip();
+    if (event.key !== "Escape" || !tip?.hasAttribute("data-open")) return;
+    // 这一下 Esc 只关提示，不连带关掉它所在的对话框 / 面板（WCAG 1.4.13）
+    event.preventDefault();
+    event.stopPropagation();
+    hideTooltip();
   });
   globalThis.addEventListener?.("scroll", hideTooltip, true);
 }
@@ -84,19 +107,30 @@ export function installTooltips(root, closestFrom) {
 const regions = new WeakMap();
 
 function regionFor(within) {
+  within ??= defaultLayerRoot();
   const doc = within?.ownerDocument || document;
   const host = within && within !== doc.body ? within : doc.body;
   let region = regions.get(host);
   if (region?.isConnected) return region;
   region = doc.createElement("div");
   region.className = "xxd-toast-region";
-  region.setAttribute("role", "status");
+  // 一个有名字的区域（读屏能跳到），里面新加的 toast 会被念出来
+  region.setAttribute("role", "region");
+  region.setAttribute("aria-label", t("notifications", null, host.nodeType === 1 ? host : doc.documentElement));
   region.setAttribute("aria-live", "polite");
+  region.setAttribute("aria-relevant", "additions");
+  // 键盘聚焦进来时也要展开叠放（不然聚焦到的那张是 aria-hidden）
+  region.addEventListener("focusin", () => restack(region));
+  region.addEventListener("focusout", () => queueMicrotask(() => restack(region)));
+  region.addEventListener("pointerenter", () => restack(region));
+  region.addEventListener("pointerleave", () => restack(region));
   // within 是 ShadowRoot：当作一整页（固定在视口角上），不是容器
   if (host !== doc.body && host.nodeType === 1) {
     region.setAttribute("data-scoped", "");
     if (getComputedStyle(host).position === "static") host.style.position = "relative";
   }
+  // 整页的 toast 区（body 或 ShadowRoot 里）进顶层；容器里的（面板里就地出现）不用
+  if (!region.hasAttribute("data-scoped") && typeof region.showPopover === "function") region.popover = "manual";
   host.append(region);
   regions.set(host, region);
   return region;
@@ -106,11 +140,12 @@ function regionFor(within) {
 function restack(region) {
   if (!region.hasAttribute("data-stack")) return;
   const list = [...region.querySelectorAll(":scope > .xxd-toast:not([data-leaving])")];
+  const open = region.contains(region.getRootNode().activeElement) || region.matches(":hover");
   list.forEach((t, n) => {
     const i = list.length - 1 - n;
     t.style.setProperty("--i", String(i));
     t.toggleAttribute("data-hidden-in-stack", i >= 3);
-    t.setAttribute("aria-hidden", String(i > 0 && !region.matches(":hover, :focus-within")));
+    t.setAttribute("aria-hidden", String(i > 0 && !open));
   });
 }
 
@@ -123,8 +158,8 @@ const timers = new WeakMap();
  * stack: false 时一张张排开（旧行为）。
  */
 export function toast(message, { tone = "neutral", within, duration, action, stack = true } = {}) {
-  // 带操作（撤销、重试）的要留够时间去点：缺省 6 秒；只是告知的 2.6 秒
-  duration ??= action?.label ? 6000 : 2600;
+  // 带操作（撤销、重试）的要留够时间去点：缺省 10 秒（键盘用户还要按 Alt+T 跳过来）；只是告知的 2.6 秒
+  duration ??= action?.label ? 10000 : 2600;
   const region = regionFor(within);
   region.toggleAttribute("data-stack", stack);
   const key = `${tone}\u0000${message}`;
@@ -160,6 +195,7 @@ export function toast(message, { tone = "neutral", within, duration, action, sta
     el.append(btn);
   }
   region.append(el);
+  toTop(region);
   restack(region);
 
   let timer = 0;
@@ -175,8 +211,6 @@ export function toast(message, { tone = "neutral", within, duration, action, sta
   el.addEventListener("focusout", (event) => {
     if (!el.contains(event.relatedTarget)) restart(1200);
   });
-  region.addEventListener("pointerenter", () => restack(region));
-  region.addEventListener("pointerleave", () => restack(region));
 
   // 横向滑动关闭
   let startX = null;
@@ -208,15 +242,50 @@ export function toast(message, { tone = "neutral", within, duration, action, sta
   function dismiss() {
     clearTimeout(timer);
     if (!el.isConnected || el.hasAttribute("data-leaving")) return;
+    // 焦点在这张 toast 里：交还给按 Alt+T 之前的位置
+    if (el.contains(el.getRootNode().activeElement)) (lastFocus.get(region)?.isConnected ? lastFocus.get(region) : null)?.focus({ preventScroll: true });
     el.setAttribute("data-leaving", "");
     restack(region);
     setTimeout(() => {
       el.remove();
       restack(region);
+      if (!region.querySelector(".xxd-toast") && region.matches?.(":popover-open")) region.hidePopover();
     }, 140);
   }
   timers.set(el, { restart, dismiss });
   return { element: el, dismiss };
+}
+
+/* ── 键盘够得着 toast：Alt+T 跳到最新一张（有按钮就到按钮上，计时随之暂停），Esc 关掉它、焦点回到原处 ── */
+const lastFocus = new WeakMap();
+
+function latestToast(root) {
+  const scope = root.querySelectorAll ? root : document;
+  const all = [...scope.querySelectorAll(".xxd-toast-region > .xxd-toast:not([data-leaving])")];
+  return all[all.length - 1] || null;
+}
+
+export function installToasts(root) {
+  root.addEventListener("keydown", (event) => {
+    if (event.altKey && !event.ctrlKey && !event.metaKey && (event.code === "KeyT" || event.key === "t" || event.key === "T")) {
+      const el = latestToast(root);
+      if (!el) return;
+      event.preventDefault();
+      const region = el.parentElement;
+      lastFocus.set(region, el.getRootNode().activeElement);
+      const target = el.querySelector("button") || el;
+      if (target === el) el.tabIndex = -1;
+      target.focus();
+      return;
+    }
+    if (event.key === "Escape") {
+      const el = event.target?.closest?.(".xxd-toast");
+      if (!el) return;
+      event.preventDefault();
+      event.stopPropagation();
+      timers.get(el)?.dismiss();
+    }
+  });
 }
 
 /* ── 复制：[data-copy="文本"] 或 [data-copy-target="#selector"]；完成后图标变勾一会儿 ── */

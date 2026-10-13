@@ -2,12 +2,13 @@
 //   dist/components.css   只有组件（需要另外引入 tokens.css）
 //   dist/xxd.css          令牌 + 组件（一个文件搞定）
 //   dist/xxd.shadow.css   Shadow DOM 版本（:root → :host；宿主页面的继承样式和同名变量进不来）
+//   dist/xxd.shadow.css.js  同一份压缩后放进 globalThis.XxdShadowCSS（内容脚本用，不需要 web_accessible_resources）
 //   dist/xxd.js           经典脚本 window.Xxd（自动 install）
 //   dist/xxd.esm.js       ESM 打包版
 //   dist/boot.js          @xxd/tokens 首帧脚本（方便一起拷进插件）
 //   dist/icons.js         @xxd/icons 经典脚本 window.XxdIcons
 import { build } from "esbuild";
-import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync, existsSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,8 +19,22 @@ const dist = join(root, "dist");
 const tokensDir = join(root, "../xxd-tokens");
 const iconsDir = join(root, "../xxd-icons");
 
-for (const dir of [tokensDir, iconsDir]) {
-  if (!existsSync(join(dir, "dist"))) execFileSync("node", ["scripts/build.mjs"], { cwd: dir, stdio: "inherit" });
+// 令牌和图标：没构建过、或者源码比构建产物新，就先构建（以前只看 dist 在不在，改了 tokens.css 会用到旧的）
+for (const [dir, out] of [[tokensDir, "dist/tokens.json"], [iconsDir, "dist/icons.iife.js"]]) {
+  if (isStale(dir, out)) execFileSync("node", ["scripts/build.mjs"], { cwd: dir, stdio: "inherit" });
+}
+
+/** 源码（src、scripts、包根目录的 .css / .js）里有比 out 新的文件。 */
+function isStale(dir, out) {
+  const target = join(dir, out);
+  if (!existsSync(target)) return true;
+  const built = statSync(target).mtimeMs;
+  const newer = (p) => {
+    const st = statSync(p);
+    if (st.isDirectory()) return readdirSync(p).some((n) => n !== "node_modules" && n !== "dist" && newer(join(p, n)));
+    return /\.(css|js|mjs|json)$/.test(p) && st.mtimeMs > built;
+  };
+  return readdirSync(dir).some((n) => !/^(node_modules|dist|test)$/.test(n) && newer(join(dir, n)));
 }
 
 // 和 @xxd/tokens 用同一个转换（:root → :host、令牌在 Shadow 内部再声明、继承属性重置）
@@ -41,7 +56,13 @@ const components = cssResult.outputFiles[0].text;
 const tokens = readFileSync(join(tokensDir, "tokens.css"), "utf8");
 writeFileSync(join(dist, "components.css"), `${banner}\n${components}`);
 writeFileSync(join(dist, "xxd.css"), `${banner}\n${tokens}\n${components}`);
-writeFileSync(join(dist, "xxd.shadow.css"), `${banner}\n${toShadow(`${tokens}\n${components}`)}`);
+const shadow = toShadow(`${tokens}\n${components}`);
+writeFileSync(join(dist, "xxd.shadow.css"), `${banner}\n${shadow}`);
+// 内容脚本用：Shadow 样式压缩后放进一个 JS 字符串（globalThis.XxdShadowCSS）。
+// 跟着内容脚本一起注入，mountXxdUI 同步挂上：不用 fetch，不用 web_accessible_resources（网站也就没法借它认出插件）。
+const shadowMin = (await build({ stdin: { contents: shadow, loader: "css" }, write: false, minify: true, target: ["chrome114"] })).outputFiles[0].text.trim();
+writeFileSync(join(dist, "xxd.shadow.min.css"), `${banner}\n${shadowMin}\n`);
+writeFileSync(join(dist, "xxd.shadow.css.js"), `${banner.replace("*/", "— Shadow DOM 样式 */")}\nglobalThis.XxdShadowCSS = ${JSON.stringify(shadowMin)};\n`);
 
 const minCss = await build({ stdin: { contents: `${tokens}\n${components}`, loader: "css" }, write: false, minify: true, target: ["chrome114"] });
 writeFileSync(join(dist, "xxd.min.css"), `${banner}\n${minCss.outputFiles[0].text}`);

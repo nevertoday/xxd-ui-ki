@@ -1,4 +1,7 @@
 {
+  "xxdLocale": {
+    "message": "en"
+  },
   "appName": {
     "message": "__APP_NAME_EN__"
   },
@@ -17,12 +20,6 @@
   "tabSettings": {
     "message": "Settings"
   },
-  "emptyTitle": {
-    "message": "Start here"
-  },
-  "emptyText": {
-    "message": "An extension template made with the XXD UI Kit."
-  },
   "historyEmpty": {
     "message": "Nothing here yet"
   },
@@ -33,28 +30,7 @@
     "message": "Done"
   },
   "searchPlaceholder": {
-    "message": "Search settings (⌘F)"
-  },
-  "signinGift": {
-    "message": "New accounts get a 7-day full experience"
-  },
-  "signinGoogle": {
-    "message": "Continue with Google"
-  },
-  "signinOr": {
-    "message": "or use email"
-  },
-  "signinAs": {
-    "message": "Sign in as"
-  },
-  "continue": {
-    "message": "Continue"
-  },
-  "back": {
-    "message": "Back"
-  },
-  "terms": {
-    "message": "By continuing you agree to the Terms and Privacy Policy"
+    "message": "Search settings"
   },
   "dropTitle": {
     "message": "Drop files here"
@@ -68,38 +44,8 @@
   "dropVeil": {
     "message": "Drop to add"
   },
-  "groupAccount": {
-    "message": "Account"
-  },
   "groupAbout": {
     "message": "About"
-  },
-  "upgrade": {
-    "message": "Become a member"
-  },
-  "planMonth": {
-    "message": "Monthly"
-  },
-  "planYear": {
-    "message": "Yearly"
-  },
-  "planKeep": {
-    "message": "Your remaining trial days are kept."
-  },
-  "pay": {
-    "message": "Pay"
-  },
-  "paid": {
-    "message": "I've paid — check now"
-  },
-  "payOpened": {
-    "message": "The payment page opened in a new tab"
-  },
-  "memberDone": {
-    "message": "Membership is active"
-  },
-  "signout": {
-    "message": "Sign out"
   },
   "version": {
     "message": "Version"
@@ -109,5 +55,25 @@
   },
   "yesterday": {
     "message": "Yesterday"
+  },
+  "navMain": {
+    "message": "Main"
+  },
+  "clear": {
+    "message": "Clear"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "confirmDelete": {
+    "message": "Confirm delete"
+  },
+  "itemCount": {
+    "message": "$COUNT$ items",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

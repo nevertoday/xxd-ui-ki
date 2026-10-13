@@ -5,7 +5,8 @@ description: Build or restyle any 小小东 interface with the open-source (MIT)
 
 # 小小东 UI Kit
 
-仓库：`/Volumes/T7-usb/js/xxd-ui-kit`（MIT 开源；不 push `upstream`；推送、发 npm 等小小东说了再做）。
+仓库：这个 Skill 所在目录往上两级（`skills/xxd-ui/` → 仓库根目录；Skill 通常是从仓库链接过去的）；也可以用环境变量 `XXD_UI_KIT_DIR` 指定。
+MIT 开源；不 push `upstream`；推送、发 npm、部署等用户说了再做。装过 `pnpm xxd link` 的话，任何目录都能用 `xxd-ui …` 代替 `pnpm xxd …`。
 
 ## 先读
 
@@ -24,8 +25,8 @@ description: Build or restyle any 小小东 interface with the open-source (MIT)
 ## 新插件
 
 ```bash
-cd /Volumes/T7-usb/js/xxd-ui-kit
-pnpm xxd new <目录> --name 四字名字 --name-en "English" --slug short-id
+cd <仓库根目录>
+pnpm xxd new <目录> --name 四字名字 --name-en "English" --slug short-id   # 需要时加 --popup / --content "<match>" / --account
 ```
 
 然后在模板上改：tab 在最上面（没有顶栏）、内容在阅读列里、底部 dock（状态在前，下一步在最后）、设置页用 `Xxd.mountAppearance` 接 `XxdExtension.createAppearanceStore({ key })`。详见 `docs/EXTENSION-KIT.md`。
@@ -52,5 +53,5 @@ pnpm xxd new <目录> --name 四字名字 --name-en "English" --slug short-id
 
 - 令牌唯一来源 `packages/xxd-tokens/tokens.css`；图标 `packages/xxd-icons/src/nodes.js`（新图标同时在 `src/meta.js` 写分类和中文关键词，测试会查）；原生组件 `packages/xxd-css/src/`，并同步 `registry.json`；Kumo 颜色映射只改 `packages/kumo/scripts/theme-generator/xxd-overrides.ts`。
 - 跑 `pnpm xxd:build && pnpm xxd:test`；动了 Kumo 再跑 `pnpm --filter @cloudflare/kumo test` 和 `pnpm lint`。
-- 看效果：`packages/xxd-css/playground.html`（原生），`pnpm --filter @cloudflare/kumo-docs-astro dev` 后的 `/xxd/native`、`/xxd/showcase`（React），亮/暗 × 直角/圆角 × 墨色/主色都要看。
-- 完成后在 `docs/PLAN.md` 记录。
+- 看效果：`pnpm dev` 打开展示站（http://localhost:4400），每个组件页有原生和 React 两种演示，右上角切亮/暗 × 直角/圆角 × 主色，都要看。
+- 完成后在 `docs/maintainers/` 当前那一轮的计划里记录。

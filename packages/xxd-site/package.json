@@ -8,7 +8,7 @@
   "scripts": {
     "assets": "node scripts/assets.mjs",
     "dev": "pnpm run assets && astro dev --port 4400",
-    "build": "pnpm run assets && astro build",
+    "build": "pnpm run assets && astro build && node scripts/page-md.mjs",
     "preview": "astro preview --port 4400",
     "visual": "node scripts/visual.mjs",
     "visual:update": "node scripts/visual.mjs --update",

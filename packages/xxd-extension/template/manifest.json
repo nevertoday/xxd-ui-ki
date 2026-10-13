@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "default_locale": "zh_CN",
+  "default_locale": "en",
   "name": "__MSG_appName__",
   "description": "__MSG_appDescription__",
   "version": "0.1.0",
@@ -12,15 +12,5 @@
   "side_panel": { "default_path": "sidepanel.html" },
   "options_page": "options.html",
   "action": { "default_title": "__MSG_actionTitle__" },
-  "background": { "service_worker": "background.js" },
-  "content_scripts": [
-    {
-      "matches": ["https://example.com/*"],
-      "js": ["vendor/xxd/xxd.js", "vendor/xxd/extension.js", "content.js"],
-      "run_at": "document_idle"
-    }
-  ],
-  "web_accessible_resources": [
-    { "resources": ["vendor/xxd/xxd.shadow.css"], "matches": ["https://example.com/*"] }
-  ]
+  "background": { "service_worker": "background.js", "type": "module" }
 }

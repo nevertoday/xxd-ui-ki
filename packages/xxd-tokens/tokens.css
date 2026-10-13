@@ -106,7 +106,7 @@
   --control-h: 40px;
   --control-h-sm: 32px;
   --control-h-xs: 24px;
-  --icon-button: 38px;
+  --icon-button: 40px; /* 和 --control-h 一样高：同一行的图标按钮、输入框、按钮上下对齐 */
   --hit-min: 40px;
 
   /* ── 图标：24 网格、1.5 线宽、圆头、斜接角（方角） ── */
@@ -144,7 +144,7 @@
   --control-h: 32px;
   --control-h-sm: 26px;
   --control-h-xs: 20px;
-  --icon-button: 30px;
+  --icon-button: 32px;
 }
 
 :root[data-theme="dark"] {

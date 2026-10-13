@@ -113,3 +113,6 @@ export declare function resolveLocale(input?: string | null): XxdLocale;
 export declare function t(key: string, vars?: Record<string, string | number> | null, node?: Element): string;
 /** 浮层挂在哪：节点在 Shadow 里就是那个 ShadowRoot，否则是 body。 */
 export declare function layerRoot(node: Node): HTMLElement | ShadowRoot;
+/** 注入到别人网页里时（mountXxdUI 会调用）：toast、确认框、命令面板、图片查看器、tooltip 默认出现在这个 ShadowRoot 里。传 null 恢复成 body。 */
+export declare function setDefaultLayerRoot(root: ShadowRoot | HTMLElement | null): void;
+export declare function defaultLayerRoot(): HTMLElement | ShadowRoot;

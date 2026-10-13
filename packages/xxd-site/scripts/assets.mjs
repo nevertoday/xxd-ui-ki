@@ -1,5 +1,6 @@
 // 展示站的静态资源：
 //   public/xxd/      @xxd/css 的构建产物（boot.js、xxd.css、xxd.js、icons.js）
+//   public/v/<版本>/  同一批文件带版本号的一份（README「先试一下」引用它）
 //   public/xxd/echarts.js  图表组件页用（echarts/dist/echarts.min.js）
 //   public/xxd/kumo.css  React 组件的预编译样式（@cloudflare/kumo standalone，Kumo 换皮版）
 //   public/xxd/forced-states.css  状态矩阵用：把组件 CSS 里的 :hover / :focus-visible / :active 复制成 [data-force~="…"] 版本，
@@ -17,6 +18,12 @@ mkdirSync(out, { recursive: true });
 const cssDist = join(pkgs, "xxd-css/dist");
 if (!existsSync(join(cssDist, "xxd.js"))) execFileSync("node", ["scripts/build.mjs"], { cwd: join(pkgs, "xxd-css"), stdio: "inherit" });
 for (const f of ["boot.js", "xxd.css", "xxd.js", "icons.js"]) copyFileSync(join(cssDist, f), join(out, f));
+
+// 带版本号的一份：public/v/<版本>/，给「先试一下」的 <link> / <script> 用（public/_headers 让它长期缓存）
+const version = JSON.parse(readFileSync(join(pkgs, "xxd-css/package.json"), "utf8")).version;
+const versioned = join(here, "../public/v", version);
+mkdirSync(versioned, { recursive: true });
+for (const f of ["boot.js", "xxd.css", "xxd.min.css", "components.css", "xxd.js", "xxd.esm.js", "icons.js"]) copyFileSync(join(cssDist, f), join(versioned, f));
 
 // 图表组件页用的 ECharts（只在那一页加载）
 import { createRequire } from "node:module";

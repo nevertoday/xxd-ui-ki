@@ -1,16 +1,21 @@
 // 查找：图标（名字、别名、中文关键词）、组件和模式（英文名、中文名、类名）、令牌、展示站页面地址。
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { ICON_ALIASES, ICON_NAMES, iconSVG, resolveIcon } from "../../../xxd-icons/src/svg.js";
 import { ICON_GROUPS, ICON_KEYWORDS } from "../../../xxd-icons/src/meta.js";
 import { suggest } from "./term.mjs";
+import { isEn } from "./lang.mjs";
 
 export const SITE = "https://ui.xiaoxiaodong.ai";
 const repo = join(dirname(fileURLToPath(import.meta.url)), "../../../..");
 const readJson = (rel) => JSON.parse(readFileSync(join(repo, rel), "utf8"));
+// 英文版的注册表（展示站 /en/ 用的那份）：命令行说英文时，名字、说明、示例、规则都用它
+const EN = await import(pathToFileURL(join(repo, "packages/xxd-css/registry.en.js")).href);
+const EN_PATTERNS = await import(pathToFileURL(join(repo, "packages/xxd-css/patterns.en.js")).href);
 
 const GROUP_ZH = Object.fromEntries(ICON_GROUPS.flatMap((g) => Object.keys(g.icons).map((n) => [n, g.zh])));
+const GROUP_EN = Object.fromEntries(ICON_GROUPS.flatMap((g) => Object.keys(g.icons).map((n) => [n, g.en])));
 const ALIASES_OF = {};
 for (const [alias, target] of Object.entries(ICON_ALIASES)) (ALIASES_OF[target] ||= []).push(alias);
 
@@ -23,13 +28,13 @@ export const iconName = (name) => (ICON_NAMES.includes(name) ? name : ICON_ALIAS
  */
 export function searchIcons(query) {
   const words = String(query || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
-  const all = ICON_NAMES.map((name) => ({ name, keywords: ICON_KEYWORDS[name] || "", group: GROUP_ZH[name] || "", aliases: ALIASES_OF[name] || [] }));
+  const all = ICON_NAMES.map((name) => ({ name, keywords: ICON_KEYWORDS[name] || "", group: GROUP_ZH[name] || "", groupEn: GROUP_EN[name] || "", aliases: ALIASES_OF[name] || [] }));
   if (!words.length) return all;
   const scoreOf = (icon) => {
     let total = 0;
     for (const w of words) {
       const names = [icon.name, ...icon.aliases].map((n) => n.toLowerCase());
-      const kws = `${icon.keywords} ${icon.group}`.toLowerCase().split(/\s+/);
+      const kws = `${icon.keywords} ${icon.group} ${icon.groupEn}`.toLowerCase().split(/\s+/);
       let s = 0;
       if (names.includes(w)) s = 100;
       else if (names.some((n) => n.startsWith(w))) s = 60;
@@ -48,7 +53,7 @@ export function searchIcons(query) {
 /** 一个图标的几种写法。 */
 export function iconAs(name, format = "html", size = 24) {
   const real = iconName(name);
-  if (!real) throw new Error(`没有叫 ${name} 的图标`);
+  if (!real) throw new Error(isEn() ? `There's no icon called ${name}` : `没有叫 ${name} 的图标`);
   if (format === "svg") return iconSVG(real, { size });
   if (format === "react") return `<Icon name="${real}" />`;
   if (format === "js") return `XxdIcons.iconSVG("${real}", { size: 16 })`;
@@ -62,9 +67,20 @@ export { resolveIcon };
 // —— 组件与模式 ——
 const slugOf = (name) => name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 
-export function catalog() {
-  const comps = readJson("packages/xxd-css/registry.json").components.map((c) => ({ ...c, kind: "component", slug: slugOf(c.name), path: `/components/${slugOf(c.name)}` }));
-  const pats = readJson("packages/xxd-css/patterns.json").patterns.map((p) => ({ ...p, kind: "pattern", category: "模式", path: `/patterns/${p.slug}` }));
+/** 组件和模式。每项有 label（这种语言的名字）、categoryLabel；说英文时说明、示例、规则换成英文版。 */
+export function catalog({ en = isEn() } = {}) {
+  const comps = readJson("packages/xxd-css/registry.json").components.map((c) => {
+    const base = { ...c, kind: "component", slug: slugOf(c.name), path: `/components/${slugOf(c.name)}`, label: c.zh, categoryLabel: c.category };
+    if (!en) return base;
+    const { title, ...rest } = EN.components[c.name] ?? {};
+    return { ...base, ...rest, label: title ?? c.name, categoryLabel: EN.categories[c.category] ?? c.category };
+  });
+  const pats = readJson("packages/xxd-css/patterns.json").patterns.map((p) => {
+    const base = { ...p, kind: "pattern", category: "模式", path: `/patterns/${p.slug}`, label: p.zh, categoryLabel: "模式" };
+    if (!en) return base;
+    const { title, ...rest } = EN_PATTERNS.patterns[p.name] ?? {};
+    return { ...base, ...rest, label: title ?? p.name, categoryLabel: "Patterns" };
+  });
   return [...comps, ...pats];
 }
 
@@ -72,7 +88,7 @@ export function catalog() {
 export function findComponent(query, list = catalog()) {
   const q = String(query || "").trim().toLowerCase();
   if (!q) return { exact: null, matches: [] };
-  const exact = list.find((c) => c.name.toLowerCase() === q || c.zh === query || c.slug === q || c.classes?.includes(q) || c.classes?.includes(`xxd-${q}`));
+  const exact = list.find((c) => c.name.toLowerCase() === q || c.zh === query || c.label?.toLowerCase() === q || c.slug === q || c.classes?.includes(q) || c.classes?.includes(`xxd-${q}`));
   if (exact) return { exact, matches: [exact] };
   const matches = list.filter((c) => c.name.toLowerCase().includes(q) || c.zh.includes(query) || c.classes?.some((x) => x.includes(q)) || (c.summary || "").includes(query));
   if (matches.length === 1) return { exact: matches[0], matches };

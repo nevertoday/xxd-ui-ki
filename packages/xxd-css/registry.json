@@ -329,7 +329,7 @@
       "attributes": {
         "data-size": "sm"
       },
-      "markup": "<div class=\"xxd-clipboard\" style=\"width:100%;max-width:300px\">\n  <code>pnpm xxd new ~/js/插件-今日待办</code>\n  <button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"sm\" aria-label=\"复制\" data-copy=\"pnpm xxd new ~/js/插件-今日待办\"><i data-xxd-icon=\"Copy\" data-size=\"14\"></i></button>\n</div>",
+      "markup": "<div class=\"xxd-clipboard\" style=\"width:100%;max-width:300px\">\n  <code>pnpm xxd new ./today</code>\n  <button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"sm\" aria-label=\"复制\" data-copy=\"pnpm xxd new ./today\"><i data-xxd-icon=\"Copy\" data-size=\"14\"></i></button>\n</div>",
       "react": "ClipboardText",
       "js": "[data-copy=\"文本\"] 或 [data-copy-target=\"#选择器\"]；data-copy-done 自定义气泡文字",
       "a11y": [
@@ -1016,7 +1016,7 @@
       "summary": "操作结果的一句话：已保存、已复制、失败可重试；同一句再来时只动一下。",
       "a11y": [
         "区域是 role=status + aria-live=polite，不打断正在读的内容",
-        "带操作（撤销、重试）的缺省停 6 秒；鼠标放上去或键盘聚焦到里面时暂停计时"
+        "带操作（撤销、重试）的缺省停 10 秒；鼠标放上去或键盘聚焦到里面时暂停计时；按 Alt+T 跳到最新一张，Esc 关掉并回到原处"
       ]
     },
     {
@@ -1139,7 +1139,7 @@
         "xxd-empty__text",
         "xxd-empty__actions"
       ],
-      "markup": "<div class=\"xxd-empty\" data-size=\"sm\"><i data-xxd-icon=\"FileText\"></i><p class=\"xxd-empty__title\">还没有记录</p></div>\n<div class=\"xxd-empty\"><i data-xxd-icon=\"Package\"></i><p class=\"xxd-empty__title\">还没有插件</p><p class=\"xxd-empty__text\">用一行命令新建一个。</p><div class=\"xxd-clipboard\" data-size=\"sm\"><code>pnpm xxd new ~/js/插件-今日待办</code><button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"xs\" aria-label=\"复制\" data-copy=\"pnpm xxd new ~/js/插件-今日待办\"><i data-xxd-icon=\"Copy\" data-size=\"14\"></i></button></div></div>",
+      "markup": "<div class=\"xxd-empty\" data-size=\"sm\"><i data-xxd-icon=\"FileText\"></i><p class=\"xxd-empty__title\">还没有记录</p></div>\n<div class=\"xxd-empty\"><i data-xxd-icon=\"Package\"></i><p class=\"xxd-empty__title\">还没有插件</p><p class=\"xxd-empty__text\">用一行命令新建一个。</p><div class=\"xxd-clipboard\" data-size=\"sm\"><code>pnpm xxd new ./today</code><button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"xs\" aria-label=\"复制\" data-copy=\"pnpm xxd new ./today\"><i data-xxd-icon=\"Copy\" data-size=\"14\"></i></button></div></div>",
       "react": "Empty",
       "rules": [
         "说明 + 一个明确的下一步"

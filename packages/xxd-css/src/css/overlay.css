@@ -14,6 +14,8 @@
   .xxd-dialog {
     width: min(440px, calc(100vw - 32px));
     max-height: min(680px, calc(100dvh - 48px));
+    /* 居中写明白：不靠浏览器默认的 margin:auto（Tailwind 等 reset 会把它清成 0） */
+    margin: auto;
     padding: 0;
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
@@ -422,6 +424,25 @@
   .xxd-toast-region[data-scoped] {
     position: absolute;
     bottom: var(--toast-offset, 16px);
+  }
+
+  /* 整页的 toast 区放进顶层（popover="manual"）：盖在对话框和宿主网页的高 z-index 元素上面。去掉浏览器给 popover 的默认样式。 */
+  .xxd-toast-region[popover] {
+    top: auto;
+    width: auto;
+    height: auto;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    overflow: visible;
+  }
+
+  .xxd-tooltip[popover] {
+    inset: auto;
+    margin: 0;
+    border: 0;
+    overflow: visible;
   }
 
   .xxd-toast {

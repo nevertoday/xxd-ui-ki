@@ -19,7 +19,7 @@ const { title, description = L.description, headings = [], wide = false, charts 
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 const isCurrent = (href) => (href.replace(/\/$/, "") || "/") === path;
 const nav = navFor(lang);
-const searchIndex = JSON.stringify(flatPagesFor(lang).map((p) => ({ label: p.label, hint: p.sub ? `${p.sub} · ${p.group}` : p.group, href: p.href })));
+const searchIndex = JSON.stringify(flatPagesFor(lang).map((p) => ({ label: p.label, hint: p.sub ? `${p.sub} · ${p.group}` : p.group, href: p.href, keywords: p.keywords })));
 const mdHref = mdOf(path, lang);
 const other = counterpart(path, lang);
 const otherLang = lang === "en" ? "zh" : "en";
@@ -44,7 +44,7 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
     <link rel="alternate" hreflang="zh-CN" href={`${site}${lang === "zh" ? path : other}`} />
     <link rel="alternate" hreflang="en" href={`${site}${lang === "en" ? (path === "/en" ? "/en/" : path) : other}`} />
     <!-- 层顺序：Tailwind（React 演示用）在前，小小东在后 —— 小小东的组件永远赢过 Tailwind 的重置 -->
-    <style is:inline>@layer properties, theme, base, components, utilities, xxd.base, xxd.components, site;</style>
+    <style is:inline>@layer properties, theme, base, xxd, components, utilities, site;</style>
     <script is:inline src="/xxd/boot.js" data-key="xxd-site"></script>
     <link rel="stylesheet" href="/xxd/kumo.css" />
     <link rel="stylesheet" href="/xxd/xxd.css" />
@@ -55,9 +55,9 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
     {charts && <script is:inline src="/xxd/echarts.js"></script>}
   </head>
   <body class="xxd-page">
-    <a class="site-skip xxd-sr-only" href="#main">{L.skip}</a>
+    <a class="site-skip xxd-sr-only-focusable" href="#main">{L.skip}</a>
     <header class="site-top">
-      <button class="xxd-btn site-menu" data-variant="ghost" data-icon-only aria-label={L.openNav} id="site-menu" set:html={icon("Menu", 18)} />
+      <button class="xxd-btn site-menu" data-variant="ghost" data-icon-only aria-label={L.openNav} id="site-menu" aria-controls="site-nav" aria-expanded="false" set:html={icon("Menu", 18)} />
       <a class="site-brand" href={withLang("/", lang)}><span class="site-mark" aria-hidden="true"></span><span class="site-brand__name">{L.brand}</span></a>
       <button class="site-search" id="site-search" type="button">
         <Fragment set:html={icon("Search", 14)} /><span>{L.search}</span><kbd class="xxd-kbd">⌘K</kbd>
@@ -182,7 +182,7 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
         window.addEventListener("xxd:settings", sync);
 
         // 搜索：⌘K / 点按钮，用小小东自己的命令面板
-        const items = pages.map((p) => ({ label: p.label, hint: p.hint, run: () => { location.href = p.href; } }));
+        const items = pages.map((p) => ({ label: p.label, hint: p.hint, keywords: p.keywords, run: () => { location.href = p.href; } }));
         const open = () => X.openCommandPalette({ items, placeholder: S.placeholder, empty: S.empty });
         document.getElementById("site-search").addEventListener("click", open);
         X.bindCommandPalette(items, { placeholder: S.placeholder, empty: S.empty });
@@ -190,9 +190,26 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
         // 窄屏导航抽屉
         const nav = document.getElementById("site-nav");
         const scrim = document.getElementById("site-nav-scrim");
-        const toggle = (on) => { nav.toggleAttribute("data-open", on); scrim.toggleAttribute("data-open", on); };
-        document.getElementById("site-menu").addEventListener("click", () => toggle(!nav.hasAttribute("data-open")));
+        const menu = document.getElementById("site-menu");
+        // 打开时焦点进抽屉（当前页那一项）、Tab 在抽屉里循环、Esc 关；关掉后焦点回到菜单按钮
+        const toggle = (on) => {
+          nav.toggleAttribute("data-open", on);
+          scrim.toggleAttribute("data-open", on);
+          menu.setAttribute("aria-expanded", String(on));
+          if (on) (nav.querySelector('[aria-current="page"]') || nav.querySelector("a"))?.focus();
+          else if (nav.contains(document.activeElement)) menu.focus();
+        };
+        menu.addEventListener("click", () => toggle(!nav.hasAttribute("data-open")));
         scrim.addEventListener("click", () => toggle(false));
+        nav.addEventListener("keydown", (event) => {
+          if (!nav.hasAttribute("data-open")) return;
+          if (event.key === "Escape") { event.preventDefault(); toggle(false); return; }
+          if (event.key !== "Tab") return;
+          const links = [...nav.querySelectorAll("a")];
+          const first = links[0], last = links[links.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        });
 
         // 代码块的复制按钮、活演示里的 JS 行为
         for (const pre of document.querySelectorAll(".site-code")) {

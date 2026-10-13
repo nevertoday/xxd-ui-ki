@@ -1,4 +1,7 @@
 {
+  "xxdLocale": {
+    "message": "zh-CN"
+  },
   "appName": {
     "message": "__APP_NAME__"
   },
@@ -17,12 +20,6 @@
   "tabSettings": {
     "message": "设置"
   },
-  "emptyTitle": {
-    "message": "从这里开始"
-  },
-  "emptyText": {
-    "message": "这是用小小东 UI Kit 生成的插件模板。"
-  },
   "historyEmpty": {
     "message": "还没有记录"
   },
@@ -33,28 +30,7 @@
     "message": "完成了"
   },
   "searchPlaceholder": {
-    "message": "搜索设置（⌘F）"
-  },
-  "signinGift": {
-    "message": "新账号送 7 天完整体验"
-  },
-  "signinGoogle": {
-    "message": "使用 Google 继续"
-  },
-  "signinOr": {
-    "message": "或使用邮箱"
-  },
-  "signinAs": {
-    "message": "登录"
-  },
-  "continue": {
-    "message": "继续"
-  },
-  "back": {
-    "message": "返回"
-  },
-  "terms": {
-    "message": "继续即表示同意服务条款和隐私政策"
+    "message": "搜索设置"
   },
   "dropTitle": {
     "message": "把文件拖到这里"
@@ -68,38 +44,8 @@
   "dropVeil": {
     "message": "松手，放进来"
   },
-  "groupAccount": {
-    "message": "账号"
-  },
   "groupAbout": {
     "message": "关于"
-  },
-  "upgrade": {
-    "message": "开通会员"
-  },
-  "planMonth": {
-    "message": "月度会员"
-  },
-  "planYear": {
-    "message": "年度会员"
-  },
-  "planKeep": {
-    "message": "体验剩下的天数会保留。"
-  },
-  "pay": {
-    "message": "去支付"
-  },
-  "paid": {
-    "message": "我已支付，立即查询"
-  },
-  "payOpened": {
-    "message": "已在新标签页打开支付页"
-  },
-  "memberDone": {
-    "message": "会员已开通"
-  },
-  "signout": {
-    "message": "退出登录"
   },
   "version": {
     "message": "版本"
@@ -109,5 +55,25 @@
   },
   "yesterday": {
     "message": "昨天"
+  },
+  "navMain": {
+    "message": "主导航"
+  },
+  "clear": {
+    "message": "清空"
+  },
+  "delete": {
+    "message": "删除"
+  },
+  "confirmDelete": {
+    "message": "确认删除"
+  },
+  "itemCount": {
+    "message": "$COUNT$ 项",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

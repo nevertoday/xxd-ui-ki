@@ -7,7 +7,7 @@
 
 ```bash
 cd xxd-ui-kit
-pnpm xxd new ~/js/插件-今日待办 --name 今日待办 --name-en "Today" --slug today
+pnpm xxd new ./today --name 今日待办 --name-en "Today" --slug today
 ```
 
 得到一个可以直接「加载已解压的扩展程序」的 MV3 插件：
@@ -23,13 +23,13 @@ pnpm xxd new ~/js/插件-今日待办 --name 今日待办 --name-en "Today" --sl
 ## 更新组件
 
 ```bash
-pnpm xxd sync ~/js/插件-今日待办 ~/js/xPoster      # 拷最新构建，写 VERSION
+pnpm xxd sync ./today ./my-extension      # 拷最新构建，写 VERSION
 pnpm xxd status                                   # 谁落后了（new / init / sync 过的项目都记着）
 pnpm xxd sync --all                               # 全部更新
-pnpm xxd doctor ~/js/插件-今日待办                 # 体检：引用、manifest、_locales、拼写、设计规则
+pnpm xxd doctor ./today                 # 体检：引用、manifest、_locales、拼写、设计规则
 ```
 
-`vendor/xxd/` 不要手改。`xxd-chrome-publish` / `cx-chrome-zip` 打包时会按引用带上用到的文件，`vendor/xxd/LICENSE` 让许可检查通过。
+`vendor/xxd/` 不要手改。打包插件时，只要打包工具按引用带上用到的文件就行，`vendor/xxd/LICENSE` 让许可检查通过。
 
 ### 老项目：`xxd.config.json`
 
@@ -38,10 +38,10 @@ pnpm xxd doctor ~/js/插件-今日待办                 # 体检：引用、man
 | 字段 | 作用 |
 | --- | --- |
 | `vendorDir` | 组件拷到哪；插件默认 `vendor/xxd`，网站写 `false` 不拷 |
-| `tokensTargets` | 把 `tokens.css` 原样写到这些路径（老路径被测试、网站引用，不想改时）。xPoster：`["src/xxd-theme.css", "website/xxd-theme.css"]` |
-| `layeredTokensRegions` | 把 layered 令牌写进这些 CSS 文件开头的标记区域：项目已有的变量永远优先，只多出新令牌（会员站） |
+| `tokensTargets` | 把 `tokens.css` 原样写到这些路径（老路径被测试、网站引用，不想改时）。比如 `["src/xxd-theme.css", "website/xxd-theme.css"]` |
+| `layeredTokensRegions` | 把 layered 令牌写进这些 CSS 文件开头的标记区域：项目已有的变量永远优先，只多出新令牌（见 [已有网站怎么接入](existing-site.md)） |
 | `layeredTokensExclude` | 额外跳过的令牌名（`sync` 已经会自动跳过「项目用了但没声明」的名字） |
-| `iconNodesTargets` | 把图标数据写到这些路径（会员站 `src/lib/xxd-icon-nodes.js`） |
+| `iconNodesTargets` | 把图标数据写到这些路径（比如 `src/lib/xxd-icon-nodes.js`） |
 | `adopt` | `pnpm xxd adopt <目录>`：`{ file, aliases }`。删掉 `file` 里与令牌亮暗两种值都相同的 `:root` 声明（改由令牌提供），`aliases` 把旧名换成 `var(--令牌)`。改完用 `scripts/verify/css-vars-diff.cjs` 比较前后，应当零变化 |
 
 ## 页面里怎么接

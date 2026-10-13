@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { buildAll, create, docComponent, init, parseArgs, status } from "../scripts/cli.mjs";
 import { COMMANDS, GROUPS } from "../scripts/commands.mjs";
 import { findComponent, iconAs, listTokens, pageUrl, searchIcons } from "../scripts/lib/find.mjs";
-import { checkCss, checkMarkup, doctor } from "../scripts/lib/doctor.mjs";
+import { checkCss, checkI18n, checkMarkup, doctor } from "../scripts/lib/doctor.mjs";
 import { forgetProject, listProjects, rememberProject } from "../scripts/lib/projects.mjs";
 import { suggest, width } from "../scripts/lib/term.mjs";
 
@@ -70,6 +70,8 @@ describe("查找", () => {
   it("终端：中文算两格，拼错能猜", () => {
     expect(width("删除")).toBe(4);
     expect(suggest("stauts", ["status", "sync", "doctor"])).toEqual(["status"]);
+    // 联想有上限：foo 不该猜成 doc
+    expect(suggest("foo", ["doc", "doctor", "sync"])).toEqual([]);
   });
 });
 
@@ -106,6 +108,52 @@ describe("体检规则", () => {
   });
 });
 
+describe("体检：MV3、写死的文字、没接入", () => {
+  it("评审造的不合规插件：内联脚本、on*=、远程脚本、eval、权限太宽、描述太长、example.com、内容脚本缺依赖都报出来", () => {
+    const dir = join(base, "bad-ext");
+    mkdirSync(join(dir, "_locales/en"), { recursive: true });
+    writeFileSync(join(dir, "manifest.json"), JSON.stringify({
+      manifest_version: 3, default_locale: "en", name: "__MSG_appName__", description: "x".repeat(160), version: "1.0",
+      permissions: ["storage", "<all_urls>"],
+      content_scripts: [{ matches: ["https://example.com/*"], js: ["content.js", "vendor/xxd/xxd.js"] }],
+    }));
+    writeFileSync(join(dir, "_locales/en/messages.json"), JSON.stringify({ appName: { message: "Bad" } }));
+    writeFileSync(join(dir, "page.html"), `<script>alert(1)</script><button onclick="go()">Go</button><script src="https://cdn.example.com/x.js"></script><a href="javascript:void 0">x</a>`);
+    writeFileSync(join(dir, "content.js"), `XxdExtension.mountXxdUI(host); eval("1"); new Function("return 1"); setTimeout("go()", 1);`);
+    const r = doctor(dir);
+    const mv3 = r.findings.filter((f) => f.rule === "mv3").map((f) => f.message).join("\n");
+    for (const re of [/内联 <script>/, /onclick=/, /远程脚本/, /javascript:/, /eval/, /new Function/, /setTimeout/, /<all_urls>/, /description.*160/, /example\.com/, /xxd\.js 要排在/, /extension\.js/, /Shadow 样式/]) expect(mv3, String(re)).toMatch(re);
+    expect(r.findings.filter((f) => f.rule === "mv3" && f.level === "error").length).toBeGreaterThan(5);
+  });
+
+  it("有 _locales 时：写死的中文（属性、文字、JS 字符串）都提醒；data-i18n 管着的、注释里的不算", () => {
+    const html = `<button aria-label="清空" data-i18n="clear">清空</button><input data-i18n-attr="placeholder:p" placeholder="搜索"><p>写死的字</p><!-- 注释里的中文 -->`;
+    const found = checkI18n(html, { html: true }).map((f) => f.message);
+    expect(found).toHaveLength(2);
+    expect(found[0]).toMatch(/aria-label/);
+    expect(found[1]).toMatch(/写死的字/);
+    expect(checkI18n(`// 注释\nconst a = "确认删除"; const url = "https://x.cn"; /* 块 */`).map((f) => f.message)).toEqual([expect.stringMatching(/确认删除/)]);
+  });
+
+  it("没接入的目录说清楚「先 init」，而不是没问题", () => {
+    const dir = join(base, "empty");
+    mkdirSync(dir, { recursive: true });
+    const r = doctor(dir);
+    expect(r.kind).toBe("unknown");
+    expect(r.findings[0].message).toMatch(/init/);
+  });
+
+  it("说英文时消息也是英文", () => {
+    process.env.XXD_UI_LANG = "en";
+    try {
+      expect(checkCss(".a { color: #333 }")[0].message).toMatch(/use a token/);
+      expect(() => docComponent("butn")).toThrow(/did you mean Button/);
+    } finally {
+      process.env.XXD_UI_LANG = "zh";
+    }
+  });
+});
+
 describe("项目：init / doctor / 记住", () => {
   it("新建的插件体检只差上架图标；网站 init 后 status 认得出", async () => {
     await buildAll({ quiet: true });
@@ -121,7 +169,7 @@ describe("项目：init / doctor / 记住", () => {
     const head = init(site, { quiet: true });
     expect(head).toContain('<script src="vendor/xxd/boot.js" data-key="site-ui"></script>');
     expect(JSON.parse(readFileSync(join(site, "xxd.config.json"), "utf8")).vendorDir).toBe("public/vendor/xxd");
-    expect(status(site).state).toBe("最新");
+    expect(status(site).state).toBe("current");
     expect(listProjects()).toContain(site);
 
     writeFileSync(join(site, "a.css"), ".x { color: #f00 } /* xxd-ignore */\n.y { font-weight: 700 }\n");

@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { createAppearanceStore } from "../src/settings.js";
 import { mountXxdUI } from "../src/shadow.js";
 import { applyI18n, t, uiLocale } from "../src/i18n.js";
-import { adoptTokens, buildAll, create, docComponent, listComponents, dropDeclarations, findFallbackConflicts, status, sync, upsertRegion } from "../scripts/cli.mjs";
+import { adoptTokens, applyBlocks, buildAll, create, docComponent, listComponents, dropDeclarations, findFallbackConflicts, status, sync, upsertRegion } from "../scripts/cli.mjs";
 import { mkdirSync, writeFileSync } from "node:fs";
 
 function mockChrome() {
@@ -61,6 +61,19 @@ describe("createAppearanceStore", () => {
     expect(seen).toHaveBeenCalled();
   });
 
+  it("内容脚本里（有 chrome.runtime.id、页面不是 chrome-extension:）不写宿主网页的 localStorage，也不在宿主 window 上派发事件", async () => {
+    mockChrome();
+    globalThis.chrome.runtime = { id: "abc" };
+    const heard = vi.fn();
+    window.addEventListener("xxd:settings", heard);
+    const store = createAppearanceStore({ key: "cs-ui", apply: false });
+    await store.load();
+    await store.set({ theme: "dark" });
+    expect(localStorage.getItem("cs-ui")).toBeNull();
+    expect(heard).not.toHaveBeenCalled();
+    window.removeEventListener("xxd:settings", heard);
+  });
+
   it("apply: false 时不碰页面", async () => {
     mockChrome();
     const store = createAppearanceStore({ key: "demo-ui", apply: false });
@@ -90,6 +103,33 @@ describe("mountXxdUI", () => {
     ui.destroy();
     expect(host.isConnected).toBe(false);
   });
+
+  it("调用方写在 host 上的定位不被 all:initial 清掉（真实浏览器里由 site audit 的「冒烟」再查一遍）", async () => {
+    const host = document.createElement("div");
+    host.dataset.display = "block";
+    host.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:2147483000";
+    document.body.append(host);
+    const ui = await mountXxdUI(host, { cssText: ":host{}", install: false });
+    const style = host.getAttribute("style");
+    expect(style.indexOf("all")).toBeLessThan(style.indexOf("position"));
+    expect(host.style.position).toBe("fixed");
+    expect(host.style.zIndex).toBe("2147483000");
+    expect(host.style.display).toBe("block");
+    ui.destroy();
+  });
+
+  it("登记成默认浮层根（toast 不挂到宿主网页的 body）、host 上写 lang；destroy 后还原", async () => {
+    const calls = [];
+    globalThis.Xxd = { setDefaultLayerRoot: (r) => calls.push(r), defaultLayerRoot: () => calls.at(-1), install: () => {} };
+    const host = document.createElement("div");
+    document.body.append(host);
+    const ui = await mountXxdUI(host, { cssText: ":host{}", locale: "en" });
+    expect(calls[0]).toBe(ui.root);
+    expect(host.getAttribute("lang")).toBe("en");
+    ui.destroy();
+    expect(calls.at(-1)).toBeNull();
+    delete globalThis.Xxd;
+  });
 });
 
 describe("i18n", () => {
@@ -104,6 +144,13 @@ describe("i18n", () => {
     expect(document.querySelector("span").textContent).toBe("原文");
   });
 
+  it("语言只有一个来源：_locales 的 xxdLocale（Chrome 挑了哪份 messages.json 就是哪种）", () => {
+    globalThis.chrome = { i18n: { getMessage: (k) => (k === "xxdLocale" ? "zh-Hant" : ""), getUILanguage: () => "ja" } };
+    expect(uiLocale()).toBe("zh-Hant");
+    globalThis.chrome = { i18n: { getMessage: () => "", getUILanguage: () => "ja" } };
+    expect(uiLocale()).toBe("en");
+  });
+
   it("UI 语言映射到三种", () => {
     expect(uiLocale("zh-TW")).toBe("zh-Hant");
     expect(uiLocale("zh-CN")).toBe("zh-CN");
@@ -112,7 +159,7 @@ describe("i18n", () => {
 });
 
 describe("CLI：new / sync / status", () => {
-  it("新建的插件是合法的 MV3，三语齐全，vendor 拷好，没有残留占位符", async () => {
+  it("缺省是最小的插件：合法的 MV3，三语齐全，没有登录、内容脚本和 WAR，vendor 拷好，没有残留占位符", async () => {
     await buildAll({ quiet: true });
     const base = mkdtempSync(join(process.env.TMPDIR || tmpdir(), "xxd-cli-"));
     const dir = join(base, "demo");
@@ -120,26 +167,71 @@ describe("CLI：new / sync / status", () => {
       await create(dir, { name: "批量存图", nameEn: "Bulk Save", slug: "bulk-save" });
       const manifest = JSON.parse(readFileSync(join(dir, "manifest.json"), "utf8"));
       expect(manifest.manifest_version).toBe(3);
-      expect(manifest.default_locale).toBe("zh_CN");
-      for (const loc of ["zh_CN", "zh_TW", "en"]) {
+      // 找不到用户语言时退回英文（日、德、法用户看到英文，而不是中文）
+      expect(manifest.default_locale).toBe("en");
+      expect(manifest.content_scripts).toBeUndefined();
+      expect(manifest.web_accessible_resources).toBeUndefined();
+      expect(manifest.action.default_popup).toBeUndefined();
+      const locales = { zh_CN: "zh-CN", zh_TW: "zh-Hant", en: "en" };
+      for (const [loc, tag] of Object.entries(locales)) {
         const msgs = JSON.parse(readFileSync(join(dir, "_locales", loc, "messages.json"), "utf8"));
         expect(msgs.appName.message).toBeTruthy();
+        expect(msgs.xxdLocale.message).toBe(tag);
+        expect(msgs.signinGoogle, "缺省不带登录").toBeUndefined();
       }
       expect(JSON.parse(readFileSync(join(dir, "_locales/zh_TW/messages.json"), "utf8")).appName.message).toBe("批量存圖");
-      for (const f of ["tokens.css", "xxd.css", "xxd.shadow.css", "xxd.js", "boot.js", "icons.js", "extension.js", "VERSION", "LICENSE"]) {
+      for (const f of ["tokens.css", "xxd.css", "xxd.shadow.css", "xxd.shadow.css.js", "xxd.js", "boot.js", "icons.js", "extension.js", "tokens.mjs", "VERSION", "LICENSE"]) {
         expect(existsSync(join(dir, "vendor/xxd", f)), f).toBe(true);
       }
-      const all = readdirSync(dir).filter((f) => /\.(html|js|json)$/.test(f)).map((f) => readFileSync(join(dir, f), "utf8")).join("\n");
+      expect(existsSync(join(dir, "account-boot.js"))).toBe(false);
+      expect(existsSync(join(dir, "content.js"))).toBe(false);
+      const all = readdirSync(dir).filter((f) => /\.(html|js|json|css)$/.test(f)).map((f) => readFileSync(join(dir, f), "utf8")).join("\n");
       expect(all).not.toMatch(/__[A-Z_]+__/);
+      expect(all).not.toMatch(/(?:<!--|\/\/|\/\*)\s*\/?xxd:!?\w+/);
+      expect(all).not.toMatch(/account|¥|signin/i);
       expect(all).toContain("bulk-save-ui");
-      expect(all).toContain("bulk-save-account");
-      expect(readFileSync(join(dir, "account-boot.js"), "utf8")).not.toMatch(/__[A-Z_]+__/);
-      expect(status(dir).state).toBe("最新");
+      expect(status(dir).state).toBe("current");
       sync(dir, { quiet: true });
     } finally {
       rmSync(base, { recursive: true, force: true });
     }
   }, 60_000);
+
+  it("--popup --content --account：各自的文件、manifest 和文案都加上", async () => {
+    const base = mkdtempSync(join(process.env.TMPDIR || tmpdir(), "xxd-cli-"));
+    const dir = join(base, "full");
+    try {
+      await create(dir, { name: "网页摘录", nameEn: "Clipper", slug: "clipper", popup: true, content: "https://*.example.org/*", account: true });
+      const manifest = JSON.parse(readFileSync(join(dir, "manifest.json"), "utf8"));
+      expect(manifest.action.default_popup).toBe("popup.html");
+      expect(manifest.content_scripts[0].matches).toEqual(["https://*.example.org/*"]);
+      expect(manifest.content_scripts[0].js.at(-1)).toBe("content.js");
+      expect(manifest.content_scripts[0].js).toContain("vendor/xxd/xxd.shadow.css.js");
+      expect(manifest.web_accessible_resources).toBeUndefined();
+      for (const f of ["popup.html", "popup.js", "popup.css", "content.js", "account-boot.js"]) expect(existsSync(join(dir, f)), f).toBe(true);
+      const msgs = JSON.parse(readFileSync(join(dir, "_locales/en/messages.json"), "utf8"));
+      expect(msgs.popupOpenPanel && msgs.contentButton && msgs.signinGoogle).toBeTruthy();
+      const bg = readFileSync(join(dir, "background.js"), "utf8");
+      expect(bg).toContain("openPanelOnActionClick: false");
+      expect(bg).not.toContain("openPanelOnActionClick: true");
+      expect(readFileSync(join(dir, "sidepanel.html"), "utf8")).toContain("account-boot.js");
+      expect(readFileSync(join(dir, "content.js"), "utf8")).not.toMatch(/__[A-Z_]+__/);
+    } finally {
+      rmSync(base, { recursive: true, force: true });
+    }
+  }, 60_000);
+
+  it("--content 不写网址规则会提示", async () => {
+    await expect(create(join(tmpdir(), "xxd-nope"), { name: "x", content: true })).rejects.toThrow(/网址规则/);
+  });
+});
+
+describe("applyBlocks", () => {
+  it("选了留下、没选删掉、xxd:!name 反过来；三种注释都认", () => {
+    const text = "a\n<!-- xxd:acc -->\nA\n<!-- /xxd:acc -->\n// xxd:!pop\nB\n// /xxd:!pop\n/* xxd:pop */\nC\n/* /xxd:pop */\nz\n";
+    expect(applyBlocks(text, { acc: true, pop: false })).toBe("a\nA\nB\nz\n");
+    expect(applyBlocks(text, { acc: false, pop: true })).toBe("a\nC\nz\n");
+  });
 });
 
 describe("upsertRegion", () => {

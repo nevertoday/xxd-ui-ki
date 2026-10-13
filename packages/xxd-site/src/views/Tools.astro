@@ -7,7 +7,7 @@ import { Content as KitEn } from "../../../../docs/en/EXTENSION-KIT.md";
 import { COMMANDS, DOCTOR_CHECKS, GROUPS } from "../../../xxd-extension/scripts/commands.mjs";
 import { langOf } from "../i18n/index.js";
 const en = langOf(Astro.url.pathname) === "en";
-const ext = en ? "~/js/today-extension" : "~/js/插件-今日待办";
+const ext = en ? "./today" : "./today";
 const T = en
   ? {
       title: "CLI and tools", caption: "Tools",
@@ -19,7 +19,7 @@ const T = en
       ],
       flows: [
         { t: "Start a new extension", d: "Load it in Chrome right away; check it once you've changed things.", code: `xxd-ui new ${ext} --name "Today"\n# chrome://extensions → Load unpacked → pick the folder\nxxd-ui doctor ${ext}` },
-        { t: "Bring an existing extension or site in", d: "Writes xxd.config.json when needed, copies the components and prints the lines for <head>.", code: `cd ~/js/xPoster\nxxd-ui init\nxxd-ui doctor` },
+        { t: "Bring an existing extension or site in", d: "Writes xxd.config.json when needed, copies the components and prints the lines for <head>.", code: `cd ./my-extension\nxxd-ui init\nxxd-ui doctor` },
         { t: "Keep every project current", d: "Projects you've created, initialised or synced are remembered.", code: `xxd-ui status        # who is behind\nxxd-ui sync --all    # update all of them` },
         { t: "See component changes live in an extension", d: "Edit xxd-ui-kit; every save rebuilds and syncs. Reload the extension in Chrome.", code: `xxd-ui watch ${ext}` },
         { t: "Check before every commit", d: "doctor exits with 1 when it finds errors. A line that's an intended exception gets xxd-ignore.", code: `# .git/hooks/pre-commit (chmod +x)\n#!/bin/sh\nxxd-ui doctor || exit 1` },
@@ -37,7 +37,7 @@ const T = en
       ],
       flows: [
         { t: "新做一个插件", d: "建好就能在 Chrome 里加载；改完体检一下。", code: `xxd-ui new ${ext} --name 今日待办\n# chrome://extensions →「加载已解压的扩展程序」→ 选这个目录\nxxd-ui doctor ${ext}` },
-        { t: "老插件或网站接入", d: "需要时写 xxd.config.json、拷组件，打印要放进 <head> 的几行。", code: `cd ~/js/xPoster\nxxd-ui init\nxxd-ui doctor` },
+        { t: "老插件或网站接入", d: "需要时写 xxd.config.json、拷组件，打印要放进 <head> 的几行。", code: `cd ./my-extension\nxxd-ui init\nxxd-ui doctor` },
         { t: "所有项目保持最新", d: "new / init / sync 过的项目都会记住。", code: `xxd-ui status        # 谁落后了\nxxd-ui sync --all    # 全部更新` },
         { t: "改组件时在插件里实时看", d: "改 xxd-ui-kit 的源码，每次保存自动构建并同步；在 Chrome 里刷新插件就行。", code: `xxd-ui watch ${ext}` },
         { t: "每次提交前体检", d: "有错误时 doctor 的退出码是 1。某一行确实要例外，就在那一行写 xxd-ignore。", code: `# .git/hooks/pre-commit（记得 chmod +x）\n#!/bin/sh\nxxd-ui doctor || exit 1` },

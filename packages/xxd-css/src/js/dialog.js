@@ -1,5 +1,5 @@
 // 对话框：原生 <dialog>。按钮层级见 DESIGN-PRINCIPLES §10：取消在前（辅助、内容宽度），主操作最后。
-import { afterTransition, emit, nextId } from "./dom.js";
+import { afterTransition, defaultLayerRoot, emit, nextId } from "./dom.js";
 import { ICON } from "./icons-min.js";
 import { fill$1, t } from "./i18n.js";
 
@@ -37,7 +37,7 @@ export function confirmDialog({
   cancelLabel = t("cancel"),
   closeLabel = t("close"),
   tone,
-  within = document.body,
+  within = defaultLayerRoot(),
 } = {}) {
   const dialog = document.createElement("dialog");
   dialog.className = "xxd-dialog";
@@ -128,7 +128,7 @@ export function installDialogs(root, byId, closestFrom) {
  *   await confirmDelete({ name: "长文发布", what: "这个插件的全部记录" })
  * 输入框里打对名字之前，删除按钮是禁用的。返回 true / false。
  */
-export function confirmDelete({ name, what = "", title, confirmLabel = t("delete"), cancelLabel = t("cancel"), hint, within = document.body } = {}) {
+export function confirmDelete({ name, what = "", title, confirmLabel = t("delete"), cancelLabel = t("cancel"), hint, within = defaultLayerRoot() } = {}) {
   const field = document.createElement("div");
   field.className = "xxd-field";
   const p = document.createElement("p");

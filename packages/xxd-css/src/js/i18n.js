@@ -34,6 +34,7 @@ const STRINGS = {
     listSep: "、",
     hide: "隐藏",
     show: "显示",
+    notifications: "通知（Alt+T 跳到这里）",
   },
   "zh-Hant": {
     confirm: "確定",
@@ -66,6 +67,7 @@ const STRINGS = {
     listSep: "、",
     hide: "隱藏",
     show: "顯示",
+    notifications: "通知（Alt+T 跳到這裡）",
   },
   en: {
     confirm: "OK",
@@ -98,6 +100,7 @@ const STRINGS = {
     listSep: ", ",
     hide: "Hide",
     show: "Show",
+    notifications: "Notifications (Alt+T to jump here)",
   },
 };
 

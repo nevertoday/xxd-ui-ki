@@ -253,8 +253,8 @@ export const components = {
     summary: "A read-only value with a copy button. After copying, “Copied” pops up above the button and the icon briefly turns into a check.",
     attributes: { "data-size": "sm" },
     markup: `<div class="xxd-clipboard" style="width:100%;max-width:300px">
-  <code>pnpm xxd new ~/js/today-extension</code>
-  <button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="Copy" data-copy="pnpm xxd new ~/js/today-extension"><i data-xxd-icon="Copy" data-size="14"></i></button>
+  <code>pnpm xxd new ./today</code>
+  <button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label="Copy" data-copy="pnpm xxd new ./today"><i data-xxd-icon="Copy" data-size="14"></i></button>
 </div>`,
     js: `[data-copy="text"] or [data-copy-target="#selector"]; data-copy-done sets the bubble text`,
     a11y: [
@@ -720,7 +720,7 @@ await Xxd.confirmDelete({ name: "Long-form publisher", what: "all records of thi
     ],
     a11y: [
       "The region is role=status + aria-live=polite, so it never interrupts what is being read",
-      "Toasts with an action (undo, retry) stay 6 seconds by default; the timer pauses on hover or keyboard focus inside",
+      "Toasts with an action (undo, retry) stay 10 seconds by default; the timer pauses on hover or keyboard focus inside; Alt+T jumps to the latest one, Esc closes it and returns focus",
     ],
   },
   CommandPalette: {
@@ -794,7 +794,7 @@ Xxd.bindCommandPalette(items)  // ⌘K / Ctrl+K`,
     summary: "When there is nothing yet: say why it's empty and what to do next.",
     attributes: { "data-size": "sm | lg" },
     markup: `<div class="xxd-empty" data-size="sm"><i data-xxd-icon="FileText"></i><p class="xxd-empty__title">No history yet</p></div>
-<div class="xxd-empty"><i data-xxd-icon="Package"></i><p class="xxd-empty__title">No extensions yet</p><p class="xxd-empty__text">Create one with a single command.</p><div class="xxd-clipboard" data-size="sm"><code>pnpm xxd new ~/js/today-extension</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="xs" aria-label="Copy" data-copy="pnpm xxd new ~/js/today-extension"><i data-xxd-icon="Copy" data-size="14"></i></button></div></div>`,
+<div class="xxd-empty"><i data-xxd-icon="Package"></i><p class="xxd-empty__title">No extensions yet</p><p class="xxd-empty__text">Create one with a single command.</p><div class="xxd-clipboard" data-size="sm"><code>pnpm xxd new ./today</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="xs" aria-label="Copy" data-copy="pnpm xxd new ./today"><i data-xxd-icon="Copy" data-size="14"></i></button></div></div>`,
     rules: ["An explanation + one clear next step"],
     a11y: ["The icon is decoration (aria-hidden); the title states the fact, the text gives the next step", "The next step is a button or a link, reachable by keyboard"],
   },

@@ -9,7 +9,12 @@
 //   6. 细节（scripts/polish.js）：专业的人一眼看出来的小毛病 —— 字贴边、控件被截断或折行、最后一行只剩一个字、
 //      字被挤成一字一行、元素互相压住、图标和字没对齐。扫两处：全站每一页（1280 / 390 宽），
 //      以及每个组件、模式的中英文示例放进 260 / 360 / 560px 宽的演示格子。
-// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site audit [--only=axe|long|shadow|forced|en|polish]
+//   7. 浮层（评审 R1）：每个演示里会弹出东西的按钮都真的点一下 —— 对话框 / sheet / 面板 / 菜单 / popover / toast
+//      要整个在视口里（桌面上对话框居中，手机上贴底），对话框类焦点要进去、Esc 关得掉、关掉后焦点回到按钮；
+//      toast 不被别的东西盖住。以前截图只拍关着的浮层，对话框跑到左上角也没人发现。
+//   8. 真实浏览器冒烟（评审 R1）：happy-dom 看不到的东西 —— 层叠层顺序（Tailwind 的工具类能盖住 xxd）、
+//      带 *{margin:0} reset 时对话框仍居中、mountXxdUI 之后 host 的定位不被清掉。
+// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site audit [--only=axe|long|shadow|forced|en|polish|overlay|smoke]
 // 需要 Chromium：CHROME_EXE=<chrome-headless-shell 路径>（缺省用 Playwright 自带的）。
 import { createServer } from "node:http";
 import { createReadStream, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -34,6 +39,7 @@ const PAGES = {
   "/__audit/long": () => longPage(),
   "/__audit/hostile": () => hostilePage(),
   "/__audit/cells": (q) => cellsPage(q.get("lang"), Number(q.get("w"))),
+  "/__audit/smoke": () => smokePage(),
 };
 const server = createServer((req, res) => {
   const p = decodeURIComponent(new URL(req.url, "http://x").pathname);
@@ -388,7 +394,145 @@ async function polishAudit() {
   console.log(`细节：${pages.length} 页 × 2 种宽度，每个组件和模式 × 中英 × 3 种格子宽`);
 }
 
-const sections = { axe: axeAudit, long: longAudit, shadow: hostileAudit, forced: forcedAudit, en: englishAudit, polish: polishAudit };
+/* ── 7. 浮层：真的打开每一个 ── */
+const OPENERS = "[data-xxd-dialog-open], [data-xxd-sheet-open], [data-xxd-panel-open], [data-xxd-menu], [data-xxd-popover], button[onclick]";
+async function overlayAudit() {
+  const targets = pages.filter((p) => /^\/(en\/)?(components|patterns|templates)\//.test(p) && (!process.env.AUDIT_PAGE || p.includes(process.env.AUDIT_PAGE)));
+  let opened = 0;
+  for (const [w, h] of [[1280, 900], [390, 844]]) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, reducedMotion: "reduce" });
+    const tab = await ctx.newPage();
+    for (const page of targets) {
+      await tab.goto(origin + page, { waitUntil: "networkidle" });
+      const count = await tab.evaluate((sel) => {
+        const list = [...document.querySelectorAll(".site-demo__stage, .site-template")].flatMap((stage) => [...stage.querySelectorAll(sel)]).filter((b) => !b.closest("form") && b.getClientRects().length);
+        list.forEach((b, i) => b.setAttribute("data-audit-opener", String(i)));
+        return list.length;
+      }, OPENERS);
+      for (let i = 0; i < count; i += 1) {
+        const opener = tab.locator(`[data-audit-opener="${i}"]`);
+        if (!(await opener.isVisible())) continue;
+        await opener.scrollIntoViewIfNeeded();
+        const label = `[${w}] ${page} 「${((await opener.textContent()) || (await opener.getAttribute("aria-label")) || "").trim().slice(0, 16)}」`;
+        await tab.evaluate(() => (window.__toastsBefore = document.querySelectorAll(".xxd-toast").length));
+        // 用键盘打开（菜单用鼠标打开时焦点留在按钮上是有意的；键盘打开必须进去）
+        await opener.focus();
+        await tab.keyboard.press("Enter");
+        await tab.waitForTimeout(260);
+        const r = await tab.evaluate(() => {
+          const vw = innerWidth;
+          const vh = innerHeight;
+          const box = (el) => el.getBoundingClientRect();
+          const inView = (b) => b.left >= -1 && b.top >= -1 && b.right <= vw + 1 && b.bottom <= vh + 1;
+          const layers = [...document.querySelectorAll("dialog[open], .xxd-sheet[data-open], .xxd-panel[data-open]")];
+          const pops = [...document.querySelectorAll(":popover-open")].filter((p) => !p.classList.contains("xxd-tooltip") && !p.classList.contains("xxd-bubble"));
+          const toasts = [...document.querySelectorAll(".xxd-toast:not([data-leaving])")].slice(window.__toastsBefore);
+          const active = document.activeElement;
+          const out = [];
+          for (const el of layers) {
+            const b = box(el);
+            const kind = el.tagName === "DIALOG" ? "对话框" : el.classList.contains("xxd-sheet") ? "sheet" : "面板";
+            out.push({
+              kind,
+              inView: inView(b),
+              rect: [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)],
+              centered: kind !== "对话框" || vw <= 640 ? true : Math.abs(b.left + b.width / 2 - vw / 2) <= 2 && b.top > 0,
+              bottom: kind === "对话框" && vw <= 640 && !el.classList.contains("xxd-palette") ? Math.abs(b.bottom - vh) <= 2 : true,
+              focus: el.contains(active) || el === active,
+              active: active ? active.tagName + "." + active.className : "",
+            });
+          }
+          for (const el of pops) {
+            const b = box(el);
+            const kind = el.classList.contains("xxd-menu") || el.getAttribute("role") === "menu" ? "菜单" : "popover";
+            out.push({ kind, inView: inView(b), rect: [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)], centered: true, bottom: true, focus: kind === "菜单" ? el.contains(active) : true });
+          }
+          for (const el of toasts) {
+            const b = box(el);
+            const hit = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+            out.push({ kind: "toast", inView: inView(b), rect: [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)], centered: true, bottom: true, focus: true, covered: !el.contains(hit) });
+          }
+          return out;
+        });
+        for (const o of r) {
+          opened += 1;
+          if (!o.inView) fail("浮层", `${label} ${o.kind}伸出视口 ${JSON.stringify(o.rect)}`);
+          if (!o.centered) fail("浮层", `${label} ${o.kind}没有居中 ${JSON.stringify(o.rect)}`);
+          if (!o.bottom) fail("浮层", `${label} 窄屏对话框没有贴底 ${JSON.stringify(o.rect)}`);
+          if (!o.focus) fail("浮层", `${label} 打开${o.kind}后焦点没进去（在 ${o.active}）`);
+          if (o.covered) fail("浮层", `${label} toast 被别的东西盖住`);
+        }
+        const modal = r.filter((o) => o.kind !== "toast");
+        if (!modal.length) continue;
+        // Esc 关掉；对话框类关掉后焦点回到按钮（嵌套的再按一次）
+        for (let n = 0; n < 3; n += 1) {
+          await tab.keyboard.press("Escape");
+          await tab.waitForTimeout(160);
+          if (!(await tab.evaluate(() => document.querySelector("dialog[open], .xxd-sheet[data-open], .xxd-panel[data-open], .xxd-menu:popover-open")))) break;
+        }
+        const after = await tab.evaluate(() => ({
+          still: !!document.querySelector("dialog[open], .xxd-sheet[data-open], .xxd-panel[data-open], .xxd-menu:popover-open"),
+          back: !!document.activeElement?.closest("[data-audit-opener]"),
+        }));
+        if (after.still) fail("浮层", `${label} Esc 关不掉`);
+        else if (!after.back && modal.some((o) => o.kind !== "popover")) fail("浮层", `${label} 关掉后焦点没回到按钮`);
+        // 万一还开着：清理干净再试下一个
+        await tab.evaluate(() => {
+          for (const d of document.querySelectorAll("dialog[open]")) d.close();
+          for (const p of document.querySelectorAll(":popover-open")) p.hidePopover?.();
+          for (const l of document.querySelectorAll(".xxd-sheet[data-open], .xxd-panel[data-open]")) window.Xxd?.closeLayer?.(l);
+        });
+      }
+    }
+    await ctx.close();
+  }
+  console.log(`浮层：${targets.length} 页 × 2 种宽度，打开并检查了 ${opened} 个浮层`);
+}
+
+/* ── 8. 真实浏览器冒烟 ── */
+function smokePage() {
+  // 和 @xxd/react 的 standalone.css 一样：先声明层顺序，再 Kumo（含 Tailwind preflight 和工具类），再 xxd
+  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<style>@layer properties, theme, base, xxd, components, utilities;</style>
+<link rel="stylesheet" href="/xxd/kumo.css"><link rel="stylesheet" href="/xxd/xxd.css">
+<script src="/xxd/xxd.js"></script><script src="/@pkg/xxd-extension/dist/extension.js"></script></head>
+<body class="xxd-page">
+  <button id="kumo" class="font-medium">Kumo 风格的按钮</button>
+  <dialog class="xxd-dialog" id="dlg"><div class="xxd-dialog__body">居中？</div></dialog>
+</body></html>`;
+}
+
+async function smokeAudit() {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" });
+  const tab = await ctx.newPage();
+  const errors = [];
+  tab.on("pageerror", (e) => errors.push(e.message));
+  await tab.goto(`${origin}/__audit/smoke`, { waitUntil: "networkidle" });
+  const r = await tab.evaluate(async () => {
+    const out = {};
+    out.工具类盖得住xxd = getComputedStyle(document.getElementById("kumo")).fontWeight;
+    const d = document.getElementById("dlg");
+    d.showModal();
+    const b = d.getBoundingClientRect();
+    out.对话框居中 = Math.abs(b.left + b.width / 2 - innerWidth / 2) <= 2 && b.top > 0;
+    d.close();
+    const host = document.createElement("div");
+    host.dataset.display = "block";
+    host.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:2147483000";
+    document.documentElement.append(host);
+    await window.XxdExtension.mountXxdUI(host, { cssText: ":host{}", install: false });
+    const s = getComputedStyle(host);
+    out.host定位 = `${s.position} ${s.right} ${s.zIndex} ${s.display}`;
+    return out;
+  });
+  const expect = { 工具类盖得住xxd: "500", 对话框居中: true, host定位: "fixed 16px 2147483000 block" };
+  for (const [k, v] of Object.entries(expect)) if (r[k] !== v) fail("冒烟", `${k}：期望 ${JSON.stringify(v)}，实际 ${JSON.stringify(r[k])}`);
+  for (const e of errors) fail("冒烟", `脚本错误 ${e}`);
+  await ctx.close();
+  console.log("冒烟：层叠层顺序、reset 下的对话框、注入宿主的定位");
+}
+
+const sections = { axe: axeAudit, long: longAudit, shadow: hostileAudit, forced: forcedAudit, en: englishAudit, polish: polishAudit, overlay: overlayAudit, smoke: smokeAudit };
 for (const [name, run] of Object.entries(sections)) if (!only || only === name) await run();
 await browser.close();
 server.close();

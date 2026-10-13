@@ -332,7 +332,7 @@ export function CollapsibleDemo() {
 }
 
 export function CodeDemo() {
-  return <ClipboardText text="pnpm xxd new ~/js/today-extension" />;
+  return <ClipboardText text="pnpm xxd new ./today" />;
 }
 
 export function LayerCardDemo() {
@@ -362,7 +362,7 @@ export function SecretInputDemo() {
 }
 
 export function ClipboardTextDemo() {
-  return <ClipboardText text="pnpm xxd new ~/js/today-extension" />;
+  return <ClipboardText text="pnpm xxd new ./today" />;
 }
 
 export function InlineCopyDemo() {

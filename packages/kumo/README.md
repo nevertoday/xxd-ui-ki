@@ -1,3 +1,8 @@
+> **xxd-ui-kit 里的内部包。** 这是 Cloudflare Kumo 的换皮 fork，包名保持 `@cloudflare/kumo` 只是为了方便合并上游，不会发布。
+> 要用这些 React 组件，请用 [`@xxd/react`](../xxd-react)。下面是 Kumo 原来的说明。
+>
+> **Internal package of xxd-ui-kit.** A restyled fork of Cloudflare Kumo; the name stays `@cloudflare/kumo` only to keep upstream merges easy, and it is never published. Use [`@xxd/react`](../xxd-react) instead. Kumo's original README follows.
+
 # @cloudflare/kumo
 
 Cloudflare's component library for building modern web applications.

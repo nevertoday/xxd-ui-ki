@@ -1,32 +1,18 @@
-// 侧边栏样板：登录 → 主页（拖放）→ 记录（按天分组）→ 设置（搜索、账号与会员、外观）。
-// 外观设置存在 chrome.storage.sync，镜像到 localStorage 给 boot.js 首帧用；登录状态同理（account-boot.js）。
-// 这是样板：登录、支付都是假的，换成你自己的接口即可。
+// 侧边栏样板：主页（拖放）→ 记录（按天分组）→ 设置（搜索、外观）。
+// 外观设置存在 chrome.storage.sync，镜像到 localStorage 给 boot.js 首帧用。
+// 界面上的字都在 _locales 里（简体 / 繁体 / 英文），这里用 t("键名") 取。
 const { createAppearanceStore, applyI18n, uiLocale, t } = window.XxdExtension;
-const ACCOUNT_KEY = "__SLUG__-account";
 const store = createAppearanceStore({ key: "__SLUG__-ui", defaults: { density: "compact" } });
-const local = globalThis.chrome?.storage?.local;
 const $ = (id) => document.getElementById(id);
-// 文案：有 chrome.i18n 用它，没有（在普通网页里预览）用简体
-const tr = (key, fallback) => {
-  const v = t(key);
-  return v && v !== key ? v : fallback;
-};
 
-async function setAccount(state) {
-  document.documentElement.dataset.account = state;
-  try {
-    localStorage.setItem(ACCOUNT_KEY, state);
-  } catch {}
-  await local?.set({ [ACCOUNT_KEY]: state });
-}
-
+// 日期按界面语言写（「10月12日」/「Oct 12」）
+const dayFormat = new Intl.DateTimeFormat(uiLocale(), { month: "short", day: "numeric" });
+const timeFormat = new Intl.DateTimeFormat(uiLocale(), { hour: "2-digit", minute: "2-digit" });
 function dayLabel(ts) {
   const d = new Date(ts);
-  const today = new Date();
-  const y = new Date(Date.now() - 864e5);
-  if (d.toDateString() === today.toDateString()) return tr("today", "今天");
-  if (d.toDateString() === y.toDateString()) return tr("yesterday", "昨天");
-  return `${d.getMonth() + 1}月${d.getDate()}日`;
+  if (d.toDateString() === new Date().toDateString()) return t("today");
+  if (d.toDateString() === new Date(Date.now() - 864e5).toDateString()) return t("yesterday");
+  return dayFormat.format(d);
 }
 
 const history = [];
@@ -43,10 +29,13 @@ function renderHistory() {
     for (const h of list) {
       const li = document.createElement("li");
       li.className = "xxd-list__item";
-      li.innerHTML = `<div class="xxd-list__main"><div class="xxd-list__title"></div><div class="xxd-list__meta"></div></div><button class="xxd-btn xxd-reveal" data-variant="ghost" data-size="xs" data-confirm-twice="确认删除">删除</button>`;
+      li.innerHTML = `<div class="xxd-list__main"><div class="xxd-list__title"></div><div class="xxd-list__meta"></div></div><button class="xxd-btn xxd-reveal" data-variant="ghost" data-size="xs"></button>`;
       li.querySelector(".xxd-list__title").textContent = h.title;
-      li.querySelector(".xxd-list__meta").textContent = new Date(h.at).toLocaleTimeString().slice(0, 5);
-      li.querySelector("button").addEventListener("xxd:confirm", () => {
+      li.querySelector(".xxd-list__meta").textContent = timeFormat.format(h.at);
+      const del = li.querySelector("button");
+      del.textContent = t("delete");
+      del.dataset.confirmTwice = t("confirmDelete");
+      del.addEventListener("xxd:confirm", () => {
         history.splice(history.indexOf(h), 1);
         renderHistory();
       });
@@ -56,33 +45,64 @@ function renderHistory() {
   }
 }
 
+// xxd:account
+// 账号与会员（样板：登录、支付都是假的，换成你自己的接口）
+const ACCOUNT_KEY = "__SLUG__-account";
+const local = globalThis.chrome?.storage?.local;
+
+async function setAccount(state) {
+  document.documentElement.dataset.account = state;
+  try {
+    localStorage.setItem(ACCOUNT_KEY, state);
+  } catch {}
+  await local?.set({ [ACCOUNT_KEY]: state });
+}
+
 function renderPlan(member) {
   const line = $("plan-line");
-  const text = member ? "会员 · 到 2027年11月8日" : "完整体验 · 还剩 7 天";
+  const until = new Intl.DateTimeFormat(uiLocale(), { dateStyle: "long" }).format(Date.now() + 365 * 864e5);
+  const text = member ? t("memberUntil", [until]) : t("trialLeft", ["7"]);
   if (line.textContent) Xxd.rollText(line, text);
   else line.textContent = text;
   line.dataset.tone = member ? "member" : "";
   $("avatar").toggleAttribute("data-member", member);
-  $("upgrade").textContent = member ? "管理" : tr("upgrade", "开通会员");
+  $("upgrade").textContent = member ? t("manage") : t("upgrade");
 }
 
-async function main() {
-  applyI18n(document);
-  await store.load();
+async function setupAccount() {
   const saved = await local?.get(ACCOUNT_KEY);
   if (saved?.[ACCOUNT_KEY]) await setAccount(saved[ACCOUNT_KEY]);
-
-  Xxd.mountAppearance($("appearance"), { locale: uiLocale(), get: store.get, set: (patch) => store.set(patch) });
-  Xxd.init(document);
-  $("version").textContent = globalThis.chrome?.runtime?.getManifest?.().version ?? "0.1.0";
-
-  // 登录（样板：任何邮箱都能进）
+  // 样板：任何邮箱都能进
   $("signin-form").addEventListener("submit", (e) => {
     e.preventDefault();
     setAccount("signed-in");
   });
   $("signin-google").addEventListener("click", () => setAccount("signed-in"));
   $("signout").addEventListener("xxd:confirm", () => setAccount("signed-out"));
+  renderPlan(false);
+  $("upgrade").addEventListener("click", () => ($("purchase").hidden = !$("purchase").hidden));
+  $("pay").addEventListener("click", () => Xxd.toast(t("payOpened")));
+  // 样板：「我已支付」直接开通
+  $("paid").addEventListener("click", (e) =>
+    Xxd.runBusy(e.currentTarget, () => new Promise((r) => setTimeout(r, 800))).then(() => {
+      $("purchase").hidden = true;
+      renderPlan(true);
+      Xxd.celebrate($("avatar"));
+      Xxd.toast(t("memberDone"), { tone: "success" });
+    }),
+  );
+}
+// /xxd:account
+
+async function main() {
+  applyI18n(document);
+  await store.load();
+  Xxd.mountAppearance($("appearance"), { locale: uiLocale(), get: store.get, set: (patch) => store.set(patch) });
+  Xxd.init(document);
+  $("version").textContent = globalThis.chrome?.runtime?.getManifest?.().version ?? "0.1.0";
+  // xxd:account
+  await setupAccount();
+  // /xxd:account
 
   // 主页：拖放 / 粘贴 / 选择文件
   const items = $("items");
@@ -95,11 +115,11 @@ async function main() {
     items.append(li);
     history.unshift({ title, at: Date.now() });
     renderHistory();
-    Xxd.setStatus($("status"), `${items.children.length} 项`);
+    Xxd.setStatus($("status"), t("itemCount", [String(items.children.length)]));
   };
   Xxd.bindDrop(document.querySelector(".app-body"), {
     zone: $("dropzone"),
-    veil: tr("dropVeil", "松手，放进来"),
+    veil: t("dropVeil"),
     onFiles: (files) => files.forEach((f) => add(f.name)),
     onText: (text) => add(text.slice(0, 60)),
   });
@@ -110,21 +130,9 @@ async function main() {
   });
   renderHistory();
 
-  // 设置：搜索、会员（样板：「我已支付」直接开通）
+  // 设置：搜索
   Xxd.bindSettingsSearch($("settings-search"), $("settings"));
-  renderPlan(false);
-  $("upgrade").addEventListener("click", () => ($("purchase").hidden = !$("purchase").hidden));
-  $("pay").addEventListener("click", () => Xxd.toast(tr("payOpened", "已在新标签页打开支付页")));
-  $("paid").addEventListener("click", (e) =>
-    Xxd.runBusy(e.currentTarget, () => new Promise((r) => setTimeout(r, 800))).then(() => {
-      $("purchase").hidden = true;
-      renderPlan(true);
-      Xxd.celebrate($("avatar"));
-      Xxd.toast(tr("memberDone", "会员已开通"), { tone: "success" });
-    }),
-  );
-
-  $("primary").addEventListener("click", () => Xxd.toast(tr("doneToast", "完成了"), { tone: "success" }));
+  $("primary").addEventListener("click", () => Xxd.toast(t("doneToast"), { tone: "success" }));
 }
 
 main();

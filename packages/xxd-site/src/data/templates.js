@@ -3,7 +3,7 @@ const I = (n, s = 16) => `<i data-xxd-icon="${n}" data-size="${s}"></i>`;
 const thumbs = (...c) => `<span class="xxd-thumbs">${c.map((x) => `<span style="background:${x}"></span>`).join("")}</span>`;
 
 const sidepanel = `
-<div class="xxd-sheet-host" data-density-preview="compact" style="display:flex;flex-direction:column;height:100%;--control-h:32px;--control-h-sm:26px;--control-h-xs:20px;--icon-button:30px">
+<div class="xxd-sheet-host" data-density-preview="compact" style="display:flex;flex-direction:column;height:100%;--control-h:32px;--control-h-sm:26px;--control-h-xs:20px;--icon-button:32px">
   <nav class="xxd-tabs" data-xxd-tabs style="flex:none;padding:0 14px" aria-label="主导航">
     <button role="tab" id="sp-t1" aria-controls="sp-p1" aria-selected="true">排序</button>
     <button role="tab" id="sp-t2" aria-controls="sp-p2">记录</button>

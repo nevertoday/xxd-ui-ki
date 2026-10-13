@@ -15,6 +15,13 @@ function scrimFor(layer) {
   return scrim;
 }
 
+/** 聚焦；聚焦不上（visibility 还在过渡里、刚从隐藏变回来）就接下来几帧再试。still() 不成立就放弃。 */
+function focusSoon(el, still = () => true, tries = 8) {
+  el.focus({ preventScroll: true });
+  if (el.getRootNode().activeElement === el || tries <= 0) return;
+  requestAnimationFrame(() => el.isConnected && still() && focusSoon(el, still, tries - 1));
+}
+
 export function openLayer(layer) {
   if (!layer || layer.hasAttribute("data-open")) return;
   returnTo.set(layer, layer.getRootNode().activeElement);
@@ -23,7 +30,9 @@ export function openLayer(layer) {
   scrimFor(layer)?.setAttribute("data-open", "");
   layer.closest(".xxd-sheet-host")?.setAttribute("data-sheet-open", "");
   stack.push(layer);
-  (focusables(layer)[0] || layer).focus({ preventScroll: true });
+  const target = focusables(layer)[0] || layer;
+  if (target === layer && !layer.hasAttribute("tabindex")) layer.tabIndex = -1;
+  focusSoon(target, () => layer.hasAttribute("data-open"));
   emit(layer, "xxd:open");
 }
 
@@ -36,7 +45,9 @@ export function closeLayer(layer) {
   const i = stack.lastIndexOf(layer);
   if (i >= 0) stack.splice(i, 1);
   const prev = returnTo.get(layer);
-  if (prev?.isConnected) prev.focus({ preventScroll: true });
+  if (prev?.isConnected) {
+    focusSoon(prev, () => !layer.hasAttribute("data-open"));
+  }
   emit(layer, "xxd:close");
 }
 

@@ -1,4 +1,7 @@
 {
+  "xxdLocale": {
+    "message": "zh-Hant"
+  },
   "appName": {
     "message": "__APP_NAME_HANT__"
   },
@@ -17,12 +20,6 @@
   "tabSettings": {
     "message": "設定"
   },
-  "emptyTitle": {
-    "message": "從這裡開始"
-  },
-  "emptyText": {
-    "message": "這是用小小東 UI Kit 產生的擴充功能範本。"
-  },
   "historyEmpty": {
     "message": "還沒有記錄"
   },
@@ -33,28 +30,7 @@
     "message": "完成了"
   },
   "searchPlaceholder": {
-    "message": "搜尋設定（⌘F）"
-  },
-  "signinGift": {
-    "message": "新帳號送 7 天完整體驗"
-  },
-  "signinGoogle": {
-    "message": "使用 Google 繼續"
-  },
-  "signinOr": {
-    "message": "或使用電子郵件"
-  },
-  "signinAs": {
-    "message": "登入"
-  },
-  "continue": {
-    "message": "繼續"
-  },
-  "back": {
-    "message": "返回"
-  },
-  "terms": {
-    "message": "繼續即表示同意服務條款和隱私權政策"
+    "message": "搜尋設定"
   },
   "dropTitle": {
     "message": "把檔案拖到這裡"
@@ -68,38 +44,8 @@
   "dropVeil": {
     "message": "放開，放進來"
   },
-  "groupAccount": {
-    "message": "帳號"
-  },
   "groupAbout": {
     "message": "關於"
-  },
-  "upgrade": {
-    "message": "開通會員"
-  },
-  "planMonth": {
-    "message": "月度會員"
-  },
-  "planYear": {
-    "message": "年度會員"
-  },
-  "planKeep": {
-    "message": "體驗剩下的天數會保留。"
-  },
-  "pay": {
-    "message": "去付款"
-  },
-  "paid": {
-    "message": "我已付款，立即查詢"
-  },
-  "payOpened": {
-    "message": "已在新分頁開啟付款頁"
-  },
-  "memberDone": {
-    "message": "會員已開通"
-  },
-  "signout": {
-    "message": "登出"
   },
   "version": {
     "message": "版本"
@@ -109,5 +55,25 @@
   },
   "yesterday": {
     "message": "昨天"
+  },
+  "navMain": {
+    "message": "主導覽"
+  },
+  "clear": {
+    "message": "清除"
+  },
+  "delete": {
+    "message": "刪除"
+  },
+  "confirmDelete": {
+    "message": "確認刪除"
+  },
+  "itemCount": {
+    "message": "$COUNT$ 項",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

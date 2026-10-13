@@ -27,7 +27,7 @@ export function mdHref(path, lang) {
 const zh = {
   brand: "小小东 UI",
   kit: "小小东 UI Kit",
-  description: "小小东 UI Kit：小小东提示词与 Chrome 插件共用的设计系统。",
+  description: "小小东 UI Kit：中文优先、不依赖框架的界面组件，专门照顾 Chrome 插件（MV3）。",
   skip: "跳到正文",
   openNav: "打开导航",
   search: "搜索组件、模式…",
@@ -108,7 +108,7 @@ const zh = {
 const en = {
   brand: "XXD UI",
   kit: "XXD UI Kit",
-  description: "XXD UI Kit (小小东 UI): the design system shared by the XXD member site and Chrome extensions.",
+  description: "XXD UI Kit (小小东 UI): a Chinese-first, framework-free UI kit with first-class support for Chrome extensions (MV3).",
   skip: "Skip to content",
   openNav: "Open navigation",
   search: "Search components, patterns…",

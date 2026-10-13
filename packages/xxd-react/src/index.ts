@@ -5,7 +5,8 @@
 //   import "@xxd/react/styles.css";   // 需要 Tailwind v4：先 @import "tailwindcss"
 //   import "@xxd/react/standalone.css"; // 不用 Tailwind 时
 //   import "@xxd/react/xxd.css";        // 小小东独有组件（Dock、Sheet、Settings…）用 @xxd/css 的样式
-export * from "@cloudflare/kumo";
+// Kumo 的导出逐个列在 kumo-exports.ts（生成的；不含 Cloudflare 的品牌组件）
+export * from "./kumo-exports";
 export { DialogActions } from "./dialog-actions";
 export { XxdAppearanceProvider, useXxdAppearance } from "./appearance";
 export { XxdLocaleProvider, useXxdLocale, resolveLocale, KUMO_TRANSLATIONS, type XxdLocale, type XxdStrings } from "./locale";

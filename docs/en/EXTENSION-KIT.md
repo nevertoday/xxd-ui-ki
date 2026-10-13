@@ -9,7 +9,7 @@ Extensions can't load remote code (MV3), so the component files are **copied** i
 
 ```bash
 cd xxd-ui-kit
-pnpm xxd new ~/js/today-extension --name "Today" --slug today
+pnpm xxd new ./today --name "Today" --slug today
 ```
 
 You get an MV3 extension you can load right away with “Load unpacked”:
@@ -25,13 +25,13 @@ Before publishing, add `icons` (16/32/48/128) to `manifest.json`. Give it a plai
 ## Update the components
 
 ```bash
-pnpm xxd sync ~/js/today-extension ~/js/xPoster      # copy the latest build, write VERSION
+pnpm xxd sync ./today ./my-extension      # copy the latest build, write VERSION
 pnpm xxd status                                     # who is behind (projects you've new / init / synced are remembered)
 pnpm xxd sync --all                                 # update all of them
-pnpm xxd doctor ~/js/today-extension                # check references, manifest, _locales, typos, design rules
+pnpm xxd doctor ./today                # check references, manifest, _locales, typos, design rules
 ```
 
-Never edit `vendor/xxd/` by hand. When `xxd-chrome-publish` / `cx-chrome-zip` package an extension they include the files that are referenced, and `vendor/xxd/LICENSE` (MIT) satisfies the license check.
+Never edit `vendor/xxd/` by hand. When you package the extension, a packer that follows references picks up the files in use, and `vendor/xxd/LICENSE` (MIT) satisfies the license check.
 
 ### Existing projects: `xxd.config.json`
 
@@ -40,10 +40,10 @@ Put it at the project root (an extension or a website):
 | Field | What it does |
 | --- | --- |
 | `vendorDir` | Where to copy the components; `vendor/xxd` for extensions by default, `false` for websites (no copy) |
-| `tokensTargets` | Write `tokens.css` as-is to these paths (for old paths that tests or websites reference). xPoster: `["src/xxd-theme.css", "website/xxd-theme.css"]` |
-| `layeredTokensRegions` | Write layered tokens into a marked region at the top of these CSS files: the project's own variables always win, only new tokens are added (member site) |
+| `tokensTargets` | Write `tokens.css` as-is to these paths (for old paths that tests or websites reference), e.g. `["src/xxd-theme.css", "website/xxd-theme.css"]` |
+| `layeredTokensRegions` | Write layered tokens into a marked region at the top of these CSS files: the project's own variables always win, only new tokens are added (see [existing sites](existing-site.md)) |
 | `layeredTokensExclude` | Extra token names to skip (`sync` already skips names the project uses but never declares) |
-| `iconNodesTargets` | Write icon data to these paths (member site: `src/lib/xxd-icon-nodes.js`) |
+| `iconNodesTargets` | Write icon data to these paths (e.g. `src/lib/xxd-icon-nodes.js`) |
 | `adopt` | `pnpm xxd adopt <dir>`: `{ file, aliases }`. Removes `:root` declarations in `file` whose light and dark values both equal the token (the token provides them now); `aliases` turns old names into `var(--token)`. Compare before and after with `scripts/verify/css-vars-diff.cjs`; it should show zero changes |
 
 ## Wiring up a page

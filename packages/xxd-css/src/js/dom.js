@@ -43,9 +43,17 @@ export function afterTransition(el, fn, fallback = 260) {
   setTimeout(finish, fallback);
 }
 
-/** 浮层挂在哪：锚点在 Shadow 里就是那个 ShadowRoot，否则是 body。 */
+/* 默认的浮层根：插件往网页里注入界面时（mountXxdUI），toast、确认框、命令面板、图片查看器、tooltip
+ * 没指定 within 就出现在这个 ShadowRoot 里 —— 而不是挂到宿主网页没有样式的 body 上。 */
+let defaultRoot = null;
+export function setDefaultLayerRoot(root) {
+  defaultRoot = root || null;
+}
+export const defaultLayerRoot = () => (defaultRoot?.host?.isConnected || defaultRoot?.isConnected ? defaultRoot : null) ?? globalThis.document?.body;
+
+/** 浮层挂在哪：锚点在 Shadow 里就是那个 ShadowRoot，否则是默认浮层根（通常是 body）。 */
 export function layerRoot(node) {
   const doc = node.ownerDocument || document;
   const root = node.getRootNode?.();
-  return root && root !== doc && root.nodeType === 11 ? root : doc.body;
+  return root && root !== doc && root.nodeType === 11 ? root : defaultLayerRoot() ?? doc.body;
 }

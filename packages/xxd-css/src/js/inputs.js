@@ -1,6 +1,6 @@
 // 搜索（⌘F / Esc + 匹配高亮）、标签输入、下拉选择（combobox）、命令面板。
 import { place } from "./floating.js";
-import { emit, nextId } from "./dom.js";
+import { defaultLayerRoot, emit, nextId } from "./dom.js";
 import { openDialog, closeDialog } from "./dialog.js";
 import { ICON } from "./icons-min.js";
 import { fill$1, t } from "./i18n.js";
@@ -319,7 +319,7 @@ export function installComboboxes(root, closestFrom) {
  * recentKey：记住最近运行的命令（localStorage），没有输入时排在最前「最近使用」。
  * loading：true 时显示「正在加载…」（异步命令列表）；之后 palette.setItems(items) 换上真的。
  */
-export function openCommandPalette({ items = [], placeholder = t("commandPlaceholder"), empty = t("commandEmpty"), within = document.body, recentKey, recentLabel = t("recent"), loading = false, loadingLabel = t("loading") } = {}) {
+export function openCommandPalette({ items = [], placeholder = t("commandPlaceholder"), empty = t("commandEmpty"), within = defaultLayerRoot(), recentKey, recentLabel = t("recent"), loading = false, loadingLabel = t("loading") } = {}) {
   const doc = within.ownerDocument;
   const dialog = doc.createElement("dialog");
   dialog.className = "xxd-dialog xxd-palette";
@@ -348,7 +348,13 @@ export function openCommandPalette({ items = [], placeholder = t("commandPlaceho
       shown = [];
       return;
     }
-    shown = items.filter((it) => !q || `${it.label} ${it.keywords ?? ""} ${it.hint ?? ""} ${it.group ?? ""}`.toLowerCase().includes(q));
+    // 每个词都要出现（「dark mode」能匹配 dark-mode；「日历 添加」两个词都要有）
+    const words = q.split(/\s+/).filter(Boolean);
+    shown = items.filter((it) => {
+      if (!words.length) return true;
+      const hay = `${it.label} ${it.keywords ?? ""} ${it.hint ?? ""} ${it.group ?? ""}`.toLowerCase();
+      return words.every((w) => hay.includes(w));
+    });
     if (!q && recentKey) {
       const recent = readRecent();
       const recentItems = recent.map((key) => items.find((it) => (it.id ?? it.label) === key)).filter(Boolean).map((it) => ({ ...it, group: recentLabel }));

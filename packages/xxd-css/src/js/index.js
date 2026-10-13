@@ -6,7 +6,7 @@ import { byId, closestFrom } from "./dom.js";
 import { installDialogs } from "./dialog.js";
 import { installMenus } from "./menu.js";
 import { initChoices, installChoices } from "./choice.js";
-import { installCopy, installTooltips } from "./feedback.js";
+import { installCopy, installToasts, installTooltips } from "./feedback.js";
 import { installLayers } from "./layers.js";
 import { initComboboxes, installComboboxes, installTagInputs } from "./inputs.js";
 import { initPickers, installPickers, installSecrets } from "./picker.js";
@@ -31,7 +31,7 @@ export { chartTokens, chartPalette, chartOptions, watchChartTheme, sparkline, in
 export { bindDrop, openViewer, flip, setStatus, rollText, celebrate, filterSettings, bindSettingsSearch } from "./patterns.js";
 export { ICON } from "./icons-min.js";
 export { setLocale, getLocale, resolveLocale, t } from "./i18n.js";
-export { layerRoot } from "./dom.js";
+export { layerRoot, setDefaultLayerRoot, defaultLayerRoot } from "./dom.js";
 
 const installed = new WeakSet();
 
@@ -43,6 +43,7 @@ export function install(root = document) {
     installMenus(root, byId, closestFrom);
     installChoices(root, closestFrom);
     installTooltips(root, closestFrom);
+    installToasts(root);
     installCopy(root, closestFrom);
     installLayers(root, byId, closestFrom);
     installTagInputs(root, closestFrom);

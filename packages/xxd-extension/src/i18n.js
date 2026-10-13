@@ -28,9 +28,33 @@ export function applyI18n(root = document, fallback = {}) {
   }
 }
 
-/** chrome 的 UI 语言 → 小小东的三种界面语言 */
-export function uiLocale(lang = globalThis.chrome?.i18n?.getUILanguage?.() || globalThis.navigator?.language || "zh-CN") {
-  const l = lang.toLowerCase();
+const normalize = (lang) => {
+  const l = String(lang || "").toLowerCase();
   if (l.startsWith("zh")) return /tw|hk|mo|hant/.test(l) ? "zh-Hant" : "zh-CN";
   return "en";
+};
+
+/**
+ * 界面用哪种语言（简体 / 繁体 / 英文）。唯一来源是 _locales 里的 xxdLocale 这一条：
+ * Chrome 按用户的语言挑了哪份 messages.json，界面文字、<html lang>、组件自带的文字（关闭、取消）就都用那一种，
+ * 不会出现「文案是中文、组件是英文」。没有 xxdLocale 时退回 Chrome 的界面语言。
+ */
+export function uiLocale(lang) {
+  if (lang) return normalize(lang);
+  const fromMessages = globalThis.chrome?.i18n?.getMessage?.("xxdLocale");
+  if (fromMessages) return normalize(fromMessages);
+  return normalize(globalThis.chrome?.i18n?.getUILanguage?.() || globalThis.navigator?.language || "zh-CN");
+}
+
+/** 这个脚本是不是跑在别人的网页里（内容脚本）。 */
+export const isContentScript = () => Boolean(globalThis.chrome?.runtime?.id) && globalThis.location?.protocol !== "chrome-extension:";
+
+/**
+ * 把语言用到页面上：插件自己的页面写 <html lang>；组件（window.Xxd）跟着这种语言。
+ * 内容脚本里只改组件的语言（它在插件自己的隔离环境里），不碰宿主网页的 <html lang>。extension.js 加载时自动调用。
+ */
+export function applyLocale(locale = uiLocale()) {
+  if (!isContentScript() && globalThis.document?.documentElement) globalThis.document.documentElement.lang = locale;
+  globalThis.Xxd?.setLocale?.(locale);
+  return locale;
 }

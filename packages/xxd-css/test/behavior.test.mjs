@@ -374,6 +374,23 @@ describe("O3 组件", () => {
     expect(nav.querySelector('[aria-label="下一页"]').disabled).toBe(true);
   });
 
+  it("分页：换页后焦点还在分页里（不掉到 body）", () => {
+    html(`<nav class="xxd-pagination" data-xxd-pagination data-page="1" data-total="100" data-per-page="20"></nav>`);
+    const nav = document.querySelector("nav");
+    const two = nav.querySelector('[data-page-to="2"]');
+    two.focus();
+    two.click();
+    expect(document.activeElement.getAttribute("aria-current")).toBe("page");
+    expect(document.activeElement.textContent).toBe("2");
+    const next = nav.querySelector('[data-role="next"]');
+    next.focus();
+    next.click();
+    expect(document.activeElement.dataset.role).toBe("next");
+    for (let i = 0; i < 3; i += 1) nav.querySelector('[data-role="next"]:not(:disabled)')?.click();
+    // 到了最后一页，「下一页」禁用：焦点放到当前页
+    expect(document.activeElement.getAttribute("aria-current")).toBe("page");
+  });
+
   it("区间滑块：最低不会超过最高", () => {
     html(`<div class="xxd-range-pair"><input type="range" class="xxd-range" min="0" max="100" value="20"><input type="range" class="xxd-range" min="0" max="100" value="50"></div>`);
     const [a] = document.querySelectorAll(".xxd-range");
@@ -717,6 +734,23 @@ describe("O8 焦点与计时", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("toast：Alt+T 跳到最新一张的按钮、聚焦时整摞都不对读屏隐藏；Esc 关掉并回到原处", () => {
+    html(`<button id="origin">删除</button>`);
+    const origin = document.getElementById("origin");
+    origin.focus();
+    Xxd.toast("第一条", { duration: 0 });
+    const undo = Xxd.toast("已删除", { duration: 0, action: { label: "撤销" } });
+    const region = undo.element.parentElement;
+    expect(region.getAttribute("role")).toBe("region");
+    expect(region.getAttribute("aria-label")).toMatch(/Alt\+T/);
+    origin.dispatchEvent(new KeyboardEvent("keydown", { key: "t", code: "KeyT", altKey: true, bubbles: true }));
+    expect(document.activeElement.textContent).toBe("撤销");
+    for (const el of region.querySelectorAll(".xxd-toast")) expect(el.getAttribute("aria-hidden")).toBe("false");
+    key(document.activeElement, "Escape");
+    expect(undo.element.hasAttribute("data-leaving")).toBe(true);
+    expect(document.activeElement).toBe(origin);
   });
 
   it("关掉横幅时焦点交给后面的按钮，不掉到 body 上", async () => {

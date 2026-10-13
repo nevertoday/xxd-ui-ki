@@ -2,38 +2,31 @@
   "name": "xxd-ui-kit",
   "private": true,
   "license": "MIT",
-  "description": "小小东 UI Kit — 小小东提示词与 Chrome 插件共用的设计系统（基于 cloudflare/kumo 二次开发，MIT 开源）",
+  "description": "小小东 UI Kit：中文优先、不依赖框架的界面组件，专门照顾 Chrome 插件（MV3）；React 版基于 Cloudflare Kumo（MIT）",
   "type": "module",
   "scripts": {
-    "build": "pnpm --filter @cloudflare/kumo-docs-astro build",
-    "codegen": "pnpm --filter @cloudflare/kumo-docs-astro codegen:demos && pnpm --filter @cloudflare/kumo codegen",
-    "build:all": "pnpm -r build",
-    "ci:typecheck": "tsc -p ci/tsconfig.json --noEmit",
-    "changeset": "tsx ci/scripts/ensure-changeset-config.ts && changeset",
-    "clean": "pnpm -r exec rm -rf dist build .astro .wrangler node_modules",
-    "dev": "pnpm codegen && pnpm --filter @cloudflare/kumo-docs-astro dev",
+    "dev": "pnpm --filter @xxd/site dev",
+    "build": "pnpm --filter @cloudflare/kumo build && pnpm xxd:build && pnpm --filter @xxd/site build",
+    "preview": "pnpm --filter @xxd/site preview",
+    "test": "pnpm xxd:test && pnpm --filter @cloudflare/kumo test",
+    "lint": "pnpm --filter @cloudflare/kumo lint && vp lint packages/kumo-docs-astro/src packages/kumo-screenshot-worker/src packages/xxd-react/src",
     "format": "vp fmt --write",
     "format:check": "vp fmt --check",
-    "lint": "pnpm --filter @cloudflare/kumo lint && vp lint packages/kumo-docs-astro/src packages/kumo-screenshot-worker/src packages/xxd-react/src",
-    "lockfile-check": "pnpm install --no-frozen-lockfile && git diff --exit-code pnpm-lock.yaml",
-    "preview": "pnpm --filter @cloudflare/kumo-docs-astro preview",
-    "publish:beta": "bash ci/versioning/publish-beta.sh",
-    "deploy:kumo-docs-preview": "bash ci/versioning/deploy-kumo-docs-preview.sh",
-    "deploy:kumo-docs-staging": "bash ci/versioning/deploy-kumo-docs-staging.sh",
-    "ci:post-pr-report": "tsx ci/scripts/post-pr-report.ts",
-    "release": "pnpm build:all && changeset publish",
-    "release:beta": "changeset publish --no-git-tag --tag beta",
-    "release:production": "bash ci/versioning/release-production.sh",
-    "kumo": "node packages/kumo/dist/command-line/cli.js",
-    "test": "pnpm --filter @cloudflare/kumo test",
-    "test:ci": "tsx --test ci/preview/*.test.ts ci/reporters/*.test.ts ci/scripts/*.test.ts ci/utils/*.test.ts ci/visual-regression/*.test.ts",
-    "test:watch": "pnpm --filter @cloudflare/kumo test:watch",
     "typecheck": "pnpm -r typecheck",
+    "codegen": "pnpm --filter @cloudflare/kumo-docs-astro codegen:demos && pnpm --filter @cloudflare/kumo codegen",
+    "changeset": "changeset",
     "version": "changeset version",
-    "version:beta": "./ci/versioning/version-beta.sh",
+    "lockfile-check": "pnpm install --no-frozen-lockfile && git diff --exit-code pnpm-lock.yaml",
+    "clean": "pnpm -r exec rm -rf dist build .astro .wrangler node_modules",
+    "xxd": "node packages/xxd-extension/scripts/cli.mjs",
     "xxd:build": "pnpm --filter @xxd/tokens --filter @xxd/icons build && pnpm --filter @xxd/css build && pnpm --filter @xxd/extension build && pnpm --filter @xxd/react build",
     "xxd:test": "pnpm --filter \"./packages/xxd-*\" -r test && pnpm --filter @cloudflare/kumo exec vitest run src/xxd-contract.test.ts",
-    "xxd": "node packages/xxd-extension/scripts/cli.mjs"
+    "kumo:dev": "pnpm codegen && pnpm --filter @cloudflare/kumo-docs-astro dev",
+    "kumo:build": "pnpm --filter @cloudflare/kumo-docs-astro build",
+    "kumo:preview": "pnpm --filter @cloudflare/kumo-docs-astro preview",
+    "kumo:test": "pnpm --filter @cloudflare/kumo test",
+    "kumo:test:watch": "pnpm --filter @cloudflare/kumo test:watch",
+    "kumo": "node packages/kumo/dist/command-line/cli.js"
   },
   "devDependencies": {
     "@changesets/cli": "2.29.7",
@@ -56,11 +49,11 @@
     },
     "runtime": {
       "name": "node",
-      "version": "^24.12.0"
+      "version": ">=24.12.0"
     }
   },
   "engines": {
-    "node": "^24.12.0",
-    "pnpm": "^12.3.4"
+    "node": ">=24.12.0",
+    "pnpm": ">=12.3.4"
   }
 }

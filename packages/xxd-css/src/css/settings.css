@@ -133,11 +133,12 @@
     list-style: none;
   }
 
-  /* 行里的字至少留 8 个字宽：放不下时右边的按钮整体换到下一行、靠右（不会把字挤成一字一行） */
+  /* 行里的字至少留 8 个字宽：放不下时右边的按钮整体换到下一行、靠右（不会把字挤成一字一行）。
+   * 只有文字的行照常靠左。 */
   .xxd-list > .xxd-list__item {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-items: center;
     gap: 6px var(--space-3);
     min-height: 44px;
@@ -163,9 +164,17 @@
     background: var(--selected-bg);
   }
 
-  .xxd-list__main {
+  /* 撑开的是正文：有 .xxd-list__main 就是它；没有时是第一样东西（比如一个 <span>） */
+  .xxd-list__main,
+  .xxd-list > .xxd-list__item:not(:has(> .xxd-list__main)) > :first-child:not(:only-child) {
     flex: 1 1 8em;
     min-width: 0;
+  }
+
+  /* 正文之后的按钮：同一行时被正文推到右边；换到下一行时也靠右 */
+  .xxd-list > .xxd-list__item > .xxd-list__main + *,
+  .xxd-list > .xxd-list__item:not(:has(> .xxd-list__main)) > :first-child:not(:only-child) + * {
+    margin-inline-start: auto;
   }
 
   .xxd-list__title {
