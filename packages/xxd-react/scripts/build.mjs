@@ -9,6 +9,7 @@ import { execFileSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { xxdReactProps } from "./props.mjs";
 
 const here = join(dirname(fileURLToPath(import.meta.url)), "..");
 const kumoDist = join(here, "../kumo/dist");
@@ -122,6 +123,9 @@ if (typeMissing.length) {
   console.error(`✗ 类型声明引用了没写进 dependencies / peerDependencies 的包：${typeMissing.join("、")}`);
   process.exit(1);
 }
+
+// 小小东自己写的组件的属性清单（展示站「React 属性」表、xxd-ui doc --react 读它）
+writeFileSync(join(dist, "props.json"), JSON.stringify(xxdReactProps(), null, 2) + "\n");
 
 // 4. 样式：Kumo 的 CSS 拷过来（styles.css / standalone.css 用 ./dist/… 引用）
 for (const css of ["kumo.css", "kumo-binding.css", "kumo-standalone.css"]) copyFileSync(join(kumoDist, "styles", css), join(dist, css));

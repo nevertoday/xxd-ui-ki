@@ -25,8 +25,12 @@
 - 类型声明：`@xxd/extension`、`@xxd/tokens/accent`、`@xxd/tokens/theme`、`@xxd/icons/nodes` 都有了。
 - React 和原生的控件一样高（标准 40 / 紧凑 32px），外观设置两边叫法一样。
 - `xxd-ui pack` 打出来的包能装进仓库外的项目（CI 里有一步真的装进空 Vite 项目检查）。
+- 小小东自己写的 React 组件也有属性表（展示站「React 属性」和 `xxd-ui doc <组件> --react`）。
+- Shadow DOM 版：`:root:not(…)` 这类选择器现在也正确地变成 `:host(…)`（以前没有 JS 时的暗色兜底在 Shadow 里不生效）。
 
 ### 要改的地方
+
+- 修正：`.xxd-page` 里伪元素（`::before` / `::after`）现在也是 `box-sizing: border-box`（以前写在 `:where()` 里，按规范被忽略了）。自己用伪元素画的东西尺寸可能差 1–2px。
 
 - `tokens.css` 现在只有变量：减少动效、主色的选中色和输入光标挪到了 `@xxd/tokens/base.css`。用 `xxd.css` 或 `@xxd/react` 的不用改；只引 `tokens.css` 又想要这几条的，多引一个 `base.css`。
 - ESM 里用 `@xxd/css` 并且页面上有 `<i data-xxd-icon>`：调一次 `useIcons(await import("@xxd/icons"))`（以前靠全局的 `window.XxdIcons`）。

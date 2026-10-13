@@ -7,6 +7,7 @@ import StateMatrix from "../components/StateMatrix.astro";
 import PropsTable from "../components/PropsTable.astro";
 import ReactProps from "../components/ReactProps.astro";
 import kumoRegistry from "@cloudflare/kumo/ai/component-registry.json";
+import xxdReactProps from "@xxd/react/props.json";
 import { componentsFor } from "../lib/data.js";
 import { langOf, t, withLang } from "../i18n/index.js";
 import { richText } from "../lib/markup.js";
@@ -19,7 +20,7 @@ const L = t(lang);
 const hasReact = `${c.name}Demo` in reactDemos;
 // React 组件名：registry 里写的第一个名字（「Dialog + DialogActions（@xxd/react）」→ Dialog）
 const reactName = c.react?.match(/^[A-Z]\w+/)?.[0];
-const hasReactProps = Boolean(reactName && kumoRegistry.components[reactName]);
+const hasReactProps = Boolean(reactName && (kumoRegistry.components[reactName] || xxdReactProps[reactName]));
 const related = componentsFor(lang).filter((x) => x.category === c.category && x.slug !== c.slug);
 const extraDemos = c.examples ?? [];
 const headings = [

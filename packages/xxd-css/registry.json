@@ -310,7 +310,8 @@
       "a11y": [
         "type=\"search\"，没有可见标签时写 aria-label",
         "清空按钮有 aria-label；Esc 有内容时清空、没内容时交给外层"
-      ]
+      ],
+      "react": "Search（@xxd/react）"
     },
     {
       "name": "InputGroup",
@@ -598,7 +599,7 @@
       ],
       "markup": "<div class=\"xxd-segmented\" role=\"radiogroup\" data-xxd-segmented aria-label=\"类型\">\n  <button role=\"radio\" aria-checked=\"true\">文本</button>\n  <button role=\"radio\" aria-checked=\"false\">图片</button>\n</div>",
       "js": "group.addEventListener(\"xxd:change\", (e) => e.detail.value)",
-      "react": "Tabs variant=\"segmented\"",
+      "react": "Segmented（@xxd/react）",
       "rules": [
         "一个托盘，选中段像纸一样浮出来，不是框里套框"
       ],
@@ -677,7 +678,7 @@
         "xxd-rail__spacer"
       ],
       "markup": "<nav class=\"xxd-rail\" aria-label=\"主导航\"><a href=\"#\" aria-current=\"page\"><i data-xxd-icon=\"House\"></i>首页</a><a href=\"#\"><i data-xxd-icon=\"Bookmark\"></i>收藏</a></nav>",
-      "react": "Sidebar",
+      "react": "Rail（@xxd/react）",
       "rules": [
         "图标 20px、标签 10px",
         "激活改颜色和底色，不改线宽"
@@ -814,7 +815,8 @@
         "组名用 h2（在页面 h1 下面），控件的 aria-label 和行标题一致",
         "说明文字可以用 aria-describedby 连到控件"
       ],
-      "block": true
+      "block": true,
+      "react": "SettingsGroup + SettingsRow（@xxd/react）"
     },
     {
       "name": "Appearance",
@@ -835,7 +837,8 @@
         "每个选项都是分段控件或开关，带 aria-label；色块是 radio，名字读得出来",
         "文字跟 <html lang> 或 locale 参数走三语"
       ],
-      "block": true
+      "block": true,
+      "react": "AppearanceSettings（@xxd/react）"
     },
     {
       "name": "List",
@@ -952,7 +955,8 @@
         "状态文字变化用 role=status 读出（如「已保存」）",
         "主按钮只有一个，写清楚做什么（「写入 X」）"
       ],
-      "block": true
+      "block": true,
+      "react": "Dock（@xxd/react）"
     },
     {
       "name": "Sheet",
@@ -985,7 +989,8 @@
       "avoid": [
         "要用户先回答的确认：用 Dialog",
         "桌面网页的详情：用 Panel"
-      ]
+      ],
+      "react": "Sheet + SheetHost（@xxd/react）"
     },
     {
       "name": "Panel",
@@ -1122,7 +1127,7 @@
       ],
       "markup": "<div class=\"xxd-cluster\">\n  <button class=\"xxd-btn\" onclick=\"Xxd.toast('已保存草稿', { tone: 'success' })\">保存</button>\n  <button class=\"xxd-btn\" onclick=\"Xxd.toast('已移到废纸篓', { action: { label: '撤销', onClick() { Xxd.toast('已恢复', { tone: 'success' }) } } })\">删除（可撤销）</button>\n  <button class=\"xxd-btn\" onclick=\"Xxd.toast('第 ' + (window.__n = (window.__n || 0) + 1) + ' 条消息', { tone: 'info' })\">连发几条</button>\n</div>",
       "js": "Xxd.toast(message, { tone: \"success\" | \"danger\" | \"warning\" | \"info\", within, duration, action: { label: \"撤销\", onClick }, stack: true })",
-      "react": "Toast",
+      "react": "Toasty",
       "rules": [
         "就地出现（within）",
         "堆叠：多张叠成一摞，hover 展开；同一句话再来时不加新的，只轻轻动一下",
@@ -1219,7 +1224,8 @@
       ],
       "avoid": [
         "只是显示状态：用 Badge"
-      ]
+      ],
+      "react": "Chip（@xxd/react）"
     },
     {
       "name": "Dot",
@@ -1447,7 +1453,7 @@
         "xxd-masonry"
       ],
       "markup": "<div class=\"xxd-grid\" style=\"--grid-min:200px\">\n  <a class=\"xxd-card\" href=\"#\"><div class=\"xxd-card__media\" style=\"--ratio:3/4\"></div><div class=\"xxd-card__body\"><p class=\"xxd-card__title\">编辑式海报</p><span class=\"xxd-card__meta\">xxd-panel-001</span></div></a>\n</div>",
-      "react": "LayerCard",
+      "react": "Card + CardGrid（@xxd/react）",
       "rules": [
         "卡片没有阴影，hover 只加深边线",
         "角标贴着角（读作界面）"
@@ -1564,7 +1570,8 @@
       "a11y": [
         "用真正的 h2 / h3、ul / ol、blockquote，读屏才能按结构跳",
         "链接有下划线；列表符号用主色只是装饰"
-      ]
+      ],
+      "react": "Prose（@xxd/react）"
     },
     {
       "name": "Stat",
@@ -1602,7 +1609,8 @@
       "a11y": [
         "图表旁边要有一句话结论或一张表；颜色之外，线宽也区分重点线。"
       ],
-      "js": "chart.setOption(Xxd.chartOptions(option))\nXxd.watchChartTheme(chart, () => Xxd.chartOptions(option))\n// React：<Chart echarts={echarts} options={Xxd.chartOptions(option)} />"
+      "js": "chart.setOption(Xxd.chartOptions(option))\nXxd.watchChartTheme(chart, () => Xxd.chartOptions(option))\n// React：<Chart echarts={echarts} options={Xxd.chartOptions(option)} />",
+      "react": "Chart"
     }
   ]
 }

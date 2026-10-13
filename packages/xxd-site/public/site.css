@@ -1126,4 +1126,21 @@
     overflow-wrap: normal;
     word-break: keep-all;
   }
+
+  /* React 属性表里收起来的那几组 */
+  .site-props-more {
+    margin: var(--space-2) 0 var(--space-4);
+  }
+
+  .site-props-more > summary {
+    width: fit-content;
+    padding: var(--space-1) 0;
+    color: var(--muted);
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+
+  .site-props-more > summary:hover {
+    color: var(--ink);
+  }
 }

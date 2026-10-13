@@ -272,3 +272,10 @@ describe("hover 进入立即、离开淡回（D2）", () => {
     expect(files["overlay.css"]).toMatch(/\.xxd-menu:not\(:popover-open\)[\s\S]*?transform: scale\(0\.96\)/);
   });
 });
+
+describe("选择器写法", () => {
+  it(":is() / :where() 里不写伪元素（按规范会被忽略，规则悄悄不生效）", () => {
+    const bad = all.filter((r) => /:(is|where)\([^)]*::/.test(r.selector)).map((r) => `${r.file} ${r.selector}`);
+    expect(bad).toEqual([]);
+  });
+});

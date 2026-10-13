@@ -390,9 +390,17 @@ export async function create(target, { name, nameEn, slug, desc, descEn, popup =
   return dir;
 }
 
+/** React 组件清单：Kumo 来的（它的组件清单）+ 小小东自己写的（@xxd/react 构建时生成的 dist/props.json；没构建过就现读源码）。 */
 function loadReact() {
   const reactFile = join(repo, "packages/kumo/ai/component-registry.json");
-  return existsSync(reactFile) ? JSON.parse(readFileSync(reactFile, "utf8")).components : {};
+  const kumo = existsSync(reactFile) ? JSON.parse(readFileSync(reactFile, "utf8")).components : {};
+  const propsFile = join(repo, "packages/xxd-react/dist/props.json");
+  let own = {};
+  try {
+    own = JSON.parse(existsSync(propsFile) ? readFileSync(propsFile, "utf8") : execFileSync("node", [join(repo, "packages/xxd-react/scripts/props.mjs")], { encoding: "utf8" }));
+  } catch {}
+  const xxd = Object.fromEntries(Object.entries(own).map(([name, x]) => [name, { name, description: x.description || say("小小东自己写的组件", "An XXD component"), props: x.props, subComponents: {} }]));
+  return { ...xxd, ...kumo };
 }
 
 /** 组件和模式列表；filter 按分类、英文名、中文名过滤。 */
@@ -409,7 +417,7 @@ export function listComponents(filter = "") {
     lines.push(columns(list.map((x) => [`  ${x.name}`, isEn() ? (x.label !== x.name ? x.label : "") : x.zh, x.react ? c.dim(`React: ${x.react}`) : ""])));
   }
   const reactNames = Object.keys(react);
-  if (!f && reactNames.length) lines.push("", c.bold(say(`React 组件（@xxd/react，Kumo 换皮版，${reactNames.length} 个）`, `React components (@xxd/react, restyled Kumo, ${reactNames.length})`)), `  ${reactNames.join(" ")}`);
+  if (!f && reactNames.length) lines.push("", c.bold(say(`React 组件（@xxd/react：Kumo 换皮版加小小东自己写的，${reactNames.length} 个）`, `React components (@xxd/react: restyled Kumo plus XXD's own, ${reactNames.length})`)), `  ${reactNames.join(" ")}`);
   return lines.join("\n");
 }
 
@@ -419,7 +427,7 @@ export function docComponent(name, { react: wantReact = false, markup = false } 
   if (wantReact) {
     const key = String(name || "").toLowerCase();
     const native = findComponent(name).exact;
-    const entry = Object.values(react).find((x) => x.name.toLowerCase() === key) ?? (native?.react ? Object.values(react).find((x) => x.name === native.react.split(/[\s(]/)[0]) : null);
+    const entry = Object.values(react).find((x) => x.name.toLowerCase() === key) ?? (native?.react ? Object.values(react).find((x) => x.name === native.react.split(/[\s(（]/)[0]) : null);
     if (!entry) {
       const near = suggest(name, Object.values(react).map((x) => x.name));
       throw new Error(say(`没有叫 ${name} 的 React 组件${near.length ? `，是不是 ${near.join(" / ")}？` : ""}（${BIN} ls 看全部）`, `There's no React component called ${name}${near.length ? ` — did you mean ${near.join(" / ")}?` : ""} (${BIN} ls lists everything)`));

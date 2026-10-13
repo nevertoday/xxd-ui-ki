@@ -1,6 +1,6 @@
 # 小小东 UI Kit 的 CI：推到 main 和提 PR 时运行。
 #   test   单元测试、合同测试、lint、开源自查
-#   audit  在真浏览器里压展示站（无障碍、长文字、恶意宿主页、高对比、英文漏翻、细节、浮层、冒烟），再做一次发包验收
+#   audit  在真浏览器里压展示站（无障碍、长文字、恶意宿主页、高对比、英文漏翻、细节、浮层、冒烟、读屏走查），再做一次发包验收
 # 截图对比（visual）的基线是 macOS 上截的，不在 CI 里跑。
 name: xxd
 on:
@@ -56,4 +56,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: audit
-          path: audit.txt
+          path: |
+            audit.txt
+            packages/xxd-site/visual/sr-transcript.txt

@@ -25,8 +25,12 @@ The first public version. Not on npm yet — use it from source (see the README)
 - Type declarations for `@xxd/extension`, `@xxd/tokens/accent`, `@xxd/tokens/theme` and `@xxd/icons/nodes`.
 - React and native controls are the same height (40px comfortable / 32px compact), and the appearance settings use the same words on both sides.
 - Packages made with `xxd-ui pack` install in projects outside the repo (CI installs them into an empty Vite project to check).
+- XXD's own React components have props tables too (the showcase's "React props" and `xxd-ui doc <component> --react`).
+- Shadow DOM version: selectors like `:root:not(…)` now become `:host(…)` correctly (before, the no-JS dark fallback didn't work inside Shadow DOM).
 
 ### What to change
+
+- Fix: pseudo-elements (`::before` / `::after`) inside `.xxd-page` are now `box-sizing: border-box` as well (they used to sit inside `:where()`, which the spec ignores). Things you draw with pseudo-elements may shift by 1–2px.
 
 - `tokens.css` now holds variables only: reduced motion and the accent-colored selection and caret moved to `@xxd/tokens/base.css`. Nothing to do if you use `xxd.css` or `@xxd/react`; if you link only `tokens.css` and want those rules, add `base.css`.
 - Using `@xxd/css` as ESM with `<i data-xxd-icon>` on the page: call `useIcons(await import("@xxd/icons"))` once (it used to rely on a global `window.XxdIcons`).

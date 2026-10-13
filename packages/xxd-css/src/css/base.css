@@ -26,7 +26,10 @@
     text-wrap: balance;
   }
 
-  :where(.xxd-page) :where(*, *::before, *::after) {
+  /* 伪元素不能写进 :where() 里（会被忽略），单独写；:where(.xxd-page) 保持零优先级 */
+  :where(.xxd-page) *,
+  :where(.xxd-page) *::before,
+  :where(.xxd-page) *::after {
     box-sizing: border-box;
   }
 

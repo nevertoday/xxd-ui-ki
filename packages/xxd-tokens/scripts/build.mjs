@@ -9,46 +9,27 @@ import { build } from "esbuild";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { firstCompound, rewriteSelectors, rootToHost, rootToWhere, styleRules } from "./selectors.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 const source = readFileSync(join(root, "tokens.css"), "utf8");
 
 // 写在 <html>（Shadow 里是 host）上的外观属性
-const ROOT_ATTR = /^\[data-(?:theme|corners|accent|density|finish|input)\b[^\]]*\]/;
+const ROOT_ATTRS = /^data-(theme|corners|accent|density|finish|input)$/;
+const isRootAttr = (c) => c.type === "attribute" && ROOT_ATTRS.test(c.name);
+const isHost = (sel) => sel.length === 1 && sel[0].type === "pseudo-class" && sel[0].kind === "host";
 
-/** 按顶层逗号切选择器列表（:is() / :not() 里的逗号不切）。 */
-function splitSelectors(list) {
-  const parts = [];
-  let depth = 0;
-  let start = 0;
-  for (let i = 0; i < list.length; i += 1) {
-    const ch = list[i];
-    if (ch === "(" || ch === "[") depth += 1;
-    else if (ch === ")" || ch === "]") depth -= 1;
-    else if (ch === "," && depth === 0) {
-      parts.push(list.slice(start, i));
-      start = i + 1;
-    }
-  }
-  parts.push(list.slice(start));
-  return parts.map((p) => p.trim()).filter(Boolean);
-}
-
-function shadowSelector(list) {
-  const out = [];
-  for (const sel of splitSelectors(list)) {
-    out.push(sel);
-    // 令牌块：host 上的值可能被宿主页面的规则盖掉（页面里 `div { --ink: … }` 会打到 host 上，
-    // 而且外面的规则永远赢过 :host），所以在 Shadow 内部的顶层元素上再声明一次——那里宿主页面够不着。
-    if (/^:host(\((?:[^()]|\([^()]*\))*\))?$/.test(sel)) out.push(`${sel} > *`);
-    // `[data-finish=material] .xxd-btn` 这类：属性写在 host 上时也生效
-    const attr = sel.match(ROOT_ATTR);
-    if (attr && /^\s/.test(sel.slice(attr[0].length))) out.push(`:host(${attr[0]})${sel.slice(attr[0].length)}`);
-    // 光秃秃的 `[data-finish=material]`（设变量给里面继承）：写在 host 上时也生效
-    if (attr && attr[0] === sel && !out.includes(`:host(${sel})`)) out.push(`:host(${sel})`);
-  }
-  return [...new Set(out)].join(",\n");
+/** 一个选择器在 Shadow 里要变成哪几个（lightningcss 的选择器 AST）。 */
+function shadowSelectors(selector) {
+  const out = [rootToHost(selector) ?? selector];
+  // 令牌块：host 上的值可能被宿主页面的规则盖掉（页面里 `div { --ink: … }` 会打到 host 上，
+  // 而且外面的规则永远赢过 :host），所以在 Shadow 内部的顶层元素上再声明一次——那里宿主页面够不着。
+  if (isHost(out[0])) out.push([...out[0], { type: "combinator", value: "child" }, { type: "universal" }]);
+  // `[data-finish=material] .xxd-btn`、光秃秃的 `[data-finish=material]`：属性写在 host 上时也生效
+  const [head, rest] = firstCompound(selector);
+  if (head.length === 1 && isRootAttr(head[0])) out.push([{ type: "pseudo-class", kind: "host", selectors: head }, ...rest]);
+  return out;
 }
 
 /**
@@ -79,27 +60,24 @@ export const SHADOW_RESET = `@layer xxd.reset {
 
 /** :root → :host；:root[...] / :root:lang(...) → :host([...])；令牌在 Shadow 内部再声明一次；外观属性选择器加 :host() 版本；继承属性重置。 */
 export function toShadow(css) {
-  const hosted = css
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/:root((?:\[[^\]]+\]|:lang\([^)]*\))*)/g, (_, attrs) => (attrs ? `:host(${attrs})` : ":host"));
-  // 只改规则的选择器（前面是 { } ; 或开头），不碰 @规则
-  const body = hosted.replace(/(^|[{};])(\s*)([^{}@;\s][^{};]*?)(\s*)\{/g, (_, pre, ws, sel, ws2) =>
-    /^(from|to|\d+(\.\d+)?%)(\s*,\s*(from|to|\d+(\.\d+)?%))*$/.test(sel) ? `${pre}${ws}${sel}${ws2}{` : `${pre}${ws}${shadowSelector(sel)}${ws2}{`,
-  );
-  return `${SHADOW_RESET}${body}`;
+  return `${SHADOW_RESET}${rewriteSelectors(css, shadowSelectors)}`;
 }
 
-/** 解析出每个规则块里的自定义属性。 */
-export function parseBlocks(css) {
-  const clean = css.replace(/\/\*[\s\S]*?\*\//g, "");
+/**
+ * 每条规则里的自定义属性：{ 选择器原文: { --名字: 值 } }。规则的位置由 lightningcss 找；
+ * @media 里的规则键名前面带上那条 @media（不和顶层的同名选择器混在一起）。
+ */
+export function parseBlocks(css, { errorRecovery = true } = {}) {
   const blocks = {};
-  const re = /([^{}]+)\{([^{}]*)\}/g;
-  let m;
-  while ((m = re.exec(clean))) {
-    const selector = m[1].trim().replace(/^@media[^{]*$/, "").trim();
+  for (const { selector, body, media } of styleRules(css, { errorRecovery })) {
     const vars = {};
-    for (const decl of m[2].matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) vars[decl[1]] = decl[2].trim().replace(/\s+/g, " ");
-    if (Object.keys(vars).length) blocks[selector] = { ...(blocks[selector] || {}), ...vars };
+    for (const decl of body.replace(/\/\*[\s\S]*?\*\//g, "").split(";")) {
+      const at = decl.indexOf(":");
+      const name = decl.slice(0, at).trim();
+      if (at > 0 && name.startsWith("--")) vars[name] = decl.slice(at + 1).trim().replace(/\s+/g, " ");
+    }
+    const key = media ? `${media} ${selector}` : selector;
+    if (Object.keys(vars).length) blocks[key] = { ...(blocks[key] || {}), ...vars };
   }
   return blocks;
 }
@@ -112,7 +90,7 @@ export function parseBlocks(css) {
 export function toLayered(css) {
   // :root → :where(:root)：layer 里本来就最弱，再去掉优先级；文字上也和老项目自己的 :root[...] 块区分开
   // （有些老测试按文本找第一个 `:root[data-theme="dark"] {`）。
-  const scoped = css.replace(/:root((?:\[[^\]]+\])*)/g, (_, attrs) => `:where(:root${attrs})`);
+  const scoped = rewriteSelectors(css, (sel) => (rootToWhere(sel) ? [rootToWhere(sel)] : null));
   return `/* @xxd/tokens（layered）— Copyright (c) 2026 小小东 (xiaoxiaodong.ai). MIT License. */\n@layer xxd.tokens {\n${scoped.trim()}\n}\n`;
 }
 
@@ -145,14 +123,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const json = {};
   for (const [selector, vars] of Object.entries(blocks)) {
     // 一个块可以写成「:root[data-x], [data-x]」（整页或页面里的一块都生效）：按第一个选择器认
-    const [first, second, ...more] = splitSelectors(selector);
+    const [first, second, ...more] = selector.split(/,\s*/);
     const pair = !more.length && second && second === first.replace(/^:root/, "") ? MODE_NAMES[first] : null;
     const name = MODE_NAMES[selector] || pair || (selector === ":root" ? "base" : null);
     if (name) json[name] = vars;
   }
-  // @media (pointer: coarse) 里的 :root 会被解析成 ":root" 覆盖 base 的 --hit-min，单独还原。
-  json.base["--hit-min"] = "40px";
-  json.coarse = { "--hit-min": "44px" };
+  json.coarse = blocks["@media (pointer: coarse) :root"];
   writeFileSync(join(dist, "tokens.json"), JSON.stringify(json, null, 2) + "\n");
 
   const names = Object.keys(json.base).sort();

@@ -122,7 +122,7 @@ test("字体：只用无衬线；标题和正文同一家族；先英文字体�
   const shadow = toShadow(css);
   assert.match(shadow, /:host\(:lang\(zh-Hant\)\),\n:host\(:lang\(zh-Hant\)\) > \*/);
   // layered 版本：老项目自己在 :root 上的字体优先（不写到每个元素上）
-  assert.match(toLayered(css), /:where\(:root\):lang\(zh-Hant\)/);
+  assert.match(toLayered(css), /:where\(:root:lang\(zh-Hant\)\)/);
 });
 
 test("暗色是暖黑", () => {

@@ -12,8 +12,8 @@ const html = (s) => {
   Xxd.init(document);
 };
 const key = (el, k) => el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
-// 播报是延迟写进去的（先清空再写）：等到文字出现，最多 1 秒
-const until = async (fn, ms = 1000) => {
+// 播报是延迟写进去的（先清空再写）：等到文字出现，最多 2 秒（机器忙的时候 1 秒偶尔不够）
+const until = async (fn, ms = 2000) => {
   const t0 = Date.now();
   while (!fn() && Date.now() - t0 < ms) await new Promise((r) => setTimeout(r, 10));
 };

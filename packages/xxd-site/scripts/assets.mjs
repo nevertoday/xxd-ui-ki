@@ -8,6 +8,7 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { printSelector, ruleTree } from "../../xxd-tokens/scripts/selectors.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pkgs = join(here, "../..");
@@ -47,69 +48,45 @@ const kumoCss = join(pkgs, "kumo/dist/styles/kumo-standalone.css");
 if (existsSync(kumoCss)) copyFileSync(kumoCss, join(out, "kumo.css"));
 else console.warn("！没有 kumo-standalone.css：先运行 pnpm --filter @cloudflare/kumo build（React 演示会没有样式）");
 
-/** 把 :hover / :focus-visible / :active 规则复制成强制状态版本。只处理选择器，不动声明。 */
+/**
+ * 把 :hover / :focus-visible / :active（和输入框的 :focus）规则复制成强制状态版本：.xxd-force-scope … [data-force~="hover"]。
+ * 规则和选择器由 lightningcss 解析（packages/xxd-tokens/scripts/selectors.mjs），只改选择器，声明原样复制。
+ *   - 写在 :not() 里的状态不换（:not([data-force~=…]) 会匹配到所有东西）；
+ *   - 「鼠标点的时候不显示焦点环」那条规则（[data-input="pointer"]）不复制：矩阵里的「键盘聚焦」要真的画出焦点环。
+ */
 export function forceStates(css) {
-  const PSEUDO = { ":hover": "hover", ":focus-visible": "focus", ":active": "active" };
-  const out = [];
-  let i = 0;
-  const depthStack = [];
-  // 逐个读出「选择器 { 声明 }」；@media / @layer / @supports 往里走。
-  while (i < css.length) {
-    const open = css.indexOf("{", i);
-    if (open === -1) break;
-    const close = css.indexOf("}", i);
-    if (close !== -1 && close < open) {
-      depthStack.pop();
-      i = close + 1;
-      continue;
-    }
-    const prelude = css.slice(i, open).trim().replace(/\/\*[\s\S]*?\*\//g, "").trim();
-    if (prelude.startsWith("@")) {
-      if (/^@(media|layer|supports|container)/.test(prelude)) {
-        depthStack.push(prelude);
-        i = open + 1;
-        continue;
-      }
-      // @keyframes / @font-face / @starting-style 等：整块跳过
-      let depth = 1;
-      let j = open + 1;
-      while (j < css.length && depth) {
-        if (css[j] === "{") depth += 1;
-        else if (css[j] === "}") depth -= 1;
-        j += 1;
-      }
-      i = j;
-      continue;
-    }
-    const end = css.indexOf("}", open);
-    const body = css.slice(open + 1, end);
-    const selectors = prelude.split(/,(?![^(]*\))/).map((x) => x.trim());
-    const forced = [];
-    for (const sel of selectors) {
-      // 「鼠标点的时候不显示焦点环」那条规则不复制：矩阵里的「键盘聚焦」要真的画出焦点环
-      if (sel.includes('data-input="pointer"')) continue;
-      let next = sel;
-      let touched = false;
-      for (const [pseudo, name] of Object.entries(PSEUDO)) {
-        if (next.includes(pseudo)) {
-          next = next.split(pseudo).join(`[data-force~="${name}"]`);
+  const STATE = { hover: "hover", "focus-visible": "focus", focus: "focus", active: "active" };
+  const force = (name) => ({ type: "attribute", namespace: null, name: "data-force", operation: { operator: "includes", value: name, caseSensitivity: "case-sensitive" } });
+  const isPointerOnly = (c) => c.type === "attribute" && c.name === "data-input" && c.operation?.value === "pointer";
+  // 返回换过的选择器；不该复制时返回 null
+  const convert = (selector) => {
+    let touched = false;
+    let insideNot = false;
+    const map = (components, negated) =>
+      components.map((c) => {
+        if (c.type === "pseudo-class" && STATE[c.kind]) {
+          if (negated) insideNot = true;
           touched = true;
+          return force(STATE[c.kind]);
         }
-      }
-      // 输入框的聚焦样式写在 :focus 上（不是 :focus-visible）：也算「聚焦」
-      if (/:focus(?![-\w])/.test(next)) {
-        next = next.replace(/:focus(?![-\w])/g, '[data-force~="focus"]');
-        touched = true;
-      }
-      if (touched && !next.includes(":not([data-force")) forced.push(`.xxd-force-scope ${next}`);
-    }
-    if (forced.length) {
-      const media = depthStack.filter((p) => p.startsWith("@media") || p.startsWith("@supports"));
-      let rule = `${forced.join(",\n")} {${body}}`;
-      for (const m of media.reverse()) rule = `${m} {\n${rule}\n}`;
-      out.push(rule);
-    }
-    i = end + 1;
+        if (c.type === "pseudo-class" && Array.isArray(c.selectors)) {
+          const nested = c.kind === "host" ? map(c.selectors, negated) : c.selectors.map((s) => map(s, negated || c.kind === "not"));
+          return { ...c, selectors: nested };
+        }
+        return c;
+      });
+    if (selector.some(isPointerOnly)) return null;
+    const next = map(selector, false);
+    if (!touched || insideNot) return null;
+    return [{ type: "class", name: "xxd-force-scope" }, { type: "combinator", value: "descendant" }, ...next];
+  };
+  const out = [];
+  for (const rule of ruleTree(css)) {
+    const forced = rule.selectors.map(convert).filter(Boolean);
+    if (!forced.length) continue;
+    let text = `${[...new Set(forced.map(printSelector))].join(",\n")} {${rule.body}}`;
+    for (const w of rule.wrappers.filter((x) => x.type === "media" || x.type === "supports").reverse()) text = `${w.prelude} {\n${text}\n}`;
+    out.push(text);
   }
   return `/* 由 scripts/assets.mjs 生成：状态矩阵用的强制状态（请勿手改） */\n@layer xxd.components {\n${out.join("\n")}\n}\n`;
 }

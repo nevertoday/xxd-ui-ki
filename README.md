@@ -192,7 +192,7 @@ pnpm dev                    # 展示站 http://localhost:4400
 ```bash
 pnpm --filter @xxd/site build
 pnpm --filter @xxd/site visual   # 截图对比：每页 × 4 种外观
-pnpm --filter @xxd/site run audit    # 无障碍、长文字、恶意宿主页、高对比、英文漏翻、细节、浮层、冒烟
+pnpm --filter @xxd/site run audit    # 无障碍、长文字、恶意宿主页、高对比、英文漏翻、细节、浮层、冒烟、读屏走查
 ```
 
 几条硬规矩：卡片、行、按钮不加阴影；字重只用 400 / 500 / 600；动画只改透明度和位置；每个视觉决定都要能在 [设计原则](docs/DESIGN-PRINCIPLES.md) 里找到依据。

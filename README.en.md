@@ -193,7 +193,7 @@ Two checks before release (both need headless Chrome via `CHROME_EXE`):
 ```bash
 pnpm --filter @xxd/site build
 pnpm --filter @xxd/site visual   # screenshot diff: every page × 4 appearances
-pnpm --filter @xxd/site run audit    # accessibility, long text, hostile host page, forced colors, untranslated text, polish, overlays, smoke
+pnpm --filter @xxd/site run audit    # accessibility, long text, hostile host page, forced colors, untranslated text, polish, overlays, smoke, screen-reader walk-through
 ```
 
 A few hard rules: no shadows on cards, rows or buttons; weights 400 / 500 / 600 only; animate only opacity and position; every visual decision traces back to the [design principles](https://ui.xiaoxiaodong.ai/en/principles).

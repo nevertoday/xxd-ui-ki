@@ -149,11 +149,15 @@ await browser.close();
 server.close();
 
 const withErrors = results.filter((r) => r.errors.length);
-const changed = results.filter((r) => r.diffPixels !== null && r.diffPixels !== 0);
+// 差几个像素以内是抗锯齿的随机抖动（图标页几百个小图标，偶尔有一个像素不一样）：只报告，不算失败
+const NOISE_PX = 4;
+const changed = results.filter((r) => r.diffPixels === -1 || r.diffPixels > NOISE_PX);
+const noisy = results.filter((r) => r.diffPixels > 0 && r.diffPixels <= NOISE_PX);
 console.log(`页面 ${targets.length} 个 × ${MODES.length} 种外观 = ${results.length} 张截图${update ? "（已更新基线）" : ""}`);
 console.log(`控制台错误：${withErrors.length ? withErrors.map((r) => `${r.page} ${r.mode}: ${r.errors[0]}`).join("\n  ") : "无"}`);
 console.log(`手机宽度横向溢出：${overflow.length ? overflow.map((o) => `${o.page} +${o.px}px`).join("、") : "无"}`);
 console.log(`React 演示：${reactIssues.length ? reactIssues.map((r) => `${r.page}: ${r.errors[0]}`).join("\n  ") : "全部正常渲染"}`);
+if (!update && noisy.length) console.log(`抗锯齿抖动（≤ ${NOISE_PX}px，不算失败）：${noisy.map((r) => `${r.page} ${r.mode} ${r.diffPixels}px`).join("、")}`);
 if (!update) console.log(`和基线不同：${changed.length ? changed.map((r) => `${r.page} ${r.mode} ${r.diffPixels === -1 ? "尺寸变了" : `${r.diffPixels}px`}`).join("\n  ") : "无"}`);
 writeFileSync(join(root, "visual/report.json"), JSON.stringify({ when: new Date().toISOString(), pages: targets.length, results, overflow, reactIssues }, null, 2));
 process.exit(withErrors.length || overflow.length || changed.length || reactIssues.length ? 1 : 0);

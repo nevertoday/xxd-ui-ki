@@ -63,6 +63,7 @@
     "prepack": "node scripts/build.mjs"
   },
   "devDependencies": {
-    "esbuild": "0.28.1"
+    "esbuild": "0.28.1",
+    "lightningcss": "1.33.0"
   }
 }

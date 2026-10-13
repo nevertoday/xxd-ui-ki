@@ -32,7 +32,8 @@
     },
     "./styles.css": "./styles.css",
     "./standalone.css": "./standalone.css",
-    "./xxd.css": "./xxd.css"
+    "./xxd.css": "./xxd.css",
+    "./props.json": "./dist/props.json"
   },
   "files": [
     "dist",

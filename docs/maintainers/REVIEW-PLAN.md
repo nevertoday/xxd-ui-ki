@@ -70,16 +70,16 @@
 | # | 问题 | 选项 | 建议 |
 | --- | --- | --- | --- |
 | D8 | 公开仓库里的内部文档（PLAN、OPTIMIZATION-PLAN、本文、member-site、AGENTS 里的个人授权句） | 原样留着 / 留在 `docs/maintainers/` 但删掉私有细节、README 分「使用者 / 维护者」两栏 / 移到私有仓库 | **第二种**。计划本身可以当路线图公开；私有仓库的分支名、已知失败数、会员支付流程这类删掉；AGENTS.md 只留工程约定 |
-| D9 | npm 上 `@xxd` 这个 scope 已经存在（没有任何包） | 是你的 / 不是你的 → 改用 `@nevertoday/*` 或 `@xiaoxiaodong/*` | 先请你登录 npm 确认；不是你的就尽早改名，越晚越贵 |
+| D9 | npm 上 `@xxd` 这个 scope 已经存在（没有任何包） | 是你的 / 不是你的 → 改用 `@nevertoday/*` 或 `@xiaoxiaodong/*` | 先请你登录 npm 确认；不是你的就尽早改名，越晚越贵。**2026-10-13 复查**：registry 上 `@xxd` 组织存在、下面 0 个包；`@nevertoday`、`@xiaoxiaodong` 都是「Scope not found」（没人用）。归属只有登录 npm 才看得到 |
 | D10 | `@xxd/react` 怎么发布 | 把换皮后的 kumo 打进 `@xxd/react` / 另发一个 `@xxd/kumo` | **打进去**：外部只有一个包，仓库里的内部包名不变，合并上游的成本不变；同时改成显式导出清单 |
 | D11 | 控件边界和焦点环对比度（两位评审独立提出） | 保持现在的发丝线 / 只给输入框、复选框、单选、开关加一档 ≥3:1 的 `--line-control`，焦点环改不透明 | **加**。卡片、分隔线、列表线不动，整体仍然安静；这是 WCAG 1.4.11 的硬要求 |
 | D12 | 暗色的语义色（现在是冷荧光绿 / 红） | 不动 / 换一组偏暖、低一档饱和的 | 换，先做并排给你看 |
 | D13 | `new` 生成的插件默认带登录、会员、¥29 / ¥228（三位评审都提了） | 不动 / 默认最小模板，`--account` 才带 | **默认最小**：大多数工具插件不要账号，带登录还会让商店审核要测试账号、隐私披露变复杂 |
 | D14 | secondary 和 outline 按钮看起来一样 | 让它们看起来不同 / 保留 outline 只用在彩色或图片底上，文档写清 / 删掉 outline | **第二种**，外观不变，只补用法说明 |
-| D15 | 图标来源 | 你确认 500 个都是原创绘制（没有复制 Lucide / Phosphor 的路径）后写进图标包 README | 需要你一句话确认 |
+| D15 | 图标来源 | 你确认 500 个都是原创绘制（没有复制 Lucide / Phosphor 的路径）后写进图标包 README | 需要你一句话确认。**2026-10-13 自查**（`scripts/verify/icon-similarity.mjs`，对比 lucide-static 0.460 的 1539 个图标）：501 个里整个相同的 4 个（ChevronDown、Ellipsis、EllipsisVertical、Minus，都是最简单的几何形），1124 个形状里和 Lucide 某个形状相同的 57 个，全是直线、居中的圆、打勾这类基本笔画；没有复杂路径一样。Phosphor 是 256 网格，坐标体系不同，不会逐点重合。O11 新画的约 300 个有本仓库的提交记录；最早的 201 个来自会员站，要你确认 |
 | D16 | 以后提交用的邮箱 | 继续用现在的 / 改用 GitHub 的 noreply 地址 | 你决定；历史不改写 |
 | D17 | 上游的 `kumo-docs-astro`、`kumo-figma`、`kumo-screenshot-worker` | 删掉 / 留着但根目录脚本改成 `kumo:*`、去掉 Cloudflare 的账号和发布脚本 | **留着**（删了合并上游会冲突），只做中和 |
-| D1 | 纯平还是质感（仍未定） | — | 评审说 /foundations/finish 现在肉眼看不出差别；R5 先把这一页做成能比较的样子再定 |
+| D1 | 纯平还是质感（仍未定） | — | 评审说 /foundations/finish 现在肉眼看不出差别；R5 先把这一页做成能比较的样子再定。**R5 之后**：这一页有 3 倍放大、按下那一帧、亮暗各一组，而且局部开立体终于真的生效了（以前被外层的 flat 盖住）。建议维持**平面为缺省**（按钮无阴影、整体安静），立体作为可选项留在「外观」里；等你看过放大对比再定 |
 
 ---
 
@@ -225,18 +225,18 @@
 | R2 对外这一层 | ✅ 完成 | 2026-10-12 |
 | R3 插件套件 | ✅ 完成（试点在 xPoster 的 xxd-ui-content-pilot 分支，未合并） | 2026-10-12 |
 | R4 无障碍 | ✅ 完成（真读屏软件没测，见下） | 2026-10-12 |
-| R5 视觉与展示站 | ✅ 完成 | 2026-10-12 |
+| R5 视觉与展示站 | ✅ 完成（截图 768 张逐页对比后更新了本机基线） | 2026-10-13 |
 | R6 工程与发布 | ✅ 完成（发版、打 tag 等维护者决定，见下） | 2026-10-13 |
 
 R4–R6 的几处说明：
 
-- **R4**：axe、键盘、播报都有自动检查；VoiceOver / NVDA 实际朗读没有人工测过。
+- **R4**：axe、键盘、播报都有自动检查；审计的「读屏」一节（`packages/xxd-site/scripts/sr.mjs`）用键盘走 8 个关键流程，每一步读 Chrome 无障碍树里的焦点（角色、名字、展开 / 选中 / 按下 / 模态）和播报区，文字稿在 `visual/sr-transcript.txt`。读屏软件念的就是这些，但 VoiceOver / NVDA 真机朗读（语速、重复播报、虚拟光标）仍要人工试一次：开 VoiceOver 要改系统设置、会在这台电脑上出声，AI 助手不替你做。
 - **R6-1 / R6-3**：包都能 `pnpm pack`，元数据、LICENSE、`prepack` 齐了，但仍是 `private: true`；npm 发布、打 `v0.1.0` tag、GitHub Release 等维护者说了再做。CHANGELOG 先手写 0.1.0（中英两份），展示站「更新日志」读它。
 - **R6-2**：Kumo 不是内联成一个大文件，而是按原来的模块结构拷进 `@xxd/react/dist/kumo/`（内联会让用的人没法按需打包：一个按钮加对话框的应用从 442 KB 涨到 1.17 MB）。
 - **R6-5**：CI 加了浏览器那一组（audit + `scripts/pack-check.mjs` 发包验收）；截图基线是 macOS 上截的，不进 CI。
 - **R6-6**：install 期间注册的监听统一挂一个 AbortSignal（不用逐个改模块）；window 级监听按 root 各装一份，处理函数都是幂等的；tooltip 同一时刻只有一个，状态没有按 root 拆。
 - **R6-9**：控件高度和内边距的映射写在 `kumo-binding.css`（认 Kumo 的尺寸类），没有改上游组件源码，合并上游不冲突。
-- **R6-11**：CSS 转换没有整套换成 lightningcss，改为构建产物逐个用 lightningcss 解析做门禁（`xxd-css/test/css-parse.test.mjs`）；体积预算见 `xxd-css/test/size.test.mjs`。
+- **R6-11**：选择器的改写（Shadow 版 `:root → :host(…)`、layered 版 `:where(:root…)`、`parseBlocks`、展示站状态矩阵的 `forceStates`）都改由 lightningcss 解析和打印（`xxd-tokens/scripts/selectors.mjs`）。声明部分原样保留，因为 lightningcss 1.33 写回带 `var()` 的声明会出错。换过来以后顺带修好三处：`:root:not([data-theme])` 以前在 Shadow 里写成了无效的 `:host:not(…)`；状态矩阵漏掉了一条 `[data-input="pointer"]` 规则；base.css 里 `:where(*, *::before, *::after)` 的伪元素按规范会被忽略，从来没生效（合同测试现在会拦）。另外，构建产物逐个用 lightningcss 解析做门禁（`xxd-css/test/css-parse.test.mjs`），体积预算见 `xxd-css/test/size.test.mjs`。
 
 建议顺序：先定 D8–D17（D9、D15 只要你确认一下）→ **R1**（小、立刻见效，并补上门禁）→ **R2**（仓库已经公开，门面最急）→ **R3**（头号场景）→ R4 → R5 → R6。
 R6-1 / R6-2 和 R2-3 互相依赖：npm 发布之前，R2 先如实写「从源码用」。
