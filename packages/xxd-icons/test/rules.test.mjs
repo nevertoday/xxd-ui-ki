@@ -11,6 +11,13 @@ const ROUND_ALLOWED = new Set([
   "Grip", "Dot", "Circle", "Image", "Images", "ImagePlus", "ImageUp", "Share2", "User", "UserRound", "UserPlus",
   "UserRoundCheck", "UserRoundX", "Users", "Contact", "Key", "Tag", "Tags", "Eye", "ScanEye", "Radio", "Palette",
   "MailSearch", "UserRoundPen",
+  // 2026-10 扩充：镜头、车轮、表盘、脸、头像、节点、指孔、硬币、音符……都是本身圆的东西
+  "Scissors", "AtSign", "Percent", "CirclePlus", "CircleMinus", "Award", "Rocket", "Target", "Crosshair", "Cog", "Anchor",
+  "Timer", "AlarmClock", "CalendarClock", "BellDot", "Focus", "ZoomIn", "ZoomOut", "FileImage", "FileAudio", "FileSearch",
+  "FileClock", "FolderSearch", "Smile", "Frown", "Meh", "CirclePlay", "CircleStop", "Music", "ListMusic", "Disc", "Camera",
+  "Webcam", "ShoppingCart", "Banknote", "Coins", "CircleDollarSign", "Truck", "UserMinus", "UserSearch", "CircleUser",
+  "SquareUser", "PersonStanding", "MapPin", "Compass", "Locate", "LocateFixed", "Route", "Car", "Bike", "Shapes",
+  "EllipsisVertical", "GripHorizontal", "GitBranch", "GitCommit", "GitMerge", "GitPullRequest", "GitFork",
 ]);
 
 test("全局属性：1.5 线宽、圆头、斜接角、不填充", () => {

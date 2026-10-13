@@ -42,7 +42,7 @@ const pre = "border:1px solid var(--line);border-radius:var(--r-md)";
 cd xxd-ui-kit
 pnpm xxd new ${ext} ${en ? '--name "Today"' : '--name 今日待办 --name-en "Today"'} --slug today
 pnpm xxd sync ${ext}     # ${en ? "update the components later" : "以后更新组件"}
-pnpm xxd status ~/js/*          # ${en ? "who is behind" : "谁落后了"}`)}</code></pre>
+pnpm xxd status                 # ${en ? "who is behind (every remembered project)" : "谁落后了（记住的全部项目）"}`)}</code></pre>
   <pre class="site-code" tabindex="0" style={`${pre};margin-top:var(--space-3)`}><code>{code(`
 <script src="vendor/xxd/boot.js" data-key="today-ui" data-default-density="compact"></script>
 <link rel="stylesheet" href="vendor/xxd/xxd.css">
@@ -78,7 +78,7 @@ import "@xxd/react/standalone.css";       // ${en ? "without Tailwind" : "不用
   {
     en ? (
       <ul class="site-rules">
-        <li>Colors, radii, shadows and font sizes come from tokens only; rectangles use only --r-xs/sm/md/lg/pill, semantic circles use --r-circle.</li>
+        <li>Colors, radii, shadows and font sizes come from tokens only; rectangles use only <code class="xxd-code-inline">--r-xs/sm/md/lg/pill</code>, semantic circles use <code class="xxd-code-inline">--r-circle</code>.</li>
         <li>Cards, rows and buttons have no shadow; weights are 400 / 500 / 600 only; selection changes color, never weight.</li>
         <li>Hover changes instantly on enter and fades back on leave; motion animates opacity / transform only.</li>
         <li>In dialogs Cancel comes first and stays quiet; a button's label says what the next click will do.</li>
@@ -86,7 +86,7 @@ import "@xxd/react/standalone.css";       // ${en ? "without Tailwind" : "不用
       </ul>
     ) : (
       <ul class="site-rules">
-        <li>颜色、圆角、阴影、字号只用令牌；矩形圆角只用 --r-xs/sm/md/lg/pill，语义圆用 --r-circle。</li>
+        <li>颜色、圆角、阴影、字号只用令牌；矩形圆角只用 <code class="xxd-code-inline">--r-xs/sm/md/lg/pill</code>，语义圆用 <code class="xxd-code-inline">--r-circle</code>。</li>
         <li>卡片、行、按钮没有阴影；字重只有 400 / 500 / 600；选中改颜色不加粗。</li>
         <li>hover 进入立即、离开淡回；动效只动 opacity / transform。</li>
         <li>对话框取消在前、安静；按钮文字说下一次点击会做什么。</li>

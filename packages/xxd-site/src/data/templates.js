@@ -144,9 +144,9 @@ export const templatesFor = (lang = "zh") => (lang === "en" ? templatesEn.map((t
 export const templates = [
   { slug: "extension-sidepanel", zh: "插件侧边栏", summary: "紧凑密度：tab 在最上面（没有顶栏）、拖放区和取图方式、记录、设置、状态行、底部 dock。", markup: sidepanel, width: 380, height: 720, where: "Chrome 侧边栏" },
   { slug: "extension-sign-in", zh: "插件登录页", summary: "没登录时侧边栏只有这一屏。", markup: signIn, width: 380, height: 640, where: "Chrome 侧边栏" },
-  { slug: "settings", zh: "设置页", summary: "搜索钉在顶部（过滤 + 标字）、账号、写入、AI 密钥、外观组、关于。", markup: settings, height: 980 },
+  { slug: "settings", zh: "设置页", summary: "搜索钉在顶部（过滤 + 标字）、账号、写入、AI 密钥、外观组、关于。", markup: settings, height: 980, flow: true },
   { slug: "detail-panel", zh: "会员站详情面板", summary: "瀑布流 + 右侧详情面板：标题栏、图、提示词、标签、底部 dock（上一个 / 下一个 / 下一步）。", markup: detailPanel, height: 680 },
-  { slug: "article", zh: "文章阅读页", summary: "阅读排版 + 右侧目录（滚动高亮）。", markup: article, height: 760 },
-  { slug: "resource-list", zh: "资源列表页", summary: "页面头、筛选、表格（全选 / 排序 / 悬停操作）、分页。", markup: resourceList, height: 620 },
+  { slug: "article", zh: "文章阅读页", summary: "阅读排版 + 右侧目录（滚动高亮）。", markup: article, height: 760, flow: true },
+  { slug: "resource-list", zh: "资源列表页", summary: "页面头、筛选、表格（全选 / 排序 / 悬停操作）、分页。", markup: resourceList, height: 620, flow: true },
   { slug: "delete-confirm", zh: "删除确认", summary: "输入名字确认删除的对话框。", markup: deleteConfirm, height: 260 },
 ];

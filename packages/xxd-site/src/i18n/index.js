@@ -53,6 +53,7 @@ const zh = {
   mdLink: "本页的 Markdown（给 AI）",
   switchLang: "English",
   switchLangLabel: "Switch to English",
+  github: "GitHub 上的源码",
   // 组件页
   componentCaption: "组件",
   bothImpl: "原生 HTML 与 React",
@@ -70,6 +71,8 @@ const zh = {
   native: "原生 HTML",
   code: "代码",
   copy: "复制",
+  codeAll: "展开全部",
+  codeLess: "收起",
   do: "好",
   dont: "不好",
   // 模式 / 模板
@@ -131,6 +134,7 @@ const en = {
   mdLink: "This page as Markdown (for AI)",
   switchLang: "中文",
   switchLangLabel: "切换到中文",
+  github: "Source on GitHub",
   componentCaption: "Component",
   bothImpl: "native HTML and React",
   demo: "Demo",
@@ -147,6 +151,8 @@ const en = {
   native: "Native HTML",
   code: "Code",
   copy: "Copy",
+  codeAll: "Show all",
+  codeLess: "Show less",
   do: "Do",
   dont: "Don't",
   patternCaption: "Pattern · from",

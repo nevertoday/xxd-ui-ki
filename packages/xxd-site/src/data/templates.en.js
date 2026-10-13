@@ -140,9 +140,9 @@ const deleteConfirm = `
 export const templates = [
   { slug: "extension-sidepanel", title: "Extension side panel", summary: "Compact density: tabs at the very top (no top bar), drop zone and ways to get images, history, settings, status line, bottom dock.", markup: sidepanel, width: 380, height: 720, where: "Chrome side panel" },
   { slug: "extension-sign-in", title: "Extension sign-in", summary: "When signed out, the side panel shows only this screen.", markup: signIn, width: 380, height: 640, where: "Chrome side panel" },
-  { slug: "settings", title: "Settings page", summary: "Search pinned to the top (filters + marks text), account, writing, AI key, appearance group, about.", markup: settings, height: 980 },
+  { slug: "settings", title: "Settings page", summary: "Search pinned to the top (filters + marks text), account, writing, AI key, appearance group, about.", markup: settings, height: 980, flow: true },
   { slug: "detail-panel", title: "Member site details panel", summary: "Masonry + a details panel on the right: title bar, image, prompt, tags, bottom dock (previous / next / next step).", markup: detailPanel, height: 680 },
-  { slug: "article", title: "Article page", summary: "Reading typography + a table of contents on the right (highlights while scrolling).", markup: article, height: 760 },
-  { slug: "resource-list", title: "Resource list", summary: "Page header, filters, a table (select all / sort / hover actions), pagination.", markup: resourceList, height: 620 },
+  { slug: "article", title: "Article page", summary: "Reading typography + a table of contents on the right (highlights while scrolling).", markup: article, height: 760, flow: true },
+  { slug: "resource-list", title: "Resource list", summary: "Page header, filters, a table (select all / sort / hover actions), pagination.", markup: resourceList, height: 620, flow: true },
   { slug: "delete-confirm", title: "Delete confirmation", summary: "A dialog that asks you to type the name before deleting.", markup: deleteConfirm, height: 260 },
 ];

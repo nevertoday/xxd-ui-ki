@@ -308,21 +308,40 @@
     border-bottom: 1px solid var(--line);
   }
 
-  /* ── 布局预设：两栏、三栏…，窄屏自动叠起来 ── */
+  /* ── 布局预设：两栏、三栏…。看的是布局自己有多宽（容器查询），不是整个窗口：
+   *    放进窄的侧边栏、卡片里也会叠成一栏。宽 ≥ 560px 才分栏；三栏 ≥ 760px、四栏 ≥ 880px，不够时先两栏 ── */
   .xxd-layout {
-    display: grid;
-    gap: var(--layout-gap, var(--space-4));
-    grid-template-columns: 1fr;
+    --_gap: var(--layout-gap, var(--space-4));
+    container-type: inline-size;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--_gap);
   }
 
-  @media (min-width: 720px) {
-    .xxd-layout[data-cols="2up"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .xxd-layout[data-cols="3up"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .xxd-layout[data-cols="4up"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .xxd-layout[data-cols="1-2"] { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
-    .xxd-layout[data-cols="2-1"] { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
-    .xxd-layout[data-cols="1-3"] { grid-template-columns: minmax(0, 1fr) minmax(0, 3fr); }
-    .xxd-layout[data-cols="side"] { grid-template-columns: 240px minmax(0, 1fr); }
+  .xxd-layout > * {
+    flex: 0 0 100%;
+    min-width: 0;
+  }
+
+  @container (min-width: 560px) {
+    .xxd-layout:is([data-cols="2up"], [data-cols="3up"], [data-cols="4up"]) > * { flex-basis: calc((100% - var(--_gap)) / 2); }
+    .xxd-layout[data-cols="1-2"] > :nth-child(odd),
+    .xxd-layout[data-cols="2-1"] > :nth-child(even) { flex-basis: calc((100% - var(--_gap)) / 3); }
+    .xxd-layout[data-cols="1-2"] > :nth-child(even),
+    .xxd-layout[data-cols="2-1"] > :nth-child(odd) { flex-basis: calc((100% - var(--_gap)) * 2 / 3); }
+    .xxd-layout[data-cols="1-3"] > :nth-child(odd) { flex-basis: calc((100% - var(--_gap)) / 4); }
+    .xxd-layout[data-cols="1-3"] > :nth-child(even) { flex-basis: calc((100% - var(--_gap)) * 3 / 4); }
+    .xxd-layout[data-cols="side"] > :nth-child(odd) { flex-basis: 240px; }
+    .xxd-layout[data-cols="side"] > :nth-child(even) { flex-basis: calc(100% - 240px - var(--_gap)); }
+  }
+
+  @container (min-width: 760px) {
+    .xxd-layout[data-cols="3up"] > * { flex-basis: calc((100% - 2 * var(--_gap)) / 3); }
+  }
+
+  @container (min-width: 880px) {
+    .xxd-layout[data-cols="4up"] > * { flex-basis: calc((100% - 3 * var(--_gap)) / 4); }
   }
 
   /* ── 面：base（纸）/ raised（浮起：只给浮层）/ sunken（凹下：洗色） ── */

@@ -12,6 +12,18 @@
     font: var(--weight-regular) var(--text-sm) / 1.55 var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* 换行：避免最后一行只剩一两个字（「篇」「了。」单独掉下去）。会继承，所有正文都生效 */
+    text-wrap: pretty;
+  }
+
+  /* 一行的控件里，开头和结尾的全角标点挤掉半个字的空白：「这是什么？」「删除（可撤销）」两边留白一样 */
+  :where(.xxd-page) :where(button, .xxd-btn, .xxd-chip, .xxd-badge, [role="tab"], .xxd-menu__item, .xxd-link) {
+    text-spacing-trim: trim-both;
+  }
+
+  /* 标题：几行长短均匀，不出现「一整行 + 一个字」 */
+  :where(.xxd-page) :where(h1, h2, h3, h4, legend, [class*="__title"], [class*="__name"]) {
+    text-wrap: balance;
   }
 
   :where(.xxd-page) :where(*, *::before, *::after) {
@@ -43,8 +55,9 @@
     background: color-mix(in srgb, var(--action) 18%, transparent);
   }
 
-  /* hidden 属性永远有效：组件自己写了 display（grid / flex）也一样。 */
-  :where([class*="xxd-"])[hidden] {
+  /* hidden 属性永远有效：组件自己写了 display（grid / flex）也一样；组件里面没有类名的元素
+     （面包屑的 <li>、列表项）也算 */
+  :where([class*="xxd-"], [class*="xxd-"] *)[hidden] {
     display: none !important;
   }
 

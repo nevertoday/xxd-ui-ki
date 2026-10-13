@@ -133,10 +133,35 @@
 
   /* ── 分页完整：信息、每页条数、简洁模式 ── */
   .xxd-pagination-bar {
+    container-type: inline-size;
+    width: 100%;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-3) var(--space-4);
+  }
+
+  @container (max-width: 419px) {
+    .xxd-pagination:not([data-simple]) > [data-page-to]:not(:first-child, :last-child),
+    .xxd-pagination:not([data-simple]) > .xxd-pagination__gap,
+    .xxd-pagination__info {
+      display: none;
+    }
+
+    .xxd-pagination:not([data-simple]) > .xxd-pagination__status {
+      display: inline-block;
+    }
+  }
+
+  @media (max-width: 419px) {
+    .xxd-pagination:not([data-simple]) > [data-page-to]:not(:first-child, :last-child),
+    .xxd-pagination:not([data-simple]) > .xxd-pagination__gap {
+      display: none;
+    }
+
+    .xxd-pagination:not([data-simple]) > .xxd-pagination__status {
+      display: inline-block;
+    }
   }
 
   .xxd-pagination__info {
@@ -313,13 +338,10 @@
   .xxd-badge[data-appearance="dot"][data-tone="warning"]::before { background: var(--warning); }
   .xxd-badge[data-appearance="dot"][data-tone="action"]::before { background: var(--action); }
 
+  /* 「新」：和其他徽标一样高、一样的字号，只靠实心底强调（一排徽标高低一致） */
   .xxd-badge[data-variant="new"] {
-    height: 16px;
-    padding: 0 5px;
     background: var(--action-fill);
     color: var(--on-action);
-    font-size: 10px;
-    letter-spacing: 0;
   }
 
   /* ── 横幅：动作区、关闭 ── */

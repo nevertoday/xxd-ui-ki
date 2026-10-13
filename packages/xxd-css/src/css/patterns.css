@@ -288,11 +288,23 @@
     background: var(--line);
   }
 
+  /* 占满卡片宽度（卡片是 justify-items: center）：里面不拆行的链接才有 max-width 的参照，超长时出省略号 */
   .xxd-auth__terms {
+    justify-self: stretch;
     margin-top: var(--space-2);
     color: var(--muted);
     font-size: var(--text-2xs);
     line-height: 1.6;
+  }
+
+  /* 「服务条款」「隐私政策」这类短链接不拆成两行 */
+  .xxd-auth__terms a {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+    white-space: nowrap;
   }
 
   .xxd-auth [data-step]:not([data-active]) {
@@ -308,13 +320,15 @@
   /* ── 账号卡与计划行 ── */
   .xxd-account {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     align-items: center;
-    gap: 12px;
+    gap: 8px 12px;
     padding: 14px;
   }
 
   .xxd-account__main {
-    flex: 1;
+    flex: 1 1 8em;
     min-width: 0;
   }
 

@@ -6,12 +6,15 @@
 //   4. 高对比模式（forced-colors）：开关、勾选、分段、tab 的选中态和未选中态看得出差别。
 //   5. 英文版：/en/ 下每一页 <html lang="en">，看得见的字和 aria-label / placeholder / title / tooltip 里没有汉字
 //      （标了 lang="zh…" 的地方除外：切换语言的按钮、中文提交记录、语言本名），中文页和英文页互相链到对方。
-// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site audit [--only=axe|long|shadow|forced|en]
+//   6. 细节（scripts/polish.js）：专业的人一眼看出来的小毛病 —— 字贴边、控件被截断或折行、最后一行只剩一个字、
+//      字被挤成一字一行、元素互相压住、图标和字没对齐。扫两处：全站每一页（1280 / 390 宽），
+//      以及每个组件、模式的中英文示例放进 260 / 360 / 560px 宽的演示格子。
+// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site audit [--only=axe|long|shadow|forced|en|polish]
 // 需要 Chromium：CHROME_EXE=<chrome-headless-shell 路径>（缺省用 Playwright 自带的）。
 import { createServer } from "node:http";
 import { createReadStream, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, extname, join, relative } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { createRequire } from "node:module";
 import { chromium } from "playwright";
 
@@ -30,10 +33,14 @@ const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": 
 const PAGES = {
   "/__audit/long": () => longPage(),
   "/__audit/hostile": () => hostilePage(),
+  "/__audit/cells": (q) => cellsPage(q.get("lang"), Number(q.get("w"))),
 };
 const server = createServer((req, res) => {
   const p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-  if (PAGES[p]) return res.writeHead(200, { "content-type": TYPES[".html"] }).end(PAGES[p]());
+  if (PAGES[p]) {
+    Promise.resolve(PAGES[p](new URL(req.url, "http://x").searchParams)).then((html) => res.writeHead(200, { "content-type": TYPES[".html"] }).end(html));
+    return;
+  }
   // /@pkg/xxd-css/dist/… → 仓库里的构建产物（不进展示站）
   let file = p.startsWith("/@pkg/") ? join(pkgs, p.slice(6)) : join(dist, p);
   if (!file.startsWith(pkgs)) return res.writeHead(403).end();
@@ -319,7 +326,69 @@ async function englishAudit() {
   console.log(`英文：${enPages.length} 页`);
 }
 
-const sections = { axe: axeAudit, long: longAudit, shadow: hostileAudit, forced: forcedAudit, en: englishAudit };
+/* ── 6. 细节 ── */
+const POLISH = readFileSync(join(root, "scripts/polish.js"), "utf8");
+// 侧栏本身是 232px 的桌面组件，比它窄的格子里本来就该折叠；图表要 ECharts，格子里没有
+const POLISH_EXEMPT = new Set(["Sidebar", "Chart"]);
+
+async function cellsPage(lang, w) {
+  const reg = JSON.parse(readFileSync(join(pkgs, "xxd-css/registry.json"), "utf8")).components;
+  const pat = JSON.parse(readFileSync(join(pkgs, "xxd-css/patterns.json"), "utf8")).patterns;
+  const en = await import(pathToFileURL(join(pkgs, "xxd-css/registry.en.js")).href);
+  const enp = await import(pathToFileURL(join(pkgs, "xxd-css/patterns.en.js")).href);
+  // 每个格子里的 id 加上序号，几个示例放在一页上也不会互相抢（对话框、tab、sheet 都按 id 找）
+  const uniq = (m, i) => m.replace(/\b(id|for|aria-controls|aria-labelledby|data-sidebar-sub|data-submenu|data-xxd-dialog-open|data-xxd-sheet-open|data-xxd-panel-open|data-xxd-menu|data-xxd-popover|data-xxd-sidebar-toggle|data-copy-target)="([^"]+)"/g, (_, a, v) => `${a}="${v.split(" ").map((x) => (x.startsWith("#") ? x.replace(/^#([\w-]+)/, `#$1-${i}`) : `${x}-${i}`)).join(" ")}"`).replace(/getElementById\("([\w-]+)"\)/g, `getElementById("$1-${i}")`);
+  const cells = [...reg, ...pat].filter((c) => !POLISH_EXEMPT.has(c.name)).map((c, i) => {
+    const isPat = pat.includes(c);
+    const e = (isPat ? enp.patterns : en.components)[c.name] ?? {};
+    const markup = lang === "en" ? e.markup ?? c.markup : c.markup;
+    return `<div class="site-demo cell" data-name="${c.name}" style="width:${w}px;margin:0 0 12px"><div class="site-demo__stage" data-align="${c.align ?? (isPat ? "start" : "center")}" ${c.block ?? isPat ? "data-block" : ""}>${uniq(markup, i)}</div></div>`;
+  });
+  return `<!doctype html><html lang="${lang === "en" ? "en" : "zh-CN"}" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/xxd/xxd.css"><link rel="stylesheet" href="/site.css"><script src="/xxd/boot.js"></script><script src="/xxd/icons.js"></script><script src="/xxd/xxd.js"></script></head>
+<body class="xxd-page" style="padding:12px">${cells.join("")}</body></html>`;
+}
+
+async function polishAudit() {
+  const seen = new Set();
+  const report = (where, x) => {
+    const key = `${x.kind}|${x.where}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    fail("细节", `${where} ${x.kind}：${x.where} —— ${x.detail}`);
+  };
+  // 全站每一页
+  for (const [w, h] of [[1280, 900], [390, 844]]) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, reducedMotion: "reduce" });
+    const tab = await ctx.newPage();
+    for (const page of pages) {
+      await tab.goto(origin + page, { waitUntil: "networkidle" });
+      await tab.waitForTimeout(80);
+      await tab.addScriptTag({ content: POLISH });
+      for (const x of await tab.evaluate(() => xxdPolish(document.querySelector("main") || document.body))) report(`[${w}] ${page}`, x);
+    }
+    await ctx.close();
+  }
+  // 每个示例放进窄 / 中 / 宽的格子
+  for (const lang of ["zh", "en"]) {
+    for (const w of [260, 360, 560]) {
+      const ctx = await browser.newContext({ viewport: { width: w + 40, height: 900 }, reducedMotion: "reduce" });
+      const tab = await ctx.newPage();
+      const errors = [];
+      tab.on("pageerror", (e) => errors.push(e.message));
+      await tab.goto(`${origin}/__audit/cells?lang=${lang}&w=${w}`, { waitUntil: "networkidle" });
+      await tab.waitForTimeout(150);
+      await tab.addScriptTag({ content: POLISH });
+      const found = await tab.evaluate(() => [...document.querySelectorAll(".cell")].flatMap((c) => xxdPolish(c).map((x) => ({ ...x, cell: c.dataset.name }))));
+      for (const x of found) report(`[${lang} ${w}px] ${x.cell}`, x);
+      for (const e of errors) fail("细节", `[${lang} ${w}px] 脚本错误 ${e}`);
+      await ctx.close();
+    }
+  }
+  console.log(`细节：${pages.length} 页 × 2 种宽度，每个组件和模式 × 中英 × 3 种格子宽`);
+}
+
+const sections = { axe: axeAudit, long: longAudit, shadow: hostileAudit, forced: forcedAudit, en: englishAudit, polish: polishAudit };
 for (const [name, run] of Object.entries(sections)) if (!only || only === name) await run();
 await browser.close();
 server.close();

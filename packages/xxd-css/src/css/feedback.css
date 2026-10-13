@@ -132,9 +132,15 @@
   }
 
   /* 横幅 */
+  /* 横幅：图标 · 文字 · 操作 · 关闭 各占一栏。横幅窄（< 440px）时操作移到文字下面，
+     不会被挤得没有内边距；关闭按钮始终在右上角 */
   .xxd-banner {
-    display: flex;
-    align-items: flex-start;
+    container-type: inline-size;
+    /* container-type 让宽度不再由内容决定：在 flex / 居中的父元素里也要占满一行 */
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: start;
     gap: 10px;
     padding: 12px 14px;
     border: 1px solid var(--line);
@@ -161,8 +167,56 @@
     font-size: var(--text-xs);
   }
 
-  .xxd-banner__actions {
-    margin-left: auto;
+  .xxd-banner > * {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .xxd-banner > .ui-icon {
+    grid-column: 1;
+  }
+
+  .xxd-banner > .xxd-banner__actions {
+    grid-column: 3;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .xxd-banner > .xxd-banner__close {
+    grid-column: 4;
+  }
+
+  /* 没有图标：少一栏 */
+  .xxd-banner:not(:has(> .ui-icon, > [data-xxd-icon])) {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .xxd-banner:not(:has(> .ui-icon, > [data-xxd-icon])) > * {
+    grid-column: 1;
+  }
+
+  .xxd-banner:not(:has(> .ui-icon, > [data-xxd-icon])) > .xxd-banner__actions {
+    grid-column: 2;
+  }
+
+  .xxd-banner:not(:has(> .ui-icon, > [data-xxd-icon])) > .xxd-banner__close {
+    grid-column: 3;
+  }
+
+  .xxd-banner > [data-xxd-icon] {
+    grid-column: 1;
+  }
+
+  @container (max-width: 440px) {
+    .xxd-banner > .xxd-banner__actions {
+      grid-row: 2;
+      grid-column: 2 / -1;
+    }
+
+    .xxd-banner:not(:has(> .ui-icon, > [data-xxd-icon])) > .xxd-banner__actions {
+      grid-column: 1 / -1;
+    }
   }
 
   .xxd-banner[data-tone="warning"] {

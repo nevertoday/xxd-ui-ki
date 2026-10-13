@@ -25,6 +25,9 @@ const other = counterpart(path, lang);
 const otherLang = lang === "en" ? "zh" : "en";
 const site = Astro.site ? Astro.site.href.replace(/\/$/, "") : "";
 const accentNames = JSON.stringify(Object.fromEntries(ACCENT_PRESETS.map((p) => [p.id, lang === "en" ? p.name : p.zh])));
+// 仓库地址；GitHub 的标志用它官方的实心图形（品牌标志不是界面图标，不套 24 网格线条规则）
+const REPO = "https://github.com/nevertoday/xxd-ui-kit";
+const GITHUB_MARK = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>';
 const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.searchEmpty });
 ---
 
@@ -35,6 +38,8 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title === L.brand ? title : `${title} · ${L.brand}`}</title>
     <meta name="description" content={description} />
+    <!-- 网站图标：和顶栏的品牌方块同一个图形；不写的话浏览器会去要 /favicon.ico，得到 404 -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="text/markdown" href={mdHref} />
     <link rel="alternate" hreflang="zh-CN" href={`${site}${lang === "zh" ? path : other}`} />
     <link rel="alternate" hreflang="en" href={`${site}${lang === "en" ? (path === "/en" ? "/en/" : path) : other}`} />
@@ -84,6 +89,7 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
           </div>
         </div>
         <a class="xxd-btn site-lang" data-size="sm" data-variant="ghost" href={other} hreflang={HTML_LANG[otherLang]} lang={HTML_LANG[otherLang]} aria-label={L.switchLangLabel}><span class="site-lang__full">{L.switchLang}</span><span class="site-lang__short" aria-hidden="true">{lang === "en" ? "中" : "EN"}</span></a>
+        <a class="xxd-btn site-github" data-size="sm" data-variant="ghost" data-icon-only href={REPO} aria-label={L.github} data-tooltip={L.github} set:html={GITHUB_MARK} />
       </div>
     </header>
 

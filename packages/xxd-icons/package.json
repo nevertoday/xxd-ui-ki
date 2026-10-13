@@ -20,6 +20,10 @@
       "import": "./src/phosphor.js"
     },
     "./nodes": "./src/nodes.js",
+    "./meta": {
+      "types": "./src/meta.d.ts",
+      "import": "./src/meta.js"
+    },
     "./dist/*": "./dist/*"
   },
   "files": [

@@ -39,7 +39,7 @@ const wall = componentsFor(lang).filter((c) => c.wall !== false);
     {
       wall.map((c) => (
         <div class="site-wall__cell">
-          <div class="site-wall__stage xxd-page" set:html={embed(c.wall ?? c.markup)} />
+          <div class="site-wall__stage xxd-page" data-block={c.block ? "" : undefined} set:html={embed(c.wall ?? c.markup)} />
           <a class="site-wall__name" href={withLang(`/components/${c.slug}`, lang)}>
             {c.label}
             {lang !== "en" && <span>{c.name}</span>}

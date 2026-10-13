@@ -10,7 +10,7 @@ description: Build or restyle any 小小东 interface with the open-source (MIT)
 ## 先读
 
 1. `docs/DESIGN-PRINCIPLES.md` —— 审美宪法。任何视觉决定都要对应到其中一条，对应不上就问用户。
-2. 要用的组件：`pnpm xxd doc <组件>`（原生）或 `pnpm xxd doc <组件> --react`；全部组件 `pnpm xxd ls`。
+2. 要用的组件：`pnpm xxd doc <组件>`（原生，中文名也行；`--markup` 只要示例代码）或 `pnpm xxd doc <组件> --react`；全部组件 `pnpm xxd ls`。要用的图标：`pnpm xxd icon <中文关键词>`（500 个；不要自己画 SVG，也不要猜名字）。
 
 ## 选哪一层
 
@@ -32,7 +32,7 @@ pnpm xxd new <目录> --name 四字名字 --name-en "English" --slug short-id
 
 ## 已有项目
 
-- 先 `pnpm xxd status <目录>` 看版本；更新用 `pnpm xxd sync <目录>`，不要手改 `vendor/xxd/`。
+- 先 `pnpm xxd status <目录>` 看版本；更新用 `pnpm xxd sync <目录>`，不要手改 `vendor/xxd/`。还没接入的项目：`pnpm xxd init <目录>`。
 - 渐进迁移：先只换令牌（`tokens.css` + `boot.js`，用 `tokensTargets` 保留老路径），再一个模块一个模块换成 `xxd-*` 类，并删掉旧 CSS 里对应的规则。
 - 用户在别的项目里有未提交的改动时：用 `git worktree add -b <新分支>` 在临时目录里改，提交到新分支，不碰原工作区；**不推送、不部署**，除非用户明确要求。
 
@@ -46,10 +46,11 @@ pnpm xxd new <目录> --name 四字名字 --name-en "English" --slug short-id
 - 对话框：取消在前（`ui-dialog-cancel`，内容宽度、安静），主操作最后；按钮文字说下一次点击会做什么。
 - 反馈就地出现：面板里的操作 `Xxd.toast(…, { within: panelBody })`。
 - 文案直接、照字面；三语（简 / 繁 / 英），`data-i18n`。
+- 改完跑 `pnpm xxd doctor <目录>`：错误（图标名拼错、引用的文件不在、__MSG 缺条目）必须修；提醒里是新写的代码就改成令牌，老代码顺手改或说明。确实要例外的那一行写 `xxd-ignore`。
 
 ## 改 UI Kit 本身
 
-- 令牌唯一来源 `packages/xxd-tokens/tokens.css`；图标 `packages/xxd-icons/src/nodes.js`；原生组件 `packages/xxd-css/src/`，并同步 `registry.json`；Kumo 颜色映射只改 `packages/kumo/scripts/theme-generator/xxd-overrides.ts`。
+- 令牌唯一来源 `packages/xxd-tokens/tokens.css`；图标 `packages/xxd-icons/src/nodes.js`（新图标同时在 `src/meta.js` 写分类和中文关键词，测试会查）；原生组件 `packages/xxd-css/src/`，并同步 `registry.json`；Kumo 颜色映射只改 `packages/kumo/scripts/theme-generator/xxd-overrides.ts`。
 - 跑 `pnpm xxd:build && pnpm xxd:test`；动了 Kumo 再跑 `pnpm --filter @cloudflare/kumo test` 和 `pnpm lint`。
 - 看效果：`packages/xxd-css/playground.html`（原生），`pnpm --filter @cloudflare/kumo-docs-astro dev` 后的 `/xxd/native`、`/xxd/showcase`（React），亮/暗 × 直角/圆角 × 墨色/主色都要看。
 - 完成后在 `docs/PLAN.md` 记录。

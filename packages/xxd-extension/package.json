@@ -9,7 +9,7 @@
     ".": "./src/index.js",
     "./dist/*": "./dist/*"
   },
-  "bin": { "xxd": "./scripts/cli.mjs" },
+  "bin": { "xxd-ui": "./scripts/cli.mjs" },
   "files": ["src", "dist", "template", "scripts"],
   "scripts": {
     "build": "node scripts/cli.mjs build",

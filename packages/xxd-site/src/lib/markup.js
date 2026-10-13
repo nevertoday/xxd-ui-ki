@@ -36,3 +36,15 @@ export const STATES = {
   error: { label: "出错", en: "Error", attrs: 'aria-invalid="true"' },
   readonly: { label: "只读", en: "Read-only", attrs: "readonly" },
 };
+
+/**
+ * 注册表里的说明是纯文字。显示时先转义，再把代码名包成行内代码：令牌（--muted）、类名（.xxd-row）、
+ * 属性（aria-pressed="true"、data-copy、role=switch）、标签（<select>）、调用（Xxd.toast(...)）。
+ * 这样它们看得出是代码，也不会在「--」「-」后面断行。
+ */
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const CODE = /(--[a-z0-9][\w-]*|(?:\b[a-z]+)?\.xxd-[\w-]+|\b(?:aria|data)-[a-z][\w-]*(?:=(?:&quot;|")[^"&]*(?:&quot;|"))?|\brole=(?:"[^"]*"|[a-z]+)|&lt;\/?[a-z][a-z0-9-]*(?:\s[^&]*?)?&gt;|\bXxd(?:Extension)?\.\w+(?:\([^)]*\))?)/g;
+export function richText(s) {
+  // 短的代码名整体不断开；长的（整段标签）照常可以换行，免得在手机上撑出屏幕
+  return esc(s).replace(CODE, (m) => `<code class="xxd-code-inline${m.length <= 24 ? " site-token" : ""}">${m}</code>`);
+}

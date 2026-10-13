@@ -126,9 +126,10 @@
   }
 
   /* 面包屑 */
+  /* 面包屑不换行（换行后第二行会以「>」开头）：放不下时前面的项先缩成省略号，当前页最后才缩 */
   .xxd-breadcrumbs {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 6px;
     margin: 0;
@@ -138,16 +139,37 @@
     list-style: none;
   }
 
+  /* 每一项是普通的块（不是 flex）：文字直接写在 <li> 里时也能出省略号 */
   .xxd-breadcrumbs > li {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    display: block;
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .xxd-breadcrumbs > li[aria-current],
+  .xxd-breadcrumbs > li:last-child {
+    flex-shrink: 0.2;
+  }
+
+  /* 当前页再长也给前面留几个字：前面的项不会被缩没 */
+  .xxd-breadcrumbs > li:not(:first-child):last-child {
+    max-width: calc(100% - 3.5em);
+  }
+
+  .xxd-breadcrumbs > .xxd-breadcrumbs__gap {
+    flex: none;
   }
 
   .xxd-breadcrumbs > li + li::before {
     content: "";
+    display: inline-block;
     width: 12px;
     height: 12px;
+    margin-right: 6px;
+    vertical-align: -2px;
     background: var(--muted-2);
     -webkit-mask: var(--xxd-chevron-right) center / contain no-repeat;
     mask: var(--xxd-chevron-right) center / contain no-repeat;
@@ -167,11 +189,21 @@
   }
 
   /* 分页 */
+  /* 页码不折行：窄的时候（分页栏 < 420px，或者手机）只留「‹ 3 / 12 ›」 */
   .xxd-pagination {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 4px;
+  }
+
+  .xxd-pagination > .xxd-pagination__status {
+    display: none;
+    padding: 0 6px;
+    color: var(--ink);
+    font: var(--weight-medium) var(--text-xs) / 1 var(--font-body);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .xxd-pagination > a,

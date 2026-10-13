@@ -24,7 +24,9 @@ pnpm xxd new ~/js/插件-今日待办 --name 今日待办 --name-en "Today" --sl
 
 ```bash
 pnpm xxd sync ~/js/插件-今日待办 ~/js/xPoster      # 拷最新构建，写 VERSION
-pnpm xxd status ~/js/插件-今日待办 ~/js/xPoster    # 谁落后了
+pnpm xxd status                                   # 谁落后了（new / init / sync 过的项目都记着）
+pnpm xxd sync --all                               # 全部更新
+pnpm xxd doctor ~/js/插件-今日待办                 # 体检：引用、manifest、_locales、拼写、设计规则
 ```
 
 `vendor/xxd/` 不要手改。`xxd-chrome-publish` / `cx-chrome-zip` 打包时会按引用带上用到的文件，`vendor/xxd/LICENSE` 让许可检查通过。
@@ -94,7 +96,7 @@ store.subscribe((s) => ui.update(s));
 
 `manifest.json` 里把 `vendor/xxd/xxd.shadow.css` 加进 `web_accessible_resources`。`xxd.js` 作为 content script 加载时不会自动接管宿主页面。
 
-`xxd.shadow.css` 自己就挡得住宿主页面（O8，`pnpm --filter @xxd/site audit` 里有一张恶意宿主页做门禁）：
+`xxd.shadow.css` 自己就挡得住宿主页面（`pnpm --filter @xxd/site audit` 里有一张恶意宿主页做门禁）：
 
 - 宿主页面的继承样式（`text-transform`、`letter-spacing`、`text-align`、行高、字体、光标……）在 Shadow 的顶层元素上重置；
 - 令牌在 Shadow 内部再声明一次：宿主页面就算写了 `div { --ink: … }` 打到 host 上，也改不了我们的颜色和圆角；

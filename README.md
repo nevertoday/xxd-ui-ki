@@ -32,7 +32,7 @@
 | 包               | 一句话                                                                                                 |
 | ---------------- | ------------------------------------------------------------------------------------------------------ |
 | `@xxd/tokens`    | 所有颜色、字号、间距、圆角的唯一来源。另带一段首帧脚本，让页面打开第一眼就是用户选的主题，不闪         |
-| `@xxd/icons`     | 201 个图标，统一画法（24 网格、1.5 线宽）                                                              |
+| `@xxd/icons`     | 500 个图标，统一画法（24 网格、1.5 线宽），可以按中文关键词搜                                          |
 | `@xxd/css`       | 59 个原生组件和 13 个小小东专属模式（拖放、图片查看器、两次确认……），一个 CSS 文件加一个 JS 文件就能用 |
 | `@xxd/react`     | Kumo 的 React 组件换上小小东的样子，再加上小小东专属组件和外观、语言两个 Provider                      |
 | `@xxd/extension` | Chrome 插件工具箱：一条命令新建插件，外观设置在各页面间同步，往网页里放界面时不和网页互相干扰          |
@@ -54,7 +54,7 @@ pnpm xxd new ~/js/插件-今日待办 --name 今日待办 --name-en "Today" --sl
 
 ```bash
 pnpm xxd sync ~/js/插件-今日待办     # 拷入最新版
-pnpm xxd status ~/js/插件-*          # 看哪些插件还是旧版
+pnpm xxd status                      # 看哪些插件还是旧版（记住的全部项目）
 ```
 
 页面里这样接：
@@ -103,9 +103,15 @@ import "@xxd/react/standalone.css"; // 不用 Tailwind 时
 
 ```bash
 pnpm xxd ls             # 列出全部组件
-pnpm xxd doc Dialog     # 某个组件的写法、属性和规则
+pnpm xxd doc 对话框     # 某个组件的写法、属性和规则（中文名、拼错都行）
 pnpm xxd doc Dialog --react
+pnpm xxd icon 删除      # 找图标（500 个，中文关键词）；加 --svg / --react / --copy
+pnpm xxd tokens line    # 令牌和亮 / 暗色值
+pnpm xxd doctor <目录>  # 体检项目：接入、manifest、图标名和类名拼写、写死的颜色 / 阴影 / 字重 / 圆角
+pnpm xxd link           # 装成全局命令 xxd-ui，任何目录都能用
 ```
+
+全部命令：`pnpm xxd help`，或展示站的[命令行与工具](https://ui.xiaoxiaodong.ai/tools)。
 
 想直接看效果，就打开展示站 <https://ui.xiaoxiaodong.ai>。改代码时在本机跑：
 
@@ -132,7 +138,7 @@ pnpm lint
 ```bash
 pnpm --filter @xxd/site build
 pnpm --filter @xxd/site visual   # 截图对比：每页 × 4 种外观，和上次比有没有走样
-pnpm --filter @xxd/site audit    # 压力测试：无障碍零问题、超长文字不撑破、恶意网页干扰不到、高对比模式看得清、英文页没有漏翻
+pnpm --filter @xxd/site audit    # 压力测试：无障碍零问题、超长文字不撑破、恶意网页干扰不到、高对比模式看得清、英文页没有漏翻、没有贴边 / 孤字 / 挤成一字一行这类细节毛病
 ```
 
 这两道检查都要用无头 Chrome，需要设置 `CHROME_EXE`。截图基线只存在本机。

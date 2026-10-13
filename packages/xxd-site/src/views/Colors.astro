@@ -58,7 +58,7 @@ const swatch = (name) => ({ name, light: tokens.base[name], dark: dark[name] });
 
   <h2 class="site-h2" id="accent">{T.accent}</h2>
   <p class="site-p">{T.accentNote}</p>
-  <div class="xxd-table-wrap"><table class="site-props">
+  <div class="xxd-table-wrap"><table class="site-props" data-nowrap>
     <thead><tr>{T.cols.map((c) => <th>{c}</th>)}</tr></thead>
     <tbody>
       {accents.map((a) => (

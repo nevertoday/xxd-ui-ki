@@ -4,8 +4,9 @@ import * as registryEn from "../../../xxd-css/registry.en.js";
 import tokens from "../../../xxd-tokens/dist/tokens.json";
 import { ACCENT_PRESETS, accentPalette, contrast, toRgb } from "@xxd/tokens";
 import { ICON_NAMES, ICON_ALIASES, iconSVG } from "@xxd/icons";
+import { ICON_GROUPS, ICON_KEYWORDS } from "@xxd/icons/meta";
 
-export { registry, tokens, ACCENT_PRESETS, accentPalette, contrast, toRgb, ICON_NAMES, ICON_ALIASES, iconSVG };
+export { registry, tokens, ACCENT_PRESETS, accentPalette, contrast, toRgb, ICON_NAMES, ICON_ALIASES, ICON_GROUPS, ICON_KEYWORDS, iconSVG };
 
 export const slug = (name) => name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 

@@ -59,9 +59,13 @@
     color: var(--muted);
   }
 
+  /* 数字和单位是一个整体，不拆成两行 */
   .xxd-stat__value {
     grid-area: value;
     margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font: var(--weight-strong) var(--text-xl, 22px) / 1.2 var(--font-body);
     font-variant-numeric: tabular-nums;
     color: var(--ink);
@@ -101,5 +105,23 @@
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  /* 卡片窄（< 260px）：折线放到最下面、撑满一行，变化那一行不被挤成两行 */
+  .xxd-stat {
+    container-type: inline-size;
+    min-width: 0;
+  }
+
+  @container (max-width: 259px) {
+    .xxd-stat > * {
+      grid-column: 1 / -1;
+    }
+
+    .xxd-stat > .xxd-stat__spark {
+      grid-row: 4;
+      width: 100%;
+      margin-top: var(--space-2);
+    }
   }
 }

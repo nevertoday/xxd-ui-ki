@@ -1,5 +1,5 @@
 // 每页的 Markdown 版本和 llms.txt（给 AI）：内容来自同一份数据，和 HTML 页一致。中文在 /md、/llms.txt，英文在 /en/md、/en/llms.txt。
-import { componentsFor, ICON_NAMES } from "./data.js";
+import { componentsFor, ICON_NAMES, ICON_GROUPS } from "./data.js";
 import { principlesFor } from "../data/principles.js";
 import { patternsFor } from "../data/patterns.js";
 import { templatesFor } from "../data/templates.js";
@@ -11,14 +11,16 @@ const fence = (s, lang = "html") => "```" + lang + "\n" + s.trim() + "\n```";
 const W = {
   zh: { category: "分类", examples: "示例", props: "属性与类名", classes: "类名", a11y: "键盘与读屏", rules: "规则", good: "好", bad: "不好", colon: "：", sep: "、",
     index: "# 小小东 UI\n\n小小东提示词与每一个小小东插件共用的设计系统。见 /llms.txt。",
-    icons: (n, names) => `# 图标\n\n${n} 个：${names}\n\n用法：\`<i data-xxd-icon="Check"></i>\` 或 \`XxdIcons.iconSVG("Check", { size: 16 })\`。`,
+    icons: (n) => `# 图标\n\n${n} 个，按分类列出，每个后面是中文关键词。用法：\`<i data-xxd-icon="Check"></i>\`、\`XxdIcons.iconSVG("Check", { size: 16 })\` 或 React \`<Icon name="Check" />\`。命令行查找：\`pnpm xxd icon 关键词\`。\n\n` +
+      ICON_GROUPS.map((g) => `## ${g.zh}\n\n` + Object.entries(g.icons).map(([k, v]) => `- ${k} — ${v}`).join("\n")).join("\n\n"),
     other: (label, group, href) => `# ${label}\n\n（${group}）完整内容见 ${href}；组件 API 见 /api/registry.json。`,
     llmsTitle: "# 小小东 UI Kit",
     llmsLead: "> 小小东提示词与 Chrome 插件共用的设计系统。黑白灰、默认直角、强调靠墨色；原生 HTML（@xxd/css）与 React（@xxd/react）两种实现。",
     pages: "## 页面", comps: "## 组件（原生类名）", registry: "注册表：/api/registry.json", alt: "English: /en/llms.txt" },
   en: { category: "Category", examples: "Examples", props: "Attributes and classes", classes: "Classes", a11y: "Keyboard and screen readers", rules: "Rules", good: "Do", bad: "Don't", colon: ": ", sep: ", ",
     index: "# XXD UI\n\nThe design system shared by the XXD member site and every XXD Chrome extension. See /en/llms.txt.",
-    icons: (n, names) => `# Icons\n\n${n} icons: ${names}\n\nUsage: \`<i data-xxd-icon="Check"></i>\` or \`XxdIcons.iconSVG("Check", { size: 16 })\`.`,
+    icons: (n) => `# Icons\n\n${n} icons by category. Usage: \`<i data-xxd-icon="Check"></i>\`, \`XxdIcons.iconSVG("Check", { size: 16 })\` or React \`<Icon name="Check" />\`. Find one from the CLI: \`pnpm xxd icon <keyword>\`.\n\n` +
+      ICON_GROUPS.map((g) => `## ${g.en}\n\n` + Object.keys(g.icons).join(", ")).join("\n\n"),
     other: (label, group, href) => `# ${label}\n\n(${group}) Full content at ${href}; component API at /en/api/registry.json.`,
     llmsTitle: "# XXD UI Kit (小小东 UI)",
     llmsLead: "> The design system shared by the XXD member site and Chrome extensions. Black, white and gray, square corners by default, emphasis in ink; two implementations: native HTML (@xxd/css) and React (@xxd/react).",
@@ -53,7 +55,7 @@ export function mdPages(lang = "zh") {
   const pages = [
     { path: "index", body: w.index },
     { path: "principles", body: [`# ${L.pagePrinciples}`, "", ...principlesFor(lang).flatMap((p) => [lang === "en" ? `## ${p.title} (${p.ref})` : `## ${p.title}（${p.ref}）`, `- ${w.good}${w.colon}${p.doText}`, fence(p.doMarkup), `- ${w.bad}${w.colon}${p.dontText}`, ""])].join("\n") },
-    { path: "foundations/icons", body: w.icons(ICON_NAMES.length, ICON_NAMES.join(w.sep)) },
+    { path: "foundations/icons", body: w.icons(ICON_NAMES.length) },
     ...componentsFor(lang).map((c) => ({ path: `components/${c.slug}`, body: componentMd(c, lang) })),
     ...patternsFor(lang).map((p) => ({ path: `patterns/${p.slug}`, body: [`# ${p.label}`, "", p.summary, "", fence(p.markup), ...(p.rules ?? []).map((r) => `- ${r}`), ...(p.js ? ["", fence(p.js, "js")] : [])].join("\n") })),
     ...templatesFor(lang).map((x) => ({ path: `templates/${x.slug}`, body: [`# ${x.label}`, "", x.summary, "", fence(x.markup)].join("\n") })),

@@ -7,6 +7,8 @@ import StateMatrix from "../components/StateMatrix.astro";
 import PropsTable from "../components/PropsTable.astro";
 import { componentsFor } from "../lib/data.js";
 import { langOf, t, withLang } from "../i18n/index.js";
+import { richText } from "../lib/markup.js";
+import { principlesFor } from "../data/principles.js";
 import * as reactDemos from "../react/demos.tsx";
 
 const { c } = Astro.props;
@@ -26,6 +28,14 @@ const headings = [
   ...(related.length ? [{ slug: "related", text: L.related }] : []),
 ];
 const title = lang === "en" ? c.label : `${c.label} ${c.name}`;
+// 规则里单独一条「§9」：指向设计原则的那一节（同一个 § 有几条时，链到第一条）
+const principleOf = (ref) => principlesFor(lang).find((p) => p.ref === ref);
+const ruleHtml = (r) => {
+  const p = /^§[\d½]+$/.test(r) ? principleOf(r) : null;
+  if (!p) return richText(r);
+  const label = lang === "en" ? `See design principle ${r}: ${p.title}` : `见设计原则 ${r}：${p.title}`;
+  return `<a class="xxd-link" href="${withLang(`/principles#${p.id}`, lang)}">${label.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</a>`;
+};
 const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI component` : `${c.label}（${c.name}）—— 小小东 UI 组件`);
 ---
 
@@ -33,7 +43,7 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
   <header class="site-head">
     <p class="xxd-text" data-variant="caption">{L.componentCaption} · {c.categoryLabel}{hasReact && ` · ${L.bothImpl}`}</p>
     <h1 class="xxd-text" data-variant="display">{c.label} {(lang !== "en" || c.label !== c.name) && <span class="xxd-text" data-variant="mono-secondary">{c.name}</span>}</h1>
-    {c.summary && <p class="site-lead">{c.summary}</p>}
+    {c.summary && <p class="site-lead" set:html={richText(c.summary)} />}
   </header>
 
   <h2 class="site-h2" id="demo">{L.demo}</h2>
@@ -43,7 +53,7 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
     extraDemos.map((e, i) => (
       <>
         <h3 class="site-h3" id={`example-${i}`}>{e.title}</h3>
-        {e.text && <p class="site-p">{e.text}</p>}
+        {e.text && <p class="site-p" set:html={richText(e.text)} />}
         <Demo markup={e.markup} align={e.align} block={e.block} />
       </>
     ))
@@ -75,7 +85,7 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
     c.a11y && (
       <>
         <h2 class="site-h2" id="a11y">{L.a11y}</h2>
-        <ul class="site-rules">{c.a11y.map((r) => <li>{r}</li>)}</ul>
+        <ul class="site-rules">{c.a11y.map((r) => <li set:html={richText(r)} />)}</ul>
       </>
     )
   }
@@ -84,7 +94,7 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
     c.rules?.length > 0 && (
       <>
         <h2 class="site-h2" id="rules">{L.rules}</h2>
-        <ul class="site-rules">{c.rules.map((r) => <li>{r}</li>)}</ul>
+        <ul class="site-rules">{c.rules.map((r) => <li set:html={ruleHtml(r)} />)}</ul>
       </>
     )
   }

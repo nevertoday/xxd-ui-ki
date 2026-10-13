@@ -1,5 +1,5 @@
 ---
-// 活演示：上面是真的组件，下面是代码。有 React 版时多一个「React」标签页，两种实现并排。
+// 活演示：上面是真的组件，下面是代码（默认展开，限高；太长时底部有「展开全部」）。有 React 版时多一个「React」标签页，两种实现并排。
 import { icon } from "../lib/data.js";
 import { embed, extractFunction, nextId } from "../lib/markup.js";
 import ReactDemo from "../react/ReactDemo.tsx";
@@ -40,26 +40,45 @@ const hasReact = Boolean(reactCode);
       <button role="tab" id={`${id}-t1`} aria-controls={`${id}-native ${id}-code1`} aria-selected="true">{L.native}</button>
       {hasReact && <button role="tab" id={`${id}-t2`} aria-controls={`${id}-react ${id}-code2`}>React</button>}
     </div>
-    <button class="xxd-btn" data-variant="ghost" data-size="sm" data-site-code-toggle aria-expanded="false">
+    <button class="xxd-btn" data-variant="ghost" data-size="sm" data-site-code-toggle aria-expanded="true">
       <Fragment set:html={icon("Code", 14)} />{L.code}
     </button>
   </div>
-  <pre class="site-code" tabindex="0" id={`${id}-code1`} hidden><code>{markup.trim()}</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label={L.copy} data-copy-target={`#${id}-code1 code`} set:html={icon("Copy", 14)} /></pre>
-  {hasReact && <pre class="site-code" tabindex="0" id={`${id}-code2`} hidden><code>{reactCode}</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" aria-label={L.copy} data-copy-target={`#${id}-code2 code`} set:html={icon("Copy", 14)} /></pre>}
+  <div class="site-demo__code" id={`${id}-code1`}>
+    <pre class="site-code" tabindex="0"><code>{markup.trim()}</code></pre>
+    <button class="xxd-btn site-code__copy" data-variant="ghost" data-icon-only data-size="sm" aria-label={L.copy} data-copy-target={`#${id}-code1 code`} set:html={icon("Copy", 14)} />
+    <button class="xxd-btn site-code__more" data-variant="ghost" data-size="sm" aria-expanded="false" data-all={L.codeAll} data-less={L.codeLess} hidden>{L.codeAll}</button>
+  </div>
+  {
+    hasReact && (
+      <div class="site-demo__code" id={`${id}-code2`} hidden>
+        <pre class="site-code" tabindex="0"><code>{reactCode}</code></pre>
+        <button class="xxd-btn site-code__copy" data-variant="ghost" data-icon-only data-size="sm" aria-label={L.copy} data-copy-target={`#${id}-code2 code`} set:html={icon("Copy", 14)} />
+        <button class="xxd-btn site-code__more" data-variant="ghost" data-size="sm" aria-expanded="false" data-all={L.codeAll} data-less={L.codeLess} hidden>{L.codeAll}</button>
+      </div>
+    )
+  }
 </div>
 
 <script is:inline>
-  // 「代码」按钮：展开 / 收起当前标签页对应的代码；切换标签页时代码跟着换
+  // 「代码」按钮：收起 / 展开当前标签页对应的代码（默认展开）；切换标签页时代码跟着换。
+  // 代码超过限高时露出「展开全部」，点了去掉限高
   (() => {
     for (const demo of document.querySelectorAll(".site-demo:not([data-ready])")) {
       demo.setAttribute("data-ready", "");
       const toggle = demo.querySelector("[data-site-code-toggle]");
-      const codes = [...demo.querySelectorAll(".site-code")];
+      const codes = [...demo.querySelectorAll(".site-demo__code")];
       const tabs = [...demo.querySelectorAll('.site-demo__bar > .xxd-tabs > [role="tab"]')];
       const show = () => {
         const open = toggle.getAttribute("aria-expanded") === "true";
         const i = Math.max(0, tabs.findIndex((t) => t.getAttribute("aria-selected") === "true"));
         codes.forEach((c, n) => (c.hidden = !(open && n === i)));
+        for (const c of codes) {
+          if (c.hidden) continue;
+          const pre = c.querySelector(".site-code");
+          const more = c.querySelector(".site-code__more");
+          more.hidden = !c.hasAttribute("data-full") && pre.scrollHeight <= pre.clientHeight + 1;
+        }
         // 标签页的 aria-controls 写了两个 id：舞台交给 tabs 脚本，代码由这里管
         tabs.forEach((t, n) => {
           const stage = document.getElementById(t.getAttribute("aria-controls").split(" ")[0]);
@@ -70,7 +89,17 @@ const hasReact = Boolean(reactCode);
         toggle.setAttribute("aria-expanded", String(toggle.getAttribute("aria-expanded") !== "true"));
         show();
       });
+      for (const more of demo.querySelectorAll(".site-code__more")) {
+        more.addEventListener("click", () => {
+          const box = more.closest(".site-demo__code");
+          const full = box.toggleAttribute("data-full");
+          more.setAttribute("aria-expanded", String(full));
+          more.textContent = full ? more.dataset.less : more.dataset.all;
+          if (!full) box.scrollIntoView({ block: "nearest" });
+        });
+      }
       demo.addEventListener("xxd:change", show);
+      show();
     }
   })();
 </script>

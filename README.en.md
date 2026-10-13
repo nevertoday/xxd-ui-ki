@@ -33,7 +33,7 @@ kit         sync settings
 | Package          | In one sentence                                                                                                                                      |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@xxd/tokens`    | The single source of every color, type size, spacing step and radius. Ships a first-frame script so pages open in the user's theme without a flash   |
-| `@xxd/icons`     | 201 icons drawn one way (24 grid, 1.5 stroke)                                                                                                        |
+| `@xxd/icons`     | 500 icons drawn one way (24 grid, 1.5 stroke), searchable by Chinese keyword                                                                        |
 | `@xxd/css`       | 59 native components and 13 XXD patterns (drag and drop, image viewer, confirm twice…) — one CSS file plus one JS file                               |
 | `@xxd/react`     | Kumo's React components in the XXD look, plus XXD-only components and two providers for appearance and language                                      |
 | `@xxd/extension` | The Chrome extension toolkit: one command creates an extension, appearance settings sync across its pages, UI injected into web pages stays isolated |
@@ -55,7 +55,7 @@ When the components are updated later:
 
 ```bash
 pnpm xxd sync ~/js/today-extension     # copy in the latest version
-pnpm xxd status ~/js/*                 # see which extensions are behind
+pnpm xxd status                        # see which extensions are behind (every remembered project)
 ```
 
 Wire it into a page like this:
@@ -104,9 +104,15 @@ From the command line, no docs needed:
 
 ```bash
 pnpm xxd ls             # list every component
-pnpm xxd doc Dialog     # usage, attributes and rules for one component
+pnpm xxd doc Dialog     # usage, attributes and rules for one component (typos are fine)
 pnpm xxd doc Dialog --react
+pnpm xxd icon trash     # find an icon (500, Chinese keywords too); add --svg / --react / --copy
+pnpm xxd tokens line    # tokens with light / dark values
+pnpm xxd doctor <dir>   # check a project: setup, manifest, icon and class typos, hard-coded colors / shadows / weights / radii
+pnpm xxd link           # install as the global command xxd-ui, usable in any directory
 ```
+
+Every command: `pnpm xxd help`, or [CLI and tools](https://ui.xiaoxiaodong.ai/en/tools) on the showcase.
 
 To see them in action, open the showcase at <https://ui.xiaoxiaodong.ai/en/>. While changing code, run it locally:
 
@@ -133,7 +139,7 @@ pnpm lint
 ```bash
 pnpm --filter @xxd/site build
 pnpm --filter @xxd/site visual   # screenshot comparison: every page × 4 appearances against the last run
-pnpm --filter @xxd/site audit    # stress test: zero accessibility issues, long text never overflows, hostile pages can't interfere, high-contrast mode stays readable, nothing left untranslated on English pages
+pnpm --filter @xxd/site audit    # stress test: zero accessibility issues, long text never overflows, hostile pages can't interfere, high-contrast mode stays readable, nothing left untranslated on English pages, no polish slips (text touching borders, orphaned last characters, text squeezed into a column)
 ```
 
 Both need headless Chrome; set `CHROME_EXE`. The screenshot baseline lives only on your machine.

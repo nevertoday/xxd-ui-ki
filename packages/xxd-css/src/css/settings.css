@@ -133,10 +133,13 @@
     list-style: none;
   }
 
+  /* 行里的字至少留 8 个字宽：放不下时右边的按钮整体换到下一行、靠右（不会把字挤成一字一行） */
   .xxd-list > .xxd-list__item {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     align-items: center;
-    gap: var(--space-3);
+    gap: 6px var(--space-3);
     min-height: 44px;
     padding: 8px 14px;
     color: var(--ink);
@@ -161,7 +164,7 @@
   }
 
   .xxd-list__main {
-    flex: 1;
+    flex: 1 1 8em;
     min-width: 0;
   }
 

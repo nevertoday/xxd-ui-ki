@@ -103,3 +103,13 @@ test("React 演示：demos.en.tsx 和 demos.tsx 导出同样的函数，函数�
   const bad = body.split("\n").filter((l) => han.test(l));
   assert.deepEqual(bad, []);
 });
+
+test("richText：先转义，再把令牌、类名、属性、标签、调用包成行内代码", async () => {
+  const { richText } = await import("../src/lib/markup.js");
+  assert.equal(richText("用 --muted，不要更浅"), '用 <code class="xxd-code-inline site-token">--muted</code>，不要更浅');
+  assert.match(richText('写 aria-busy="true"'), /<code class="xxd-code-inline site-token">aria-busy="true"<\/code>/);
+  assert.match(richText("原生 <select>"), /<code[^>]*>&lt;select&gt;<\/code>/);
+  assert.match(richText("a.xxd-row 整行可点"), /<code[^>]*>a\.xxd-row<\/code>/);
+  assert.equal(richText("<img onerror=alert(1)>").includes("<img"), false);
+  assert.equal(richText("h1–h3 in page order"), "h1–h3 in page order");
+});

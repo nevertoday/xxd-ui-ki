@@ -26,7 +26,9 @@ Before publishing, add `icons` (16/32/48/128) to `manifest.json`. Give it a plai
 
 ```bash
 pnpm xxd sync ~/js/today-extension ~/js/xPoster      # copy the latest build, write VERSION
-pnpm xxd status ~/js/today-extension ~/js/xPoster    # who is behind
+pnpm xxd status                                     # who is behind (projects you've new / init / synced are remembered)
+pnpm xxd sync --all                                 # update all of them
+pnpm xxd doctor ~/js/today-extension                # check references, manifest, _locales, typos, design rules
 ```
 
 Never edit `vendor/xxd/` by hand. When `xxd-chrome-publish` / `cx-chrome-zip` package an extension they include the files that are referenced, and `vendor/xxd/LICENSE` (MIT) satisfies the license check.
@@ -96,7 +98,7 @@ store.subscribe((s) => ui.update(s));
 
 Add `vendor/xxd/xxd.shadow.css` to `web_accessible_resources` in `manifest.json`. When `xxd.js` loads as a content script it does not take over the host page.
 
-`xxd.shadow.css` holds off the host page on its own (O8; `pnpm --filter @xxd/site audit` runs a hostile host page as a gate):
+`xxd.shadow.css` holds off the host page on its own (`pnpm --filter @xxd/site audit` runs a hostile host page as a gate):
 
 - Inherited styles from the host page (`text-transform`, `letter-spacing`, `text-align`, line height, font, cursor…) are reset on the top-level elements inside the shadow root;
 - Tokens are declared again inside the shadow root: even if the host page writes `div { --ink: … }` and it hits the host, our colors and radii don't change;

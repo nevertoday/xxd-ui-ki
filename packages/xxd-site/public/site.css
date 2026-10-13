@@ -182,6 +182,11 @@
     grid-column: 2 / -1;
   }
 
+  /* 整页宽的页面不受 1200px 正文上限：大屏上组件墙、图标格子一直铺到右边，不留一大片空白 */
+  .site-body:has(> .site-main--wide) {
+    grid-template-columns: 232px minmax(0, 1fr);
+  }
+
   .site-toc {
     position: sticky;
     top: 56px;
@@ -267,8 +272,33 @@
     line-height: 1.8;
   }
 
+  /* 悬挂缩进：折行时第二行和第一行的字对齐，不顶到圆点下面 */
+  .site-rules li {
+    position: relative;
+    padding-left: 1em;
+  }
+
+  /* 规则里的令牌名、命令是一个整体，不在「--」后面断开 */
+  .site-rules code,
+  .site-token {
+    white-space: nowrap;
+  }
+
   .site-rules li::before {
-    content: "· ";
+    content: "·";
+    position: absolute;
+    left: 0.25em;
+  }
+
+  /* 类名一个个排：只在类名之间换行，不在「xxd-」后面断开 */
+  .site-classes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+  }
+
+  .site-classes > span {
+    white-space: nowrap;
   }
 
   /* 活演示 */
@@ -335,6 +365,162 @@
     right: 8px;
   }
 
+  /* 演示下面的代码：默认展开，限高滚动。复制按钮单独占右边一列 —— 长的一行在它左边就滚走了，不会压在按钮下面 */
+  .site-demo__code,
+  .site-codeblock {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .site-demo__code > .site-code,
+  .site-codeblock > .site-code {
+    padding-right: 8px;
+  }
+
+  .site-demo__code {
+    border-top: 1px solid var(--line);
+    background: color-mix(in srgb, var(--action) 4%, var(--paper));
+  }
+
+  .site-demo__code[hidden] {
+    display: none;
+  }
+
+  .site-demo__code > .site-code {
+    max-height: 340px;
+    border-top: 0;
+    background: none;
+    overflow: auto;
+  }
+
+  .site-demo__code[data-full] > .site-code {
+    max-height: none;
+  }
+
+  /* 命令行页：「我要做什么」两列卡片；命令表 */
+  .site-flows {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+    gap: var(--space-5);
+  }
+
+  .site-flow {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .site-flow__title {
+    margin: 0;
+    color: var(--ink);
+    font: var(--weight-medium) var(--text-base) / 1.4 var(--font-body);
+  }
+
+  .site-flow__desc {
+    margin: 0;
+    color: var(--muted);
+    font: var(--text-sm) / 1.6 var(--font-body);
+  }
+
+  /* 命令清单：左边命令名，右边完整用法、说明、例子；窄屏叠成一列 */
+  .site-cmds {
+    margin: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .site-cmds__row {
+    display: grid;
+    grid-template-columns: 7.5em minmax(0, 1fr);
+    gap: var(--space-4);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .site-cmds__name {
+    color: var(--ink);
+    font: var(--weight-medium) var(--text-sm) / 1.5 var(--font-mono);
+  }
+
+  .site-cmds__body {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+    margin: 0;
+  }
+
+  /* 用法只在空格处换行，不把 --name 拆开 */
+  .site-cmds__usage {
+    color: var(--ink);
+    min-width: 0;
+    font: var(--text-xs) / 1.6 var(--font-mono);
+    white-space: normal;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .site-cmds__desc {
+    margin: 0;
+    color: var(--muted);
+    font: var(--text-sm) / 1.6 var(--font-body);
+  }
+
+  .site-cmds__eg {
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+
+  .site-cmds__eg code {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 560px) {
+    .site-cmds__row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 4px;
+    }
+  }
+
+  /* 单独一段能复制的代码（命令行页、开始页） */
+  .site-codeblock {
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: color-mix(in srgb, var(--action) 4%, var(--paper));
+    overflow: hidden;
+  }
+
+  .site-codeblock > .site-code {
+    border-top: 0;
+    background: none;
+  }
+
+  .site-codeblock + .site-codeblock {
+    margin-top: var(--space-3);
+  }
+
+  .site-code__copy {
+    margin: 8px 8px 0 0;
+  }
+
+  .site-code__more {
+    grid-column: 1 / -1;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    color: var(--muted);
+  }
+
+  .site-code__more[hidden] {
+    display: none;
+  }
+
   .site-code[hidden] {
     display: none;
   }
@@ -382,11 +568,29 @@
   .site-props th {
     color: var(--muted);
     font-weight: var(--weight-medium);
+    white-space: nowrap;
+  }
+
+  /* 全是短值的表（颜色对比度）：不折行，窄屏横向滚动 */
+  .site-props[data-nowrap] td {
+    white-space: nowrap;
   }
 
   .site-props td:first-child {
     font-family: var(--font-mono);
     white-space: nowrap;
+  }
+
+  /* 属性表借用 .xxd-table-wrap 的横向滚动（可滚动时 JS 补 tabindex，键盘能滚），但不要它的边框 */
+  .site-props-wrap {
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  /* 说明列至少 14 个字宽：手机上第一列很长时，整张表横向滚动，而不是把说明挤成一字一行 */
+  .site-props td + td {
+    min-width: 14em;
   }
 
   /* 首页组件墙 */
@@ -416,6 +620,12 @@
     gap: 10px;
     padding: var(--space-6) var(--space-4);
     overflow: hidden;
+  }
+
+  /* 整行的组件（列表、设置组、顶栏…）在组件墙里也占满一行，上下仍然居中 */
+  .site-wall__stage[data-block] > * {
+    flex: 0 0 auto;
+    width: 100%;
   }
 
   .site-wall__name {
@@ -520,9 +730,66 @@
   }
 
   /* 图标墙 */
+  /* 图标页：搜索 + 复制格式一行，下面按分类分组 */
+  .site-icons-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-5);
+    margin-top: var(--space-4);
+  }
+
+  .site-icons-bar__search {
+    flex: 0 1 380px;
+    min-width: min(100%, 240px);
+  }
+
+  .site-icons-bar__format {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .site-icons-bar__count {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .site-icons-bar__cli {
+    margin-top: var(--space-2);
+  }
+
+  .site-icons-group {
+    margin-top: var(--space-6);
+  }
+
+  .site-icons-group[hidden],
+  .site-icons-empty[hidden] {
+    display: none;
+  }
+
+  .site-icons-group__title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-2);
+    color: var(--ink);
+    font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+  }
+
+  .site-icons-group__title span {
+    color: var(--muted);
+    font: var(--text-2xs) var(--font-mono);
+  }
+
+  .site-icons-empty {
+    margin-top: var(--space-6);
+    color: var(--muted);
+  }
+
   .site-icons {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     border-top: 1px solid var(--line);
     border-left: 1px solid var(--line);
   }

@@ -71,7 +71,9 @@ export function renderPagination(nav, { page = Number(nav.dataset.page) || 1, to
   const middle = pageList(current, pages)
     .map((p) => (p === "…" ? `<span class="xxd-pagination__gap">…</span>` : `<button type="button" data-page-to="${p}" ${p === current ? 'aria-current="page"' : ""}>${p}</button>`))
     .join("");
-  nav.innerHTML = prev + middle + next;
+  // 窄的时候只显示这一段（CSS 的容器查询）：「3 / 12」，读屏也读得到当前页
+  const status = `<span class="xxd-pagination__status">${current} / ${pages}</span>`;
+  nav.innerHTML = prev + status + middle + next;
   const info = nav.parentElement?.querySelector(".xxd-pagination__info");
   if (info) info.textContent = total ? `${(current - 1) * perPage + 1}–${Math.min(total, current * perPage)} / ${total}` : "0 / 0";
   return { page: current, pages };
@@ -143,7 +145,9 @@ export function highlight(el, lang = el.dataset.lang || el.closest("[data-lang]"
   const text = el.textContent;
   const html = highlightText(text, lang);
   const pre = el.closest(".xxd-code");
-  el.innerHTML = pre?.hasAttribute("data-lines") ? html.split("\n").map((l) => `<span class="line">${l}</span>`).join("\n") : html;
+  // 行号：每行一个块；换行符放进行里（夹在块之间会多出一个空行），复制出来仍然是原来的代码
+  const lines = html.split("\n");
+  el.innerHTML = pre?.hasAttribute("data-lines") ? lines.map((l, i) => `<span class="line">${l}${i < lines.length - 1 ? "\n" : ""}</span>`).join("") : html;
   el.dataset.highlighted = "1";
   return el;
 }

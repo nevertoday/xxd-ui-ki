@@ -18,7 +18,7 @@ const L = t(langOf(Astro.url.pathname));
       {x.width && <span class="xxd-text" data-variant="caption">{L.designedFor(x.width, x.where)}</span>}
     </div>
   </header>
-  <div class="site-template" style={`border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:var(--bg);${x.width ? `max-width:${x.width}px;` : ""}${x.height ? `height:${x.height}px;` : ""}`}>
+  <div class="site-template" style={`border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:var(--bg);${x.width ? `max-width:${x.width}px;` : ""}${x.height ? (x.flow ? `min-height:${x.height}px;` : `height:${x.height}px;`) : ""}`}>
     <div class="xxd-page" style="height:100%;position:relative" set:html={embed(x.markup)} />
   </div>
   <pre id="tpl-src" hidden><code>{x.markup.trim()}</code></pre>

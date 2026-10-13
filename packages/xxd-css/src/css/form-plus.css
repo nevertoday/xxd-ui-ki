@@ -33,7 +33,7 @@
 
   .xxd-input-group > input {
     flex: 1;
-    min-width: 0;
+    min-width: 5ch;
     height: 100%;
     padding: 0 12px;
     border: 0;
@@ -47,19 +47,23 @@
     color: var(--muted);
   }
 
+  /* 前后缀：放不下时出省略号（不是被硬切成「.xiaoxiaodor」）；输入框至少留 5 个字符 */
   .xxd-input-group__addon,
   .xxd-input-group__suffix {
-    display: inline-flex;
-    flex: none;
-    align-items: center;
-    gap: 6px;
-    height: 100%;
+    display: block;
+    flex: 0 1 auto;
+    min-width: 2em;
+    overflow: hidden;
     color: var(--muted);
     font-size: var(--text-sm);
+    line-height: 1.4;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
+  /* 前缀（「https://」）通常很短：尽量不缩，先缩后缀 */
   .xxd-input-group__addon {
+    flex-shrink: 0.2;
     padding-left: 12px;
   }
 
@@ -151,8 +155,9 @@
     cursor: copy;
   }
 
+  /* 复制图标常显为淡色（看得出能复制，也不会在字后面留一截空白），hover / 聚焦时加深 */
   .xxd-inline-copy > .ui-icon {
-    opacity: 0;
+    opacity: 0.45;
     color: var(--muted);
     transition: opacity var(--motion-quick) ease;
   }

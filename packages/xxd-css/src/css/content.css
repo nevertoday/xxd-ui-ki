@@ -18,10 +18,18 @@
     white-space: nowrap;
   }
 
+  /* 数据表不折行：窄了就在 .xxd-table-wrap 里横向滚动（「落后 2」不会拆成两行）。
+     写长段文字的列加 data-wrap，那一列才换行 */
   .xxd-table td {
     height: 44px;
     padding: 6px 12px;
     color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .xxd-table [data-wrap] {
+    min-width: 16em;
+    white-space: normal;
   }
 
   .xxd-table tbody tr + tr td {
@@ -48,11 +56,12 @@
   }
 
   /* 折叠：<details class="xxd-collapse"><summary>标题</summary>内容</details> */
+  /* 问题折成两行时，箭头对齐第一行（不是两行的中间） */
   .xxd-collapse > summary {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
-    min-height: 40px;
+    padding-block: 11px;
     color: var(--ink);
     font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
     list-style: none;
@@ -68,6 +77,7 @@
     flex: none;
     width: 14px;
     height: 14px;
+    margin-top: calc((1.4em - 14px) / 2);
     background: var(--muted);
     -webkit-mask: var(--xxd-chevron-right) center / contain no-repeat;
     mask: var(--xxd-chevron-right) center / contain no-repeat;
@@ -371,16 +381,26 @@
     text-decoration-color: var(--action);
   }
 
-  .xxd-prose ul,
-  .xxd-prose ol {
+  /* 只管正文里的普通列表（没有类名的 ul / ol）：面包屑、目录这些带类名的组件不受影响。
+     列表符号写明（宿主页面的 CSS 重置常把 list-style 清成 none） */
+  .xxd-prose ul:not([class]),
+  .xxd-prose ol:not([class]) {
     padding-left: 1.4em;
   }
 
-  .xxd-prose li::marker {
+  .xxd-prose ul:not([class]) {
+    list-style: disc;
+  }
+
+  .xxd-prose ol:not([class]) {
+    list-style: decimal;
+  }
+
+  .xxd-prose :is(ul, ol):not([class]) > li::marker {
     color: var(--action);
   }
 
-  .xxd-prose li + li {
+  .xxd-prose :is(ul, ol):not([class]) > li + li {
     margin-top: 4px;
   }
 
