@@ -167,6 +167,17 @@
     font-size: var(--text-xs);
   }
 
+  /* 横幅里的几条（更新说明） */
+  .xxd-banner__list {
+    margin: 2px 0 0;
+    padding-inline-start: 1.2em;
+    list-style: disc;
+  }
+
+  .xxd-banner__list > li + li {
+    margin-top: 2px;
+  }
+
   .xxd-banner > * {
     grid-row: 1;
     grid-column: 2;

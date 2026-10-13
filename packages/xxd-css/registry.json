@@ -1110,7 +1110,8 @@
         "xxd-banner__title",
         "xxd-banner__text",
         "xxd-banner__actions",
-        "xxd-banner__close"
+        "xxd-banner__close",
+        "xxd-banner__list"
       ],
       "markup": "<div class=\"xxd-banner\" data-tone=\"warning\" style=\"max-width:520px\"><i data-xxd-icon=\"TriangleAlert\"></i><div><p class=\"xxd-banner__title\">今天还能写入 1 篇</p><p class=\"xxd-banner__text\">明天 0 点恢复；会员不限。</p></div><div class=\"xxd-banner__actions\"><button class=\"xxd-btn\" data-size=\"sm\">开通会员</button></div><button class=\"xxd-btn xxd-banner__close\" data-variant=\"ghost\" data-icon-only data-size=\"xs\" data-banner-close aria-label=\"关闭\"><i data-xxd-icon=\"X\" data-size=\"14\"></i></button></div>",
       "react": "Banner",

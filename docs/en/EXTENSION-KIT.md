@@ -1,70 +1,108 @@
 # Chrome extension kit
 
-`@xxd/extension` gives every XXD extension the same appearance — light / dark, square / rounded, accent, three languages — and the same components.
+`@xxd/extension` gives every extension the same look: light / dark, square / rounded, an accent color, three languages and the same components.
 Extensions can't load remote code (MV3), so the component files are **copied** into each extension's `vendor/xxd/`, and each extension pins the version it uses.
-
-> This is the English version of `docs/EXTENSION-KIT.md`. Extension names in the commands are only examples.
 
 ## Create an extension
 
 ```bash
-cd xxd-ui-kit
-pnpm xxd new ./today --name "Today" --slug today
+xxd-ui new ./today --name "Today" --slug today
 ```
 
-You get an MV3 extension you can load right away with “Load unpacked”:
+By default you get the smallest MV3 extension you can load right away with “Load unpacked”:
 
-- `sidepanel.html`: tabs at the very top (no top bar), content, a bottom dock; the side panel defaults to compact density
-- `options.html`: the settings page (search with ⌘F + the appearance group)
-- `content.js`: an example of putting UI into a web page (Shadow DOM)
-- `_locales/zh_CN · zh_TW · en`
-- `vendor/xxd/`: `tokens.css` `xxd.css` `xxd.shadow.css` `xxd.js` `boot.js` `icons.js` `extension.js` `VERSION` `LICENSE`
+- `sidepanel.html`: tabs at the very top (no top bar), content, a dock at the bottom; the side panel uses compact density
+- `options.html`: the options page (search + appearance group)
+- `background.js`: clicking the toolbar icon opens the side panel (`type: module`, so it can `import` the vendored `tokens.mjs`)
+- `_locales/en · zh_CN · zh_TW`: every piece of UI text lives here; `default_locale` is `en` (Japanese, German, French… users see English rather than Chinese)
+- `vendor/xxd/`: `tokens.css` `xxd.css` `xxd.shadow.css` `xxd.shadow.css.js` `xxd.js` `boot.js` `icons.js` `extension.js` `tokens.mjs` `VERSION` `LICENSE`
 
-Before publishing, add `icons` (16/32/48/128) to `manifest.json`. Give it a plain name that says what it does.
+Add more when you need it (they combine):
 
-## Update the components
+| Option | Adds |
+| --- | --- |
+| `--popup` | `popup.html`: the small window from the toolbar icon (360 wide, height follows the content up to 600), with a button that opens the side panel |
+| `--content "https://*.example.com/*"` | `content.js`: puts a button into matching pages (Shadow DOM), with the manifest's `content_scripts` in the right dependency order |
+| `--account` | A sign-in screen plus an account and membership group (a sample: sign-in and payment are fake, prices are placeholders) |
+
+Before publishing: `xxd-ui store-icons ./today --glyph ListChecks` makes the 16 / 32 / 48 / 128 PNGs and adds them to the manifest. Name the extension in a few plain words that say what it does.
+
+## Update and check
 
 ```bash
-pnpm xxd sync ./today ./my-extension      # copy the latest build, write VERSION
-pnpm xxd status                                     # who is behind (projects you've new / init / synced are remembered)
-pnpm xxd sync --all                                 # update all of them
-pnpm xxd doctor ./today                # check references, manifest, _locales, typos, design rules
+xxd-ui sync ./today ./my-extension     # copy the latest build, write VERSION
+xxd-ui status                          # who is behind (anything you new / init / sync is remembered; compared by file content, so doc-only commits don't count)
+xxd-ui sync --all                      # update all of them
+xxd-ui doctor ./today                  # check it; exits with 1 on errors
 ```
 
-Never edit `vendor/xxd/` by hand. When you package the extension, a packer that follows references picks up the files in use, and `vendor/xxd/LICENSE` (MIT) satisfies the license check.
+`doctor` checks: referenced files exist; the manifest and `_locales` agree; **MV3 rules** (inline scripts, `on*=`, remote scripts, `eval`, store length limits, permissions covering every site, icon sizes, content-script dependency order); **hard-coded Chinese** (with `_locales`: Chinese in `aria-label`, page text or JS strings); misspelt icon and class names; hard-coded colors / shadows / weights / radii / motion / fonts. A line that's meant to be different gets `xxd-ignore`.
 
-### Existing projects: `xxd.config.json`
+Don't edit `vendor/xxd/` by hand. When you package the extension, a packer that follows references picks up the files in use, and `vendor/xxd/LICENSE` satisfies license checks.
 
-Put it at the project root (an extension or a website):
+### `xxd.config.json`
+
+In the project root (extension or site); every field is optional:
 
 | Field | What it does |
 | --- | --- |
-| `vendorDir` | Where to copy the components; `vendor/xxd` for extensions by default, `false` for websites (no copy) |
-| `tokensTargets` | Write `tokens.css` as-is to these paths (for old paths that tests or websites reference), e.g. `["src/xxd-theme.css", "website/xxd-theme.css"]` |
-| `layeredTokensRegions` | Write layered tokens into a marked region at the top of these CSS files: the project's own variables always win, only new tokens are added (see [existing sites](existing-site.md)) |
-| `layeredTokensExclude` | Extra token names to skip (`sync` already skips names the project uses but never declares) |
+| `vendorDir` | Where to copy the components; extensions default to `vendor/xxd`, sites write `false` to skip copying |
+| `vendorFiles` | Copy only these, e.g. `["tokens.css", "boot.js", "xxd.css", "xxd.js"]` |
+| `vendorMinify` | Copy minified `xxd.css` and `xxd.shadow.css` (default `true`) |
+| `tokensTargets` | Write `tokens.css` as-is to these paths (for old paths that tests or websites reference), e.g. `["src/xxd-theme.css"]` |
+| `layeredTokensRegions` | Write layered tokens into a marked region at the top of these CSS files: the project's own variables always win (see [existing sites](existing-site.md)) |
+| `layeredTokensExclude` | Extra token names to skip (`sync` already skips names the project uses without declaring) |
 | `iconNodesTargets` | Write icon data to these paths (e.g. `src/lib/xxd-icon-nodes.js`) |
-| `adopt` | `pnpm xxd adopt <dir>`: `{ file, aliases }`. Removes `:root` declarations in `file` whose light and dark values both equal the token (the token provides them now); `aliases` turns old names into `var(--token)`. Compare before and after with `scripts/verify/css-vars-diff.cjs`; it should show zero changes |
+| `adopt` | `xxd-ui adopt <dir>`: `{ file, aliases }`. Drops `:root` declarations whose light and dark values equal the tokens; `aliases` turns old names into `var(--token)`. Try `--dry-run` first |
+| `doctor.ignore` | Skip whole checks, e.g. `["color"]` |
+
+Bringing in an existing extension: `xxd-ui init ./my-extension`. If a page already has a `boot.js` `data-key`, it's kept (users keep their appearance settings); `--key` sets it explicitly.
+
+## What each page uses
+
+| Page | Size | Density | Good for | Watch out |
+| --- | --- | --- | --- | --- |
+| Side panel | 320–400 wide | Compact | The main features, lists, history, settings entry | Tabs at the top; overlays are sheets rising from the bottom |
+| Popup | 360 wide, ≤ 600 tall | Compact | One or two of the most-used actions | Don't set `height:100%` (it collapses to a strip); no modal dialogs — use a sheet or go to the side panel |
+| Options page | 680 reading column | Comfortable | Appearance, shortcuts, import / export, about | Settings groups + search |
+| Inside web pages | Follows the page | Compact | An entry button, a small panel | Always Shadow DOM (below) |
+
+The usual extension chores have ready-made patterns on the showcase: permission request, shortcuts, import and export settings, what's new, extension updated — please reload.
 
 ## Wiring up a page
 
 ```html
 <head>
-  <!-- Apply the appearance before the first frame (reads the localStorage mirror); one data-key per extension -->
+  <!-- applies the appearance before the first frame (reads the localStorage mirror); one data-key per extension -->
   <script src="vendor/xxd/boot.js" data-key="today-ui" data-default-density="compact"></script>
   <link rel="stylesheet" href="vendor/xxd/xxd.css">
   <script src="vendor/xxd/icons.js"></script>
-  <script src="vendor/xxd/xxd.js"></script>        <!-- window.Xxd, runs install(document) automatically -->
-  <script src="vendor/xxd/extension.js"></script>  <!-- window.XxdExtension -->
+  <script src="vendor/xxd/xxd.js"></script>        <!-- window.Xxd, install(document) runs automatically -->
+  <script src="vendor/xxd/extension.js"></script>  <!-- window.XxdExtension; sets the language from _locales -->
 </head>
 <body class="xxd-page">
 ```
 
-To swap in the tokens without touching the UI yet, include only `vendor/xxd/tokens.css` and `boot.js` (the image sorter pilot does this).
+To swap the tokens only and leave the UI alone for now, include just `vendor/xxd/tokens.css` and `boot.js`.
+
+## Language: one source
+
+Every `messages.json` has an `xxdLocale` entry (`en` / `zh-CN` / `zh-Hant`). Whichever file Chrome picks for the user decides the language:
+
+- `extension.js` sets `<html lang>` when it loads, and the components' own text (Close, Cancel, Previous…) follows;
+- `XxdExtension.uiLocale()` returns it; format dates with `Intl.DateTimeFormat(uiLocale())`;
+- in content scripts only the components' language changes — the host page's `<html lang>` is left alone; the Shadow host gets `lang`, so screen readers use the right language.
+
+```html
+<span data-i18n="tabSettings">Settings</span>
+<input data-i18n-attr="placeholder:searchPlaceholder,aria-label:searchPlaceholder">
+```
+
+`XxdExtension.applyI18n(document)` fills these in from `chrome.i18n`; when a translation is missing, the original text in the HTML stays. In JS use `XxdExtension.t("key", [substitutions])`.
 
 ## Appearance settings
 
-The source of truth is `chrome.storage.sync`; the localStorage mirror only keeps the first frame from flashing. The side panel, settings page and popup stay in sync live.
+`chrome.storage.sync` is the source of truth; a localStorage mirror exists only so the first frame doesn't flash. The side panel, options page and popup stay in sync live.
 
 ```js
 const { createAppearanceStore, uiLocale } = window.XxdExtension;
@@ -79,41 +117,42 @@ Xxd.mountAppearance(document.getElementById("settings"), {
 });
 ```
 
-## Putting UI into a web page
+## Putting UI into web pages
 
-Always inside Shadow DOM, so styles never leak either way; appearance attributes go on the host, never on the host page's `<html>`.
+Always inside Shadow DOM, so neither side's styles leak; appearance attributes go on the host, never on the host page's `<html>`, and nothing is written to the host page's localStorage.
 
 ```js
-const store = createAppearanceStore({ key: "today-ui", apply: false });
-await store.load();
-const host = document.createElement("div");
-document.documentElement.append(host);
-const ui = await XxdExtension.mountXxdUI(host, {
-  cssHref: chrome.runtime.getURL("vendor/xxd/xxd.shadow.css"),
-  settings: store.get(),
-});
-ui.root.innerHTML = `<button class="xxd-btn" data-variant="primary" data-size="sm">Export MD</button>`;
-store.subscribe((s) => ui.update(s));
+// manifest.json: content_scripts js in this order:
+//   vendor/xxd/xxd.js, vendor/xxd/extension.js, vendor/xxd/icons.js, vendor/xxd/xxd.shadow.css.js, content.js
+(async () => {
+  if (document.querySelector("xxd-root[data-ext='today']")) return; // don't inject twice
+  const store = XxdExtension.createAppearanceStore({ key: "today-ui", apply: false });
+  await store.load();
+  const host = document.createElement("xxd-root");          // a custom element: the page's div { … } rules can't reach it
+  host.dataset.ext = "today";
+  host.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:2147483000";
+  document.documentElement.append(host);
+  const ui = await XxdExtension.mountXxdUI(host, { settings: store.get() });
+  ui.root.innerHTML = `<button class="xxd-btn" data-variant="primary" data-size="sm">Export MD</button>`;
+  store.subscribe((s) => ui.update(s));
+})();
 ```
 
-Add `vendor/xxd/xxd.shadow.css` to `web_accessible_resources` in `manifest.json`. When `xxd.js` loads as a content script it does not take over the host page.
+- Styles come from `xxd.shadow.css.js` (`globalThis.XxdShadowCSS`): attached synchronously, no fetch, **no `web_accessible_resources` needed** (so sites can't use it to detect the extension). `cssHref` still works if you prefer, but then `xxd.shadow.css` must be in WAR.
+- Positioning and `z-index` written on the host survive (`all: initial` goes first).
+- Toasts, confirm dialogs, the command palette, the image viewer and tooltips appear in this Shadow root when no `within` is given; toasts and tooltips go into the browser's top layer, so no host-page z-index covers them.
+- With the theme set to “follow system”, switching the OS between light and dark follows along.
+- After the extension updates, the old script's `chrome.*` calls throw “Extension context invalidated”: wrap them with `XxdExtension.guardContext(ui.root)` (see the “Extension updated, please reload” pattern).
+- `xxd.js` loaded as a content script doesn't take over the host page.
 
-`xxd.shadow.css` holds off the host page on its own (`pnpm --filter @xxd/site audit` runs a hostile host page as a gate):
+`xxd.shadow.css` holds off the host page by itself (`pnpm --filter @xxd/site audit` has a hostile host page as a gate): inherited host styles are reset on the Shadow's top elements; tokens are declared again inside the Shadow, so a host rule like `div { --ink: … }` can't change them; `data-theme` / `data-corners` / `data-finish` on the host all work.
 
-- Inherited styles from the host page (`text-transform`, `letter-spacing`, `text-align`, line height, font, cursor…) are reset on the top-level elements inside the shadow root;
-- Tokens are declared again inside the shadow root: even if the host page writes `div { --ink: … }` and it hits the host, our colors and radii don't change;
-- `data-theme` / `data-corners` / `data-finish` work when written on the host;
-- Tooltips, toasts, the “Copied” bubble and confetti all mount inside the anchor's shadow root (`Xxd.toast(msg, { within: ui.root })` accepts a ShadowRoot directly).
+## In the service worker
 
-## Language of the behavior JS
+`vendor/xxd/tokens.mjs` is plain data, so the service worker, OffscreenCanvas and notifications can use the token colors too:
 
-Text the native components generate (previous page, close, copy failed, the image viewer…) follows `<html lang>` in three languages; the extension's `i18n.js` already sets `lang`. To pin it, call `Xxd.setLocale("en")`. Options and `data-*` text still win.
-
-## Three languages
-
-```html
-<span data-i18n="tabSettings">Settings</span>
-<input data-i18n-attr="placeholder:searchPlaceholder">
+```js
+import { TOKENS, setBadge } from "./vendor/xxd/tokens.mjs";
+await setBadge("3", "danger");   // the badge on the toolbar icon
+TOKENS.light["--ink"];           // "#111111"
 ```
-
-`XxdExtension.applyI18n(document)` replaces them via `chrome.i18n`; when a translation is missing, the original text in the HTML stays.

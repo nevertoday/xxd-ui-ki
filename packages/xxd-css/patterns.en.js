@@ -208,4 +208,70 @@ await Xxd.flip(container, () => reorderDom())  // the general “slide into the 
 <button class="xxd-btn" data-size="sm" onclick="const el=document.getElementById('roll-demo'); Xxd.rollText(el, el.textContent.includes('Free') ? 'Member · until Nov 8, 2027' : 'Free · 3 posts left today')">Swap</button>`,
     rules: ["With reduced motion the text just swaps"],
   },
+  Permission: {
+    title: "Permission request",
+    from: "Extensions (MV3)",
+    summary: "When a feature needs an optional permission: say why first, and request it only when the user clicks. Once granted the button reads “Allowed”; if denied, say what's missing and how to turn it on later. Don't take every permission at install time.",
+    markup: `<div class="xxd-banner" data-tone="info">
+  <div><p class="xxd-banner__title">Read the current tab's address</p><p class="xxd-banner__text">Used to add this page to your list; read only when you click, never your browsing history.</p><p class="xxd-banner__text" role="status" id="perm-status"></p></div>
+  <div class="xxd-banner__actions"><button class="xxd-btn" data-size="sm" data-variant="primary" id="perm-btn">Allow</button></div>
+</div>
+<script>XxdExtension.bindPermission(document.getElementById("perm-btn"), { permissions: ["tabs"], status: document.getElementById("perm-status") });</script>`,
+    rules: ["Put it in optional_permissions / optional_host_permissions in the manifest, not permissions", "chrome.permissions.request only works inside a user click", "Say why and when it's used; after a denial, don't keep asking"],
+    a11y: ["The result goes into the role=\"status\" line, so screen readers announce it", "Once granted the button is disabled and marked aria-pressed=\"true\""],
+  },
+  Shortcuts: {
+    title: "Shortcuts",
+    from: "Extensions (MV3)",
+    summary: "List the extension's shortcuts (the manifest's commands) on the options page, with “Not set” where there's none. Shortcuts can only be changed on Chrome's shortcuts page, so the last button opens it.",
+    markup: `<section class="xxd-group" style="width:100%">
+  <h2 class="xxd-group__title">Shortcuts</h2>
+  <div class="xxd-group__body" id="shortcuts"></div>
+</section>
+<script>XxdExtension.mountShortcuts(document.getElementById("shortcuts"), { names: { _execute_action: "Open the side panel", save: "Save this page" } });</script>`,
+    rules: ["Read the current shortcuts with chrome.commands.getAll(); don't hard-code them", "Show keys with xxd-kbd, joined by “+”"],
+    a11y: ["Each row's name is body text with the shortcut on the right; when unset, say so instead of leaving it blank"],
+    js: `await XxdExtension.mountShortcuts(container, { names: { _execute_action: "Open the side panel" } })`,
+  },
+  ImportExport: {
+    title: "Import and export settings",
+    from: "Extensions (MV3)",
+    summary: "Take settings along to a new computer or a reinstall: export a JSON file; on import accept only the known format and keys, and confirm with a toast.",
+    markup: `<div class="xxd-row" style="width:100%">
+  <div class="xxd-row__text"><div class="xxd-row__title">Settings backup</div><div class="xxd-row__desc">Export to a file, import it on another computer</div></div>
+  <div class="xxd-row__control xxd-cluster"><button class="xxd-btn" data-size="sm" id="export-btn">Export</button><button class="xxd-btn" data-size="sm" id="import-btn">Import…</button></div>
+</div>
+<script>
+  document.getElementById("export-btn").addEventListener("click", () => XxdExtension.exportSettings({ filename: "today-settings.json" }));
+  document.getElementById("import-btn").addEventListener("click", () => {
+    const input = Object.assign(document.createElement("input"), { type: "file", accept: "application/json" });
+    input.addEventListener("change", () => input.files[0] && XxdExtension.importSettings(input.files[0]));
+    input.click();
+  });
+</script>`,
+    rules: ["Only import files whose format is xxd-settings; pass keys to accept only the ones you know", "After an import every page updates itself through chrome.storage.onChanged; nothing needs reopening"],
+    a11y: ["The result is announced with a toast"],
+  },
+  WhatsNew: {
+    title: "What's new",
+    from: "Extensions (MV3)",
+    summary: "The first time someone opens a new version, a banner at the top says in two or three lines what's different; after “Got it” it doesn't come back for that version. No dialog, no new tab.",
+    markup: `<div id="whats-new" style="width:100%"></div>
+<script>XxdExtension.showWhatsNew(document.getElementById("whats-new"), { version: "1.3." + Date.now(), title: "New in 1.3", notes: ["History can be collapsed by day", "Exported files include the title"] });</script>`,
+    rules: ["Only changes people will notice, three at most", "The version defaults to the manifest's version; it's remembered in chrome.storage.local"],
+    a11y: ["The banner is role=\"status\", announced once when it appears"],
+    js: `await XxdExtension.showWhatsNew(container, { title: "New in 1.3", notes: ["…", "…"] })`,
+  },
+  Reload: {
+    title: "Extension updated, please reload",
+    from: "Extensions (MV3)",
+    summary: "In content scripts: after the extension is updated or reloaded, the old script still in the page throws “Extension context invalidated” on any chrome.* call. Wrap calls in guardContext: when the context is gone it says so in its own Shadow root with a reload button, instead of quietly breaking.",
+    markup: `<div class="xxd-stack" id="reload-demo" style="width:100%"><button class="xxd-btn" id="reload-try">Save to the extension (pretend it was updated)</button></div>
+<script>
+  const safe = XxdExtension.guardContext(document.getElementById("reload-demo"));
+  document.getElementById("reload-try").addEventListener("click", () => safe(() => { throw new Error("Extension context invalidated."); }));
+</script>`,
+    rules: ["Route every chrome.* call (sendMessage, storage) through safe(…)", "Once it's dead don't retry; reloading the page is the only way out"],
+    a11y: ["The banner is role=\"alert\" and focus moves to the reload button"],
+  },
 };

@@ -101,7 +101,7 @@ async function axeAudit() {
 function longPage() {
   return `<!doctype html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/xxd/xxd.css"><style>.cell{width:var(--cell,320px);margin:0 0 24px}</style></head>
-<body class="xxd-page" style="margin:0"><div id="app"></div><script src="/xxd/icons.js"></script><script src="/xxd/xxd.js"></script></body></html>`;
+<body class="xxd-page" style="margin:0"><div id="app"></div><script src="/xxd/icons.js"></script><script src="/xxd/xxd.js"></script><script src="/xxd/extension.js"></script></body></html>`;
 }
 
 // 只有一个字形的格子（字形表）和故意定宽的东西不算
@@ -351,7 +351,7 @@ async function cellsPage(lang, w) {
     return `<div class="site-demo cell" data-name="${c.name}" style="width:${w}px;margin:0 0 12px"><div class="site-demo__stage" data-align="${c.align ?? (isPat ? "start" : "center")}" ${c.block ?? isPat ? "data-block" : ""}>${uniq(markup, i)}</div></div>`;
   });
   return `<!doctype html><html lang="${lang === "en" ? "en" : "zh-CN"}" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="/xxd/xxd.css"><link rel="stylesheet" href="/site.css"><script src="/xxd/boot.js"></script><script src="/xxd/icons.js"></script><script src="/xxd/xxd.js"></script></head>
+<link rel="stylesheet" href="/xxd/xxd.css"><link rel="stylesheet" href="/site.css"><script src="/xxd/boot.js"></script><script src="/xxd/icons.js"></script><script src="/xxd/xxd.js"></script><script src="/xxd/extension.js"></script></head>
 <body class="xxd-page" style="padding:12px">${cells.join("")}</body></html>`;
 }
 

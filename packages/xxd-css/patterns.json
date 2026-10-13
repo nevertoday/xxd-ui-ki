@@ -228,6 +228,93 @@
         "减少动效时直接换字"
       ],
       "js": "Xxd.rollText(element, newText)"
+    },
+    {
+      "name": "Permission",
+      "slug": "permission",
+      "zh": "需要权限",
+      "from": "插件（MV3）",
+      "summary": "功能要用到一项可选权限时：先说清楚为什么要，按钮在用户点击时才申请；允许了按钮变成「已允许」，拒绝了说明少了什么、怎么再开。不在安装时就把权限全要走。",
+      "classes": [],
+      "markup": "<div class=\"xxd-banner\" data-tone=\"info\">\n  <div><p class=\"xxd-banner__title\">要读取当前标签页的地址</p><p class=\"xxd-banner__text\">用来把这一页加进清单；只在你点按钮时读，不会记录浏览历史。</p><p class=\"xxd-banner__text\" role=\"status\" id=\"perm-status\"></p></div>\n  <div class=\"xxd-banner__actions\"><button class=\"xxd-btn\" data-size=\"sm\" data-variant=\"primary\" id=\"perm-btn\">允许读取</button></div>\n</div>\n<script>XxdExtension.bindPermission(document.getElementById(\"perm-btn\"), { permissions: [\"tabs\"], status: document.getElementById(\"perm-status\") });</script>",
+      "rules": [
+        "manifest 里把它写进 optional_permissions / optional_host_permissions，而不是 permissions",
+        "chrome.permissions.request 只能在用户点击里调用",
+        "说清楚为什么要、只在什么时候用；拒绝之后不反复弹"
+      ],
+      "a11y": [
+        "结果写进 role=\"status\" 的那一行，读屏会念出来",
+        "允许之后按钮禁用并标 aria-pressed=\"true\""
+      ],
+      "js": "await XxdExtension.bindPermission(button, { permissions: [\"tabs\"], origins: [\"https://*.example.com/*\"], status, onChange: (granted) => … })"
+    },
+    {
+      "name": "Shortcuts",
+      "slug": "shortcuts",
+      "zh": "快捷键",
+      "from": "插件（MV3）",
+      "summary": "设置页里列出插件的快捷键（manifest 的 commands），没设的写「没设置」；快捷键只能在 Chrome 的快捷键页改，所以最后一个按钮直接打开那一页。",
+      "classes": [],
+      "markup": "<section class=\"xxd-group\" style=\"width:100%\">\n  <h2 class=\"xxd-group__title\">快捷键</h2>\n  <div class=\"xxd-group__body\" id=\"shortcuts\"></div>\n</section>\n<script>XxdExtension.mountShortcuts(document.getElementById(\"shortcuts\"), { names: { _execute_action: \"打开侧边栏\", save: \"保存当前页\" } });</script>",
+      "rules": [
+        "用 chrome.commands.getAll() 读当前的快捷键，不要在界面里写死",
+        "按键用 xxd-kbd 显示，组合键之间是「+」"
+      ],
+      "a11y": [
+        "每一行的名字是正文，快捷键在右边；没设置时写字，不留空"
+      ],
+      "js": "await XxdExtension.mountShortcuts(container, { names: { _execute_action: \"打开侧边栏\" } })"
+    },
+    {
+      "name": "ImportExport",
+      "slug": "import-export",
+      "zh": "导入导出设置",
+      "from": "插件（MV3）",
+      "summary": "换电脑、重装插件时把设置带走：导出成一个 JSON 文件，导入时只收认得的格式和键，结果用 toast 说一声。",
+      "classes": [],
+      "markup": "<div class=\"xxd-row\" style=\"width:100%\">\n  <div class=\"xxd-row__text\"><div class=\"xxd-row__title\">设置备份</div><div class=\"xxd-row__desc\">导出成文件，换电脑后导入</div></div>\n  <div class=\"xxd-row__control xxd-cluster\"><button class=\"xxd-btn\" data-size=\"sm\" id=\"export-btn\">导出</button><button class=\"xxd-btn\" data-size=\"sm\" id=\"import-btn\">导入…</button></div>\n</div>\n<script>\n  document.getElementById(\"export-btn\").addEventListener(\"click\", () => XxdExtension.exportSettings({ filename: \"today-settings.json\" }));\n  document.getElementById(\"import-btn\").addEventListener(\"click\", () => {\n    const input = Object.assign(document.createElement(\"input\"), { type: \"file\", accept: \"application/json\" });\n    input.addEventListener(\"change\", () => input.files[0] && XxdExtension.importSettings(input.files[0]));\n    input.click();\n  });\n</script>",
+      "rules": [
+        "只导入 format 是 xxd-settings 的文件；传 keys 只收认得的键",
+        "导入以后各页面通过 chrome.storage.onChanged 自己更新，不要求重开"
+      ],
+      "a11y": [
+        "结果用 toast 说（读屏会念）"
+      ],
+      "js": "await XxdExtension.exportSettings({ keys: [\"today-ui\", \"today-rules\"], filename: \"today-settings.json\" })\nawait XxdExtension.importSettings(file, { keys: [\"today-ui\", \"today-rules\"] })"
+    },
+    {
+      "name": "WhatsNew",
+      "slug": "whats-new",
+      "zh": "更新说明",
+      "from": "插件（MV3）",
+      "summary": "更新到新版本后第一次打开时，在最上面放一条横幅，用两三句话说新版本有什么不同；点「知道了」以后这个版本不再出现。不弹窗、不开新标签页。",
+      "classes": [],
+      "markup": "<div id=\"whats-new\" style=\"width:100%\"></div>\n<script>XxdExtension.showWhatsNew(document.getElementById(\"whats-new\"), { version: \"1.3.\" + Date.now(), title: \"1.3 更新了这些\", notes: [\"记录可以按天折叠\", \"导出的文件带上了标题\"] });</script>",
+      "rules": [
+        "只写用户能感觉到的变化，最多三条",
+        "版本号缺省取 manifest 的 version；记在 chrome.storage.local"
+      ],
+      "a11y": [
+        "横幅是 role=\"status\"，出现时读屏念一次"
+      ],
+      "js": "await XxdExtension.showWhatsNew(container, { title: \"1.3 更新了这些\", notes: [\"…\", \"…\"] })"
+    },
+    {
+      "name": "Reload",
+      "slug": "reload",
+      "zh": "插件已更新，请刷新",
+      "from": "插件（MV3）",
+      "summary": "内容脚本里：插件被更新或重新加载以后，网页里还留着的旧脚本调用 chrome.* 会报「Extension context invalidated」。用 guardContext 包一层，失效时在自己的 Shadow 里说一声并给一个刷新按钮，而不是悄悄坏掉。",
+      "classes": [],
+      "markup": "<div class=\"xxd-stack\" id=\"reload-demo\" style=\"width:100%\"><button class=\"xxd-btn\" id=\"reload-try\">保存到插件（模拟插件已更新）</button></div>\n<script>\n  const safe = XxdExtension.guardContext(document.getElementById(\"reload-demo\"));\n  document.getElementById(\"reload-try\").addEventListener(\"click\", () => safe(() => { throw new Error(\"Extension context invalidated.\"); }));\n</script>",
+      "rules": [
+        "所有 chrome.* 调用（sendMessage、storage）都走 safe(…)",
+        "失效以后不要再重试；只给「刷新页面」一个出路"
+      ],
+      "a11y": [
+        "横幅是 role=\"alert\"，焦点移到刷新按钮上"
+      ],
+      "js": "const safe = XxdExtension.guardContext(ui.root);\nbutton.onclick = () => safe(() => chrome.runtime.sendMessage({ type: \"save\" }));"
     }
   ]
 }

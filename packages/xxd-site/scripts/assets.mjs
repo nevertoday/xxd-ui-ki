@@ -18,6 +18,10 @@ mkdirSync(out, { recursive: true });
 const cssDist = join(pkgs, "xxd-css/dist");
 if (!existsSync(join(cssDist, "xxd.js"))) execFileSync("node", ["scripts/build.mjs"], { cwd: join(pkgs, "xxd-css"), stdio: "inherit" });
 for (const f of ["boot.js", "xxd.css", "xxd.js", "icons.js"]) copyFileSync(join(cssDist, f), join(out, f));
+// 插件套件（XxdExtension）：插件专用模式的演示要用（没有 chrome.* 时走演示行为）
+const extDist = join(pkgs, "xxd-extension/dist/extension.js");
+if (!existsSync(extDist)) execFileSync("node", ["scripts/cli.mjs", "build"], { cwd: join(pkgs, "xxd-extension"), stdio: "inherit" });
+copyFileSync(extDist, join(out, "extension.js"));
 
 // 带版本号的一份：public/v/<版本>/，给「先试一下」的 <link> / <script> 用（public/_headers 让它长期缓存）
 const version = JSON.parse(readFileSync(join(pkgs, "xxd-css/package.json"), "utf8")).version;
