@@ -1,7 +1,7 @@
 ---
 // 活演示：上面是真的组件，下面是代码（默认展开，限高；太长时底部有「展开全部」）。有 React 版时多一个「React」标签页，两种实现并排。
 import { icon } from "../lib/data.js";
-import { embed, extractFunction, nextId } from "../lib/markup.js";
+import { embed, extractFunction, formatMarkup, nextId, withImports } from "../lib/markup.js";
 import ReactDemo from "../react/ReactDemo.tsx";
 import demoSource from "../react/demos.tsx?raw";
 import demoSourceEn from "../react/demos.en.tsx?raw";
@@ -18,7 +18,8 @@ const { markup, react, align = "center", block = false, title } = Astro.props;
 const lang = langOf(Astro.url.pathname);
 const L = t(lang);
 const id = nextId("demo");
-const reactCode = react ? extractFunction(lang === "en" ? demoSourceEn : demoSource, `${react}Demo`) : "";
+const reactSource = lang === "en" ? demoSourceEn : demoSource;
+const reactCode = react ? withImports(extractFunction(reactSource, `${react}Demo`), reactSource) : "";
 const hasReact = Boolean(reactCode);
 ---
 
@@ -40,12 +41,13 @@ const hasReact = Boolean(reactCode);
       <button role="tab" id={`${id}-t1`} aria-controls={`${id}-native ${id}-code1`} aria-selected="true">{L.native}</button>
       {hasReact && <button role="tab" id={`${id}-t2`} aria-controls={`${id}-react ${id}-code2`}>React</button>}
     </div>
+    <button class="xxd-btn" data-variant="ghost" data-size="sm" data-site-code-wrap aria-pressed="false">{L.codeWrap}</button>
     <button class="xxd-btn" data-variant="ghost" data-size="sm" data-site-code-toggle aria-expanded="true">
       <Fragment set:html={icon("Code", 14)} />{L.code}
     </button>
   </div>
   <div class="site-demo__code" id={`${id}-code1`}>
-    <pre class="site-code" tabindex="0"><code>{markup.trim()}</code></pre>
+    <pre class="site-code" tabindex="0"><code>{formatMarkup(markup)}</code></pre>
     <button class="xxd-btn site-code__copy" data-variant="ghost" data-icon-only data-size="sm" aria-label={L.copy} data-copy-target={`#${id}-code1 code`} set:html={icon("Copy", 14)} />
     <button class="xxd-btn site-code__more" data-variant="ghost" data-size="sm" aria-expanded="false" data-all={L.codeAll} data-less={L.codeLess} hidden>{L.codeAll}</button>
   </div>
@@ -100,6 +102,28 @@ const hasReact = Boolean(reactCode);
       }
       demo.addEventListener("xxd:change", show);
       show();
+    }
+    // 「折行」：缺省长行横向滚动；打开后所有代码块都折行（记在这台浏览器里）
+    const KEY = "xxd-site-code-wrap";
+    const setWrap = (on) => {
+      document.documentElement.toggleAttribute("data-code-wrap", on);
+      for (const b of document.querySelectorAll("[data-site-code-wrap]")) b.setAttribute("aria-pressed", String(on));
+    };
+    let saved = false;
+    try {
+      saved = localStorage.getItem(KEY) === "1";
+    } catch {}
+    setWrap(saved);
+    for (const b of document.querySelectorAll("[data-site-code-wrap]:not([data-ready])")) {
+      b.setAttribute("data-ready", "");
+      b.addEventListener("click", () => {
+        const on = b.getAttribute("aria-pressed") !== "true";
+        setWrap(on);
+        try {
+          localStorage.setItem(KEY, on ? "1" : "0");
+        } catch {}
+        for (const demo of document.querySelectorAll(".site-demo")) demo.dispatchEvent(new CustomEvent("xxd:change"));
+      });
     }
   })();
 </script>

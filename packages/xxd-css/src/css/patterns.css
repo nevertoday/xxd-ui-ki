@@ -202,6 +202,11 @@
     gap: var(--space-5);
   }
 
+  /* 「清空全部记录」这类收尾的链接和列表左边对齐，不在中间飘着 */
+  .xxd-history > .xxd-link {
+    justify-self: start;
+  }
+
   .xxd-history__day {
     margin: 0 0 6px;
     padding: 0 2px;
@@ -209,9 +214,11 @@
     font: var(--weight-medium) var(--text-xs) / 1.4 var(--font-body);
   }
 
+  /* 固定宽度（最多叠 3 张）：一张、两张、三张的行，标题都从同一条线开始 */
   .xxd-thumbs {
     display: flex;
     flex: none;
+    width: 64px;
   }
 
   .xxd-thumbs > * {

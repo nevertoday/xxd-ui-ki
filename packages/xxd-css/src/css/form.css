@@ -39,8 +39,8 @@
     width: 100%;
     min-width: 0;
     height: var(--control-h);
-    padding: 0 12px;
-    border: 1px solid var(--line-strong);
+    padding: 0 var(--field-pad-x, 12px);
+    border: 1px solid var(--line-control);
     border-radius: var(--r-sm);
     background: var(--paper);
     color: var(--ink);
@@ -57,13 +57,19 @@
   .xxd-input:hover,
   .xxd-textarea:hover,
   .xxd-select > select:hover {
-    border-color: color-mix(in srgb, var(--ink) 28%, var(--line-strong));
+    border-color: color-mix(in srgb, var(--ink) 28%, var(--line-control));
+  }
+
+  /* 只读：底色淡一档，一眼和能改的分开（字还是正文色，能选中复制） */
+  .xxd-input[readonly],
+  .xxd-textarea[readonly] {
+    background: var(--wash);
   }
 
   .xxd-input:focus,
   .xxd-textarea:focus,
   .xxd-select > select:focus {
-    border-color: color-mix(in srgb, var(--action) 70%, var(--line-strong));
+    border-color: color-mix(in srgb, var(--action) 70%, var(--line-control));
     outline: none;
   }
 
@@ -240,7 +246,7 @@
     width: 34px;
     height: 20px;
     margin: 0;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--line-control);
     border-radius: var(--r-pill);
     background: var(--wash-strong);
     cursor: pointer;
@@ -284,7 +290,7 @@
     width: 16px;
     height: 16px;
     margin: 2px 0 0;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--line-control);
     background: var(--paper);
     cursor: pointer;
     transition: background-color var(--motion-quick) ease, border-color var(--motion-quick) ease;
@@ -300,7 +306,7 @@
 
   .xxd-check:hover,
   .xxd-radio:hover {
-    border-color: color-mix(in srgb, var(--ink) 40%, var(--line-strong));
+    border-color: color-mix(in srgb, var(--ink) 40%, var(--line-control));
   }
 
   .xxd-check:checked,
@@ -392,7 +398,7 @@
   .xxd-range::-webkit-slider-runnable-track {
     height: 2px;
     border-radius: var(--r-pill);
-    background: var(--line-strong);
+    background: var(--line-control);
   }
 
   .xxd-range::-webkit-slider-thumb {
@@ -400,7 +406,7 @@
     width: 14px;
     height: 14px;
     margin-top: -6px;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--line-control);
     border-radius: var(--r-pill);
     background: var(--paper);
   }
@@ -412,7 +418,7 @@
   .xxd-range::-moz-range-track {
     height: 2px;
     border-radius: var(--r-pill);
-    background: var(--line-strong);
+    background: var(--line-control);
   }
 
   .xxd-range::-moz-range-progress {
@@ -423,7 +429,7 @@
   .xxd-range::-moz-range-thumb {
     width: 14px;
     height: 14px;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--line-control);
     border-radius: var(--r-pill);
     background: var(--paper);
   }
@@ -452,14 +458,14 @@
     gap: 6px;
     min-height: var(--control-h);
     padding: 5px 8px;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--line-control);
     border-radius: var(--r-sm);
     background: var(--paper);
     cursor: text;
   }
 
   .xxd-taginput:focus-within {
-    border-color: color-mix(in srgb, var(--action) 70%, var(--line-strong));
+    border-color: color-mix(in srgb, var(--action) 70%, var(--line-control));
   }
 
   .xxd-taginput > input {

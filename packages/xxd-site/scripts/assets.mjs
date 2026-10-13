@@ -6,7 +6,6 @@
 //   public/xxd/forced-states.css  状态矩阵用：把组件 CSS 里的 :hover / :focus-visible / :active 复制成 [data-force~="…"] 版本，
 //                                 这样「悬停 / 聚焦 / 按下」可以静态并排展示，用的是真实的组件规则而不是手写的模仿。
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -15,12 +14,18 @@ const pkgs = join(here, "../..");
 const out = join(here, "../public/xxd");
 mkdirSync(out, { recursive: true });
 
+// 依赖的包由根目录的 pnpm xxd:build 先构建（这里不替别的包构建，免得用到半新半旧的产物）
+const need = (file, name) => {
+  if (existsSync(file)) return;
+  console.error(`✗ ${name} 还没构建：先跑 pnpm xxd:build`);
+  process.exit(1);
+};
 const cssDist = join(pkgs, "xxd-css/dist");
-if (!existsSync(join(cssDist, "xxd.js"))) execFileSync("node", ["scripts/build.mjs"], { cwd: join(pkgs, "xxd-css"), stdio: "inherit" });
+need(join(cssDist, "xxd.js"), "@xxd/css");
 for (const f of ["boot.js", "xxd.css", "xxd.js", "icons.js"]) copyFileSync(join(cssDist, f), join(out, f));
 // 插件套件（XxdExtension）：插件专用模式的演示要用（没有 chrome.* 时走演示行为）
 const extDist = join(pkgs, "xxd-extension/dist/extension.js");
-if (!existsSync(extDist)) execFileSync("node", ["scripts/cli.mjs", "build"], { cwd: join(pkgs, "xxd-extension"), stdio: "inherit" });
+need(extDist, "@xxd/extension");
 copyFileSync(extDist, join(out, "extension.js"));
 
 // 带版本号的一份：public/v/<版本>/，给「先试一下」的 <link> / <script> 用（public/_headers 让它长期缓存）
@@ -81,6 +86,8 @@ export function forceStates(css) {
     const selectors = prelude.split(/,(?![^(]*\))/).map((x) => x.trim());
     const forced = [];
     for (const sel of selectors) {
+      // 「鼠标点的时候不显示焦点环」那条规则不复制：矩阵里的「键盘聚焦」要真的画出焦点环
+      if (sel.includes('data-input="pointer"')) continue;
       let next = sel;
       let touched = false;
       for (const [pseudo, name] of Object.entries(PSEUDO)) {
@@ -88,6 +95,11 @@ export function forceStates(css) {
           next = next.split(pseudo).join(`[data-force~="${name}"]`);
           touched = true;
         }
+      }
+      // 输入框的聚焦样式写在 :focus 上（不是 :focus-visible）：也算「聚焦」
+      if (/:focus(?![-\w])/.test(next)) {
+        next = next.replace(/:focus(?![-\w])/g, '[data-force~="focus"]');
+        touched = true;
       }
       if (touched && !next.includes(":not([data-force")) forced.push(`.xxd-force-scope ${next}`);
     }

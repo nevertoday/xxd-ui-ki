@@ -63,9 +63,17 @@ export function currentVersion() {
   return { version: pkg.version, commit: commit + dirty, hash: complete ? h.digest("hex").slice(0, 12) : null };
 }
 
+/** 用户命令（new / init / sync / pack）用：令牌、图标、组件先重新构建，再构建插件套件，保证拷出去的是最新的。 */
 export async function buildAll({ quiet = false } = {}) {
-  // 令牌、图标、组件每次都重新构建（以前只在 dist 不存在时才构建，改了 tokens.css 或图标再 sync 会拷到旧的）
   for (const pkg of ["xxd-tokens", "xxd-icons", "xxd-css"]) execFileSync("node", ["scripts/build.mjs"], { cwd: join(repo, "packages", pkg), stdio: quiet ? "ignore" : "inherit" });
+  await buildExtension();
+}
+
+/** 只构建插件套件自己（dist/extension.js、dist/tokens.mjs）。包的 build 脚本和测试用：依赖由根目录按拓扑顺序先构建好，这里不碰别的包的 dist。 */
+export async function buildExtension() {
+  if (!existsSync(join(tokensDir, "dist/tokens.json")) || !existsSync(join(cssDir, "dist/xxd.js"))) {
+    throw new Error(say("先构建令牌和组件：pnpm xxd:build", "Build tokens and components first: pnpm xxd:build"));
+  }
   mkdirSync(join(pkgDir, "dist"), { recursive: true });
   const banner = "/* @xxd/extension — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). MIT License. */";
   await build({
@@ -240,7 +248,7 @@ export function sync(target, { quiet = false } = {}) {
   }
   if (config.layeredTokensRegions?.length) {
     const names = Object.keys(JSON.parse(readFileSync(join(tokensDir, "dist/tokens.json"), "utf8")).base);
-    const skip = [...new Set([...findFallbackConflicts(dir, names), ...(config.layeredTokensExclude ?? [])])].sort();
+    const skip = [...new Set([...findFallbackConflicts(dir, names), ...(config.layeredTokensExclude ?? [])])].sort((a, b) => a.localeCompare(b));
     if (skip.length && !quiet) console.log(say(`  跳过 ${skip.length} 个令牌（项目里用了但没声明，声明了会改变现在的样子）：${skip.join(" ")}`, `  Skipped ${skip.length} tokens (the project uses them without declaring them; declaring them would change how it looks): ${skip.join(" ")}`));
     const layered = dropDeclarations(readFileSync(join(tokensDir, "dist/tokens.layered.css"), "utf8"), skip);
     for (const rel of config.layeredTokensRegions) {
@@ -521,7 +529,7 @@ export function init(target, { vendor, noVendor = false, quiet = false, key: wan
   ].join("\n");
 }
 
-/** 把 tokens、icons、css、react 打成 .tgz（pnpm pack 会把 workspace:* 换成真的版本号）。 */
+/** 把 tokens、icons、css、react 打成 .tgz：pnpm pack 先跑各包的 prepack 构建，并把 workspace:* 换成真的版本号。 */
 export function pack(outDir) {
   const out = resolve(outDir);
   mkdirSync(out, { recursive: true });
@@ -715,34 +723,29 @@ function printDoctor(result) {
   return errors;
 }
 
-async function main() {
-  // 命令是第一个不以 - 开头的词（--en / --zh 写在前面也行）
-  const argv = process.argv.slice(2);
-  const at = argv.findIndex((a) => !a.startsWith("-"));
-  const cmd = at === -1 ? "help" : argv[at];
-  const rest = at === -1 ? argv : [...argv.slice(0, at), ...argv.slice(at + 1)];
-  const args = parseArgs(rest);
-  if (args.en) setLang("en");
-  else if (args.zh) setLang("zh");
-  // pnpm 在仓库根目录执行脚本；相对路径按调用者的目录解析
-  const cwd = process.env.INIT_CWD || process.cwd();
-  const targets = args._.map((t) => resolve(cwd, t.replace(/^~(?=\/|$)/, homedir())));
-  if (args.help && cmd !== "help") return console.log(help(cmd));
-  if (cmd === "help" || cmd === "--help" || cmd === "-h") {
+/**
+ * 命令表：每个命令一个处理函数。命令的说明、用法、例子在 commands.mjs（help 和展示站都从那里生成），
+ * 测试会检查两边一一对应。
+ */
+export const HANDLERS = {
+  help: async ({ args }) => {
     console.log(help(args._[0]));
-  } else if (cmd === "new") {
+  },
+  new: async ({ args, targets }) => {
     if (!targets[0]) throw new Error(say(`用法：${BIN} new <目录> --name 名字`, `Usage: ${BIN} new <dir> --name Name`));
     await buildAll({ quiet: true });
     const dir = await create(targets[0], args);
     rememberProject(dir);
     console.log(c.dim(say(`下一步：chrome://extensions →「加载已解压的扩展程序」→ 选 ${dir}；改完跑 ${BIN} doctor ${dir}`, `Next: chrome://extensions → Load unpacked → pick ${dir}; after changes run ${BIN} doctor ${dir}`)));
-  } else if (cmd === "init") {
+  },
+  init: async ({ args, cwd, targets }) => {
     const dir = targets[0] || cwd;
     await buildAll({ quiet: true });
     const head = init(dir, { vendor: args.vendor, noVendor: args.noVendor, key: typeof args.key === "string" ? args.key : undefined });
     console.log(say(`\n把这几行放进页面（路径按页面所在位置调整）：\n\n${head}\n`, `\nPut these lines in your pages (adjust the paths to where each page lives):\n\n${head}\n`));
     console.log(c.dim(say(`以后：${BIN} sync 更新组件，${BIN} doctor 体检`, `Later: ${BIN} sync to update, ${BIN} doctor to check`)));
-  } else if (cmd === "sync") {
+  },
+  sync: async ({ args, cwd, targets }) => {
     let list = targets;
     if (args.all) list = listProjects().filter((p) => existsSync(p));
     else if (!list.length) list = [cwd];
@@ -752,7 +755,8 @@ async function main() {
       sync(t);
       rememberProject(t);
     }
-  } else if (cmd === "status") {
+  },
+  status: async ({ cwd, targets }) => {
     let list = targets;
     if (!list.length) {
       list = listProjects();
@@ -760,12 +764,14 @@ async function main() {
     }
     if (!list.length) return console.log(say(`还没有记住的项目。${BIN} status <目录…>，或先 ${BIN} init / sync 一次`, `No remembered projects yet. ${BIN} status <dir…>, or run ${BIN} init / sync once`));
     printStatus(list);
-  } else if (cmd === "doctor" || cmd === "check") {
+  },
+  doctor: async ({ args, cwd, targets }) => {
     const result = doctor(targets[0] || cwd, { now: currentVersion(), bin: BIN });
     if (args.json) console.log(JSON.stringify(result, null, 2));
     else if (printDoctor(result)) process.exitCode = 1;
     if (args.json && result.findings.some((f) => f.level === "error")) process.exitCode = 1;
-  } else if (cmd === "watch") {
+  },
+  watch: async ({ targets }) => {
     if (!targets.length) throw new Error(say(`用法：${BIN} watch <项目目录…>`, `Usage: ${BIN} watch <project-dir…>`));
     const sources = ["packages/xxd-tokens/tokens.css", "packages/xxd-icons/src", "packages/xxd-css/src", "packages/xxd-extension/src"].map((p) => join(repo, p));
     let timer = null;
@@ -792,7 +798,8 @@ async function main() {
       });
     }
     console.log(c.dim(say("盯着令牌、图标、组件、插件套件的源码；Ctrl+C 停", "Watching the tokens, icons, components and extension kit sources; Ctrl+C to stop")));
-  } else if (cmd === "projects") {
+  },
+  projects: async ({ args, cwd }) => {
     if (args.forget) {
       const dir = resolve(cwd, String(args.forget).replace(/^~(?=\/|$)/, homedir()));
       console.log(forgetProject(dir) ? say(`✓ 不再记 ${dir}`, `✓ Forgot ${dir}`) : say(`本来就没记 ${dir}`, `${dir} wasn't remembered`));
@@ -801,14 +808,17 @@ async function main() {
       if (!list.length) console.log(say("还没有记住的项目（new / init / sync 过的会自动记住）", "No remembered projects yet (anything you new / init / sync is remembered)"));
       else printStatus(list);
     }
-  } else if (cmd === "ls") {
+  },
+  ls: async ({ args }) => {
     console.log(listComponents(args._.join(" ")));
-  } else if (cmd === "doc") {
+  },
+  doc: async ({ args }) => {
     if (!args._.length) throw new Error(say(`用法：${BIN} doc <组件>（中文名也行，比如 ${BIN} doc 对话框）`, `Usage: ${BIN} doc <component> (e.g. ${BIN} doc Dialog)`));
     const text = docComponent(args._.join(" "), { react: Boolean(args.react), markup: Boolean(args.markup) });
     console.log(text);
     if (args.copy) console.error(copy(args.markup ? text : docComponent(args._.join(" "), { markup: true })) ? c.green(say("✓ 示例代码已复制", "✓ Example copied")) : c.yellow(say("没能复制（找不到剪贴板工具）", "Couldn't copy (no clipboard tool found)")));
-  } else if (cmd === "icon" || cmd === "icons") {
+  },
+  icon: async ({ args }) => {
     const format = args.svg ? "svg" : args.react ? "react" : args.js ? "js" : args.html ? "html" : null;
     const q = args._.join(" ");
     const results = searchIcons(q);
@@ -834,7 +844,8 @@ async function main() {
     console.log(columns(shown.map((r) => [r.name, c.dim(isEn() ? r.groupEn : r.group), isEn() ? r.aliases.join(" ") : r.keywords])));
     if (results.length > shown.length) console.log(c.dim(say(`…还有 ${results.length - shown.length} 个，多加一个词缩小范围`, `…${results.length - shown.length} more; add a word to narrow it down`)));
     console.log(c.dim(say(`\n要哪个：${BIN} icon ${shown[0].name}（加 --svg / --react / --copy）`, `\nPick one: ${BIN} icon ${shown[0].name} (add --svg / --react / --copy)`)));
-  } else if (cmd === "tokens") {
+  },
+  tokens: async ({ args }) => {
     const list = listTokens(args._.join(" "));
     if (args.json) return console.log(JSON.stringify(list, null, 2));
     const swatch = (v) => {
@@ -844,7 +855,8 @@ async function main() {
       return `\x1b[48;2;${r};${g};${b}m  \x1b[0m `;
     };
     console.log(columns([[c.dim(say("令牌", "token")), c.dim(say("亮色", "light")), c.dim(say("暗色", "dark")), c.dim(say("圆角 / 紧凑", "rounded / compact"))], ...list.map((t) => [t.name, `${swatch(t.light)}${t.light}`, t.dark && t.dark !== t.light ? `${swatch(t.dark)}${t.dark}` : "", t.rounded || t.compact || ""])]));
-  } else if (cmd === "open") {
+  },
+  open: async ({ args }) => {
     const q = args._.join(" ");
     const url = pageUrl(q, { en: Boolean(args.en) || isEn() });
     if (!url) {
@@ -853,7 +865,8 @@ async function main() {
     }
     console.log(url);
     openUrl(url);
-  } else if (cmd === "adopt") {
+  },
+  adopt: async ({ args, targets }) => {
     const dir = targets[0];
     if (!dir) throw new Error(say(`用法：${BIN} adopt <项目目录>`, `Usage: ${BIN} adopt <project-dir>`));
     const config = readConfig(dir)?.adopt;
@@ -869,28 +882,54 @@ async function main() {
     const prefix = args.dryRun ? say("（试运行，没有改文件）", "(dry run, nothing written) ") : "";
     console.log(`${prefix}${say(`✓ 改由令牌提供（删掉 ${result.removed.length} 个相同的声明）：`, `✓ Handed to the tokens (${result.removed.length} identical declarations removed): `)}${result.removed.join(" ")}`);
     console.log(`${say("✓ 旧名改为别名：", "✓ Old names aliased: ")}${result.aliased.join(" ") || say("（无）", "(none)")}`);
-  } else if (cmd === "store-icons") {
+  },
+  "store-icons": async ({ args, cwd, targets }) => {
     const dir = targets[0] || cwd;
     const icons = storeIcons(dir, { glyph: args.glyph, bg: args.bg, fg: args.fg });
     console.log(say(`✓ 生成了 ${Object.values(icons).join(" ")}，写进了 manifest 的 icons 和 action.default_icon`, `✓ Made ${Object.values(icons).join(" ")} and added them to the manifest's icons and action.default_icon`));
-  } else if (cmd === "pack") {
+  },
+  pack: async ({ cwd, targets }) => {
     const out = targets[0] || resolve(cwd, "packs");
-    await buildAll({ quiet: true });
-    execFileSync("pnpm", ["--filter", "@xxd/react", "build"], { cwd: repo, stdio: "ignore" });
+    // 每个包的 prepack 会先构建（@xxd/react 要求 Kumo 已经构建过：pnpm --filter @cloudflare/kumo build）
     const files = pack(out);
     console.log(say(`✓ 打好了 ${files.length} 个包 → ${out}\n  ${files.join("\n  ")}\n\n在你的项目里：npm install ${relative(cwd, out) || "."}/*.tgz`, `✓ Packed ${files.length} packages → ${out}\n  ${files.join("\n  ")}\n\nIn your project: npm install ${relative(cwd, out) || "."}/*.tgz`));
-  } else if (cmd === "add" || cmd === "blocks") {
+  },
+  add: async ({ cmd, rest, cwd }) => {
     const kumoCli = join(repo, "packages/kumo/dist/command-line/cli.js");
     if (!existsSync(kumoCli)) throw new Error(say("先构建 React 组件库：pnpm --filter @cloudflare/kumo build", "Build the React library first: pnpm --filter @cloudflare/kumo build"));
     execFileSync("node", [kumoCli, cmd, ...rest], { stdio: "inherit", cwd });
-  } else if (cmd === "build") {
+  },
+  build: async () => {
     await buildAll();
-  } else if (cmd === "link") {
+  },
+  link: async () => {
     console.log(link());
-  } else {
+  },
+};
+/** 别名 → 命令 */
+export const ALIASES = { "--help": "help", "-h": "help", "check": "doctor", "icons": "icon", "blocks": "add" };
+
+async function main() {
+  // 命令是第一个不以 - 开头的词（--en / --zh 写在前面也行）
+  const argv = process.argv.slice(2);
+  const at = argv.findIndex((a) => !a.startsWith("-"));
+  const cmd = at === -1 ? "help" : argv[at];
+  const rest = at === -1 ? argv : [...argv.slice(0, at), ...argv.slice(at + 1)];
+  const args = parseArgs(rest);
+  if (args.en) setLang("en");
+  else if (args.zh) setLang("zh");
+  // pnpm 在仓库根目录执行脚本；相对路径按调用者的目录解析
+  const cwd = process.env.INIT_CWD || process.cwd();
+  const targets = args._.map((t) => resolve(cwd, t.replace(/^~(?=\/|$)/, homedir())));
+  if (args.help && cmd !== "help") return console.log(help(ALIASES[cmd] ?? cmd));
+  const name = ALIASES[cmd] ?? cmd;
+  const handler = Object.hasOwn(HANDLERS, name) ? HANDLERS[name] : null;
+  if (!handler) {
     console.log(unknown(cmd));
     process.exitCode = 1;
+    return;
   }
+  await handler({ cmd, args, rest, cwd, targets });
 }
 
 const invokedDirectly = (() => {

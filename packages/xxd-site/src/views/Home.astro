@@ -4,6 +4,8 @@ import Site from "../layouts/Site.astro";
 import { componentsFor } from "../lib/data.js";
 import { embed } from "../lib/markup.js";
 import { langOf, t, withLang } from "../i18n/index.js";
+import { WALL, WALL_HIDE, WALL_WIDE } from "../data/wall.js";
+import { WALL as WALL_EN } from "../data/wall.en.js";
 const lang = langOf(Astro.url.pathname);
 const L = t(lang);
 const T = {
@@ -15,14 +17,17 @@ const T = {
     wall: "全部组件",
   },
   en: {
-    lead: "A Chinese-first, framework-free UI kit — one CSS file and one JS file, built with Chrome extensions in mind. Black, white and gray, square corners by default, ink for emphasis. Switch the theme, corners, accent, density and button finish in the top right — every cell below follows.",
+    lead: "A Chinese-first, framework-free UI kit — one CSS file and one JS file, built with Chrome extensions in mind. Black, white and gray, square corners by default, ink for emphasis. Switch the theme, corners, accent, density and button style in the top right — every cell below follows.",
     start: "Get started",
     principles: "Design principles",
     cli: "CLI",
     wall: "All components",
   },
 }[lang];
-const wall = componentsFor(lang).filter((c) => c.wall !== false);
+const staticForms = lang === "en" ? WALL_EN : WALL;
+// 墙上的格子一样高：示例里写死的高度（侧栏 420px）缩到格子放得下
+const fitWall = (markup) => markup.replace(/height:\s*4\d\dpx/g, "height:230px");
+const wall = componentsFor(lang).filter((c) => c.wall !== false && !WALL_HIDE.has(c.name));
 ---
 
 <Site title={L.brand} wide charts>
@@ -38,12 +43,12 @@ const wall = componentsFor(lang).filter((c) => c.wall !== false);
   <section class="site-wall" aria-label={T.wall}>
     {
       wall.map((c) => (
-        <div class="site-wall__cell">
-          <div class="site-wall__stage xxd-page" data-block={c.block ? "" : undefined} set:html={embed(c.wall ?? c.markup)} />
+        <div class="site-wall__cell" data-wide={WALL_WIDE.has(c.name) ? "" : undefined}>
           <a class="site-wall__name" href={withLang(`/components/${c.slug}`, lang)}>
             {c.label}
             {lang !== "en" && <span>{c.name}</span>}
           </a>
+          <div class="site-wall__stage xxd-page" data-block={c.block && !staticForms[c.name] ? "" : undefined} set:html={embed(staticForms[c.name] ?? c.wall ?? fitWall(c.markup))} />
         </div>
       ))
     }

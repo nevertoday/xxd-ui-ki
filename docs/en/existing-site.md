@@ -38,7 +38,7 @@ xxd-ui sync ./my-site
 (selectors written as `:where(:root…)`).
 
 - **Unlayered styles always beat layered ones**, so none of your existing variables change; you only gain the ones you didn't have (`--r-*` radii, `--space-*`, `--motion-*`, `--control-h`, `--text-*`, `--z-*`…).
-- The block leaves out the global reduced-motion rule; your own motion handling stays as it is.
+- The block is variables only: global rules such as reduced motion live in `@xxd/tokens/base.css` and aren't included, so your own motion handling stays as it is.
 - As long as your site doesn't set `data-corners` / `data-accent`, it stays square and ink.
 - Running `sync` again only replaces what's between the markers.
 

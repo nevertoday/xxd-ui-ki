@@ -1,7 +1,7 @@
 // React 组件。不用 JSX，免编译即可被任何打包器使用。
 import { createContext, createElement, forwardRef, useContext } from "react";
 import { ICON_ATTRIBUTES, ICON_NODES } from "./nodes.js";
-import { ICON_NAMES, resolveIcon } from "./svg.js";
+import { ICON_NAMES, resolveIcon, warnUnknownIcon } from "./svg.js";
 
 export { ICON_NAMES };
 
@@ -16,16 +16,20 @@ const toReactAttrs = (attrs) =>
 const SVG_ATTRS = toReactAttrs(ICON_ATTRIBUTES);
 
 /**
- * <Icon name="Check" size={16} />
+ * <Icon name="Check" size={16} />，或按需打包：import { Check } from "@xxd/icons/each"; <Icon icon={Check} />
  * 兼容 Phosphor 的 props：size、color、className、weight（忽略 —— 线宽永远是 1.5，激活态改颜色不改线宽）、mirrored。
  */
 export const Icon = forwardRef(function Icon(
-  { name, size, color, className, weight: _weight, mirrored, label, style, children, ...rest },
+  { name, icon, size, color, className, weight: _weight, mirrored, label, style, children, ...rest },
   ref,
 ) {
   const ctx = useContext(IconContext);
-  const nodes = resolveIcon(name);
-  if (!nodes) return null;
+  // icon：@xxd/icons/each 的图标数据（按需打包）；name：名字
+  const nodes = resolveIcon(icon ?? name);
+  if (!nodes) {
+    warnUnknownIcon(name);
+    return null;
+  }
   const finalSize = size ?? ctx.size ?? 16;
   const a11y = label ? { role: "img", "aria-label": label } : { "aria-hidden": true, focusable: "false" };
   return createElement(

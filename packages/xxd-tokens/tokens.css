@@ -33,6 +33,9 @@
   --muted-2: #9a968d; /* 只做装饰（图标、分隔点、行号），不当文字色：在白底只有 2.9:1 */
   --line: #e7e7ea;
   --line-strong: #c9c9ce;
+  /* 控件的边（输入框、复选、单选、开关、滑块）：要认得出这是个控件，和底色至少 3:1（WCAG 1.4.11）。
+     卡片、分隔线、列表线仍然用安静的 --line / --line-strong。 */
+  --line-control: #86868b;
   --paper-rgb: 255, 255, 255;
   --shadow-rgb: 17, 17, 17;
 
@@ -57,6 +60,8 @@
   --action-fill: var(--action);
   --action-fill-hover: color-mix(in srgb, var(--action) 86%, var(--paper));
   --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 24%, transparent);
+  /* 键盘焦点环：不透明，和底色至少 3:1（--action-text 已经按主色压到 4.5:1 以上） */
+  --focus-color: var(--action-text);
 
   /* ── 圆角：直角（缺省）/ 圆角 ─────────────────── */
   --r-xs: 0px;   /* 小标记 */
@@ -87,7 +92,15 @@
   --text-md: 15px;
   --text-lg: 16px;
   --text-xl: 20px;
-  --text-display: 28px; /* 展示标题（不叫 --text-2xl，避免和 Tailwind 的同名变量冲突） */
+  --text-xxl: 24px; /* 页面大标题（不叫 --text-2xl，避免和 Tailwind 的同名变量冲突） */
+  --text-display: 28px; /* 展示标题 */
+  /* 行高落在 4px 网格上：字号和它的行高成对用（13 / 20、16 / 24、20 / 28、24 / 32、28 / 36） */
+  --leading-xs: 16px;
+  --leading-sm: 20px;
+  --leading-md: 24px;
+  --leading-lg: 28px;
+  --leading-xl: 32px;
+  --leading-display: 36px;
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-strong: 600;
@@ -140,14 +153,26 @@
   }
 }
 
-:root[data-density="compact"] {
+/* 紧凑密度：整页（<html data-density>，boot.js 写）或者页面里的一块（任何元素上的 data-density="compact"） */
+:root[data-density="compact"],
+[data-density="compact"] {
   --control-h: 32px;
   --control-h-sm: 26px;
   --control-h-xs: 20px;
   --icon-button: 32px;
+  /* 组件级的内边距一起收（高度跟着 --control-h 自己变：标签页 = 控件高，列表行 +4，设置行 +8） */
+  --control-pad-x: 12px;
+  --control-pad-x-sm: 8px;
+  --control-pad-x-lg: 16px;
+  --field-pad-x: 8px;
+  --row-pad-y: 8px;
+  --row-pad-x: 12px;
+  --list-row-pad-y: 4px;
 }
 
-:root[data-theme="dark"] {
+/* 暗色：整页（<html data-theme>，boot.js 写）或者页面里的一块（任何元素上的 data-theme="dark"） */
+:root[data-theme="dark"],
+[data-theme="dark"] {
   color-scheme: dark;
   /* 暖黑，不是蓝黑 */
   --bg: #171612;
@@ -163,17 +188,72 @@
   --muted-2: #837d72;
   --line: #34322b;
   --line-strong: #4c483f;
+  --line-control: #807a6e;
   --paper-rgb: 32, 31, 26;
   --shadow-rgb: 0, 0, 0;
-  --success: #4ade80;
-  --success-rgb: 74, 222, 128;
-  --danger: #f87171;
-  --danger-rgb: 248, 113, 113;
-  --warning: #f0b35a;
-  --warning-rgb: 240, 179, 90;
+  /* 暗色的语义色和暖黑同一个调子：偏暖、低一档饱和（不用冷的荧光绿 / 红）。字用的版本对暗纸 ≥ 4.5；
+     *-strong 是实心底（白字 ≥ 4.5、对暗纸 ≥ 3） */
+  --success: #7cc48a;
+  --success-rgb: 124, 196, 138;
+  --danger: #ec7a6d;
+  --danger-rgb: 236, 122, 109;
+  --warning: #e8a95a;
+  --warning-rgb: 232, 169, 90;
+  --success-strong: #2f7d47;
+  --warning-strong: #a35f1b;
   --danger-strong: #d03a2f;
   --shadow-popover: 0 18px 44px rgba(0, 0, 0, 0.42);
   --shadow-dialog: 0 28px 76px rgba(0, 0, 0, 0.5);
+  /* 派生的强调令牌：:root 上已经按亮色算好再继承下来，换了 --ink 的这一块要重新声明，主按钮、焦点才跟着变 */
+  --action: var(--ink);
+  --action-rgb: var(--ink-rgb);
+  --on-action: var(--on-ink);
+  --action-text: var(--ink);
+  --action-fill: var(--action);
+  --action-fill-hover: color-mix(in srgb, var(--action) 86%, var(--paper));
+  --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 24%, transparent);
+  --focus-color: var(--action-text);
+}
+
+/* 亮色的一块：暗色页面里某一块要亮（比如并排对比）。只放颜色，和 :root 的亮色值一样（测试会对一遍）。 */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fcfcfc;
+  --paper: #ffffff;
+  --wash: #f4f4f5;
+  --wash-strong: #ececee;
+  --selected-bg: #ededed;
+  --switch-on: #56565b;
+  --ink: #111111;
+  --ink-rgb: 17, 17, 17;
+  --on-ink: #ffffff;
+  --muted: #6b6b6b;
+  --muted-2: #9a968d;
+  --line: #e7e7ea;
+  --line-strong: #c9c9ce;
+  --line-control: #86868b;
+  --paper-rgb: 255, 255, 255;
+  --shadow-rgb: 17, 17, 17;
+  --success: #15803d;
+  --success-rgb: 21, 128, 61;
+  --danger: #b42318;
+  --danger-rgb: 180, 35, 24;
+  --warning: #b45309;
+  --warning-rgb: 180, 83, 9;
+  --success-strong: #15803d;
+  --danger-strong: #b42318;
+  --warning-strong: #b45309;
+  /* 派生的强调令牌：:root 上已经按亮色算好再继承下来，换了 --ink 的这一块要重新声明，主按钮、焦点才跟着变 */
+  --action: var(--ink);
+  --action-rgb: var(--ink-rgb);
+  --on-action: var(--on-ink);
+  --action-text: var(--ink);
+  --action-fill: var(--action);
+  --action-fill-hover: color-mix(in srgb, var(--action) 86%, var(--paper));
+  --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 24%, transparent);
+  --focus-color: var(--action-text);
+  --shadow-popover: 0 18px 44px rgba(var(--shadow-rgb), 0.16);
+  --shadow-dialog: 0 28px 76px rgba(var(--shadow-rgb), 0.24);
 }
 
 :root[data-corners="rounded"] {
@@ -190,7 +270,8 @@
    - 选中与 hover 的底色是它的淡层，而不是灰；
    - 背景、wash、线条掺 3–12% 的它，让灰色和它同调。
    正文 --ink、纸色、成功/危险/警告保持不变。 */
-:root[data-accent] {
+:root[data-accent],
+:root[data-accent] [data-theme="light"] {
   --action: var(--action-custom);
   --action-rgb: var(--action-rgb-custom);
   --on-action: var(--on-action-custom);
@@ -207,7 +288,8 @@
   --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 45%, transparent);
 }
 
-:root[data-theme="dark"][data-accent] {
+:root[data-theme="dark"][data-accent],
+:root[data-accent] [data-theme="dark"] {
   --action: var(--action-custom-dark);
   --action-rgb: var(--action-rgb-custom-dark);
   --on-action: var(--on-action-custom-dark);
@@ -223,44 +305,27 @@
   --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 55%, transparent);
 }
 
-/* 选中文字和输入光标也跟主色 */
-:root[data-accent] ::selection {
-  background: color-mix(in srgb, var(--action) 24%, transparent);
-}
-
-:root[data-accent] :is(input, textarea) {
-  caret-color: var(--action);
-}
-
 /* 系统要求更高对比度（macOS「增强对比度」、prefers-contrast: more）：
    控件边框到 3:1（WCAG 1.4.11），次要文字到 6:1 以上，线条加深。平时保持安静的发丝线。 */
 @media (prefers-contrast: more) {
   :root,
-  :root[data-accent] {
+  :root[data-accent],
+  [data-theme="light"] {
     --muted: #595959;
     --muted-2: #6b6b6b;
     --line: #b4b4ba;
     --line-strong: #86868b;
+    --line-control: #6b6b70;
   }
 
   :root[data-theme="dark"],
-  :root[data-theme="dark"][data-accent] {
+  :root[data-theme="dark"][data-accent],
+  [data-theme="dark"] {
     --muted: #c9c3b6;
     --muted-2: #a7a194;
     --line: #5a564c;
     --line-strong: #8a8478;
-  }
-}
-
-/* 减少动效：一次性全部静止，组件不各自例外 */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+    --line-control: #a39d90;
   }
 }
 

@@ -1,5 +1,5 @@
 // 行为测试（happy-dom）。
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import * as Xxd from "../src/js/index.js";
 
 beforeAll(() => Xxd.install(document));
@@ -12,6 +12,11 @@ const html = (s) => {
   Xxd.init(document);
 };
 const key = (el, k) => el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
+// 播报是延迟写进去的（先清空再写）：等到文字出现，最多 1 秒
+const until = async (fn, ms = 1000) => {
+  const t0 = Date.now();
+  while (!fn() && Date.now() - t0 < ms) await new Promise((r) => setTimeout(r, 10));
+};
 
 describe("confirmDialog", () => {
   it("取消在前、主操作在后；点主操作 resolve(true)", async () => {
@@ -70,14 +75,23 @@ describe("分段控件", () => {
 });
 
 describe("toast", () => {
-  it("within 时出现在容器里（就地反馈），并带 aria-live", () => {
+  it("within 时出现在容器里（就地反馈）；念出来走常驻的播报区，错误用 assertive 并加「错误：」", async () => {
     html(`<aside id="panel"></aside>`);
     const panel = document.getElementById("panel");
     Xxd.toast("已保存", { tone: "success", within: panel, duration: 0 });
     const region = panel.querySelector(".xxd-toast-region");
     expect(region?.hasAttribute("data-scoped")).toBe(true);
-    expect(region.getAttribute("aria-live")).toBe("polite");
+    expect(region.getAttribute("role")).toBe("region");
     expect(region.textContent).toContain("已保存");
+    // 播报区在 install 时就建好了（不是和内容一起插进去）
+    const polite = document.querySelector('.xxd-announcer[role="status"]');
+    const assertive = document.querySelector('.xxd-announcer[role="alert"]');
+    expect(polite && assertive).toBeTruthy();
+    await until(() => polite.textContent === "已保存");
+    expect(polite.textContent).toBe("已保存");
+    Xxd.toast("写入失败", { tone: "danger", within: panel, duration: 0 });
+    await until(() => assertive.textContent === "错误：写入失败");
+    expect(assertive.textContent).toBe("错误：写入失败");
   });
 });
 
@@ -97,6 +111,21 @@ describe("sheet", () => {
     key(document.getElementById("inside"), "Escape");
     expect(sheet.hasAttribute("data-open")).toBe(false);
     expect(document.activeElement).toBe(opener);
+  });
+
+  it("sheet / 面板是模态：role=dialog + aria-modal，外面的东西 inert，关掉后还原", () => {
+    html(`<main id="page"><button id="p-open" data-xxd-panel-open="pd">详情</button></main>
+      <div class="xxd-panel" id="pd" aria-labelledby="pd-t"><h2 id="pd-t">详情</h2><button data-xxd-panel-close>关闭</button></div>`);
+    const panel = document.getElementById("pd");
+    document.getElementById("p-open").click();
+    expect(panel.getAttribute("role")).toBe("dialog");
+    expect(panel.getAttribute("aria-modal")).toBe("true");
+    expect(document.getElementById("page").hasAttribute("inert")).toBe(true);
+    // 播报区不能被 inert（不然打开面板时什么都念不出来）
+    for (const a of document.querySelectorAll(".xxd-announcer")) expect(a.hasAttribute("inert")).toBe(false);
+    panel.querySelector("[data-xxd-panel-close]").click();
+    expect(document.getElementById("page").hasAttribute("inert")).toBe(false);
+    expect(panel.hasAttribute("aria-modal")).toBe(false);
   });
 });
 
@@ -296,14 +325,17 @@ describe("O2 组件", () => {
   });
 
   it("密钥输入：显示 / 隐藏切换 type 和 aria-pressed", () => {
-    html(`<div class="xxd-input-group xxd-secret" data-xxd-secret><input type="password" value="sk_1"><button data-secret-toggle aria-label="显示"></button></div>`);
+    html(`<div class="xxd-input-group xxd-secret" data-xxd-secret><input type="password" value="sk_1"><button data-secret-toggle aria-label="显示密钥"></button></div>`);
     const btn = document.querySelector("[data-secret-toggle]");
     btn.click();
     expect(document.querySelector("input").type).toBe("text");
     expect(btn.getAttribute("aria-pressed")).toBe("true");
-    expect(btn.getAttribute("aria-label")).toBe("隐藏");
+    // 名字固定，状态只靠 aria-pressed（不会念成「隐藏，已按下」）
+    expect(btn.getAttribute("aria-label")).toBe("显示密钥");
     btn.click();
     expect(document.querySelector("input").type).toBe("password");
+    expect(btn.getAttribute("aria-pressed")).toBe("false");
+    expect(btn.getAttribute("aria-label")).toBe("显示密钥");
   });
 
   it("Toast：同一句话不重复加，只动一下；多张时写出叠放序号", () => {
@@ -501,14 +533,14 @@ describe("O4 小小东模式", () => {
     expect(b.textContent).toBe("删除");
   });
 
-  it("登录：邮箱有字才出「继续」，继续进到密码步、返回回去", () => {
-    html(`<div data-xxd-auth><div data-step="email" data-active><input type="email" required><button data-auth-next="password" hidden>继续</button></div>
+  it("登录：「继续」一直在；继续进到密码步、返回回去", () => {
+    html(`<div data-xxd-auth><div data-step="email" data-active><input type="email" required><button data-auth-next="password">继续</button></div>
       <div data-step="password"><b data-auth-email></b><input type="password"><button data-auth-back="email">返回</button></div></div>`);
     const email = document.querySelector('input[type="email"]');
     const next = document.querySelector("[data-auth-next]");
+    expect(next.hidden).toBe(false);
     email.value = "a@b.co";
     email.dispatchEvent(new Event("input", { bubbles: true }));
-    expect(next.hidden).toBe(false);
     next.click();
     expect(document.querySelector('[data-step="password"]').hasAttribute("data-active")).toBe(true);
     expect(document.querySelector("[data-auth-email]").textContent).toBe("a@b.co");
@@ -760,5 +792,177 @@ describe("O8 焦点与计时", () => {
     close.click();
     await new Promise((r) => setTimeout(r, 160));
     expect(document.activeElement?.id).toBe("after");
+  });
+});
+
+describe("R4 无障碍", () => {
+  it("菜单和说明浮层的按钮：aria-haspopup / aria-expanded=false / aria-controls；浮层补 role 和名字", () => {
+    html(`<button data-xxd-menu="m9">更多</button><div class="xxd-menu" id="m9" role="menu" popover><button class="xxd-menu__item" role="menuitem">重命名</button><button class="xxd-menu__item" role="menuitem">删除</button></div>
+      <button data-xxd-popover="p9">这是什么？</button><div class="xxd-popover" id="p9" popover>说明</div>`);
+    const menuBtn = document.querySelector('[data-xxd-menu="m9"]');
+    expect(menuBtn.getAttribute("aria-haspopup")).toBe("menu");
+    expect(menuBtn.getAttribute("aria-expanded")).toBe("false");
+    expect(menuBtn.getAttribute("aria-controls")).toBe("m9");
+    const pop = document.getElementById("p9");
+    expect(pop.getAttribute("role")).toBe("dialog");
+    expect(document.getElementById(pop.getAttribute("aria-labelledby")).textContent).toBe("这是什么？");
+  });
+
+  it("菜单字母跳转：按 s 到「删除」不对，按 删 到「删除」", () => {
+    html(`<div class="xxd-menu" id="m8" role="menu"><button class="xxd-menu__item" role="menuitem">重命名</button><button class="xxd-menu__item" role="menuitem">删除</button></div>`);
+    const [a, b] = document.querySelectorAll("#m8 [role=menuitem]");
+    a.focus();
+    key(a, "删");
+    expect(document.activeElement).toBe(b);
+  });
+
+  it("Picker 是 combobox，名字是字段名 + 当前值", () => {
+    html(`<div class="xxd-field"><span class="xxd-label">画质</span><div class="xxd-picker" data-xxd-picker><button class="xxd-picker__trigger"><span class="xxd-picker__value"></span></button><div class="xxd-listbox"><div class="xxd-option" data-value="h" aria-selected="true">高</div></div></div></div>`);
+    const trigger = document.querySelector(".xxd-picker__trigger");
+    expect(trigger.getAttribute("role")).toBe("combobox");
+    const names = trigger.getAttribute("aria-labelledby").split(" ").map((id) => document.getElementById(id).textContent);
+    expect(names).toEqual(["画质", "高"]);
+  });
+
+  it("setFieldError：写 aria-invalid、错误行连进 aria-describedby（说明保留），传空清掉", () => {
+    html(`<div class="xxd-field"><input id="em" aria-describedby="em-help"><p class="xxd-help" id="em-help">说明</p></div>`);
+    const input = document.getElementById("em");
+    const err = Xxd.setFieldError(input, "请输入有效的邮箱");
+    expect(input.getAttribute("aria-invalid")).toBe("true");
+    expect(input.getAttribute("aria-describedby").split(" ")).toEqual(["em-help", err.id]);
+    Xxd.setFieldError(input, "");
+    expect(input.hasAttribute("aria-invalid")).toBe(false);
+    expect(input.getAttribute("aria-describedby")).toBe("em-help");
+    expect(document.querySelector(".xxd-error")).toBeNull();
+  });
+
+  it("登录：邮箱格式不对时有看得见的错误、连上 describedby、焦点回到输入框", () => {
+    html(`<div class="xxd-auth" data-xxd-auth><div data-step="email" data-active><input type="email" value="not-an-email" aria-label="邮箱"><button data-auth-next="password">继续</button></div><div data-step="password"><input type="password"></div></div>`);
+    document.querySelector("[data-auth-next]").click();
+    const email = document.querySelector('input[type="email"]');
+    expect(email.getAttribute("aria-invalid")).toBe("true");
+    const err = document.getElementById(email.getAttribute("aria-describedby"));
+    expect(err?.textContent).toMatch(/邮箱/);
+    expect(document.activeElement).toBe(email);
+  });
+
+  it("排序：把手有操作说明；拿起、移动、放下都念出来", async () => {
+    html(`<ul data-xxd-sortable><li data-sort-item data-id="a"><button class="xxd-sort-handle" aria-label="拖动排序：写作"></button>写作</li><li data-sort-item data-id="b"><button class="xxd-sort-handle" aria-label="拖动排序：记录"></button>记录</li></ul>`);
+    const handle = document.querySelector(".xxd-sort-handle");
+    expect(document.getElementById(handle.getAttribute("aria-describedby")).textContent).toMatch(/空格/);
+    const polite = () => document.querySelector('.xxd-announcer[role="status"]').textContent;
+    key(handle, " ");
+    await until(() => polite() === "已拿起 写作，第 1 项，共 2 项");
+    expect(polite()).toBe("已拿起 写作，第 1 项，共 2 项");
+    key(handle, "ArrowDown");
+    await until(() => polite() === "移到第 2 项，共 2 项");
+    expect(polite()).toBe("移到第 2 项，共 2 项");
+  });
+
+  it("拖列宽、拖侧栏宽的把手：role=separator、能聚焦、方向键改宽度", () => {
+    html(`<table class="xxd-table"><thead><tr><th style="width:120px"><button class="xxd-th-sort">名称</button><span class="xxd-th-resize"></span></th></tr></thead></table>`);
+    const h = document.querySelector(".xxd-th-resize");
+    expect(h.getAttribute("role")).toBe("separator");
+    expect(h.tabIndex).toBe(0);
+    expect(h.getAttribute("aria-label")).toMatch(/名称/);
+    key(h, "Home");
+    expect(h.closest("th").style.width).toBe("48px");
+    expect(h.getAttribute("aria-valuenow")).toBe("48");
+  });
+
+  it("确认对话框是 alertdialog，正文连进 aria-describedby", async () => {
+    if (!HTMLDialogElement.prototype.showModal) HTMLDialogElement.prototype.showModal = function () { this.open = true; };
+    const p = Xxd.confirmDialog({ title: "删除？", message: "删除后不能恢复。" });
+    const dialog = document.querySelector("dialog.xxd-dialog");
+    expect(dialog.getAttribute("role")).toBe("alertdialog");
+    expect(document.getElementById(dialog.getAttribute("aria-describedby")).textContent).toBe("删除后不能恢复。");
+    dialog.close("cancel");
+    await p;
+  });
+
+  it("命令面板：分组是 role=group，没结果时没有空的 aria-activedescendant", () => {
+    if (!HTMLDialogElement.prototype.showModal) HTMLDialogElement.prototype.showModal = function () { this.open = true; };
+    const palette = Xxd.openCommandPalette({ items: [{ label: "新建", group: "文件", run() {} }, { label: "打开", group: "文件", run() {} }] });
+    const dialog = document.querySelector("dialog.xxd-palette");
+    const group = dialog.querySelector('[role="group"]');
+    expect(document.getElementById(group.getAttribute("aria-labelledby")).textContent).toBe("文件");
+    expect(group.querySelectorAll('[role="option"]').length).toBe(2);
+    const input = dialog.querySelector("input");
+    input.value = "zzzz";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(input.hasAttribute("aria-activedescendant")).toBe(false);
+    dialog.close?.();
+    void palette;
+  });
+});
+
+
+describe("R6 生命周期", () => {
+  // document 上的委托会处理冒泡出来的 Shadow 事件：这组只看 Shadow 自己装的那一份
+  beforeAll(() => Xxd.uninstall(document));
+  afterAll(() => Xxd.install(document));
+  const shadowWith = (markup) => {
+    const host = document.createElement("div");
+    document.body.append(host);
+    const root = host.attachShadow({ mode: "open" });
+    root.innerHTML = markup;
+    return root;
+  };
+  const SHEET = `<div class="xxd-sheet-host"><div class="xxd-scrim"></div><section class="xxd-sheet" id="lc"><p>x</p></section><button id="lc-open" data-xxd-sheet-open="lc">open</button></div>`;
+
+  it("uninstall 之后点击不再起作用；再 install 又能用", () => {
+    const root = shadowWith(SHEET);
+    Xxd.install(root);
+    root.getElementById("lc-open").click();
+    expect(root.getElementById("lc").hasAttribute("data-open")).toBe(true);
+    Xxd.closeSheet(root.getElementById("lc"));
+    Xxd.uninstall(root);
+    root.getElementById("lc-open").click();
+    expect(root.getElementById("lc").hasAttribute("data-open")).toBe(false);
+    Xxd.install(root);
+    root.getElementById("lc-open").click();
+    expect(root.getElementById("lc").hasAttribute("data-open")).toBe(true);
+    Xxd.uninstall(root);
+  });
+
+  it("signal abort 等于 uninstall", () => {
+    const root = shadowWith(SHEET);
+    const ac = new AbortController();
+    Xxd.install(root, { signal: ac.signal });
+    ac.abort();
+    root.getElementById("lc-open").click();
+    expect(root.getElementById("lc").hasAttribute("data-open")).toBe(false);
+  });
+
+  it("同一个 root 已经被另一份 @xxd/css 装过：不重复装，提示一次", () => {
+    const root = shadowWith(SHEET);
+    root[Symbol.for("xxd.installed")] = true;
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    Xxd.install(root);
+    expect(warn).toHaveBeenCalledWith(expect.stringMatching(/两份 @xxd\/css/));
+    warn.mockRestore();
+    root.getElementById("lc-open").click();
+    expect(root.getElementById("lc").hasAttribute("data-open")).toBe(false);
+  });
+
+  it("Shadow 里找不到 id 时不去宿主网页找同 id 的元素", () => {
+    document.body.insertAdjacentHTML("beforeend", `<section class="xxd-sheet" id="lc-host"></section>`);
+    const root = shadowWith(`<div class="xxd-sheet-host"><button id="b" data-xxd-sheet-open="lc-host">open</button></div>`);
+    Xxd.install(root);
+    root.getElementById("b").click();
+    expect(document.getElementById("lc-host").hasAttribute("data-open")).toBe(false);
+    Xxd.uninstall(root);
+  });
+
+  it("页面里有 data-xxd-icon 但没有图标库：提示一次；useIcons 之后正常换成 SVG", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    document.body.insertAdjacentHTML("beforeend", `<i data-xxd-icon="Check"></i>`);
+    Xxd.init(document);
+    expect(warn).toHaveBeenCalledWith(expect.stringMatching(/没有图标库/));
+    warn.mockRestore();
+    Xxd.useIcons(await import("../../xxd-icons/src/svg.js"));
+    Xxd.init(document);
+    expect(document.querySelector("svg.ui-icon")).toBeTruthy();
+    Xxd.useIcons(null);
   });
 });

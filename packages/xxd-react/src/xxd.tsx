@@ -39,27 +39,79 @@ export function SheetHost({ className, ...rest }: HTMLAttributes<HTMLDivElement>
   return <div className={cx("xxd-sheet-host", className)} {...rest} />;
 }
 
+const FOCUSABLE = "input, select, textarea, button:not([disabled]), [href], [tabindex]:not([tabindex='-1'])";
+
+/**
+ * 打开时是一个模态对话框：role=dialog + aria-modal，背景（同一个 SheetHost 里的其他东西）inert，Tab 在里面循环，Esc 关；
+ * 关掉后焦点回到打开它的按钮。宿主上写 data-sheet-open（dock 主按钮跟着藏起来）。
+ */
 export function Sheet({ open, onOpenChange, title, children, className }: { open: boolean; onOpenChange: (open: boolean) => void; title: ReactNode; children?: ReactNode; className?: string }) {
   const { t } = useXxdLocale();
   const id = useId();
   const ref = useRef<HTMLElement>(null);
   const back = useRef<Element | null>(null);
   useEffect(() => {
+    const sheet = ref.current;
+    const host = sheet?.closest(".xxd-sheet-host");
+    if (!sheet) return;
     if (open) {
       back.current = document.activeElement;
-      ref.current?.querySelector<HTMLElement>("input, select, textarea, button:not([data-sheet-close]), [href], [tabindex]:not([tabindex='-1'])")?.focus();
-    } else if (back.current instanceof HTMLElement) back.current.focus();
+      host?.setAttribute("data-sheet-open", "");
+      // 背景不能点、读屏也读不到
+      const others = host ? [...host.children].filter((el) => el !== sheet && !el.classList.contains("xxd-scrim")) : [];
+      for (const el of others) el.setAttribute("inert", "");
+      const items = [...sheet.querySelectorAll<HTMLElement>(FOCUSABLE)];
+      const first = items.find((el) => !el.hasAttribute("data-sheet-close")) ?? items[0] ?? sheet;
+      // 减少动效时 visibility 的过渡是 0.01ms：这一帧可能还聚焦不上，下一帧再试
+      first.focus();
+      const raf = requestAnimationFrame(() => document.activeElement !== first && first.focus());
+      return () => {
+        cancelAnimationFrame(raf);
+        for (const el of others) el.removeAttribute("inert");
+        host?.removeAttribute("data-sheet-open");
+      };
+    }
+    if (back.current instanceof HTMLElement && sheet.contains(document.activeElement)) back.current.focus();
+    else if (back.current instanceof HTMLElement && document.activeElement === document.body) back.current.focus();
+    return undefined;
   }, [open]);
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
       e.stopPropagation();
       onOpenChange(false);
+      return;
+    }
+    if (e.key !== "Tab" || !ref.current) return;
+    const items = [...ref.current.querySelectorAll<HTMLElement>(FOCUSABLE)];
+    if (!items.length) {
+      e.preventDefault();
+      return;
+    }
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
     }
   };
   return (
     <>
       <div className="xxd-scrim" data-open={flag(open)} onClick={() => onOpenChange(false)} aria-hidden="true" />
-      <section ref={ref} className={cx("xxd-sheet", className)} data-open={flag(open)} aria-labelledby={`${id}-t`} aria-hidden={!open} inert={!open} onKeyDown={onKeyDown}>
+      <section
+        ref={ref}
+        className={cx("xxd-sheet", className)}
+        data-open={flag(open)}
+        role="dialog"
+        aria-modal={open ? true : undefined}
+        aria-labelledby={`${id}-t`}
+        aria-hidden={!open}
+        inert={!open}
+        tabIndex={-1}
+        onKeyDown={onKeyDown}
+      >
         <div className="xxd-sheet__head">
           <h3 className="xxd-sheet__title" id={`${id}-t`}>{title}</h3>
           <button type="button" className="xxd-btn" data-variant="ghost" data-icon-only="" data-size="sm" data-sheet-close="" aria-label={t.close} onClick={() => onOpenChange(false)}>
@@ -297,13 +349,24 @@ export function Prose({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
 /* ── O4 模式 ── */
 
 /** 状态行：空着，除非有事要说 —— 一句话，最多一个动作。 */
+/**
+ * 状态行：空着时什么都不显示。念出来靠一个常驻的、看不见的 live region（一直挂着，只换文字）：
+ * 和内容一起才挂上去的 live region，第一句话很多读屏不念。
+ */
 export function StatusLine({ children, tone, action }: { children?: ReactNode; tone?: "danger" | "warning" | "success"; action?: { label: ReactNode; onClick: () => void } }) {
-  if (children == null || children === "" || children === false) return null;
+  const empty = children == null || children === "" || children === false;
   return (
-    <div className="xxd-statusline" role="status" data-tone={tone}>
-      <span>{children}</span>
-      {action && <button type="button" className="xxd-link" onClick={action.onClick}>{action.label}</button>}
-    </div>
+    <>
+      <span className="xxd-sr-only" role={tone === "danger" ? "alert" : "status"} aria-live={tone === "danger" ? "assertive" : "polite"}>
+        {empty ? "" : children}
+      </span>
+      {!empty && (
+        <div className="xxd-statusline" data-tone={tone}>
+          <span aria-hidden="true">{children}</span>
+          {action && <button type="button" className="xxd-link" onClick={action.onClick}>{action.label}</button>}
+        </div>
+      )}
+    </>
   );
 }
 

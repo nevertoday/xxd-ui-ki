@@ -1,5 +1,7 @@
 // 小小东模式的行为（优化计划 O4）。
 import { defaultLayerRoot, emit, layerRoot, reducedMotion } from "./dom.js";
+import { announce } from "./announce.js";
+import { setFieldError } from "./inputs.js";
 import { openDialog } from "./dialog.js";
 import { bindSearch, markMatches, clearMarks } from "./inputs.js";
 import { t } from "./i18n.js";
@@ -102,10 +104,13 @@ export function openViewer(items, start = 0, { actions = [], within = defaultLay
     const item = items[i];
     const fresh = img.cloneNode();
     fresh.src = item.src;
-    fresh.alt = item.alt ?? "";
+    // 没给 alt 就写「第 n 张，共 m 张」，不当装饰图（空 alt 读屏会跳过）
+    fresh.alt = item.alt || t("imageOf", { i: i + 1, n: items.length }, within);
     img.replaceWith(fresh);
     dialog._img = fresh;
     count.textContent = `${i + 1} / ${items.length}`;
+    // 翻页念出来（第一次打开时对话框自己的名字会念，不重复）
+    if (dialog.open) announce(item.alt ? `${item.alt}，${i + 1} / ${items.length}` : fresh.alt, { within: dialog });
     emit(dialog, "xxd:change", { index: i });
   };
   dialog.addEventListener("click", (e) => {
@@ -210,16 +215,22 @@ export function installSortable(root, closestFrom) {
     const item = handle.closest("[data-sort-item]");
     const list = item.parentElement;
     const grabbed = item.hasAttribute("data-grabbed");
+    // 每一步都念出来：拿起 / 移到第几项 / 放下 / 取消（读屏用户看不见位置）
+    const items = () => [...list.querySelectorAll(":scope > [data-sort-item]")];
+    const name = () => itemName(item);
+    const pos = () => ({ i: items().indexOf(item) + 1, n: items().length });
     if (event.key === " " || event.key === "Enter") {
       event.preventDefault();
       if (grabbed) {
         item.removeAttribute("data-grabbed");
         handle.setAttribute("aria-pressed", "false");
         emit(list, "xxd:change", { order: order(list) });
+        announce(t("sortDropped", { name: name(), ...pos() }, list), { within: list });
       } else {
         item.setAttribute("data-grabbed", "");
         handle.setAttribute("aria-pressed", "true");
         item.dataset.startIndex = String([...list.children].indexOf(item));
+        announce(t("sortGrabbed", { name: name(), ...pos() }, list), { within: list });
       }
     } else if (grabbed && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
       event.preventDefault();
@@ -228,6 +239,7 @@ export function installSortable(root, closestFrom) {
       if (event.key === "ArrowDown" && !item.nextElementSibling) return;
       flip(list, () => list.insertBefore(item, ref), { duration: 160, selector: ":scope > [data-sort-item]" });
       handle.focus();
+      announce(t("sortMoved", pos(), list), { within: list });
     } else if (grabbed && event.key === "Escape") {
       event.preventDefault();
       const i = Number(item.dataset.startIndex);
@@ -235,8 +247,33 @@ export function installSortable(root, closestFrom) {
       item.removeAttribute("data-grabbed");
       handle.setAttribute("aria-pressed", "false");
       handle.focus();
+      announce(t("sortCancelled", { name: name(), ...pos() }, list), { within: list });
     }
   });
+}
+
+/** 一项的名字：把手以外的字。 */
+function itemName(item) {
+  const copy = item.cloneNode(true);
+  copy.querySelectorAll(".xxd-sort-handle, .ui-icon, button").forEach((n) => n.remove());
+  return copy.textContent.trim();
+}
+
+/** 排序列表初始化：每个把手连上一句操作说明（看不见，读屏聚焦时念）。 */
+export function initSortable(root) {
+  for (const list of root.querySelectorAll("[data-xxd-sortable]")) {
+    if (list.dataset.sortReady) continue;
+    list.dataset.sortReady = "1";
+    const help = list.ownerDocument.createElement("span");
+    help.className = "xxd-sr-only";
+    help.id = `xxd-sort-help-${Math.random().toString(36).slice(2, 8)}`;
+    help.textContent = t("sortHelp", null, list);
+    list.before(help);
+    for (const h of list.querySelectorAll(".xxd-sort-handle")) {
+      const ids = (h.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
+      if (!ids.includes(help.id)) h.setAttribute("aria-describedby", [...ids, help.id].join(" "));
+    }
+  }
 }
 
 function restoreLabel(btn) {
@@ -268,7 +305,22 @@ export function installConfirmTwice(root, closestFrom) {
       label.slice(1).forEach((n) => (n.nodeValue = ""));
     } else btn.append((btn._labelNodes = [btn.ownerDocument.createTextNode(text)])[0]);
     btn.setAttribute("data-confirming", "");
-    btn._confirmTimer = setTimeout(() => restoreLabel(btn), 3000);
+    // 读屏用户看不见按钮变了：念一句；5 秒没再点才复原，焦点还在按钮上时不复原（等离开再说）
+    announce(t("confirmTwiceHint", { label: text }, btn), { within: btn, assertive: true });
+    const later = () => {
+      if (btn.matches(":focus") && btn.hasAttribute("data-confirming")) {
+        btn._confirmTimer = setTimeout(later, 1000);
+        return;
+      }
+      restoreLabel(btn);
+    };
+    btn._confirmTimer = setTimeout(later, Number(btn.dataset.confirmTimeout) || 5000);
+  });
+  root.addEventListener("focusout", (event) => {
+    const btn = event.target?.closest?.("[data-confirm-twice][data-confirming]");
+    if (!btn) return;
+    clearTimeout(btn._confirmTimer);
+    btn._confirmTimer = setTimeout(() => restoreLabel(btn), 1500);
   });
 }
 
@@ -286,10 +338,11 @@ export function installAuth(root, closestFrom) {
       const auth = next.closest("[data-xxd-auth]");
       const email = auth.querySelector('[data-step="email"] input[type="email"]');
       if (email && !email.checkValidity()) {
-        email.setAttribute("aria-invalid", "true");
+        // 说清楚哪里不对、怎么改，焦点回到输入框（不只是变红）
+        setFieldError(email, auth.dataset.emailError || t("emailInvalid", null, auth), { focus: true });
         return;
       }
-      email?.removeAttribute("aria-invalid");
+      if (email) setFieldError(email, "");
       auth.querySelectorAll("[data-auth-email]").forEach((el) => (el.textContent = email?.value ?? ""));
       return go(auth, next.dataset.authNext);
     }
@@ -299,12 +352,10 @@ export function installAuth(root, closestFrom) {
       go(back.closest("[data-xxd-auth]"), back.dataset.authBack);
     }
   });
-  // 邮箱里有字了，「继续」才出现
+  // 「继续」一直在（藏起来的按钮让人以为流程走不下去）；改了邮箱就清掉上一次的错误
   root.addEventListener("input", (event) => {
     const input = closestFrom(event, '[data-xxd-auth] [data-step="email"] input[type="email"]');
-    if (!input) return;
-    const next = input.closest("[data-step]").querySelector("[data-auth-next]");
-    if (next) next.hidden = !input.value.trim();
+    if (input?.getAttribute("aria-invalid") === "true") setFieldError(input, "");
   });
 }
 
@@ -315,7 +366,8 @@ export function setStatus(el, text, { tone, action } = {}) {
   if (!text) return el;
   if (tone) el.dataset.tone = tone;
   else delete el.dataset.tone;
-  el.setAttribute("role", "status");
+  // 念出来走常驻的播报区（这一行可能刚从 hidden 变出来，自己当 live region 第一句常常不念）
+  announce(text, { within: el, assertive: tone === "danger" });
   const span = el.ownerDocument.createElement("span");
   span.textContent = text;
   el.append(span);

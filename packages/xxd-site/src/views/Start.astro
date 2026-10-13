@@ -12,7 +12,17 @@ const T = en
       title: "Get started",
       caption: "Get started",
       lead: "One set of tokens, one set of components. Set up once, then pick the path that fits your project: a plain page, a Chrome extension, a site that already has its own variables, or React.",
-      h: { prep: "0. Set up", web: "Plain web page", ext: "Chrome extension", existing: "A site with its own variables", react: "React", rules: "Rules to keep while coding" },
+      h: { prep: "0. Set up", web: "Plain web page", ext: "Chrome extension", existing: "A site with its own variables", react: "React", rules: "Rules to keep while coding", terms: "Terms" },
+      terms: [
+        ["Tokens", "Design variables: the CSS custom properties for color, type size, spacing and radius. The single source is tokens.css."],
+        ["Components", "One piece of UI: a button, a dialog, a list."],
+        ["Patterns", "A fixed combination of components for a common job: drop zone, two-step confirm, sign-in."],
+        ["Templates", "A whole page put together, ready to copy."],
+        ["Density", "Comfortable (40px controls, for sites) or compact (32px, for side panels and popups)."],
+        ["Finish", "Flat or material: only changes solid buttons."],
+        ["vendor", "The built files copied into a project (vendor/xxd/); update them with sync, never by hand."],
+        ["init / sync / doctor", "Bring a project in / copy in the latest build / check it against the rules."],
+      ],
       prep: "Not on npm yet (alpha, 0.x), so you use it from source. You need Node 24.12+ and pnpm 12.",
       prepAfter: "Commands below are written as <code class=\"xxd-code-inline\">xxd-ui …</code>; without <code class=\"xxd-code-inline\">link</code>, run them inside the repo as <code class=\"xxd-code-inline\">pnpm xxd …</code>.",
       webTry: "<strong>Try it</strong> with the versioned files hosted on this site:",
@@ -32,7 +42,17 @@ const T = en
       title: "开始使用",
       caption: "开始",
       lead: "同一份令牌、同一套组件。先准备一次，再按项目选一条路：普通网页、Chrome 插件、已经有一套变量的网站，或者 React。",
-      h: { prep: "0. 准备", web: "普通网页", ext: "Chrome 插件", existing: "已经有一套变量的网站", react: "React", rules: "写代码时守住" },
+      h: { prep: "0. 准备", web: "普通网页", ext: "Chrome 插件", existing: "已经有一套变量的网站", react: "React", rules: "写代码时守住", terms: "术语" },
+      terms: [
+        ["令牌", "设计变量（design token）：颜色、字号、间距、圆角这些 CSS 变量，唯一来源是 tokens.css。"],
+        ["组件", "一个界面零件：按钮、对话框、列表。"],
+        ["模式（patterns）", "几个组件拼成的固定做法：拖放区、两次确认、登录。"],
+        ["模板", "拼好的整页，可以整页复制。"],
+        ["密度", "标准（控件 40px，网站用）或紧凑（32px，侧边栏和 popup 用）。"],
+        ["质感", "平面或立体：只影响实心按钮。"],
+        ["vendor", "拷进项目的构建文件（vendor/xxd/）；用 sync 更新，不要手改。"],
+        ["init / sync / doctor", "接入一个项目 / 拷入最新版 / 按规则体检。"],
+      ],
       prep: "还没发布到 npm（alpha，0.x），目前从源码用。需要 Node 24.12 以上和 pnpm 12。",
       prepAfter: "下面的命令写成 <code class=\"xxd-code-inline\">xxd-ui …</code>；没有 <code class=\"xxd-code-inline\">link</code> 的话，在仓库里换成 <code class=\"xxd-code-inline\">pnpm xxd …</code>。",
       webTry: "<strong>先试一下</strong>：直接引用展示站上带版本号的文件：",
@@ -151,6 +171,13 @@ export function App() {
   <Code code={`@layer properties, theme, base, xxd, components, utilities;
 @import "tailwindcss";
 @import "@xxd/react/styles.css";`} />
+
+  <h2 class="site-h2" id="terms">{T.h.terms}</h2>
+  <dl class="site-terms">
+    {T.terms.map(([term, text]) => (
+      <div><dt>{term}</dt><dd>{text}</dd></div>
+    ))}
+  </dl>
 
   <h2 class="site-h2" id="rules">{T.h.rules}</h2>
   {

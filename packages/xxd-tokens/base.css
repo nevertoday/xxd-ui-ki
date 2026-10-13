@@ -1,0 +1,23 @@
+/* @xxd/tokens 的全局规则（不是变量）：@xxd/css 和 @xxd/react 会自动带上。
+ * 只用 tokens.css 换变量、不想动页面行为的老项目，不引这个文件就行。 */
+
+/* 选中文字和输入光标也跟主色 */
+:root[data-accent] ::selection {
+  background: color-mix(in srgb, var(--action) 24%, transparent);
+}
+
+:root[data-accent] :is(input, textarea) {
+  caret-color: var(--action);
+}
+
+/* 减少动效：一次性全部静止，组件不各自例外 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

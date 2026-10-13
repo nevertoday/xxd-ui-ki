@@ -38,7 +38,7 @@ export function createAppearanceStore({ key = "xxd-ui", area = "sync", element, 
     if (changedArea !== area || !changes[key]) return;
     commit(changes[key].newValue || {});
   };
-  storage && globalThis.chrome?.storage?.onChanged?.addListener(onChanged);
+  if (storage) globalThis.chrome?.storage?.onChanged?.addListener(onChanged);
 
   return {
     key,
@@ -59,7 +59,7 @@ export function createAppearanceStore({ key = "xxd-ui", area = "sync", element, 
     },
     destroy() {
       listeners.clear();
-      storage && globalThis.chrome?.storage?.onChanged?.removeListener(onChanged);
+      if (storage) globalThis.chrome?.storage?.onChanged?.removeListener(onChanged);
     },
   };
 }

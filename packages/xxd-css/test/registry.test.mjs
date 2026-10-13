@@ -45,7 +45,7 @@ describe("registry.json", () => {
 
   it("CSS 里的类都登记在某个组件下（工具类除外）", () => {
     const listed = new Set([...registry.components.flatMap((c) => c.classes), ...patternsFile.patterns.flatMap((p) => p.classes)]);
-    const utilities = new Set(["xxd-page", "xxd-sr-only", "xxd-sr-only-focusable", "xxd-title", "xxd-heading", "xxd-muted", "xxd-small", "xxd-mono", "xxd-divider", "xxd-read", "xxd-stack", "xxd-cluster"]);
+    const utilities = new Set(["xxd-page", "xxd-sr-only", "xxd-sr-only-focusable", "xxd-frame", "xxd-title", "xxd-heading", "xxd-muted", "xxd-small", "xxd-mono", "xxd-divider", "xxd-read", "xxd-stack", "xxd-cluster"]);
     const unlisted = [...defined].filter((k) => !listed.has(k) && !utilities.has(k));
     expect(unlisted).toEqual([]);
   });
@@ -101,3 +101,44 @@ describe("英文版（registry.en.js / patterns.en.js）", () => {
   });
 });
 
+describe("示例代码本身达标（会被 doc 命令和 AI 照抄到每个项目）", () => {
+  const all = [...registry.components.flatMap((c) => [c.markup, ...(c.examples ?? []).map((e) => e.markup)].map((m) => [c.name, m])), ...patternsFile.patterns.map((p) => [p.name, p.markup])];
+  it("aria-describedby / aria-labelledby / aria-controls 指向的 id 都在同一段示例里", () => {
+    const bad = [];
+    for (const [name, m] of all) {
+      const ids = new Set([...m.matchAll(/\bid="([^"]+)"/g)].map((x) => x[1]));
+      for (const ref of m.matchAll(/\baria-(?:describedby|labelledby|controls)="([^"]+)"/g)) for (const id of ref[1].split(/\s+/)) if (!ids.has(id)) bad.push(`${name}: ${id}`);
+    }
+    expect(bad).toEqual([]);
+  });
+  it("每一行 .xxd-error 都被某个 aria-describedby 引用（错误要连到输入框上）", () => {
+    const bad = [];
+    for (const [name, m] of all) {
+      for (const e of m.matchAll(/<[^>]*class="[^"]*\bxxd-error\b[^"]*"[^>]*>/g)) {
+        const id = /\bid="([^"]+)"/.exec(e[0])?.[1];
+        if (!id || !new RegExp(`aria-describedby="[^"]*\\b${id}\\b`).test(m)) bad.push(name);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+});
+
+describe("示例不写死样子", () => {
+  it("style 属性里只有布局和尺寸：颜色、背景、边框、字体、阴影交给类名和令牌（复制出去的代码不带写死的样子）", () => {
+    const bad = [];
+    for (const c of [...registry.components, ...patternsFile.patterns]) {
+      for (const m of [c.markup, ...(c.examples ?? []).map((e) => e.markup)]) {
+        for (const s of m.matchAll(/style="([^"]*)"/g)) if (/(^|;)\s*(color|background|border|font|box-shadow)\b/.test(s[1])) bad.push(`${c.name}: ${s[1]}`);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+});
+
+
+it("质感：离按钮最近的 data-finish 说了算（不用会被外层 flat 一起匹配的祖先选择器）", () => {
+  const css = readFileSync(join(root, "src/css/button.css"), "utf8");
+  expect(css).not.toMatch(/:not\(\[data-finish="flat"\] \*/);
+  expect(css).toMatch(/\[data-finish="material"\] \{\n\s+--btn-edge/);
+  expect(css).toMatch(/\[data-finish="flat"\] \{\n\s+--btn-edge: 100%/);
+});

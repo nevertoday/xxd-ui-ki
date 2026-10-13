@@ -2,7 +2,6 @@
 // 以及几个真实属性（圆角、遮罩、页面底色和字色、color-scheme）。
 //   CHROME_EXE=<chromium 可执行文件> node scripts/verify/css-vars-diff.cjs before.css after.css
 
-const { createRequire } = require("node:module");
 const fs = require("node:fs");
 const pw = require(require.resolve("playwright", { paths: [require("node:path").join(__dirname, "../../node_modules/.pnpm/playwright@1.57.0/node_modules")] }));
 const [beforeFile, afterFile] = process.argv.slice(2);

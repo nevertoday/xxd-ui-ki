@@ -19,7 +19,7 @@ const accents = ACCENT_PRESETS.slice(1).map((p) => {
 const T = en
   ? {
       title: "Color", caption: "Foundations",
-      lead: "Black / white / gray, with emphasis in ink; color is reserved for meaning and the optional accent. Swatches show the color in the current appearance; the light and dark values are written below.",
+      lead: "Black, white and gray, with ink for emphasis; color is reserved for meaning and the optional accent. Swatches show the color in the current appearance; the light and dark values are written below.",
       groups: ["Paper and lines", "Ink and text", "Meaning colors"], accent: "18 accents", light: "Light", dark: "Dark",
       gate: "Contrast (enforced by tests): body and secondary text ≥ 4.5 on paper / bg / wash; meaning colors ≥ 4.5; white text on *-strong fills ≥ 4.5.",
       accentNote: "Accents are lightened or darkened automatically: marks (switches, tab underlines, focus) ≥ 3:1; text ≥ 4.5:1; solid fills (primary buttons, solid badges) are darkened a little more so white text on them is ≥ 4.5:1. This holds on both light and dark paper. The first one is ink, the default.",

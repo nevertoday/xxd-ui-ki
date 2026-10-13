@@ -104,7 +104,7 @@ export const ICON_GROUPS = [
     id: "communication", zh: "通讯与社交", en: "Communication",
     icons: {
       Mail: "邮件 邮箱 信 email", MailCheck: "邮件已发送 已读", MailSearch: "搜索邮件", MailOpen: "已读邮件 打开的信", MailPlus: "写邮件 新邮件", MailX: "删除邮件 退信",
-      Mails: "多封邮件 群发", MessageCircle: "消息 聊天 评论 对话框", MessageSquareText: "评论 留言 消息", MessageSquarePlus: "发起对话 添加评论",
+      Mails: "多封邮件 群发", MessageCircle: "消息 聊天 评论 对话框 圆", MessageSquare: "消息 聊天 评论 方形气泡", MessageSquareText: "评论 留言 消息", MessageSquarePlus: "发起对话 添加评论",
       MessageSquareWarning: "反馈 投诉 报错", MessagesSquare: "群聊 讨论 对话",
       Phone: "电话 打电话 手机号", PhoneCall: "来电 通话中", Video: "视频 摄像 会议", VideoOff: "关闭摄像头", Mic: "麦克风 录音 语音", MicOff: "静音 关闭麦克风",
       Headphones: "耳机 客服 收听", Megaphone: "公告 广播 推广 通知", Rss: "订阅 RSS 资讯源", Radio: "广播 直播 信号",

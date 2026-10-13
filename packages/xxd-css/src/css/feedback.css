@@ -419,4 +419,30 @@
       transform: translateX(250%);
     }
   }
+
+  /* 减少动效：不转、不跑，但也不能定住（定住像是卡死了）—— 换成很慢的淡入淡出。
+   * 令牌里的全局减少动效规则是没进层的 !important；层里的 !important 优先级更高，所以这里盖得住。 */
+  @media (prefers-reduced-motion: reduce) {
+    .xxd-spinner {
+      animation-name: xxd-breathe !important;
+      animation-duration: 2.4s !important;
+      animation-timing-function: ease-in-out !important;
+      animation-iteration-count: infinite !important;
+    }
+
+    .xxd-loadbar::after {
+      width: 100%;
+      transform: none;
+      animation-name: xxd-breathe !important;
+      animation-duration: 2.4s !important;
+      animation-timing-function: ease-in-out !important;
+      animation-iteration-count: infinite !important;
+    }
+  }
+
+  @keyframes xxd-breathe {
+    50% {
+      opacity: 0.35;
+    }
+  }
 }

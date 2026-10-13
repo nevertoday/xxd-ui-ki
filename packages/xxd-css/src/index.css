@@ -5,6 +5,8 @@
  * 先加载 Tailwind / Kumo 时，在你自己的 CSS 最前面写同一行（@xxd/react 的 styles.css 已经写了）。 */
 @layer theme, base, xxd, components, utilities;
 @layer xxd.base, xxd.components;
+/* 减少动效、主色的选中色和输入光标（@xxd/tokens 里不是变量的那几条） */
+@import "@xxd/tokens/base.css";
 @import "./css/base.css";
 @import "./css/text.css";
 @import "./css/button.css";

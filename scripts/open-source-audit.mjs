@@ -2,6 +2,7 @@
 // 开源自查：列出仓库里不该公开的内部引用。只读，不改任何文件。推送前跑一次。
 //   node scripts/open-source-audit.mjs          人看的报告
 //   node scripts/open-source-audit.mjs --json   机器读
+//   node scripts/open-source-audit.mjs --check  CI 用：STRICT 里的几项有一处就退出 1（其余几项只报告）
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -24,6 +25,9 @@ export const CHECKS = [
   { id: "private-flag", label: "private: true（要发 npm 的包再改）", re: /"private":\s*true/g },
   { id: "upstream-brand", label: "上游 Cloudflare 品牌 / 账号", re: /cloudflare-logo|CloudflareLogo|account_id|kumo-ui\.com/g },
 ];
+
+// 必须是 0 处的；会员站域名、private、上游品牌在文档和上游代码里有正当的出现，只报告
+export const STRICT = ["local-path", "email", "wechat", "store-id", "proprietary"];
 
 const findings = Object.fromEntries(CHECKS.map((c) => [c.id, []]));
 for (const file of files) {
@@ -51,4 +55,13 @@ if (process.argv.includes("--json")) {
     for (const h of hits.slice(0, 8)) console.log(`    ${h}`);
     if (hits.length > 8) console.log(`    …还有 ${hits.length - 8} 处（--json 看全部）`);
   }
+}
+
+if (process.argv.includes("--check")) {
+  const bad = STRICT.filter((id) => findings[id].length);
+  if (bad.length) {
+    console.error(`✗ 开源自查没过：${bad.map((id) => `${CHECKS.find((c) => c.id === id).label} ${findings[id].length} 处`).join("、")}`);
+    process.exit(1);
+  }
+  console.log("✓ 开源自查：本机路径、邮箱、微信号、商店 ID、旧版权声明都是 0 处");
 }

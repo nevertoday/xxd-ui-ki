@@ -36,7 +36,7 @@
 ## 提交前
 
 ```bash
-pnpm xxd:build && pnpm xxd:test           # 小小东的包（含所有合同测试）
+pnpm xxd:build && pnpm xxd:test           # 小小东的包（含所有合同测试）；改了 packages/kumo 先 pnpm --filter @cloudflare/kumo build
 pnpm --filter @cloudflare/kumo test       # 动了 packages/kumo 时
 pnpm lint
 pnpm changeset                            # 改了用户看得到的东西时，写一条版本记录（见 .changeset/README.md）

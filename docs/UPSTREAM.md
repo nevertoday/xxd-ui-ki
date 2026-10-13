@@ -47,3 +47,8 @@ pnpm install && pnpm --filter @cloudflare/kumo build && pnpm test
 - 只改了 `scripts/theme-generator/xxd-overrides.ts`（然后 `pnpm --filter @cloudflare/kumo codegen:themes` 重新生成 `theme-kumo.css`），组件源码没动：
   - `kumo-brand` / `kumo-brand-hover` / `kumo-badge-{purple,teal,blue}` 改用 `--action-fill`（主色实心底上白字 ≥ 4.5:1）；
   - `kumo-placeholder` 从 `--muted-2` 改成 `--muted`；兜底色 `#6f6f6f` → `#6b6b6b`。
+
+## 第四轮（评审 R6，2026-10-13）
+
+- 只在 `kumo-binding.css` 末尾加了一段 `@layer utilities`：按 `data-kumo-component` 加 Kumo 自己的尺寸类（`h-9`、`h-6.5`、`size-9`…）把控件高度和内边距映射到 `--control-h*` / `--control-pad-x*` / `--field-pad-x`，组件源码没动。上游要是改了尺寸类名（比如 `h-9` 换成别的），这段要跟着改；`scripts/pack-check.mjs` 会在真浏览器里查原生和 React 按钮是不是一样高。
+- `@xxd/react` 构建时把 `packages/kumo/dist` 的模块和类型拷进自己的 `dist/kumo/`（见 `packages/xxd-react/scripts/build.mjs`），对外不再依赖 `@cloudflare/kumo`。

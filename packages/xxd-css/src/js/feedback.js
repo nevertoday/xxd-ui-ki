@@ -3,6 +3,7 @@ import { place } from "./floating.js";
 import { defaultLayerRoot, layerRoot, nextId } from "./dom.js";
 import { ICON } from "./icons-min.js";
 import { t } from "./i18n.js";
+import { announce } from "./announce.js";
 
 /* ── Tooltip：[data-tooltip="说明"]，可选 data-tooltip-placement="bottom" ── */
 let tip = null;
@@ -83,9 +84,21 @@ export function installTooltips(root, closestFrom) {
     const grouped = tip?.hasAttribute("data-open") || Date.now() - tipHiddenAt < GROUP_WINDOW;
     tipTimer = setTimeout(() => showTooltip(anchor), grouped ? 0 : 400);
   });
+  // 鼠标能移到提示上去读（放大镜用户要用，WCAG 1.4.13）：离开按钮后留 120ms，移进提示就不关，离开提示再关
+  let leaveTimer = 0;
   root.addEventListener("pointerout", (event) => {
     const anchor = closestFrom(event, "[data-tooltip]");
-    if (anchor && !anchor.contains(event.relatedTarget)) hideTooltip();
+    const to = event.relatedTarget;
+    if (anchor && !anchor.contains(to)) {
+      if (tip && to && tip.contains(to)) return;
+      clearTimeout(leaveTimer);
+      leaveTimer = setTimeout(() => !tip?.matches?.(":hover") && hideTooltip(), 120);
+      return;
+    }
+    if (tip && event.target === tip && !(to && (tip.contains(to) || tipAnchor?.contains(to)))) hideTooltip();
+  });
+  root.addEventListener("pointerover", (event) => {
+    if (tip && (event.target === tip || tip.contains(event.target))) clearTimeout(leaveTimer);
   });
   root.addEventListener("focusin", (event) => {
     const anchor = closestFrom(event, "[data-tooltip]");
@@ -114,11 +127,9 @@ function regionFor(within) {
   if (region?.isConnected) return region;
   region = doc.createElement("div");
   region.className = "xxd-toast-region";
-  // 一个有名字的区域（读屏能跳到），里面新加的 toast 会被念出来
+  // 一个有名字的区域（读屏能跳到）。念出来靠常驻的播报区（announce），不靠这里：新插进去的 live region 第一句常常不念
   region.setAttribute("role", "region");
   region.setAttribute("aria-label", t("notifications", null, host.nodeType === 1 ? host : doc.documentElement));
-  region.setAttribute("aria-live", "polite");
-  region.setAttribute("aria-relevant", "additions");
   // 键盘聚焦进来时也要展开叠放（不然聚焦到的那张是 aria-hidden）
   region.addEventListener("focusin", () => restack(region));
   region.addEventListener("focusout", () => queueMicrotask(() => restack(region)));
@@ -197,6 +208,9 @@ export function toast(message, { tone = "neutral", within, duration, action, sta
   region.append(el);
   toTop(region);
   restack(region);
+  // 念出来：错误立刻打断（assertive），其余排队念；语气不只靠颜色，前面加「错误：」「注意：」
+  const prefix = tone === "danger" ? t("errorPrefix", null, region) : tone === "warning" ? t("warningPrefix", null, region) : "";
+  announce(`${prefix}${message}${action?.label ? t("toastActionHint", { label: action.label }, region) : ""}`, { assertive: tone === "danger", within: region });
 
   let timer = 0;
   const restart = (ms = duration) => {
@@ -341,12 +355,13 @@ export function showBubble(anchor, text, { duration = 1200 } = {}) {
   if (!bubble || !bubble.isConnected) {
     bubble = doc.createElement("div");
     bubble.className = "xxd-bubble";
-    bubble.setAttribute("role", "status");
-    bubble.setAttribute("aria-live", "polite");
+    // 看得见的气泡；念出来走常驻的播报区
+    bubble.setAttribute("aria-hidden", "true");
   }
   if (bubble.parentNode !== layerRoot(anchor)) layerRoot(anchor).append(bubble);
   clearTimeout(bubbleTimer);
   bubble.textContent = text;
+  announce(text, { within: anchor });
   place(anchor, bubble, { placement: "top", offset: 6 });
   bubble.setAttribute("data-open", "");
   bubbleTimer = setTimeout(() => bubble.removeAttribute("data-open"), duration);

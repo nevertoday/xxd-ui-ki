@@ -20,14 +20,16 @@ const sample = `<div class="xxd-cluster"><button class="xxd-btn" data-variant="p
 <footer class="xxd-dock" style="position:static;border:1px solid var(--line)"><div class="xxd-dock__status">${w.status}</div><div class="xxd-dock__primary"><button class="xxd-btn" data-variant="primary" data-size="sm">${w.links}</button></div></footer>`;
 const T = en
   ? {
-      title: "Finish", h1: "Finish: flat / material", caption: "Foundations", compare: "Side by side", use: "How to turn it on",
+      title: "Button style", h1: "Button style: flat / material", caption: "Foundations", compare: "Side by side", zoom: "Up close", use: "How to turn it on",
+      zoomLead: "At 1× the difference is a single pixel, so here it's 3× — resting and pressed, in light and dark.", rest: "Resting", pressed: "Pressed", light: "Light", dark: "Dark",
       lead: "Only affects solid buttons (primary, danger). Both render in the current theme, corners and accent — switch the appearance in the top bar to compare.",
       code: `<html data-finish="material">          <!-- the whole product -->
 <section data-finish="material">…</section>  <!-- one area; data-finish="flat" inside turns it off again -->
 Xxd.mountAppearance(el, { showFinish: true })   // let users choose under Appearance`,
     }
   : {
-      title: "质感", h1: "质感：平面 / 立体", caption: "基础", compare: "并排", use: "怎么开",
+      title: "质感", h1: "质感：平面 / 立体", caption: "基础", compare: "并排", zoom: "放大看", use: "怎么开",
+      zoomLead: "1 倍下差别只有一个像素，这里放大 3 倍：平时和按下，亮色和暗色各一组。", rest: "平时", pressed: "按下", light: "亮", dark: "暗",
       lead: "只影响实心按钮（主操作、危险）。两种都在当前主题、圆角、主色下渲染 —— 用顶栏切换外观对比。",
       code: `<html data-finish="material">          <!-- 整个产品 -->
 <section data-finish="material">…</section>  <!-- 局部；里面再写 data-finish="flat" 可以关掉 -->
@@ -35,7 +37,7 @@ Xxd.mountAppearance(el, { showFinish: true })   // 让用户在「外观」里�
     };
 ---
 
-<Site title={T.title} headings={[{ slug: "compare", text: T.compare }, { slug: "use", text: T.use }]}>
+<Site title={T.title} headings={[{ slug: "compare", text: T.compare }, { slug: "zoom", text: T.zoom }, { slug: "use", text: T.use }]}>
   <header class="site-head">
     <p class="xxd-text" data-variant="caption">{T.caption}</p>
     <h1 class="xxd-text" data-variant="display">{T.h1}</h1>
@@ -47,6 +49,25 @@ Xxd.mountAppearance(el, { showFinish: true })   // 让用户在「外观」里�
       <figure data-kind="do">
         <div class="site-dodont__stage" data-finish={s.finish} style="display:grid;gap:14px;justify-items:start" set:html={sample} />
         <figcaption><b>{s.name}</b>{s.note}</figcaption>
+      </figure>
+    ))}
+  </div>
+  <h2 class="site-h2" id="zoom">{T.zoom}</h2>
+  <p class="site-p">{T.zoomLead}</p>
+  <div class="site-finish-zoom">
+    {sets.map((s) => (
+      <figure>
+        <figcaption><b>{s.name}</b></figcaption>
+        {[["light", T.light], ["dark", T.dark]].map(([theme, label]) => (
+          <div class="site-finish-zoom__row xxd-force-scope" data-theme={theme} data-finish={s.finish}>
+            <span class="xxd-text" data-variant="caption">{label}</span>
+            <div class="site-finish-zoom__lens">
+              <button class="xxd-btn" data-variant="primary" data-size="sm" tabindex="-1" aria-label={`${s.name} · ${label} · ${T.rest}`}>{w.post}</button>
+              <button class="xxd-btn" data-variant="primary" data-size="sm" data-force="active" tabindex="-1" aria-label={`${s.name} · ${label} · ${T.pressed}`}>{w.post}</button>
+            </div>
+            <span class="xxd-text" data-variant="caption">{T.rest} · {T.pressed}</span>
+          </div>
+        ))}
       </figure>
     ))}
   </div>

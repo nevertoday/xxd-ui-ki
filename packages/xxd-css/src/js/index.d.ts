@@ -1,6 +1,12 @@
 export type Tone = "neutral" | "success" | "danger" | "warning";
 
-export declare function install(root?: Document | ShadowRoot): Document | ShadowRoot;
+export interface IconsLike { hydrateIcons?(root?: ParentNode): number }
+/** 装好事件委托并初始化。signal abort 时等于 uninstall(root)；icons 同 useIcons。可重复调用。 */
+export declare function install(root?: Document | ShadowRoot, options?: { signal?: AbortSignal; icons?: IconsLike }): Document | ShadowRoot;
+/** 撤掉 install(root) 装的监听和观察者。 */
+export declare function uninstall(root?: Document | ShadowRoot): void;
+/** 图标渲染用哪份 @xxd/icons（ESM 项目用；经典脚本自动用 window.XxdIcons）。 */
+export declare function useIcons(icons: IconsLike | null): void;
 export declare function init(root?: ParentNode): void;
 
 export declare function openDialog(dialog: HTMLDialogElement): void;
@@ -116,3 +122,8 @@ export declare function layerRoot(node: Node): HTMLElement | ShadowRoot;
 /** 注入到别人网页里时（mountXxdUI 会调用）：toast、确认框、命令面板、图片查看器、tooltip 默认出现在这个 ShadowRoot 里。传 null 恢复成 body。 */
 export declare function setDefaultLayerRoot(root: ShadowRoot | HTMLElement | null): void;
 export declare function defaultLayerRoot(): HTMLElement | ShadowRoot;
+
+/** 读屏播报：常驻的 live region（install 时建好），只换文字。assertive 打断当前朗读（错误用）。 */
+export declare function announce(message: string, options?: { assertive?: boolean; within?: Node }): void;
+/** 表单错误：写 aria-invalid、在输入框后面放一行 .xxd-error 并连上 aria-describedby；message 为空就清掉。 */
+export declare function setFieldError(input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, message: string, options?: { focus?: boolean }): HTMLElement | null;

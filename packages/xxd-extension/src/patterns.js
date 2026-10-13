@@ -6,6 +6,7 @@
 //   guardContext     「插件已更新，请刷新页面」：内容脚本里插件被更新 / 重新加载后，chrome.* 全部失效
 // 没有 chrome.*（展示站、普通网页里预览）时都有演示行为，不报错。
 import { uiLocale } from "./i18n.js";
+import { xxd } from "./xxd.js";
 
 const STRINGS = {
   "zh-CN": {
@@ -50,7 +51,7 @@ const s = (key, vars) => {
   return vars ? text.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? "")) : text;
 };
 const chromeApi = () => globalThis.chrome;
-const toast = (msg, opts) => globalThis.Xxd?.toast?.(msg, opts);
+const toast = (msg, opts) => xxd()?.toast?.(msg, opts);
 
 /* ── 需要权限 ── */
 /**

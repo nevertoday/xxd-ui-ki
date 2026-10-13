@@ -113,3 +113,10 @@ test("richText：先转义，再把令牌、类名、属性、标签、调用包
   assert.equal(richText("<img onerror=alert(1)>").includes("<img"), false);
   assert.equal(richText("h1–h3 in page order"), "h1–h3 in page order");
 });
+
+test("forceStates：输入框的 :focus 也算「聚焦」；「鼠标点时不显示焦点环」的规则不复制（不然矩阵里的键盘聚焦画不出来）", () => {
+  const out = forceStates(`@layer xxd.components { .xxd-input:focus { border-color: red; } :root[data-input="pointer"] .x :focus-visible { outline: none; } .x:focus-within { color: blue; } }`);
+  assert.match(out, /\.xxd-force-scope \.xxd-input\[data-force~="focus"\]/);
+  assert.doesNotMatch(out, /data-input="pointer"/);
+  assert.doesNotMatch(out, /focus-within/);
+});

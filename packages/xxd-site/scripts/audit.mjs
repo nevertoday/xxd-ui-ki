@@ -14,7 +14,7 @@
 //      toast 不被别的东西盖住。以前截图只拍关着的浮层，对话框跑到左上角也没人发现。
 //   8. 真实浏览器冒烟（评审 R1）：happy-dom 看不到的东西 —— 层叠层顺序（Tailwind 的工具类能盖住 xxd）、
 //      带 *{margin:0} reset 时对话框仍居中、mountXxdUI 之后 host 的定位不被清掉。
-// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site audit [--only=axe|long|shadow|forced|en|polish|overlay|smoke]
+// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site run audit [--only=axe|long|shadow|forced|en|polish|overlay|smoke]
 // 需要 Chromium：CHROME_EXE=<chrome-headless-shell 路径>（缺省用 Playwright 自带的）。
 import { createServer } from "node:http";
 import { createReadStream, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -372,6 +372,26 @@ async function polishAudit() {
       await tab.waitForTimeout(80);
       await tab.addScriptTag({ content: POLISH });
       for (const x of await tab.evaluate(() => xxdPolish(document.querySelector("main") || document.body))) report(`[${w}] ${page}`, x);
+      // 模板预览框 overflow:hidden：里面的东西超出左右边会被悄悄裁掉（不算「溢出」，上面查不到）
+      if (/\/templates\//.test(page)) {
+        const clipped = await tab.evaluate(() => {
+          const out = [];
+          for (const frame of document.querySelectorAll(".site-template")) {
+            const box = frame.getBoundingClientRect();
+            for (const el of frame.querySelectorAll("*")) {
+              if (el.closest("[hidden], dialog:not([open]), [popover]:not(:popover-open), svg") || !el.getClientRects().length) continue;
+              // 能横向滚动的容器（表格、标签栏）里面不算
+              let scroller = false;
+              for (let p = el.parentElement; p && p !== frame; p = p.parentElement) if (/(auto|scroll)/.test(getComputedStyle(p).overflowX)) scroller = true;
+              if (scroller) continue;
+              const r = el.getBoundingClientRect();
+              if (r.width && (r.left < box.left - 1 || r.right > box.right + 1)) out.push({ kind: "被预览框裁掉", where: `${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? "." + el.className.trim().split(/\s+/)[0] : ""}「${(el.textContent || "").trim().slice(0, 16)}」`, detail: `左 ${Math.round(r.left - box.left)}px / 右 ${Math.round(box.right - r.right)}px` });
+            }
+          }
+          return out.slice(0, 5);
+        });
+        for (const x of clipped) report(`[${w}] ${page}`, x);
+      }
     }
     await ctx.close();
   }

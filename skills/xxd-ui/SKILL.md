@@ -11,7 +11,7 @@ MIT 开源；不 push `upstream`；推送、发 npm、部署等用户说了再�
 ## 先读
 
 1. `docs/DESIGN-PRINCIPLES.md` —— 审美宪法。任何视觉决定都要对应到其中一条，对应不上就问用户。
-2. 要用的组件：`pnpm xxd doc <组件>`（原生，中文名也行；`--markup` 只要示例代码）或 `pnpm xxd doc <组件> --react`；全部组件 `pnpm xxd ls`。要用的图标：`pnpm xxd icon <中文关键词>`（500 个；不要自己画 SVG，也不要猜名字）。
+2. 要用的组件：`pnpm xxd doc <组件>`（原生，中文名也行；`--markup` 只要示例代码）或 `pnpm xxd doc <组件> --react`；全部组件 `pnpm xxd ls`。要用的图标：`pnpm xxd icon <中文关键词>`（500 多个；不要自己画 SVG，也不要猜名字）。
 
 ## 选哪一层
 

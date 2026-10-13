@@ -1,6 +1,8 @@
 // 三语（简 / 繁 / 英）：chrome.i18n 优先，没有时用传入的字典。
 //   <span data-i18n="settingsTitle"></span>
 //   <input data-i18n-attr="placeholder:searchPlaceholder,aria-label:searchLabel">
+import { xxd } from "./xxd.js";
+
 export function t(key, substitutions, fallback = {}) {
   const fromChrome = globalThis.chrome?.i18n?.getMessage?.(key, substitutions);
   if (fromChrome) return fromChrome;
@@ -43,18 +45,20 @@ export function uiLocale(lang) {
   if (lang) return normalize(lang);
   const fromMessages = globalThis.chrome?.i18n?.getMessage?.("xxdLocale");
   if (fromMessages) return normalize(fromMessages);
-  return normalize(globalThis.chrome?.i18n?.getUILanguage?.() || globalThis.navigator?.language || "zh-CN");
+  // 不在插件里（普通网页、展示站）：跟页面的 <html lang>，再退回浏览器语言
+  const pageLang = !globalThis.chrome?.i18n && globalThis.document?.documentElement?.lang;
+  return normalize(pageLang || globalThis.chrome?.i18n?.getUILanguage?.() || globalThis.navigator?.language || "zh-CN");
 }
 
 /** 这个脚本是不是跑在别人的网页里（内容脚本）。 */
 export const isContentScript = () => Boolean(globalThis.chrome?.runtime?.id) && globalThis.location?.protocol !== "chrome-extension:";
 
 /**
- * 把语言用到页面上：插件自己的页面写 <html lang>；组件（window.Xxd）跟着这种语言。
+ * 把语言用到页面上：插件自己的页面写 <html lang>；组件（@xxd/css，见 useXxd）跟着这种语言。
  * 内容脚本里只改组件的语言（它在插件自己的隔离环境里），不碰宿主网页的 <html lang>。extension.js 加载时自动调用。
  */
 export function applyLocale(locale = uiLocale()) {
   if (!isContentScript() && globalThis.document?.documentElement) globalThis.document.documentElement.lang = locale;
-  globalThis.Xxd?.setLocale?.(locale);
+  xxd()?.setLocale?.(locale);
   return locale;
 }

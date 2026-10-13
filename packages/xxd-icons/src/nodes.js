@@ -1,7 +1,6 @@
 // 小小东图标：一种画法。24 单位网格；描边 1.5、圆头、斜接角（方角）；不填充。
 // 直线和方角，坐标落在半像素上；只有东西本身是圆的才画圆。
-// 来源：会员站 member-cloudflare/src/lib/site-icons.js（2026-09-26 用户设计规则），
-// 本文件是唯一来源 —— 会员站以后从这里取。
+// 最早画在会员站里（2026-09-26 定下的规则），现在本文件是唯一来源 —— 会员站和插件都从这里取。
 export const ICON_ATTRIBUTES = Object.freeze({
   fill: "none",
   stroke: "currentColor",
@@ -16,7 +15,8 @@ const path = (d, attrs = {}) => ["path", { d, ...attrs }];
 const rect = (x, y, width, height) => ["rect", { x, y, width, height }];
 const circle = (cx, cy, r) => ["circle", { cx, cy, r }];
 const draw = (...parts) => parts.map(part => typeof part === "string" ? path(part) : part);
-const page = rect(5, 3.5, 14, 17);
+// 文件：右上角一个方角的折角（不是光秃秃的方块，和 Square、Tablet 分得开）
+const page = path("M5 3.5h9.5L19 8v12.5H5ZM14.5 3.5V8H19");
 const frame = rect(3.5, 3.5, 17, 17);
 const folder = path("M3.5 19.5v-15h6L12 7h8.5v12.5Z");
 const folderBack = path("M3.5 9.5v-5h6l2.5 2.5h8.5v2.5");
@@ -157,7 +157,9 @@ export const ICON_NODES = {
   Mail: envelope,
   MailCheck: draw("M20.5 12V5h-17v14H12", "m3.5 5 8.5 7 8.5-7", "m15 18 2.5 2.5L22 15"),
   MailSearch: draw("M20.5 10V5h-17v14H10", "m3.5 5 8.5 7 8.5-7", circle(16.5, 16.5, 3.5), "m19 19 3 3"),
-  MessageCircle: draw("M3.5 4h17v13H9l-5.5 4Z"),
+  // 圆的气泡（名字是 Circle）；方的气泡是 MessageSquare
+  MessageCircle: draw("M12 3.5a8.5 8.5 0 0 0-7.4 12.7L3.5 20.5l4.3-1.1A8.5 8.5 0 1 0 12 3.5Z"),
+  MessageSquare: [bubble],
   // Clapper then body: the rail animates those parts independently.
   Bell: draw("M10 20h4", "M5 17h14l-2-3V9a5 5 0 0 0-10 0v5Z"),
   BellRing: draw("M10 20h4", "M5 17h14l-2-3V9a5 5 0 0 0-10 0v5Z", "M3 7 5 4m14 0 2 3"),
@@ -261,7 +263,7 @@ export const ICON_NODES = {
   Grip: [circle(9, 9, .75), circle(15, 9, .75), circle(9, 15, .75), circle(15, 15, .75)],
   Calendar: draw(rect(3.5, 5, 17, 15.5), "M3.5 10h17M8 3v4m8-4v4"),
   Command: draw("M9 9V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3Z"),
-  Dot: [circle(12, 12, 1.5)],
+  Dot: [circle(12, 12, 2.5)],
   Circle: [circle(12, 12, 8.5)],
   Paperclip: draw("m20 11-8.5 8.5a5 5 0 0 1-7-7L13 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L14 7"),
   Undo: draw("M9 14 4 9l5-5", "M4 9h11a5 5 0 0 1 0 10h-3"),
@@ -271,7 +273,7 @@ export const ICON_NODES = {
   Heading1: draw("M4 5v14M12 5v14M4 12h8", "m16 12 3-2v9"),
   Quote: draw("M4 6h6v6l-3 6M14 6h6v6l-3 6"),
   Play: draw("m7 4 13 8-13 8Z"),
-  Square2: [rect(6.5, 6.5, 11, 11)],
+  Square2: [rect(5.5, 5.5, 13, 13)],
   // —— 扩充（2026-10）：插件和网站常用的其余图标，同一画法 ——
   // 箭头与方向
   ArrowDownLeft: draw("M18 6 6 18M6 6v12h12"),
@@ -607,7 +609,7 @@ export const ICON_ALIASES = {
   CheckCircle: "CircleCheck", XCircle: "CircleX", AlertCircle: "CircleAlert", AlertTriangle: "TriangleAlert", AlertOctagon: "OctagonAlert",
   HelpCircle: "CircleHelp", PlusCircle: "CirclePlus", MinusCircle: "CircleMinus", PlayCircle: "CirclePlay", StopCircle: "CircleStop",
   UserCircle: "CircleUser", MoreVertical: "EllipsisVertical", DotsThreeVertical: "EllipsisVertical", Fullscreen: "Maximize",
-  Enter: "CornerDownLeft", MessageSquare: "MessageCircle", Chat: "MessageCircle", Unlock: "LockOpen", Cart: "ShoppingCart",
+  Enter: "CornerDownLeft", Chat: "MessageCircle", Unlock: "LockOpen", Cart: "ShoppingCart",
   Location: "MapPin", Refresh: "RefreshCw", Reload: "RefreshCw", Edit2: "Pencil", Edit3: "PencilLine", Bolt: "Zap",
   Lightning: "Zap", Sliders: "SlidersHorizontal", Logout: "LogOut", Login: "LogIn", Spinner: "Loader", Gamepad2: "Gamepad",
   Earth: "Globe", PieChart: "ChartPie", BarChart: "ChartColumn", LineChart: "ChartLine", AreaChart: "ChartArea", Sort: "ArrowUpDown",

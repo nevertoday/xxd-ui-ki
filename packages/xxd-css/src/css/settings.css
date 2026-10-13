@@ -48,9 +48,9 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px var(--space-3);
-    min-height: 48px;
-    padding: 10px 14px;
+    gap: var(--space-2) var(--space-3);
+    min-height: var(--row-h, calc(var(--control-h) + 8px));
+    padding: var(--row-pad-y, 12px) var(--row-pad-x, 16px);
   }
 
   .xxd-row + .xxd-row {
@@ -140,9 +140,9 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
-    gap: 6px var(--space-3);
-    min-height: 44px;
-    padding: 8px 14px;
+    gap: var(--space-2) var(--space-3);
+    min-height: var(--list-row-h, calc(var(--control-h) + 4px));
+    padding: var(--list-row-pad-y, 8px) var(--row-pad-x, 16px);
     color: var(--ink);
   }
 
@@ -164,16 +164,16 @@
     background: var(--selected-bg);
   }
 
-  /* 撑开的是正文：有 .xxd-list__main 就是它；没有时是第一样东西（比如一个 <span>） */
+  /* 撑开的是正文：有 .xxd-list__main 就是它；没有时是第一样东西（比如一个 <span>；图标、头像、按钮、把手不算） */
   .xxd-list__main,
-  .xxd-list > .xxd-list__item:not(:has(> .xxd-list__main)) > :first-child:not(:only-child) {
+  .xxd-list > .xxd-list__item:not(:has(> .xxd-list__main)) > :first-child:not(:only-child, i, svg, img, button, input, .xxd-avatar, .xxd-sort-handle) {
     flex: 1 1 8em;
     min-width: 0;
   }
 
   /* 正文之后的按钮：同一行时被正文推到右边；换到下一行时也靠右 */
   .xxd-list > .xxd-list__item > .xxd-list__main + *,
-  .xxd-list > .xxd-list__item:not(:has(> .xxd-list__main)) > :first-child:not(:only-child) + * {
+  .xxd-list > .xxd-list__item:not(:has(> .xxd-list__main)) > :first-child:not(:only-child, i, svg, img, button, input, .xxd-avatar, .xxd-sort-handle) + * {
     margin-inline-start: auto;
   }
 

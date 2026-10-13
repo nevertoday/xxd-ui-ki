@@ -360,39 +360,63 @@
   }
 
   /* ── 页面头：面包屑、标题、说明、操作、tab ── */
+  /* 页面头：标题和它的说明挨着（--space-1），操作按钮在右边、和标题顶对齐、跨两行，不把说明往下推；
+   * 窄的时候（容器窄于 480px）操作换到说明下面。相关的字靠得更近（原则 §6）。 */
   .xxd-page-header {
+    container-type: inline-size;
     display: grid;
-    gap: 6px;
-    padding: var(--space-6) 0 var(--space-4);
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: var(--space-4);
+    row-gap: var(--space-1);
+    padding: var(--space-6) 0 var(--space-5);
+  }
+
+  .xxd-page-header > :not(.xxd-page-header__row, .xxd-page-header__desc) {
+    grid-column: 1 / -1;
+  }
+
+  .xxd-page-header > .xxd-breadcrumbs {
+    margin-bottom: var(--space-2);
   }
 
   .xxd-page-header__row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: var(--space-3);
+    display: contents;
   }
 
   /* 标题至少留 12 个字宽：放不下时操作按钮整体换到下一行，标题不会被挤成一字一行 */
   .xxd-page-header__title {
-    flex: 1 1 12em;
+    grid-column: 1;
     min-width: min(100%, 12em);
     margin: 0;
-    font: var(--weight-strong) var(--text-xl) / 1.35 var(--font-body);
+    font: var(--weight-strong) var(--text-xl) / var(--leading-lg) var(--font-body);
   }
 
   .xxd-page-header__desc {
+    grid-column: 1;
     max-width: 640px;
     margin: 0;
     color: var(--muted);
     font-size: var(--text-sm);
-    line-height: 1.6;
+    line-height: var(--leading-sm);
   }
 
   .xxd-page-header__actions {
+    grid-column: 2;
+    grid-row: span 2;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    justify-content: flex-end;
+    gap: var(--space-2);
+  }
+
+  @container (max-width: 480px) {
+    .xxd-page-header__actions {
+      grid-column: 1 / -1;
+      grid-row: auto;
+      justify-content: flex-start;
+      margin-top: var(--space-2);
+    }
   }
 
   .xxd-page-header > .xxd-tabs {

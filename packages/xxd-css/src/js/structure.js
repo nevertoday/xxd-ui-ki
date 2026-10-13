@@ -24,7 +24,11 @@ export function toggleSidebar(sidebar, collapsed = !sidebar.hasAttribute("data-c
       }
     }
   }
-  for (const t of document.querySelectorAll(`[data-xxd-sidebar-toggle="${sidebar.id}"]`)) t.setAttribute("aria-expanded", String(!collapsed));
+  // 名字固定成「侧栏」，展开 / 折叠只靠 aria-expanded（不会展开着还念「折叠侧栏」）
+  for (const btn of document.querySelectorAll(`[data-xxd-sidebar-toggle="${sidebar.id}"]`)) {
+    btn.setAttribute("aria-expanded", String(!collapsed));
+    if (!btn.dataset.keepLabel) btn.setAttribute("aria-label", t("sidebar", null, btn));
+  }
   emit(sidebar, "xxd:change", { collapsed });
 }
 
@@ -39,6 +43,18 @@ export function initStructure(root) {
     if (!items.some((i) => i.tabIndex === 0)) items.forEach((el, n) => (el.tabIndex = n === 0 ? 0 : -1));
   }
   for (const s of root.querySelectorAll("[data-xxd-sidebar][data-collapsed]")) toggleSidebar(s, true);
+  // 拖侧栏宽度的把手：键盘也能用
+  for (const h of root.querySelectorAll("[data-sidebar-resize]")) {
+    const sidebar = h.closest("[data-xxd-sidebar]");
+    if (!sidebar) continue;
+    h.setAttribute("role", "separator");
+    h.setAttribute("aria-orientation", "vertical");
+    h.tabIndex = 0;
+    if (!h.hasAttribute("aria-label")) h.setAttribute("aria-label", t("resizeSidebar", null, sidebar));
+    h.setAttribute("aria-valuemin", String(Number(sidebar.dataset.min) || 200));
+    h.setAttribute("aria-valuemax", String(Number(sidebar.dataset.max) || 400));
+    h.setAttribute("aria-valuenow", String(Math.round(sidebar.getBoundingClientRect().width) || Number(sidebar.dataset.min) || 200));
+  }
   for (const list of root.querySelectorAll(".xxd-tabs")) watchTabsOverflow(list);
   for (const crumbs of root.querySelectorAll(".xxd-breadcrumbs[data-collapse]")) collapseBreadcrumbs(crumbs);
   for (const toc of root.querySelectorAll(".xxd-toc[data-spy]")) spyToc(toc);
@@ -80,6 +96,8 @@ export function collapseBreadcrumbs(crumbs) {
     item.className = "xxd-menu__item";
     item.setAttribute("role", "menuitem");
     if (a) item.href = a.href;
+    // 没有链接的那一级也要能用方向键走到
+    else item.tabIndex = -1;
     item.textContent = li.textContent.trim();
     menu.append(item);
     li.hidden = true;
@@ -88,14 +106,23 @@ export function collapseBreadcrumbs(crumbs) {
 }
 
 /* ── 文章目录：滚动到哪一节，哪一项 aria-current ── */
+const spying = new WeakMap();
 export function spyToc(toc) {
+  // 同一个目录再调一次（init 会被重复调用）：先停掉上一个观察者，不叠加
+  spying.get(toc)?.disconnect();
+  spying.delete(toc);
   const links = [...toc.querySelectorAll('a[href^="#"]')];
-  const targets = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1)))).filter(Boolean);
+  const scope = toc.getRootNode?.() ?? document;
+  const find = (id) => (scope.getElementById ? scope.getElementById(id) : document.getElementById(id));
+  const targets = links.map((a) => find(decodeURIComponent(a.hash.slice(1)))).filter(Boolean);
   if (!targets.length || typeof IntersectionObserver !== "function") return;
   const visible = new Set();
   const io = new IntersectionObserver(
     (entries) => {
-      for (const e of entries) (e.isIntersecting ? visible.add(e.target) : visible.delete(e.target));
+      for (const e of entries) {
+        if (e.isIntersecting) visible.add(e.target);
+        else visible.delete(e.target);
+      }
       const current = targets.find((t) => visible.has(t)) || null;
       if (!current) return;
       for (const a of links) a.setAttribute("aria-current", String(a.hash.slice(1) === current.id));
@@ -103,6 +130,7 @@ export function spyToc(toc) {
     { rootMargin: "-56px 0px -60% 0px" },
   );
   targets.forEach((t) => io.observe(t));
+  spying.set(toc, io);
 }
 
 export function installStructure(root, byId, closestFrom) {
@@ -155,13 +183,11 @@ export function installStructure(root, byId, closestFrom) {
     const handle = closestFrom(event, "[data-sidebar-resize]");
     if (!handle) return;
     const sidebar = handle.closest("[data-xxd-sidebar]");
-    const min = Number(sidebar.dataset.min) || 200;
-    const max = Number(sidebar.dataset.max) || 400;
     const startX = event.clientX;
     const startW = sidebar.getBoundingClientRect().width;
     sidebar.setAttribute("data-resizing", "");
     handle.setPointerCapture?.(event.pointerId);
-    const move = (e) => sidebar.style.setProperty("--sidebar-w", `${Math.min(max, Math.max(min, startW + e.clientX - startX))}px`);
+    const move = (e) => setSidebarWidth(handle, startW + e.clientX - startX);
     const up = () => {
       sidebar.removeAttribute("data-resizing");
       handle.removeEventListener("pointermove", move);
@@ -170,6 +196,31 @@ export function installStructure(root, byId, closestFrom) {
     handle.addEventListener("pointermove", move);
     handle.addEventListener("pointerup", up, { once: true });
   });
+  root.addEventListener("keydown", (event) => {
+    const handle = closestFrom(event, "[data-sidebar-resize]");
+    if (!handle) return;
+    const sidebar = handle.closest("[data-xxd-sidebar]");
+    const w = sidebar.getBoundingClientRect().width;
+    const next = { ArrowLeft: w - 16, ArrowRight: w + 16, Home: -Infinity, End: Infinity }[event.key];
+    if (next === undefined) return;
+    event.preventDefault();
+    setSidebarWidth(handle, next);
+    emit(sidebar, "xxd:resize", { width: sidebar.getBoundingClientRect().width });
+  });
+  root.addEventListener("dblclick", (event) => {
+    const handle = closestFrom(event, "[data-sidebar-resize]");
+    if (!handle) return;
+    handle.closest("[data-xxd-sidebar]").style.removeProperty("--sidebar-w");
+  });
+}
+
+function setSidebarWidth(handle, width) {
+  const sidebar = handle.closest("[data-xxd-sidebar]");
+  const min = Number(sidebar.dataset.min) || 200;
+  const max = Number(sidebar.dataset.max) || 400;
+  const w = Math.round(Math.min(max, Math.max(min, width)));
+  sidebar.style.setProperty("--sidebar-w", `${w}px`);
+  handle.setAttribute("aria-valuenow", String(w));
 }
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';

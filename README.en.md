@@ -15,7 +15,7 @@ It is the design system of XXD (小小东), an independent maker: the XXD member
 
 ![The same extension side panel in four appearances: light / dark × square / rounded, the last two with an accent color](docs/assets/overview.png)
 
-> **Status: alpha (0.x).** Not on npm yet — use it from source (shown below). During 0.x, minor versions may include breaking changes; see the [changelog](CHANGELOG.md).
+> **Status: alpha (0.x).** Not on npm yet — use it from source (shown below). During 0.x, minor versions may include breaking changes; see the [changelog](CHANGELOG.en.md).
 
 ## Good fit / not a good fit
 
@@ -38,7 +38,7 @@ It is the design system of XXD (小小东), an independent maker: the XXD member
 | How you use it | One CSS + one JS, or React components | Copy the source into your project | npm package |
 | Chrome extensions | Built for it (vendor files, Shadow DOM, three languages, doctor) | No specific support | No specific support |
 | Language | Chinese first, three languages | English | Chinese, English |
-| Size | 59 components + 13 patterns | Many components, big community | The most complete |
+| Size | 59 components + 18 patterns | Many components, big community | The most complete |
 
 ## Quick start
 
@@ -50,7 +50,7 @@ You need Node 24.12 or later and pnpm 12 (if pnpm is missing, the version in `pa
 git clone https://github.com/nevertoday/xxd-ui-kit.git
 cd xxd-ui-kit
 pnpm install
-pnpm xxd:build      # build tokens, icons, components and the extension kit
+pnpm xxd:build      # build tokens, icons, components, the extension kit and React (builds Kumo first the first time)
 pnpm xxd link       # optional: install the global command xxd-ui so it works in any directory
 ```
 
@@ -82,9 +82,13 @@ xxd-ui sync ./my-site     # later: copy in the latest version
 
 ```js
 import "@xxd/css/dist/xxd.css";
-import { install, toast, confirmDialog } from "@xxd/css";
-install();
+import * as icons from "@xxd/icons";
+import { install, uninstall, useIcons, toast, confirmDialog } from "@xxd/css";
+useIcons(icons);  // turns <i data-xxd-icon="…"> into SVG (the classic script uses icons.js automatically)
+install();        // or install(root, { signal }); uninstall(root) when that part of the page goes away
 ```
+
+Icons, only the ones you use: `import { Check } from "@xxd/icons/each"`, then `iconSVG(Check)` or `<Icon icon={Check} />`. Names are typed (`IconName`), so typos show up in your editor.
 
 Your site already has its own CSS variables and you don't want anything to change: see [bringing in an existing site](docs/en/existing-site.md).
 
@@ -144,7 +148,7 @@ A complete example (an `App.tsx` with the providers) is on the showcase's [Getti
 xxd-ui ls               # every component
 xxd-ui doc Dialog       # one component's markup, attributes and rules (Chinese names and typos work too)
 xxd-ui doc Dialog --react
-xxd-ui icon trash       # find an icon (500 of them); add --svg / --react / --copy
+xxd-ui icon trash       # find an icon (500+ of them); add --svg / --react / --copy
 xxd-ui tokens line      # tokens with their light / dark values
 xxd-ui help --en        # every command
 ```
@@ -168,8 +172,8 @@ kit         settings, the CLI
 | Package          | In one sentence                                                                                                       |
 | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `@xxd/tokens`    | The single source of every color, type size, spacing step and radius, plus a first-frame script so pages open in the user's theme |
-| `@xxd/icons`     | 500 icons drawn one way (24 grid, 1.5 stroke, square corners), searchable by Chinese keyword                         |
-| `@xxd/css`       | 59 native components and 13 patterns (drag and drop, image viewer, confirm twice…); keyboard and screen-reader behavior is our own, checked by the audit |
+| `@xxd/icons`     | 500+ icons drawn one way (24 grid, 1.5 stroke, square corners), searchable by Chinese keyword                         |
+| `@xxd/css`       | 59 native components and 18 patterns (drag and drop, image viewer, two-step confirm, extension permission requests…); keyboard and screen-reader behavior is our own, checked by the audit |
 | `@xxd/react`     | Kumo's React components in the XXD look (keyboard, focus and screen readers handled by Base UI underneath), plus XXD-only components and appearance and language providers |
 | `@xxd/extension` | The Chrome extension toolkit and the `xxd-ui` command                                                                  |
 | `@xxd/site`      | The showcase: every component, pattern, full-page template and design principle, in Chinese and English               |
@@ -189,7 +193,7 @@ Two checks before release (both need headless Chrome via `CHROME_EXE`):
 ```bash
 pnpm --filter @xxd/site build
 pnpm --filter @xxd/site visual   # screenshot diff: every page × 4 appearances
-pnpm --filter @xxd/site audit    # accessibility, long text, hostile host page, forced colors, untranslated text, polish, overlays, smoke
+pnpm --filter @xxd/site run audit    # accessibility, long text, hostile host page, forced colors, untranslated text, polish, overlays, smoke
 ```
 
 A few hard rules: no shadows on cards, rows or buttons; weights 400 / 500 / 600 only; animate only opacity and position; every visual decision traces back to the [design principles](https://ui.xiaoxiaodong.ai/en/principles).
@@ -204,7 +208,7 @@ How to contribute: [CONTRIBUTING](CONTRIBUTING.en.md).
 | Why it looks this way     | [Design principles](https://ui.xiaoxiaodong.ai/en/principles) |
 | How to use it in an extension | [Extension kit](docs/en/EXTENSION-KIT.md)            |
 | How to bring in an existing site | [Existing sites](docs/en/existing-site.md)         |
-| What changed              | [Changelog](CHANGELOG.md)                                |
+| What changed              | [Changelog](CHANGELOG.en.md)                              |
 | Reporting a security issue | [Security](SECURITY.md)                                 |
 
 **Maintaining it** (mostly in Chinese)

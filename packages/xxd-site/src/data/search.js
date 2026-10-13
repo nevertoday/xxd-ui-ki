@@ -71,7 +71,7 @@ export const PAGE_KEYWORDS = {
   "/foundations/type": "typography font text size 字体 字号 排版",
   "/foundations/spacing": "spacing density compact gap padding 间距 密度 紧凑",
   "/foundations/motion": "motion animation transition reduced-motion 动效 动画 过渡",
-  "/foundations/finish": "finish flat material 质感 纯平 按钮质感",
+  "/foundations/finish": "finish flat material button style 质感 平面 立体 纯平 按钮质感",
   "/foundations/icons": "icon icons svg 图标",
   "/start": "install setup getting-started quick-start cdn 安装 开始 上手 快速开始",
   "/tools": "cli command doctor sync init 命令行 工具 体检 同步",

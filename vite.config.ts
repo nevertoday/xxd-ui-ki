@@ -137,5 +137,16 @@ export default defineConfig({
       typeAware: true,
       typeCheck: true,
     },
+    overrides: [
+      {
+        // 小小东的包（纯 JS）：node:test 的 test() 不需要 await；数汉字时有意按字符展开字符串；测试直接用 vitest
+        files: ["packages/xxd-*/**", "scripts/**"],
+        rules: {
+          "typescript/no-floating-promises": "off",
+          "typescript/no-misused-spread": "off",
+          "vite-plus/prefer-vite-plus-imports": "off",
+        },
+      },
+    ],
   },
 });

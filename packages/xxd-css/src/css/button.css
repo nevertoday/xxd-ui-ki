@@ -4,7 +4,7 @@
  *   size: xs | sm | md（缺省）| lg；data-icon-only 纯图标（务必加 aria-label）；data-shape="round" 圆形图标按钮（跟随圆角开关）
  *   aria-busy="true" 进行中：文字保留但透明（宽度不跳），转圈居中；Xxd.runBusy(btn, task) 完成后图标变勾一下。
  *   对话框的取消用 class="xxd-btn ui-dialog-cancel"：内容宽度、视觉安静。
- *   质感：<html data-finish="material">（或任何容器上，局部 data-finish="flat" 可以关掉）时实心按钮有顶部 1px 内高光、深一点的边、按下下沉 0.5px；缺省纯平。 */
+ *   质感：<html data-finish="material">（或任何容器上；离按钮最近的那个 data-finish 说了算）时实心按钮有顶部 1px 内高光、深一点的边、按下下沉 0.5px；缺省纯平。 */
 @layer xxd.components {
   .xxd-btn {
     --btn-fg: var(--ink);
@@ -17,7 +17,8 @@
     justify-content: center;
     gap: 6px;
     height: var(--control-h);
-    padding: 0 14px;
+    /* 组件级令牌（缺省值落在 4px 刻度上；紧凑密度在 tokens.css 里一起变） */
+    padding: 0 var(--control-pad-x, 16px);
     border: 1px solid var(--btn-bd);
     border-radius: var(--r-sm);
     background: var(--btn-bg);
@@ -46,6 +47,16 @@
 
   .xxd-btn:hover {
     background: var(--btn-bg-hover);
+  }
+
+  /* 按下：纯平也看得出按下了 —— 底色再深一档（只改颜色，不位移；质感模式另外下沉 0.5px）。
+   * 实心按钮压暗 8%，其余用 --wash-strong。 */
+  .xxd-btn:active:not(:disabled, [aria-disabled="true"]) {
+    background: var(--btn-bg-active, var(--wash-strong));
+  }
+
+  .xxd-btn:is([data-variant="primary"], [data-variant="danger"]):active:not(:disabled, [aria-disabled="true"]) {
+    background: color-mix(in srgb, var(--btn-bg-hover) 92%, #000000);
   }
 
   .xxd-btn[aria-pressed="true"] {
@@ -113,14 +124,14 @@
 
   .xxd-btn[data-size="sm"] {
     height: var(--control-h-sm);
-    padding: 0 10px;
+    padding: 0 var(--control-pad-x-sm, 12px);
     font-size: var(--text-xs);
   }
 
   .xxd-btn[data-size="lg"] {
-    height: calc(var(--control-h) + 4px);
-    padding: 0 18px;
-    font-size: var(--text-base);
+    height: calc(var(--control-h) + 8px);
+    padding: 0 var(--control-pad-x-lg, 20px);
+    font-size: var(--text-md);
   }
 
   .xxd-btn[data-icon-only] {
@@ -185,19 +196,34 @@
     color: var(--success);
   }
 
-  /* 质感（data-finish="material"）：只给实心按钮；这是材质，不是浮起 —— 没有外阴影。 */
-  [data-finish="material"] .xxd-btn:not([data-finish="flat"] *):is([data-variant="primary"], [data-variant="danger"]) {
-    --btn-bd: color-mix(in srgb, var(--btn-bg) 86%, #000000);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  /* 质感（data-finish="material"）：只给实心按钮；这是材质，不是浮起 —— 没有外阴影。
+   * 离按钮最近的 data-finish 说了算：<html data-finish="flat"> 里的一块 material、material 里再一块 flat 都行。
+   * 所以用继承的变量，不用祖先选择器（祖先选择器会被更外层的 flat 一起匹配上）。 */
+  [data-finish="material"] {
+    --btn-edge: 86%;
+    --btn-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    --btn-highlight-pressed: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --btn-press-y: 0.5px;
   }
 
-  [data-finish="material"] .xxd-btn:not([data-finish="flat"] *):is([data-variant="primary"], [data-variant="danger"]):active {
-    transform: translateY(0.5px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  [data-finish="flat"] {
+    --btn-edge: 100%;
+    --btn-highlight: none;
+    --btn-highlight-pressed: none;
+    --btn-press-y: 0px;
   }
 
-  [data-finish="material"] .xxd-btn:not([data-finish="flat"] *, [data-variant="primary"], [data-variant="danger"], [data-variant="ghost"], .ui-dialog-cancel):active {
-    transform: translateY(0.5px);
+  .xxd-btn:is([data-variant="primary"], [data-variant="danger"]) {
+    --btn-bd: color-mix(in srgb, var(--btn-bg) var(--btn-edge, 100%), #000000);
+    box-shadow: var(--btn-highlight, none);
+  }
+
+  .xxd-btn:is([data-variant="primary"], [data-variant="danger"]):active:not(:disabled, [aria-disabled="true"]) {
+    box-shadow: var(--btn-highlight-pressed, none);
+  }
+
+  .xxd-btn:not([data-variant="ghost"], .ui-dialog-cancel):active:not(:disabled, [aria-disabled="true"]) {
+    transform: translateY(var(--btn-press-y, 0px));
   }
 
   /* 文字链接式按钮 */
@@ -211,6 +237,11 @@
     text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
     text-underline-offset: 3px;
     cursor: pointer;
+  }
+
+  /* 危险的文字链接（「清空全部记录」）：用危险色，别写 style="color:…" */
+  .xxd-link[data-tone="danger"] {
+    color: var(--danger);
   }
 
   .xxd-link:hover {

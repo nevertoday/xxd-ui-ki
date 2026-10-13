@@ -22,7 +22,33 @@ export function syncSelectAll(table) {
   return on;
 }
 
+const COL_MIN = 48;
+const COL_MAX = 800;
+/** 拖列宽的把手：键盘也能用（role=separator，← → 每次 16px，Home / End 最窄 / 最宽，双击恢复）。 */
+function initColumnResizers(root) {
+  for (const h of root.querySelectorAll(".xxd-th-resize")) {
+    const th = h.closest("th");
+    if (!th) continue;
+    h.setAttribute("role", "separator");
+    h.setAttribute("aria-orientation", "vertical");
+    h.tabIndex = 0;
+    const name = th.querySelector(".xxd-th-sort")?.textContent.trim() || th.textContent.trim();
+    if (!h.hasAttribute("aria-label")) h.setAttribute("aria-label", t("resizeColumn", { name }, th));
+    h.setAttribute("aria-valuemin", String(COL_MIN));
+    h.setAttribute("aria-valuemax", String(COL_MAX));
+    h.setAttribute("aria-valuenow", String(Math.round(th.getBoundingClientRect().width) || COL_MIN));
+  }
+}
+
+function setColumnWidth(handle, width) {
+  const th = handle.closest("th");
+  const w = Math.min(COL_MAX, Math.max(COL_MIN, Math.round(width)));
+  th.style.width = `${w}px`;
+  handle.setAttribute("aria-valuenow", String(w));
+}
+
 export function initData(root) {
+  initColumnResizers(root);
   for (const table of root.querySelectorAll(".xxd-table")) if (table.querySelector("[data-select-all]")) syncSelectAll(table);
   for (const wrap of root.querySelectorAll(".xxd-table-wrap")) watchStickyEdges(wrap);
   for (const pair of root.querySelectorAll(".xxd-range-pair")) syncRangePair(pair);
@@ -218,7 +244,7 @@ export function installData(root, closestFrom) {
     const startW = th.getBoundingClientRect().width;
     handle.setAttribute("data-active", "");
     handle.setPointerCapture?.(event.pointerId);
-    const move = (e) => (th.style.width = `${Math.max(48, startW + e.clientX - startX)}px`);
+    const move = (e) => setColumnWidth(handle, startW + e.clientX - startX);
     handle.addEventListener("pointermove", move);
     handle.addEventListener(
       "pointerup",
@@ -228,5 +254,21 @@ export function installData(root, closestFrom) {
       },
       { once: true },
     );
+  });
+  root.addEventListener("keydown", (event) => {
+    const handle = closestFrom(event, ".xxd-th-resize");
+    if (!handle) return;
+    const th = handle.closest("th");
+    const w = th.getBoundingClientRect().width;
+    const next = { ArrowLeft: w - 16, ArrowRight: w + 16, Home: COL_MIN, End: COL_MAX }[event.key];
+    if (next === undefined) return;
+    event.preventDefault();
+    setColumnWidth(handle, next);
+  });
+  root.addEventListener("dblclick", (event) => {
+    const handle = closestFrom(event, ".xxd-th-resize");
+    if (!handle) return;
+    handle.closest("th").style.width = "";
+    handle.setAttribute("aria-valuenow", String(Math.round(handle.closest("th").getBoundingClientRect().width)));
   });
 }

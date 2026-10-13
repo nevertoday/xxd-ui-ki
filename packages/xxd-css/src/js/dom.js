@@ -9,6 +9,8 @@ export function closestFrom(event, selector) {
 export function byId(from, id) {
   if (!id) return null;
   const root = from?.getRootNode ? from.getRootNode() : document;
+  // 在 Shadow 里只在这个 Shadow 里找：回退到宿主网页的 document 会误操作宿主上同 id 的元素
+  if (root.nodeType === 11) return root.getElementById?.(id) ?? null;
   return (root.getElementById && root.getElementById(id)) || document.getElementById(id);
 }
 

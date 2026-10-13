@@ -3,6 +3,34 @@ import { emit, focusables } from "./dom.js";
 
 const returnTo = new WeakMap();
 const stack = [];
+const inerted = new WeakMap();
+
+/**
+ * 模态：打开时把这一层「外面」的东西设成 inert（点不到、读屏也读不到），关掉再还原。
+ * sheet 只管它所在的 .xxd-sheet-host；面板一直往上管到 body（或 ShadowRoot）。遮罩、toast 区、播报区、顶层浮层不动。
+ */
+const KEEP = ".xxd-scrim, .xxd-panel-scrim, .xxd-toast-region, .xxd-announcer, [popover], script, style";
+function setOutsideInert(layer, on) {
+  if (!on) {
+    for (const el of inerted.get(layer) ?? []) el.removeAttribute("inert");
+    inerted.delete(layer);
+    return;
+  }
+  const stopAt = layer.classList.contains("xxd-sheet") ? layer.closest(".xxd-sheet-host") : null;
+  const changed = [];
+  let node = layer;
+  while (node && node.parentNode && node !== stopAt) {
+    const parent = node.parentNode;
+    for (const sib of parent.children ?? []) {
+      if (sib === node || sib.matches?.(KEEP) || sib.hasAttribute("inert") || sib.contains(layer)) continue;
+      sib.setAttribute("inert", "");
+      changed.push(sib);
+    }
+    if (parent === stopAt || parent.nodeType === 11 || parent === parent.ownerDocument?.body) break;
+    node = parent;
+  }
+  inerted.set(layer, changed);
+}
 
 function scrimFor(layer) {
   if (layer.classList.contains("xxd-sheet")) return layer.closest(".xxd-sheet-host")?.querySelector(":scope > .xxd-scrim");
@@ -27,6 +55,10 @@ export function openLayer(layer) {
   returnTo.set(layer, layer.getRootNode().activeElement);
   layer.setAttribute("data-open", "");
   layer.setAttribute("aria-hidden", "false");
+  // 读屏要知道进了一个对话框：没写 role 的补上
+  if (!layer.hasAttribute("role")) layer.setAttribute("role", "dialog");
+  layer.setAttribute("aria-modal", "true");
+  setOutsideInert(layer, true);
   scrimFor(layer)?.setAttribute("data-open", "");
   layer.closest(".xxd-sheet-host")?.setAttribute("data-sheet-open", "");
   stack.push(layer);
@@ -40,6 +72,8 @@ export function closeLayer(layer) {
   if (!layer || !layer.hasAttribute("data-open")) return;
   layer.removeAttribute("data-open");
   layer.setAttribute("aria-hidden", "true");
+  layer.removeAttribute("aria-modal");
+  setOutsideInert(layer, false);
   scrimFor(layer)?.removeAttribute("data-open");
   layer.closest(".xxd-sheet-host")?.removeAttribute("data-sheet-open");
   const i = stack.lastIndexOf(layer);

@@ -5,7 +5,7 @@
 //   </div>
 //   <button data-xxd-popover="p1">说明</button> <div class="xxd-popover" id="p1" popover>…</div>
 import { place } from "./floating.js";
-import { emit } from "./dom.js";
+import { byId, emit, nextId } from "./dom.js";
 
 const ITEM = '[role="menuitem"]:not([disabled]):not([aria-disabled="true"]), [role="menuitemcheckbox"]:not([disabled]), [role="menuitemradio"]:not([disabled])';
 const openers = new WeakMap();
@@ -44,6 +44,28 @@ export function hideFloating(floating, { restoreFocus = false } = {}) {
   const trigger = openers.get(floating);
   trigger?.setAttribute("aria-expanded", "false");
   if (restoreFocus) trigger?.focus();
+}
+
+/**
+ * 触发按钮告诉读屏会弹出什么：菜单 aria-haspopup="menu"、说明浮层 "dialog"；没打开时 aria-expanded="false"；aria-controls 指过去。
+ * 说明浮层没写 role 的补成 dialog，名字取触发按钮。init 时调用（可以重复调用）。
+ */
+export function initMenus(root = document) {
+  for (const trigger of root.querySelectorAll("[data-xxd-menu], [data-xxd-popover]")) {
+    const isMenu = trigger.hasAttribute("data-xxd-menu");
+    const id = trigger.getAttribute(isMenu ? "data-xxd-menu" : "data-xxd-popover");
+    if (!trigger.hasAttribute("aria-haspopup")) trigger.setAttribute("aria-haspopup", isMenu ? "menu" : "dialog");
+    if (!trigger.hasAttribute("aria-expanded")) trigger.setAttribute("aria-expanded", "false");
+    if (id && !trigger.hasAttribute("aria-controls")) trigger.setAttribute("aria-controls", id);
+    if (isMenu) continue;
+    const pop = byId(trigger, id);
+    if (!pop) continue;
+    if (!pop.hasAttribute("role")) pop.setAttribute("role", "dialog");
+    if (!pop.hasAttribute("aria-label") && !pop.hasAttribute("aria-labelledby")) {
+      if (!trigger.id) trigger.id = nextId("xxd-pop-trigger");
+      pop.setAttribute("aria-labelledby", trigger.id);
+    }
+  }
 }
 
 function moveFocus(menu, step) {
@@ -183,7 +205,29 @@ export function installMenus(root, byId, closestFrom) {
       hideFloating(menu, { restoreFocus: true });
     } else if (event.key === "Tab") {
       hideFloating(menu);
+    } else if (event.key.length === 1 && /\S/.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      // 字母跳转：按 r 跳到下一个以 r 开头的项（APG 推荐）
+      const items = [...menu.querySelectorAll(ITEM)].filter((el) => el.closest(".xxd-menu") === menu);
+      const at = items.indexOf(menu.getRootNode().activeElement);
+      const k = event.key.toLowerCase();
+      const next = [...items.slice(at + 1), ...items.slice(0, at + 1)].find((el) => el.textContent.trim().toLowerCase().startsWith(k));
+      if (next) {
+        event.preventDefault();
+        next.focus();
+      }
     }
+  });
+
+  // 说明浮层：焦点离开它（和它的按钮）就关掉，免得挡住别的东西（WCAG 2.4.11）
+  root.addEventListener("focusout", (event) => {
+    const next = event.relatedTarget;
+    if (!next) return;
+    const target = event.target;
+    const pop = target.closest?.(".xxd-popover") ?? (target.matches?.("[data-xxd-popover]") ? byId(target, target.getAttribute("data-xxd-popover")) : null);
+    if (!pop || !isOpen(pop)) return;
+    const opener = openers.get(pop);
+    if (pop.contains(next) || opener === next || opener?.contains?.(next)) return;
+    hideFloating(pop);
   });
 
   // 键盘高亮和鼠标悬停是同一个高亮（I4）：鼠标移进哪一项，焦点就移过去

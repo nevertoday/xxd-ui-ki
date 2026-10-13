@@ -60,12 +60,12 @@ xxd-ui doctor ./today                  # 体检，有错误时退出码是 1
 
 ## 每种页面用什么
 
-| 页面 | 尺寸 | 密度 | 适合 | 注意 |
-| --- | --- | --- | --- | --- |
-| 侧边栏 | 宽 320–400 | 紧凑 | 主要功能、列表、记录、设置入口 | tab 在最上面；浮层用 sheet，从底部升起 |
-| popup | 宽 360，高 ≤ 600 | 紧凑 | 一两个最常用的操作 | 不写 `height:100%`（会塌成一条）；不放 modal 对话框，用 sheet 或直接去侧边栏 |
-| 设置页 | 阅读列 680 | 标准 | 外观、快捷键、导入导出、关于 | 设置组 + 搜索 |
-| 注入网页 | 跟着网页 | 紧凑 | 一个入口按钮、小面板 | 一律 Shadow DOM（见下面） |
+| 页面 | 尺寸、密度 | 适合放什么 | 注意 |
+| --- | --- | --- | --- |
+| 侧边栏 | 宽 320–400，紧凑 | 主要功能、列表、记录、设置入口 | tab 在最上面；浮层用 sheet，从底部升起 |
+| popup | 宽 360、高不超过 600，紧凑 | 一两个最常用的操作 | 不写 `height:100%`（会塌成一条）；不放 modal 对话框，用 sheet 或直接去侧边栏 |
+| 设置页 | 阅读列 680，标准 | 外观、快捷键、导入导出、关于 | 设置组 + 搜索 |
+| 注入网页 | 跟着网页，紧凑 | 一个入口按钮、小面板 | 一律 Shadow DOM（见下面） |
 
 插件常用的几件事，展示站「模式」里有现成的：需要权限、快捷键、导入导出设置、更新说明、插件已更新请刷新。
 
@@ -144,8 +144,12 @@ Xxd.mountAppearance(document.getElementById("settings"), {
 - 主题「跟随系统」时，系统切换亮 / 暗会跟着变。
 - 插件更新以后，旧脚本调用 `chrome.*` 会抛「Extension context invalidated」：用 `XxdExtension.guardContext(ui.root)` 包一层（见「插件已更新，请刷新」模式）。
 - `xxd.js` 作为内容脚本加载时不会自动接管宿主页面。
+- `ui.destroy()` 撤掉装在这个 Shadow 上的所有监听和观察者，再移除 host。
+- 内容脚本用打包工具（ESM）写的话：`import * as Xxd from "@xxd/css"; useXxd(Xxd)`（或 `mountXxdUI(host, { xxd: Xxd })`），不依赖全局的 `window.Xxd`。
 
-`xxd.shadow.css` 自己就挡得住宿主页面（`pnpm --filter @xxd/site audit` 里有一张恶意宿主页做门禁）：宿主页面的继承样式在 Shadow 的顶层元素上重置；令牌在 Shadow 内部再声明一次，宿主写了 `div { --ink: … }` 也改不了；`data-theme` / `data-corners` / `data-finish` 写在 host 上都生效。
+只想换变量、不想改页面行为：`tokens.css` 里只有变量；减少动效、主色的选中色和输入光标这几条全局规则在 `@xxd/tokens/base.css`（`xxd.css` 已经带上）。
+
+`xxd.shadow.css` 自己就挡得住宿主页面（`pnpm --filter @xxd/site run audit` 里有一张恶意宿主页做门禁）：宿主页面的继承样式在 Shadow 的顶层元素上重置；令牌在 Shadow 内部再声明一次，宿主写了 `div { --ink: … }` 也改不了；`data-theme` / `data-corners` / `data-finish` 写在 host 上都生效。
 
 ## service worker 里
 

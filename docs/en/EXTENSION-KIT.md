@@ -60,12 +60,12 @@ Bringing in an existing extension: `xxd-ui init ./my-extension`. If a page alrea
 
 ## What each page uses
 
-| Page | Size | Density | Good for | Watch out |
-| --- | --- | --- | --- | --- |
-| Side panel | 320–400 wide | Compact | The main features, lists, history, settings entry | Tabs at the top; overlays are sheets rising from the bottom |
-| Popup | 360 wide, ≤ 600 tall | Compact | One or two of the most-used actions | Don't set `height:100%` (it collapses to a strip); no modal dialogs — use a sheet or go to the side panel |
-| Options page | 680 reading column | Comfortable | Appearance, shortcuts, import / export, about | Settings groups + search |
-| Inside web pages | Follows the page | Compact | An entry button, a small panel | Always Shadow DOM (below) |
+| Page | Size, density | Good for | Watch out |
+| --- | --- | --- | --- |
+| Side panel | 320–400 wide, compact | The main features, lists, history, settings entry | Tabs at the top; overlays are sheets rising from the bottom |
+| Popup | 360 wide, at most 600 tall, compact | One or two of the most-used actions | Don't set `height:100%` (it collapses to a strip); no modal dialogs — use a sheet or go to the side panel |
+| Options page | 680 reading column, comfortable | Appearance, shortcuts, import / export, about | Settings groups + search |
+| Inside web pages | Follows the page, compact | An entry button, a small panel | Always Shadow DOM (below) |
 
 The usual extension chores have ready-made patterns on the showcase: permission request, shortcuts, import and export settings, what's new, extension updated — please reload.
 
@@ -144,8 +144,12 @@ Always inside Shadow DOM, so neither side's styles leak; appearance attributes g
 - With the theme set to “follow system”, switching the OS between light and dark follows along.
 - After the extension updates, the old script's `chrome.*` calls throw “Extension context invalidated”: wrap them with `XxdExtension.guardContext(ui.root)` (see the “Extension updated, please reload” pattern).
 - `xxd.js` loaded as a content script doesn't take over the host page.
+- `ui.destroy()` removes every listener and observer installed on that Shadow root, then removes the host.
+- Content scripts built with a bundler (ESM): `import * as Xxd from "@xxd/css"; useXxd(Xxd)` (or `mountXxdUI(host, { xxd: Xxd })`), so nothing depends on a global `window.Xxd`.
 
-`xxd.shadow.css` holds off the host page by itself (`pnpm --filter @xxd/site audit` has a hostile host page as a gate): inherited host styles are reset on the Shadow's top elements; tokens are declared again inside the Shadow, so a host rule like `div { --ink: … }` can't change them; `data-theme` / `data-corners` / `data-finish` on the host all work.
+Only want the variables, not page-wide behavior: `tokens.css` holds variables only; the few global rules (reduced motion, accent-colored selection and caret) live in `@xxd/tokens/base.css` (`xxd.css` already includes it).
+
+`xxd.shadow.css` holds off the host page by itself (`pnpm --filter @xxd/site run audit` has a hostile host page as a gate): inherited host styles are reset on the Shadow's top elements; tokens are declared again inside the Shadow, so a host rule like `div { --ink: … }` can't change them; `data-theme` / `data-corners` / `data-finish` on the host all work.
 
 ## In the service worker
 

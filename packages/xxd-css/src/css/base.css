@@ -9,7 +9,7 @@
     margin: 0;
     background: var(--bg);
     color: var(--ink);
-    font: var(--weight-regular) var(--text-sm) / 1.55 var(--font-body);
+    font: var(--weight-regular) var(--text-sm) / var(--leading-sm) var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     /* 换行：避免最后一行只剩一两个字（「篇」「了。」单独掉下去）。会继承，所有正文都生效 */
@@ -37,7 +37,7 @@
 
   /* 焦点环只给键盘（boot.js 写 data-input）。 */
   :where(.xxd-page, [class*="xxd-"]) :focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--action) 60%, transparent);
+    outline: 2px solid var(--focus-color, var(--action-text, currentColor));
     outline-offset: 2px;
   }
 
@@ -142,6 +142,17 @@
   .xxd-stack {
     display: grid;
     gap: var(--stack-gap, var(--space-3));
+  }
+
+  /* 一个有边的框（演示、预览、嵌在页面里的一块）：发丝线 + 纸色；data-surface="page" 用页面底色 */
+  .xxd-frame {
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--paper);
+  }
+
+  .xxd-frame[data-surface="page"] {
+    background: var(--bg);
   }
 
   .xxd-cluster {

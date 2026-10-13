@@ -21,7 +21,8 @@
   .xxd-tabs > [role="tab"] {
     position: relative;
     flex: none;
-    height: 40px;
+    /* 跟着密度：缺省 40，紧凑 32（和控件一样高） */
+    height: var(--tab-h, var(--control-h));
     padding: 0;
     border: 0;
     background: none;

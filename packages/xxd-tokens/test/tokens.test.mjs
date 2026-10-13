@@ -9,7 +9,8 @@ import { parseBlocks, toLayered, toShadow } from "../scripts/build.mjs";
 const css = readFileSync(new URL("../tokens.css", import.meta.url), "utf8");
 const blocks = parseBlocks(css);
 const base = blocks[":root"];
-const dark = blocks[':root[data-theme="dark"]'];
+// 暗色块写成「:root[data-theme="dark"], [data-theme="dark"]」（整页或页面里的一块都生效）
+const dark = blocks[':root[data-theme="dark"],\n[data-theme="dark"]'] ?? blocks[':root[data-theme="dark"]'];
 const rounded = blocks[':root[data-corners="rounded"]'];
 const rgb = (hex) => toRgb(hex);
 const hsl = (h, s, l) => {
@@ -62,7 +63,7 @@ test("18 个主色 × 亮/暗：标记 ≥ 3，文字版 ≥ 4.5，实心底（�
     ];
     for (const [hex, paper, min, label] of checks) {
       const ratio = contrast(rgb(hex), paper);
-      assert.ok(ratio >= min - 0.01, `${preset.name} ${label}: ${ratio.toFixed(2)}`);
+      assert.ok(ratio >= min - 0.01, `${String(preset.name)} ${String(label)}: ${ratio.toFixed(2)}`);
     }
     for (const [bg, on] of [
       ["--action-fill-custom", "--on-action-custom"],
@@ -102,7 +103,7 @@ test("默认直角：五档矩形圆角都是 0；圆角模式 4/6/10/14/999；�
 
 test("字重只有 400 / 500 / 600", () => {
   const weights = Object.entries(base).filter(([k]) => k.startsWith("--weight-")).map(([, v]) => v);
-  assert.deepEqual(weights.sort(), ["400", "500", "600"]);
+  assert.deepEqual(weights.sort((a, b) => a.localeCompare(b)), ["400", "500", "600"]);
 });
 
 test("字体：只用无衬线；标题和正文同一家族；先英文字体再中文字体；繁体页面换繁体字形", () => {
@@ -140,7 +141,7 @@ test("Shadow 版本：宿主页面打不进来（O8）", () => {
   const shadow = toShadow(css);
   // 令牌在 Shadow 内部的顶层元素上再声明一次（宿主页面的 `div { --ink: … }` 会打到 host 上）
   assert.match(shadow, /:host,\n:host > \* \{/);
-  assert.match(shadow, /:host\(\[data-theme="dark"\]\),\n:host\(\[data-theme="dark"\]\) > \* \{/);
+  assert.match(shadow, /:host\(\[data-theme="dark"\]\),\n:host\(\[data-theme="dark"\]\) > \*(,\n\[data-theme="dark"\])? \{/);
   // 继承属性在最先声明的 layer 里重置
   assert.ok(shadow.startsWith("@layer xxd.reset {"));
   for (const prop of ["text-transform: none", "letter-spacing: normal", "text-align: start", "word-spacing: normal", "cursor: auto"]) assert.ok(shadow.includes(prop), prop);
@@ -209,4 +210,58 @@ test("prefers-contrast: more：控件边框 ≥ 3（纸 / wash / 选中底），
       assert.ok(contrast(rgb(mode["--muted"]), rgb(mode[surface])) >= 4.5, `${name} muted on ${surface}`);
     }
   }
+});
+
+test("控件的边（--line-control）和底色 ≥ 3（WCAG 1.4.11）；卡片、分隔线的 --line 不受影响", () => {
+  for (const [name, mode] of [["light", base], ["dark", { ...base, ...dark }]]) {
+    for (const surface of ["--paper", "--bg"]) {
+      const ratio = contrast(rgb(mode["--line-control"]), rgb(mode[surface]));
+      assert.ok(ratio >= 3, `${name}: --line-control on ${surface} = ${ratio.toFixed(2)}`);
+    }
+  }
+});
+
+test("键盘焦点环（--focus-color = --action-text）在每个主色、亮暗两种下都 ≥ 3", () => {
+  assert.equal(base["--focus-color"], "var(--action-text)");
+  for (const preset of ACCENT_PRESETS) {
+    const p = accentPalette(preset.id);
+    if (!p) continue;
+    assert.ok(contrast(rgb(p["--action-text-custom"]), LIGHT_PAPER) >= 3, `${preset.name} light ring`);
+    assert.ok(contrast(rgb(p["--action-text-custom-dark"]), DARK_PAPER) >= 3, `${preset.name} dark ring`);
+  }
+});
+
+test("暗色和紧凑可以只用在页面里的一块；dist 里有「没有 JS 时跟随系统暗色」的兜底", () => {
+  assert.ok(dark && dark["--bg"], "暗色块");
+  assert.ok(blocks[':root[data-density="compact"],\n[data-density="compact"]']?.["--control-h"], "紧凑块");
+  const built = readFileSync(new URL("../dist/tokens.css", import.meta.url), "utf8");
+  assert.match(built, /@media \(prefers-color-scheme: dark\) \{\n  :root:not\(\[data-theme\]\) \{/);
+  assert.match(built.slice(built.lastIndexOf("prefers-color-scheme")), new RegExp(`--bg: ${dark["--bg"]};`));
+});
+
+
+test("页面里的一块亮 / 暗：派生的强调令牌重新声明；亮色块和 :root 的值一致", () => {
+  const light = blocks['[data-theme="light"]'];
+  assert.ok(light, "亮色块");
+  for (const [k, v] of Object.entries(light)) {
+    if (k in base) assert.equal(v, base[k], `[data-theme=light] ${k} 和 :root 不一样`);
+  }
+  for (const k of ["--action", "--on-action", "--action-text", "--action-fill", "--action-fill-hover", "--focus-ring", "--focus-color"]) {
+    assert.ok(dark[k], `暗色块要重新声明 ${k}`);
+    assert.ok(light[k], `亮色块要重新声明 ${k}`);
+  }
+  assert.ok(blocks[':root[data-theme="dark"][data-accent],\n:root[data-accent] [data-theme="dark"]'], "开了主色的页面里，暗色的一块也用主色");
+});
+
+test("tokens.css 只放变量；减少动效、选中色、光标在 base.css", () => {
+  const vars = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  for (const re of [/prefers-reduced-motion/, /::selection/, /caret-color/]) assert.doesNotMatch(vars, re);
+  for (const block of vars.matchAll(/\{([^{}]*)\}/g)) {
+    for (const decl of block[1].split(";").map((d) => d.trim()).filter(Boolean)) {
+      assert.match(decl, /^(--[\w-]+|color-scheme)\s*:/, `tokens.css 里有不是变量的声明：${decl}`);
+    }
+  }
+  const base = readFileSync(new URL("../base.css", import.meta.url), "utf8");
+  assert.match(base, /prefers-reduced-motion: reduce/);
+  assert.match(base, /:root\[data-accent\] ::selection/);
 });

@@ -2,4 +2,5 @@
 /* xxd 放在 base 之上、components / utilities 之下（工具类能盖住 xxd 组件） */
 @layer properties, theme, base, xxd, components, utilities;
 @import "@xxd/tokens/tokens.css";
-@import "@cloudflare/kumo/styles/standalone";
+@import "@xxd/tokens/base.css";
+@import "./dist/kumo-standalone.css";

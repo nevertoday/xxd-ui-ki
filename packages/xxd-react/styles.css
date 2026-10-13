@@ -1,10 +1,12 @@
-/* @xxd/react 样式（Tailwind v4 项目）：
- *   @layer properties, theme, base, xxd, components, utilities;   （放在最前面）
+/* @xxd/react 样式（Tailwind v4 项目），在你的 CSS 最前面：
+ *   @layer properties, theme, base, xxd, components, utilities;
  *   @import "tailwindcss";
  *   @import "@xxd/react/styles.css";
- *   @source "../node_modules/@cloudflare/kumo/dist";   让 Tailwind 扫描组件类名
+ * 组件用到的 Tailwind 类由下面的 @source 扫出来（路径相对这个文件），不用再自己配。
  */
 /* xxd 放在 base 之上、components / utilities 之下（工具类能盖住 xxd 组件） */
 @layer properties, theme, base, xxd, components, utilities;
 @import "@xxd/tokens/tokens.css";
-@import "@cloudflare/kumo/styles";
+@import "@xxd/tokens/base.css";
+@import "./dist/kumo.css";
+@source "./dist";

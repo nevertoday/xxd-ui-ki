@@ -65,7 +65,7 @@ import {
 export function TextDemo() {
   return (
     <div className="grid gap-1">
-      <Text variant="heading2">外观</Text>
+      <Text variant="heading2" as="h3">外观</Text>
       <Text variant="secondary">只影响这个插件</Text>
     </div>
   );

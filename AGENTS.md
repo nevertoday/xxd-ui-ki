@@ -16,7 +16,7 @@
 - 矩形圆角只用 `--r-xs / sm / md / lg / pill`；语义圆用 `--r-circle`。默认直角。
 - 卡片、行、按钮不加阴影；动效只动 opacity / transform；字重只有 400 / 500 / 600。
 - 图标：24 网格、1.5 线宽、round cap、miter join、方角。
-- 不手改生成文件（`theme-kumo.css`、`ai/*`、`src/primitives/*`），改源配置再 codegen。
+- 不手改生成文件（`theme-kumo.css`、`ai/*`、`src/primitives/*`、`xxd-react/src/kumo-exports.ts`、`xxd-icons/src/{names.d.ts,each.js,each.d.ts}`），改源配置再 codegen / 构建。
 - 展示站有中英两版：改 `packages/xxd-css/registry.json` / `patterns.json` 时同步改旁边的 `registry.en.js` / `patterns.en.js`；加展示站页面时 `src/pages/en/` 也加一个（正文写在 `src/views/`）。测试会检查。
 - 字体只用系统无衬线（不用宋体 / 衬线），不加载网络字体。
 - 修改后跑 `pnpm --filter @cloudflare/kumo test`；基线是 64 文件 / 1450 测试全绿。

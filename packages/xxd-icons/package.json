@@ -2,8 +2,25 @@
   "name": "@xxd/icons",
   "version": "0.1.0",
   "private": true,
+  "description": "小小东 UI 的 500 多个图标：24 网格、1.5 线宽、方角，可按中文关键词搜 / XXD UI icons",
   "license": "MIT",
-  "description": "小小东图标：24 网格、1.5 线宽、圆头、斜接角、方角。SVG 字符串（原生 JS）+ React 组件 + Phosphor 兼容层。",
+  "author": "小小东 (nevertoday)",
+  "homepage": "https://ui.xiaoxiaodong.ai",
+  "bugs": {
+    "url": "https://github.com/nevertoday/xxd-ui-kit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nevertoday/xxd-ui-kit.git",
+    "directory": "packages/xxd-icons"
+  },
+  "keywords": [
+    "icons",
+    "svg",
+    "react",
+    "chrome-extension",
+    "xxd-ui"
+  ],
   "type": "module",
   "sideEffects": false,
   "exports": {
@@ -19,12 +36,22 @@
       "types": "./src/phosphor.d.ts",
       "import": "./src/phosphor.js"
     },
-    "./nodes": "./src/nodes.js",
+    "./nodes": {
+      "types": "./src/nodes.d.ts",
+      "import": "./src/nodes.js"
+    },
+    "./each": {
+      "types": "./src/each.d.ts",
+      "import": "./src/each.js"
+    },
     "./meta": {
       "types": "./src/meta.d.ts",
       "import": "./src/meta.js"
     },
-    "./dist/*": "./dist/*"
+    "./dist/icons.iife.js": "./dist/icons.iife.js",
+    "./dist/sprite.svg": "./dist/sprite.svg",
+    "./dist/svg/*": "./dist/svg/*",
+    "./package.json": "./package.json"
   },
   "files": [
     "src",
@@ -32,7 +59,8 @@
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node --test 'test/*.test.mjs'"
+    "test": "node --test 'test/*.test.mjs'",
+    "prepack": "node scripts/build.mjs"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"

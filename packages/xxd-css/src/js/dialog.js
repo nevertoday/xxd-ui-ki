@@ -41,7 +41,10 @@ export function confirmDialog({
 } = {}) {
   const dialog = document.createElement("dialog");
   dialog.className = "xxd-dialog";
+  // 要用户先回答的确认：alertdialog，正文连进 aria-describedby（焦点落在按钮上时读屏也念出「删除后不能恢复」）
+  dialog.setAttribute("role", "alertdialog");
   const titleId = nextId("xxd-confirm-title");
+  const bodyId = nextId("xxd-confirm-body");
   dialog.setAttribute("aria-labelledby", titleId);
   const form = document.createElement("form");
   form.method = "dialog";
@@ -64,8 +67,10 @@ export function confirmDialog({
 
   const body = document.createElement("div");
   body.className = "xxd-dialog__body";
+  body.id = bodyId;
   if (message instanceof Node) body.append(message);
   else body.textContent = message;
+  if (message) dialog.setAttribute("aria-describedby", bodyId);
 
   const actions = document.createElement("div");
   actions.className = "xxd-dialog__actions";

@@ -76,6 +76,12 @@
     margin-top: var(--space-3);
   }
 
+  /* 说明和下面的表单字段分开（说明属于标题，字段是另一件事）：至少 --space-4 */
+  .xxd-dialog__body > .xxd-field,
+  .xxd-dialog__body > * + .xxd-field {
+    margin-top: var(--space-4);
+  }
+
   .xxd-dialog__actions {
     display: flex;
     flex-wrap: wrap;
@@ -396,6 +402,11 @@
     transition: opacity 100ms ease, transform 100ms var(--ease-out-expo);
   }
 
+  /* 打开时鼠标能移上去（WCAG 1.4.13 可悬停） */
+  .xxd-tooltip[data-open] {
+    pointer-events: auto;
+  }
+
   .xxd-tooltip[data-open] {
     opacity: 1;
     transform: none;
@@ -494,7 +505,8 @@
     z-index: var(--z-dialog);
     display: flex;
     flex-direction: column;
-    width: min(560px, 100vw);
+    /* 100% 而不是 100vw：fixed 时就是视口宽；放进容器里（模板预览、局部面板）时按容器宽，不撑出去 */
+    width: min(560px, 100%);
     border-left: 1px solid var(--line);
     background: var(--paper);
     box-shadow: var(--shadow-sheet);
@@ -600,23 +612,42 @@
     background: var(--wash);
   }
 
-  /* 单选组：<div role="group" aria-label="排序"><button class="xxd-menu__item" role="menuitemradio" aria-checked="true">…</button></div> */
-  .xxd-menu__item[role="menuitemradio"]::before {
+  /* 前置槽：菜单里只要有图标、单选或勾选，每一项前面都留 16px 的一格，放图标 / 单选点 / 勾，
+   * 所有项的文字从同一条线开始；右边只放快捷键和子菜单箭头。 */
+  .xxd-menu__item > .ui-icon:first-child {
+    flex: none;
+    margin-inline: 1px;
+  }
+
+  .xxd-menu:has(.xxd-menu__item > .ui-icon:first-child, [role="menuitemradio"], [role="menuitemcheckbox"]) .xxd-menu__item:not(:has(> .ui-icon:first-child), [role="menuitemradio"], [role="menuitemcheckbox"])::before {
     content: "";
     flex: none;
-    width: 6px;
-    height: 6px;
-    margin: 0 4px 0 2px;
-    border-radius: var(--r-circle);
+    width: 16px;
+    height: 16px;
+  }
+
+  /* 单选组：<div role="group" aria-label="排序"><button class="xxd-menu__item" role="menuitemradio" aria-checked="true">…</button></div> */
+  .xxd-menu__item[role="menuitemradio"]::before,
+  .xxd-menu__item[role="menuitemcheckbox"]::before {
+    content: "";
+    flex: none;
+    width: 16px;
+    height: 16px;
     background: transparent;
   }
 
   .xxd-menu__item[role="menuitemradio"][aria-checked="true"]::before {
-    background: var(--action);
+    background: radial-gradient(circle, var(--action) 0 3px, transparent 3.5px);
   }
 
-  /* 单选项只用左边的点，不再画右边的勾 */
-  .xxd-menu__item[role="menuitemradio"][aria-checked="true"]::after {
+  /* 勾选项的勾也放在前置槽里 */
+  .xxd-menu__item[role="menuitemcheckbox"][aria-checked="true"]::before {
+    background: var(--action);
+    -webkit-mask: var(--xxd-check) center / 14px no-repeat;
+    mask: var(--xxd-check) center / 14px no-repeat;
+  }
+
+  .xxd-menu__item:is([role="menuitemradio"], [role="menuitemcheckbox"])[aria-checked="true"]::after {
     content: none;
   }
 
@@ -707,7 +738,7 @@
 
     .xxd-panel {
       top: auto;
-      width: 100vw;
+      width: 100%;
       max-height: 88dvh;
       border-top: 1px solid var(--line);
       border-left: 0;
@@ -721,3 +752,27 @@
     }
   }
 }
+
+/* 静态展开（展示用，比如首页组件墙）：浮层就在原地显示，不定位、不隐藏、不动画 */
+@layer xxd.components {
+  :is(.xxd-dialog, .xxd-menu, .xxd-popover, .xxd-tooltip, .xxd-panel, .xxd-sheet)[data-static] {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    display: block;
+    max-width: 100%;
+    margin: 0;
+    max-height: none;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    translate: none;
+    animation: none;
+    pointer-events: auto;
+  }
+
+  .xxd-menu[data-static] {
+    display: grid;
+  }
+}
+

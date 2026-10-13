@@ -4,6 +4,7 @@ import { defaultLayerRoot, emit, nextId } from "./dom.js";
 import { openDialog, closeDialog } from "./dialog.js";
 import { ICON } from "./icons-min.js";
 import { fill$1, t } from "./i18n.js";
+import { announce } from "./announce.js";
 
 /* ── 搜索 ── */
 /** 绑定一个搜索框：⌘F / Ctrl+F 跳到它，Esc 清空。onQuery(query) 在输入时调用。返回解绑函数。 */
@@ -184,6 +185,10 @@ function cbOpen(wrap) {
   }
   list.hidden = cbVisible(list).length === 0;
   input.setAttribute("aria-expanded", String(!list.hidden));
+  if (list.hidden) cbSetActive(input, list, null);
+  // 筛选后的条数念出来（停下来 300ms 再念，不跟着每个字念）
+  clearTimeout(wrap._announceTimer);
+  if (raw) wrap._announceTimer = setTimeout(() => announce(list.hidden ? t("commandEmpty", null, wrap) : t("resultsCount", { n: cbVisible(list).filter((o) => !o.hasAttribute("data-create")).length }, wrap), { within: wrap }), 300);
   if (!list.hidden) {
     list.style.minWidth = `${input.offsetWidth}px`;
     place(input, list, { placement: "bottom-start", offset: 4 });
@@ -235,6 +240,7 @@ export function initComboboxes(root) {
     if (!input || !list) continue;
     list.id ||= nextId("xxd-listbox");
     list.setAttribute("role", "listbox");
+    if (wrap.hasAttribute("data-multiple")) list.setAttribute("aria-multiselectable", "true");
     input.setAttribute("role", "combobox");
     input.setAttribute("aria-controls", list.id);
     input.setAttribute("aria-autocomplete", "list");
@@ -365,15 +371,28 @@ export function openCommandPalette({ items = [], placeholder = t("commandPlaceho
     shown = order.flatMap((g) => shown.filter((it) => (it.group ?? "") === g));
     active = Math.min(active, Math.max(0, shown.length - 1));
     let lastGroup = null;
+    let groupBox = null;
+    // 有组名的放进 role=group（组名是它的名字），读屏念「最近使用，组」；没组名的直接放在列表里
     list.replaceChildren(
       ...shown.flatMap((it, i) => {
         const nodes = [];
-        if ((it.group ?? "") !== lastGroup && it.group) {
-          const label = doc.createElement("li");
-          label.className = "xxd-option-group__label";
-          label.setAttribute("role", "presentation");
-          label.textContent = it.group;
-          nodes.push(label);
+        if ((it.group ?? "") !== lastGroup) {
+          groupBox = null;
+          if (it.group) {
+            const group = doc.createElement("li");
+            group.className = "xxd-option-group";
+            group.setAttribute("role", "group");
+            const label = doc.createElement("div");
+            label.className = "xxd-option-group__label";
+            label.id = `${listId}-g${i}`;
+            label.textContent = it.group;
+            group.setAttribute("aria-labelledby", label.id);
+            groupBox = doc.createElement("ul");
+            groupBox.setAttribute("role", "none");
+            groupBox.style.cssText = "margin:0;padding:0;list-style:none";
+            group.append(label, groupBox);
+            nodes.push(group);
+          }
         }
         lastGroup = it.group ?? "";
         const li = doc.createElement("li");
@@ -389,7 +408,8 @@ export function openCommandPalette({ items = [], placeholder = t("commandPlaceho
           li.append(hint);
         }
         li.addEventListener("click", () => run(i));
-        nodes.push(li);
+        if (groupBox) groupBox.append(li);
+        else nodes.push(li);
         return nodes;
       }),
     );
@@ -399,7 +419,12 @@ export function openCommandPalette({ items = [], placeholder = t("commandPlaceho
       li.textContent = empty;
       list.append(li);
     }
-    input.setAttribute("aria-activedescendant", shown.length ? `${listId}-${active}` : "");
+    // 没有结果时去掉 aria-activedescendant（空字符串是无效引用）
+    if (shown.length) input.setAttribute("aria-activedescendant", `${listId}-${active}`);
+    else input.removeAttribute("aria-activedescendant");
+    // 结果条数念出来（停下来 300ms 再念）
+    clearTimeout(dialog._announceTimer);
+    if (input.value.trim()) dialog._announceTimer = setTimeout(() => announce(shown.length ? t("resultsCount", { n: shown.length }, dialog) : empty, { within: dialog }), 300);
   };
   const run = (i) => {
     const item = shown[i];
@@ -424,7 +449,7 @@ export function openCommandPalette({ items = [], placeholder = t("commandPlaceho
       if (!shown.length) return;
       active = (active + (event.key === "ArrowDown" ? 1 : -1) + shown.length) % shown.length;
       render();
-      list.children[active]?.scrollIntoView?.({ block: "nearest" });
+      list.querySelector(`#${listId}-${active}`)?.scrollIntoView?.({ block: "nearest" });
     } else if (event.key === "Enter") {
       event.preventDefault();
       run(active);
@@ -455,3 +480,35 @@ export function bindCommandPalette(getItems, { key = "k", ...options } = {}) {
   return () => globalThis.removeEventListener("keydown", handler);
 }
 
+
+/**
+ * 表单错误：Xxd.setFieldError(input, "请输入有效的邮箱")；传空字符串清掉。
+ * 写 aria-invalid、在字段下面放一行 .xxd-error（有 id），并把它加进 aria-describedby（原来的说明保留）。
+ */
+export function setFieldError(input, message, { focus = false } = {}) {
+  const doc = input.ownerDocument;
+  const field = input.closest(".xxd-field") ?? input.parentElement;
+  let error = input.id ? field.querySelector(`.xxd-error[data-for="${input.id}"]`) : field.querySelector(".xxd-error[data-for]");
+  const ids = (input.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
+  if (!message) {
+    input.removeAttribute("aria-invalid");
+    if (error) {
+      input.setAttribute("aria-describedby", ids.filter((id) => id !== error.id).join(" "));
+      if (!input.getAttribute("aria-describedby")) input.removeAttribute("aria-describedby");
+      error.remove();
+    }
+    return null;
+  }
+  if (!error) {
+    error = doc.createElement("p");
+    error.className = "xxd-error";
+    error.id = nextId("xxd-error");
+    error.dataset.for = input.id || "";
+    input.after(error);
+  }
+  error.textContent = message;
+  input.setAttribute("aria-invalid", "true");
+  if (!ids.includes(error.id)) input.setAttribute("aria-describedby", [...ids, error.id].join(" "));
+  if (focus) input.focus();
+  return error;
+}

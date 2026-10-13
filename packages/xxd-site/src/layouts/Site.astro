@@ -45,7 +45,7 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
     <link rel="alternate" hreflang="en" href={`${site}${lang === "en" ? (path === "/en" ? "/en/" : path) : other}`} />
     <!-- 层顺序：Tailwind（React 演示用）在前，小小东在后 —— 小小东的组件永远赢过 Tailwind 的重置 -->
     <style is:inline>@layer properties, theme, base, xxd, components, utilities, site;</style>
-    <script is:inline src="/xxd/boot.js" data-key="xxd-site"></script>
+    <script is:inline src="/xxd/boot.js" data-key="xxd-site" data-default-theme="system"></script>
     <link rel="stylesheet" href="/xxd/kumo.css" />
     <link rel="stylesheet" href="/xxd/xxd.css" />
     <link rel="stylesheet" href="/xxd/forced-states.css" />
@@ -63,7 +63,7 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
       <button class="site-search" id="site-search" type="button">
         <Fragment set:html={icon("Search", 14)} /><span>{L.search}</span><kbd class="xxd-kbd">⌘K</kbd>
       </button>
-      <div class="site-appearance" id="site-appearance" aria-label={L.appearance}>
+      <div class="site-appearance" id="site-appearance" role="group" aria-label={L.appearance}>
         <div class="xxd-segmented" data-xxd-segmented data-name="theme" aria-label={L.theme}>
           <button role="radio" data-value="light" aria-label={L.light} data-tooltip={L.light} set:html={icon("Sun", 14)} />
           <button role="radio" data-value="dark" aria-label={L.dark} data-tooltip={L.dark} set:html={icon("Moon", 14)} />
@@ -73,12 +73,14 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
           <button role="radio" data-value="square">{L.square}</button>
           <button role="radio" data-value="rounded">{L.rounded}</button>
         </div>
-        <button class="xxd-btn site-accent" data-size="sm" data-variant="ghost" data-xxd-popover="site-accents" aria-label={L.accent}>
-          <span class="site-accent-dot" aria-hidden="true"></span><span class="site-accent__label">{L.accent}</span>
+        <button class="xxd-btn site-accent" data-size="sm" data-variant="ghost" data-xxd-popover="site-accents" aria-label={L.appearanceMore}>
+          <span class="site-accent-dot" aria-hidden="true"></span><span class="site-accent__label">{L.appearanceButton}</span>
         </button>
-        <div class="xxd-popover site-accents" id="site-accents" popover data-placement="bottom-end">
+        <div class="xxd-popover site-accents" id="site-accents" popover data-placement="bottom-end" aria-label={L.appearanceMore}>
+          <p class="site-more__label">{L.accent}</p>
           <div class="xxd-swatches" role="radiogroup" aria-label={L.accent} id="site-swatches"></div>
           <div class="site-more">
+            <p class="site-more__label">{L.density} · {L.finish}</p>
             <div class="xxd-segmented" data-xxd-segmented data-name="density" aria-label={L.density}>
               <button role="radio" data-value="comfortable">{L.comfortable}</button>
               <button role="radio" data-value="compact">{L.compact}</button>

@@ -35,10 +35,10 @@ export const components = {
     ],
   },
   Interaction: {
-    title: "Interaction helpers",
+    title: "Interaction utilities",
     summary: "Small interaction helpers: actions that appear on hover (.xxd-reveal), whole-row click targets, press-down feedback.",
-    markup: `<div class="xxd-row" style="border:1px solid var(--line)"><div class="xxd-row__text">Hover this row</div><button class="xxd-btn xxd-reveal" data-size="xs">Edit</button></div>
-<div class="xxd-concentric" style="--pad:4px;border:1px solid var(--line);width:fit-content;max-width:100%"><button class="xxd-btn" data-size="sm">Concentric corners</button></div>`,
+    markup: `<div class="xxd-row xxd-frame"><div class="xxd-row__text">Hover this row</div><button class="xxd-btn xxd-reveal" data-size="xs">Edit</button></div>
+<div class="xxd-concentric xxd-frame" style="--pad:4px;width:fit-content;max-width:100%"><button class="xxd-btn" data-size="sm">Concentric corners</button></div>`,
     js: `Xxd.showBubble(button, "Copied")`,
     rules: [
       "Hover changes instantly on enter and fades back over 140ms on leave",
@@ -52,9 +52,11 @@ export const components = {
   },
   Button: {
     title: "Button",
+    use: ["Doing one thing: submit, save, open a dialog. The label says what the next click will do", "At most one primary per screen; the rest are the default secondary, ghost in toolbars and for low priority"],
+    avoid: ["Just going to another page: use a link (Link)", "outline is only for colored or image backgrounds; on paper it looks the same as secondary, so use secondary"],
     summary: "A button's label says what the next click will do. One solid button per area.",
     attributes: {
-      "data-variant": "primary | secondary (default) | ghost | outline | danger | danger-outline",
+      "data-variant": "primary (one main action per screen) | secondary (default, most buttons) | ghost (toolbars, low priority) | outline (on colored or image backgrounds) | danger (irreversible things like delete) | danger-outline (dangerous but not the main action on this screen)",
       "data-size": "xs | sm | md | lg",
       "data-icon-only": "Icon only (aria-label required)",
       "aria-pressed": "Toggle state",
@@ -67,7 +69,6 @@ export const components = {
   <button class="xxd-btn">Save draft</button>
   <button class="xxd-btn" data-variant="ghost">Later</button>
   <button class="xxd-btn" data-variant="danger">Delete</button>
-  <button class="xxd-btn" data-variant="outline">Export</button>
   <button class="xxd-btn" data-size="xs">xs</button>
 </div>`,
     sample: `<button class="xxd-btn" data-variant="primary">Post to X</button>`,
@@ -89,6 +90,11 @@ export const components = {
 </div>`,
       },
       {
+        title: "outline on a colored background",
+        text: "outline is a transparent fill with a hairline: on a colored banner or an image it blends in better than secondary's paper fill. On paper it looks the same as secondary, so use secondary there.",
+        markup: `<div class="xxd-banner" data-tone="warning" style="max-width:520px"><i data-xxd-icon="TriangleAlert"></i><div><p class="xxd-banner__title">1 post left today</p><p class="xxd-banner__text">Resets at midnight; members have no limit.</p></div><div class="xxd-banner__actions"><button class="xxd-btn" data-variant="outline" data-size="sm">Become a member</button></div></div>`,
+      },
+      {
         title: "Icon buttons",
         markup: `<div class="xxd-cluster">
   <button class="xxd-btn" data-icon-only aria-label="Search" data-tooltip="Search ⌘F"><i data-xxd-icon="Search"></i></button>
@@ -100,7 +106,7 @@ export const components = {
       {
         title: "Flat / material",
         markup: `<div class="xxd-cluster" data-finish-preview="flat"><button class="xxd-btn" data-variant="primary">Post to X</button><button class="xxd-btn" data-variant="danger">Delete</button></div>`,
-        text: "Under Accent in the top right, switch the button finish to Material: solid buttons get a 1px inner highlight on top and a slightly darker edge, and sink 0.5px when pressed.",
+        text: "Under Appearance in the top right, set Button style to Material: solid buttons get a 1px inner highlight on top and a slightly darker edge, and sink 0.5px when pressed.",
       },
       {
         title: "Busy and done",
@@ -149,9 +155,22 @@ export const components = {
     },
     markup: `<div class="xxd-field">
   <label class="xxd-label" for="title">Title</label>
-  <input class="xxd-input" id="title" placeholder="Give this post a name">
-  <p class="xxd-help">Up to 100 characters</p>
+  <input class="xxd-input" id="title" placeholder="Give this post a name" aria-describedby="title-help">
+  <p class="xxd-help" id="title-help">Up to 100 characters</p>
 </div>`,
+    examples: [
+      {
+        title: "With an error",
+        text: "The input gets aria-invalid; the error text has an id and is added to aria-describedby (the help stays); it says how to fix it. In JS, Xxd.setFieldError(input, \"…\") does all of this, and an empty string clears it.",
+        markup: `<div class="xxd-field" style="width:100%;max-width:320px">
+  <label class="xxd-label" for="email-x">Email</label>
+  <input class="xxd-input" id="email-x" type="email" value="not-an-email" aria-invalid="true" aria-describedby="email-x-help email-x-err">
+  <p class="xxd-help" id="email-x-help">Used to sign in and reset your password</p>
+  <p class="xxd-error" id="email-x-err">Enter a valid email, like you@example.com</p>
+</div>`,
+      },
+    ],
+    js: `Xxd.setFieldError(input, "Enter a valid email, like you@example.com")  // "" clears it`,
     sample: `<input class="xxd-input" style="width:100%;max-width:120px" placeholder="Title">`,
     rules: ["One box is one box: on focus the border darkens once — no outer ring, no inner frame", "§4"],
     a11y: [
@@ -161,6 +180,8 @@ export const components = {
   },
   Select: {
     title: "Select",
+    use: ["Picking one of a list of plain-text options: the native select, best for keyboards and screen readers"],
+    avoid: ["Options need groups, descriptions, icons or multiple selection: use Picker", "People need to type to search: use Combobox"],
     summary: "A restyled native <select>: use it for a few options that need no descriptions or groups.",
     attributes: { "data-variant": "bare: “a value + a chevron” inside a settings row" },
     markup: `<label class="xxd-select"><select aria-label="Image quality"><option>High</option><option>Standard</option></select></label>`,
@@ -170,6 +191,8 @@ export const components = {
   },
   Picker: {
     title: "Custom select",
+    use: ["Options with groups, a line of description or an icon each, or multiple selection"],
+    avoid: ["A few plain-text options: use Select (native)", "Many options that need searching: use Combobox"],
     summary: "What a native <select> can't do: groups, per-option descriptions, icons, multiple selection. For simple cases keep using Select (native).",
     attributes: {
       "data-multiple": "Multiple selection (checkmarks; the list stays open)",
@@ -178,7 +201,9 @@ export const components = {
       "aria-invalid": "Error",
       "data-disabled": "Disabled",
     },
-    markup: `<div class="xxd-picker" data-xxd-picker style="width:100%;max-width:220px">
+    markup: `<div class="xxd-field" style="width:100%;max-width:220px">
+<span class="xxd-label">Quality</span>
+<div class="xxd-picker" data-xxd-picker>
   <button class="xxd-picker__trigger"><span class="xxd-picker__value"></span></button>
   <div class="xxd-listbox">
     <div class="xxd-option-group" role="group" aria-label="Quality">
@@ -192,18 +217,23 @@ export const components = {
     </div>
   </div>
 </div>
-<div class="xxd-picker" data-xxd-picker data-multiple data-placeholder="Choose tags" style="width:100%;max-width:220px">
+</div>
+<div class="xxd-field" style="width:100%;max-width:220px">
+<span class="xxd-label">Tags</span>
+<div class="xxd-picker" data-xxd-picker data-multiple data-placeholder="Choose tags">
   <button class="xxd-picker__trigger"><span class="xxd-picker__value"></span></button>
   <div class="xxd-listbox">
     <div class="xxd-option" data-value="poster" aria-selected="true">Poster</div>
     <div class="xxd-option" data-value="cover">Cover</div>
     <div class="xxd-option" data-value="card">Card</div>
   </div>
+</div>
 </div>`,
     js: `picker.addEventListener("xxd:change", (e) => e.detail.value)  // an array when multiple; picker.dataset.value is comma-separated`,
     a11y: [
-      "The button has aria-haspopup=listbox; the list's aria-activedescendant follows the highlight",
-      "↑ ↓ Home End move, Enter / Space select, Esc closes, typing a letter jumps to it",
+      "The button is role=combobox (APG's select-only combobox) with aria-haspopup=listbox; the highlight uses aria-activedescendant",
+      "Its name is the field name plus the current value: inside an .xxd-field with an .xxd-label before it, they're linked automatically (or write aria-labelledby yourself)",
+      "↑ ↓ Home End move, Enter / Space choose, Esc closes, typing jumps to the first match",
     ],
   },
   Search: {
@@ -211,7 +241,7 @@ export const components = {
     summary: "A search box with a magnifier and a clear button. Esc clears first; press it again to leave.",
     markup: `<div class="xxd-input-wrap">
   <i data-xxd-icon="Search" data-size="16"></i>
-  <input class="xxd-input" type="search" placeholder="Search settings (⌘F)">
+  <input class="xxd-input" type="search" placeholder="Search settings (⌘F)" aria-label="Search settings">
   <button class="xxd-input-clear" aria-label="Clear"><i data-xxd-icon="X" data-size="14"></i></button>
 </div>`,
     rules: ["⌘F / Ctrl+F jumps to it, Esc clears", "Matching text is marked with mark.xxd-hit"],
@@ -240,7 +270,7 @@ export const components = {
   <label class="xxd-label" for="k1">API key</label>
   <div class="xxd-input-group xxd-secret" data-xxd-secret>
     <input id="k1" type="password" value="sk_live_4f8a2c91d7e3b6a0" readonly>
-    <button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-toggle aria-label="Show" aria-pressed="false"><i data-xxd-icon="Eye" data-size="16"></i></button>
+    <button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-toggle aria-label="Show secret" aria-pressed="false"><i data-xxd-icon="Eye" data-size="16"></i></button>
     <button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-copy aria-label="Copy"><i data-xxd-icon="Copy" data-size="16"></i></button>
   </div>
   <p class="xxd-help">Stored on this computer only.</p>
@@ -274,6 +304,8 @@ export const components = {
   },
   Switch: {
     title: "Switch",
+    use: ["A setting that takes effect immediately: on means on, no Save needed"],
+    avoid: ["An option submitted together with other fields: use Checkbox"],
     summary: "On / off that takes effect immediately. For options that need a Save to apply, use a checkbox.",
     attributes: { "data-size": "sm | (default) | lg", "role=\"switch\"": "Required" },
     markup: `<label class="xxd-choice"><input type="checkbox" role="switch" class="xxd-switch" checked>Completion sound</label>`,
@@ -286,6 +318,8 @@ export const components = {
   },
   Checkbox: {
     title: "Checkbox",
+    use: ["Yes / no or several choices in a form, submitted with the other fields"],
+    avoid: ["A setting that takes effect immediately: use Switch", "Exactly one of several: use Radio or Segmented"],
     summary: "Multiple choice, or a single option that applies only after confirming. Supports indeterminate.",
     attributes: { "aria-invalid": "Error", "indeterminate (JS)": "Partially selected" },
     markup: `<label class="xxd-choice"><input type="checkbox" class="xxd-check" checked>Smart punctuation</label>`,
@@ -353,6 +387,8 @@ export const components = {
   },
   Tabs: {
     title: "Tabs",
+    use: ["Several faces of the same thing: Home / History / Settings"],
+    avoid: ["Switching a value (view mode, time range): use Segmented", "Going step by step: use steps, not tabs"],
     summary: "Switch between several panels in the same place; the ink line slides to the selected tab.",
     markup: `<div class="xxd-tabs" data-xxd-tabs>
   <button role="tab" id="t1" aria-controls="p1" aria-selected="true">Write</button>
@@ -373,6 +409,8 @@ export const components = {
   },
   Segmented: {
     title: "Segmented control",
+    use: ["Two to five mutually exclusive values, switched immediately: list / grid, light / dark"],
+    avoid: ["Switching whole sections of content: use Tabs", "Many options: use Select"],
     summary: "2–4 mutually exclusive options in one strip: switching views, picking a type.",
     markup: `<div class="xxd-segmented" role="radiogroup" data-xxd-segmented aria-label="Type">
   <button role="radio" aria-checked="true">Text</button>
@@ -432,7 +470,7 @@ export const components = {
       "[data-xxd-sidebar-toggle=\"id\"]": "Collapse / expand button",
       "data-sidebar-sub=\"id\"": "An item with a submenu",
     },
-    markup: `<div style="display:flex;height:420px;border:1px solid var(--line)">
+    markup: `<div class="xxd-frame" style="display:flex;height:420px">
 <aside class="xxd-sidebar" data-xxd-sidebar id="sb1" style="--sidebar-w:232px">
   <div class="xxd-sidebar__head"><span class="xxd-logo"><span class="xxd-logo__mark"></span><span data-sidebar-hide>XXD</span></span></div>
   <nav class="xxd-sidebar__body">
@@ -454,7 +492,7 @@ export const components = {
   <div class="xxd-sidebar__foot"><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-xxd-sidebar-toggle="sb1" aria-label="Collapse sidebar"><i data-xxd-icon="PanelsTopLeft" data-size="16"></i></button></div>
   <div class="xxd-sidebar__resize" data-sidebar-resize></div>
 </aside>
-<main style="flex:1;min-width:0;padding:16px" class="xxd-muted">Content area</main>
+<main style="flex:1;min-width:6em;padding:16px" class="xxd-muted">Content area</main>
 </div>`,
     rules: [
       "Collapsing is instant: labels fade out, icons stay put (only opacity animates)",
@@ -546,6 +584,8 @@ export const components = {
   },
   List: {
     title: "List",
+    use: ["A column of similar things: history, files, extensions; each row can have actions"],
+    avoid: ["Comparing or sorting by column: use Table", "A group of settings: use SettingsGroup"],
     summary: "A column of clickable rows: title, description, trailing actions. Mark the current item with aria-current.",
     attributes: { "data-interactive": "Rows are clickable (hover background)", "aria-selected": "Selected row: a light tint" },
     markup: `<ul class="xxd-list" data-interactive>
@@ -563,7 +603,7 @@ export const components = {
     ],
   },
   Glyphs: {
-    title: "Glyph grid",
+    title: "Symbol picker",
     summary: "A grid with one symbol per cell to pick from (numbers, punctuation, emoji).",
     rules: ["Bare characters; filled only on hover"],
     a11y: [
@@ -574,6 +614,8 @@ export const components = {
   },
   Dialog: {
     title: "Dialog",
+    use: ["A question that must be answered before going on: confirm a delete, pick one of two", "A very short form (one or two fields) that closes when done"],
+    avoid: ["Just letting people know: use Toast", "Long forms or content people go back and forth on: use Panel or a new page", "Most overlays in an extension side panel: use Sheet"],
     summary: "A question that must be answered before going on: a confirmation, a choice, a short form.",
     attributes: {
       "data-light-dismiss": "Click the backdrop to close (don't use it for confirmations)",
@@ -617,8 +659,10 @@ await Xxd.confirmDelete({ name: "Long-form publisher", what: "all records of thi
   },
   Sheet: {
     title: "Sheet",
+    use: ["Secondary tasks in an extension side panel or popup: pick a cover, a group of settings", "A panel rising from the bottom on phones"],
+    avoid: ["A confirmation people must answer first: use Dialog", "Details on a desktop page: use Panel"],
     summary: "A panel that rises from the dock: secondary content such as settings or pickers.",
-    markup: `<div class="xxd-sheet-host" style="display:flex;flex-direction:column;width:100%;max-width:380px;height:300px;border:1px solid var(--line);overflow:hidden">
+    markup: `<div class="xxd-sheet-host xxd-frame" style="display:flex;flex-direction:column;width:100%;max-width:380px;height:300px;overflow:hidden">
   <p class="xxd-text" data-variant="secondary" style="flex:1;margin:0;padding:14px">The side panel's content. Click “Cover” below and the sheet rises from the dock.</p>
   <div class="xxd-scrim"></div>
   <section class="xxd-sheet" id="s1" aria-labelledby="s1-title"><div class="xxd-sheet__head"><h3 class="xxd-sheet__title" id="s1-title">Cover</h3><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-xxd-sheet-close aria-label="Close"><i data-xxd-icon="X"></i></button></div><div class="xxd-sheet__body"><p class="xxd-help">Pick an image as the post cover.</p></div></section>
@@ -631,7 +675,9 @@ await Xxd.confirmDelete({ name: "Long-form publisher", what: "all records of thi
     ],
   },
   Panel: {
-    title: "Side panel",
+    title: "Details panel",
+    use: ["Clicking an item in a list to see details or edit a few fields, with the main content still beside it", "Slides in from the right on desktop"],
+    avoid: ["A question that must be answered first: use Dialog", "A narrow extension side panel: use Sheet"],
     summary: "A details panel that slides in from the right (resource details on the member site).",
     markup: `<aside class="xxd-panel" id="pd" aria-labelledby="pd-title"><div class="xxd-panel__head"><h2 class="xxd-panel__title" id="pd-title">Details</h2><button class="xxd-btn" data-variant="ghost" data-icon-only data-xxd-panel-close aria-label="Close"><i data-xxd-icon="X"></i></button></div><div class="xxd-panel__body">…</div></aside>
 <button class="xxd-btn" data-xxd-panel-open="pd">Details</button>`,
@@ -644,6 +690,8 @@ await Xxd.confirmDelete({ name: "Long-form publisher", what: "all records of thi
   },
   Menu: {
     title: "Menu",
+    use: ["Several actions behind one button: rename, export, delete", "Many options that aren't used often enough to show"],
+    avoid: ["Choosing a value: use Select or Picker", "Only one or two actions: just show the buttons"],
     summary: "A column of actions: more, export, sort. Supports submenus, radio groups and checkable items.",
     markup: `<button class="xxd-btn" data-xxd-menu="m1">More<i data-xxd-icon="ChevronDown" data-size="14"></i></button>
 <div class="xxd-menu" id="m1" role="menu" popover>
@@ -676,6 +724,8 @@ await Xxd.confirmDelete({ name: "Long-form publisher", what: "all records of thi
   },
   Popover: {
     title: "Popover",
+    use: ["Click to read an explanation; it can hold a link or a tiny form"],
+    avoid: ["A short line people should see on hover: use Tooltip", "Something that must be answered first: use Dialog"],
     summary: "An explanation or a small form you click to open: holds more than a tooltip, lighter than a dialog.",
     attributes: { "data-arrow": "Small arrow (follows the anchor)", "data-placement": "top | bottom | *-start | *-end" },
     markup: `<button class="xxd-btn" data-xxd-popover="p1">What is this?</button>
@@ -687,6 +737,8 @@ await Xxd.confirmDelete({ name: "Long-form publisher", what: "all records of thi
   },
   Tooltip: {
     title: "Tooltip",
+    use: ["The name and shortcut of an icon-only button"],
+    avoid: ["Important information or anything clickable: touch screens have no hover, so put it in the UI or use Popover"],
     summary: "One line of explanation shown on hover or keyboard focus. Explanations only — never actions.",
     attributes: {
       "data-tooltip": "Tooltip text",
@@ -705,6 +757,8 @@ await Xxd.confirmDelete({ name: "Long-form publisher", what: "all records of thi
   },
   Toast: {
     title: "Toast",
+    use: ["Saying something finished or failed, optionally with Undo / Retry", "Actions inside a panel: pass within so it appears right there"],
+    avoid: ["Things people must read or choose: use Dialog", "A state that should stay visible: use Banner or the status line"],
     summary: "One sentence about an outcome: saved, copied, failed and can retry. When the same sentence comes again it only nudges.",
     markup: `<div class="xxd-cluster">
   <button class="xxd-btn" onclick="Xxd.toast('Draft saved', { tone: 'success' })">Save</button>
@@ -741,6 +795,8 @@ Xxd.bindCommandPalette(items)  // ⌘K / Ctrl+K`,
   },
   Badge: {
     title: "Badge",
+    use: ["A very short state or count: New, Beta, 12"],
+    avoid: ["A clickable filter: use Chip", "A sentence of information: use Banner or plain text"],
     summary: "A small label for a status or a count: Draft, Posted, 12.",
     attributes: { "data-tone": "action | success | danger | warning", "data-variant": "solid | outline | new", "data-appearance": "dot: dot + text" },
     markup: `<div class="xxd-cluster">
@@ -753,6 +809,8 @@ Xxd.bindCommandPalette(items)  // ⌘K / Ctrl+K`,
   },
   Chip: {
     title: "Chip",
+    use: ["A clickable filter or a removable tag"],
+    avoid: ["Just showing a state: use Badge"],
     summary: "A tag you can toggle: filters, multi-select markers.",
     markup: `<div class="xxd-cluster">
   <button class="xxd-chip" aria-pressed="true">Poster</button> <button class="xxd-chip">Cover</button>
@@ -769,13 +827,15 @@ Xxd.bindCommandPalette(items)  // ⌘K / Ctrl+K`,
       "Never tell two statuses apart by color alone",
     ],
     markup: `<div class="xxd-cluster">
-  <span class="xxd-cluster" style="gap:6px"><span class="xxd-dot" data-tone="success" aria-hidden="true"></span>Running</span>
-  <span class="xxd-cluster" style="gap:6px"><span class="xxd-dot" data-tone="danger" aria-hidden="true"></span>Error</span>
-  <span class="xxd-cluster" style="gap:6px"><span class="xxd-dot" aria-hidden="true"></span>Stopped</span>
+  <span class="xxd-cluster" style="--cluster-gap:6px"><span class="xxd-dot" data-tone="success" aria-hidden="true"></span>Running</span>
+  <span class="xxd-cluster" style="--cluster-gap:6px"><span class="xxd-dot" data-tone="danger" aria-hidden="true"></span>Error</span>
+  <span class="xxd-cluster" style="--cluster-gap:6px"><span class="xxd-dot" aria-hidden="true"></span>Stopped</span>
 </div>`,
   },
   Banner: {
     title: "Banner",
+    use: ["A state the whole page or section should know about: quota almost used up, offline", "Can be dismissed and can carry one action"],
+    avoid: ["The result of one action: use Toast", "An error in one form field: put it under that field (Field)"],
     summary: "One notice at the top of a page or panel: quota, updates, errors.",
     attributes: {
       "data-tone": "warning | danger | success",
@@ -812,6 +872,8 @@ Xxd.bindCommandPalette(items)  // ⌘K / Ctrl+K`,
   },
   Table: {
     title: "Table",
+    use: ["A set of similar records people compare, sort or act on in bulk"],
+    avoid: ["A narrow extension side panel: use List", "Only two or three columns and nothing to compare: use List"],
     summary: "Aligned data: sorting, select all, resizable columns, sticky columns, footer totals.",
     attributes: {
       "data-interactive": "Rows highlight on hover",
@@ -892,6 +954,8 @@ Xxd.toast("Saved", { tone: "success" });</code></pre>
   },
   Card: {
     title: "Card",
+    use: ["A clickable item with an image: a poster, a style, a template"],
+    avoid: ["A line of text without an image: use List", "Just framing a block of content: use LayerCard or whitespace"],
     summary: "One card in a masonry or grid: image, title, description; the whole card is clickable.",
     markup: `<div class="xxd-grid" style="--grid-min:200px">
   <a class="xxd-card" href="#"><div class="xxd-card__media" style="--ratio:3/4"></div><div class="xxd-card__body"><p class="xxd-card__title">Editorial poster</p><span class="xxd-card__meta">xxd-panel-001</span></div></a>
@@ -946,7 +1010,7 @@ Xxd.toast("Saved", { tone: "success" });</code></pre>
   },
   Logo: {
     title: "XXD logo",
-    summary: "Four small squares fading from full to light on a warm-black square — one mark for every extension. Follows the theme (inverted in dark).",
+    summary: "Four small squares fading from full to light on a near-black square — one mark for every extension. Follows the theme (inverted in dark).",
     attributes: { "data-size": "sm | (default 20px) | lg", "--logo-size": "Any size" },
     markup: `<div class="xxd-cluster">
   <span class="xxd-logo" data-size="sm"><span class="xxd-logo__mark"></span>XXD</span>
@@ -976,14 +1040,16 @@ Xxd.toast("Saved", { tone: "success" });</code></pre>
   Chart: {
     title: "Chart",
     summary: "ECharts + Xxd.chartOptions(): one highlighted line in the accent, the rest in shades of ink; hairline grid; redraws automatically when the theme or accent changes. Also works straight in Kumo's <Chart options>.",
-    markup: `<div style="display:grid;gap:16px;width:100%;max-width:720px">
+    markup: `<div class="xxd-stack" style="--stack-gap:16px;width:100%;max-width:720px">
 <div class="xxd-chart-card">
   <div class="xxd-chart-card__head"><h3 class="xxd-chart-card__title">Posts per day</h3><span class="xxd-chart-card__meta">Last 14 days</span></div>
   <div class="xxd-chart" id="chart-line"></div>
+  <p class="xxd-text" data-variant="secondary">Long-form Publisher grew every day for 14 days, from 42 posts to 96; Image Sorter went from 20 to 40.</p>
 </div>
 <div class="xxd-chart-card">
   <div class="xxd-chart-card__head"><h3 class="xxd-chart-card__title">Users per extension</h3></div>
   <div class="xxd-chart" id="chart-bar" style="--chart-h:220px"></div>
+  <p class="xxd-text" data-variant="secondary">Bulk Image Saver has the most users (5,102), then Long-form Publisher (2,410).</p>
 </div>
 </div>
 <script>

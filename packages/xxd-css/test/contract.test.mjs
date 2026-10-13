@@ -48,8 +48,9 @@ describe("阴影只给浮层", () => {
       for (const [p, v] of r.decls) {
         if (p !== "box-shadow" || v === "none") continue;
         if (FLOATING.test(r.selector)) continue;
-        // 质感模式（D1）：实心按钮顶部 1px 内高光，是材质不是浮起
+        // 质感模式（D1）：实心按钮顶部 1px 内高光，是材质不是浮起。值放在 --btn-highlight* 里（只有 material 设，下面单独检查）
         if (r.selector.includes('data-finish="material"') && /^inset 0 1px 0 rgba\(255, 255, 255, 0\.\d+\)$/.test(v)) continue;
+        if (/^var\(--btn-highlight(-pressed)?, none\)$/.test(v)) continue;
         // 允许的是「零模糊」的描边 / 分隔线（没有投影）：第三个长度（模糊）必须是 0
         const rings = v.split(/,(?![^(]*\))/).every((part) => {
           const lengths = part.replace(/(rgba?|color-mix|var)\([^)]*\)+/g, "").replace("inset", "").trim().split(/\s+/).filter((t) => /^-?[\d.]+(px)?$/.test(t));
@@ -210,6 +211,17 @@ describe("颜色只有令牌、黑白和系统色（O8：变异测试补的漏�
       for (const [p, v] of r.decls) {
         if (p === "text-shadow" && v !== "none") bad.push(`${r.file} ${r.selector} ${p}: ${v}`);
         if (/filter$/.test(p) && /drop-shadow\(/.test(v)) bad.push(`${r.file} ${r.selector} ${p}: ${v}`);
+      }
+    expect(bad).toEqual([]);
+  });
+
+  it("--btn-highlight* 只在 material 里是 1px 白色内高光，别处只能是 none", () => {
+    const bad = [];
+    for (const r of all)
+      for (const [p, v] of r.decls) {
+        if (!/^--btn-highlight/.test(p)) continue;
+        const ok = r.selector.includes('data-finish="material"') ? /^inset 0 1px 0 rgba\(255, 255, 255, 0\.\d+\)$/.test(v) : v === "none";
+        if (!ok) bad.push(`${r.file} ${r.selector} ${p}: ${v}`);
       }
     expect(bad).toEqual([]);
   });

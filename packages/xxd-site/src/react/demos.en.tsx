@@ -65,7 +65,7 @@ import {
 export function TextDemo() {
   return (
     <div className="grid gap-1">
-      <Text variant="heading2">Appearance</Text>
+      <Text variant="heading2" as="h3">Appearance</Text>
       <Text variant="secondary">Only affects this extension</Text>
     </div>
   );

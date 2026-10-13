@@ -2,17 +2,47 @@
   "name": "@xxd/extension",
   "version": "0.1.0",
   "private": true,
+  "description": "小小东 UI 的 Chrome 插件工具：新建插件、同步组件和外观设置、xxd-ui 命令行 / XXD UI Chrome extension kit and CLI",
   "license": "MIT",
-  "description": "小小东 Chrome 插件套件：MV3 模板、外观设置同步（chrome.storage）、Shadow DOM 挂载、三语 i18n、vendor 同步命令。",
+  "author": "小小东 (nevertoday)",
+  "homepage": "https://ui.xiaoxiaodong.ai",
+  "bugs": {
+    "url": "https://github.com/nevertoday/xxd-ui-kit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nevertoday/xxd-ui-kit.git",
+    "directory": "packages/xxd-extension"
+  },
+  "keywords": [
+    "chrome-extension",
+    "mv3",
+    "cli",
+    "shadow-dom",
+    "i18n",
+    "xxd-ui"
+  ],
   "type": "module",
   "exports": {
-    ".": "./src/index.js",
-    "./dist/*": "./dist/*"
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./dist/extension.js": "./dist/extension.js",
+    "./dist/tokens.mjs": "./dist/tokens.mjs",
+    "./package.json": "./package.json"
   },
-  "bin": { "xxd-ui": "./scripts/cli.mjs" },
-  "files": ["src", "dist", "template", "scripts"],
+  "bin": {
+    "xxd-ui": "./scripts/cli.mjs"
+  },
+  "files": [
+    "src",
+    "dist",
+    "template",
+    "scripts"
+  ],
   "scripts": {
-    "build": "node scripts/cli.mjs build",
+    "build": "node scripts/build.mjs",
     "test": "vitest run"
   },
   "dependencies": {

@@ -3,7 +3,7 @@ const I = (n, s = 16) => `<i data-xxd-icon="${n}" data-size="${s}"></i>`;
 const thumbs = (...c) => `<span class="xxd-thumbs">${c.map((x) => `<span style="background:${x}"></span>`).join("")}</span>`;
 
 const sidepanel = `
-<div class="xxd-sheet-host" data-density-preview="compact" style="display:flex;flex-direction:column;height:100%;--control-h:32px;--control-h-sm:26px;--control-h-xs:20px;--icon-button:32px">
+<div class="xxd-sheet-host" data-density="compact" style="display:flex;flex-direction:column;height:100%">
   <nav class="xxd-tabs" data-xxd-tabs style="flex:none;padding:0 14px" aria-label="主导航">
     <button role="tab" id="sp-t1" aria-controls="sp-p1" aria-selected="true">排序</button>
     <button role="tab" id="sp-t2" aria-controls="sp-p2">记录</button>
@@ -47,9 +47,9 @@ const signIn = `
   <p class="xxd-auth__line">按颜色给图片链接排序。</p>
   <span class="xxd-auth__gift">新账号送 7 天完整体验</span>
   <form>
-    <button class="xxd-btn" data-block type="button">${I("Globe")}使用 Google 继续</button>
+    <button class="xxd-btn" data-block type="button"><svg class="ui-icon" width="16" height="16" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>使用 Google 继续</button>
     <div class="xxd-auth__or">或使用邮箱</div>
-    <div data-step="email" data-active><input class="xxd-input" type="email" placeholder="you@example.com" aria-label="邮箱" required><button class="xxd-btn" data-variant="primary" data-block data-auth-next="password" hidden>继续</button></div>
+    <div data-step="email" data-active><input class="xxd-input" type="email" placeholder="you@example.com" aria-label="邮箱" required><button class="xxd-btn" data-variant="primary" data-block data-auth-next="password">继续</button></div>
     <div data-step="password"><p class="xxd-help">登录 <b data-auth-email></b></p><input class="xxd-input" type="password" placeholder="密码" aria-label="密码"><div class="xxd-cluster"><button class="xxd-btn ui-dialog-cancel" data-auth-back="email">返回</button><button class="xxd-btn" data-variant="primary" style="flex:1">继续</button></div></div>
   </form>
   <p class="xxd-auth__terms">继续即表示同意 <a class="xxd-link" href="#">服务条款</a> 和 <a class="xxd-link" href="#">隐私政策</a></p>
@@ -67,7 +67,7 @@ const settings = `
       <a class="xxd-row" href="#"><div class="xxd-row__text"><div class="xxd-row__title">本地图片文件夹</div><div class="xxd-row__desc">未连接</div></div></a>
     </div></section>
     <section class="xxd-group"><h2 class="xxd-group__title">AI 服务</h2><div class="xxd-group__body">
-      <div class="xxd-row" data-stack><div class="xxd-row__text"><div class="xxd-row__title">API 密钥</div><div class="xxd-row__desc">只保存在这台电脑上</div></div><div class="xxd-input-group xxd-secret" data-xxd-secret><input type="password" value="sk_live_4f8a2c91d7e3b6a0" readonly aria-label="API 密钥"><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-toggle aria-label="显示">${I("Eye")}</button><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-copy aria-label="复制">${I("Copy")}</button></div></div>
+      <div class="xxd-row" data-stack><div class="xxd-row__text"><div class="xxd-row__title">API 密钥</div><div class="xxd-row__desc">只保存在这台电脑上</div></div><div class="xxd-input-group xxd-secret" data-xxd-secret><input type="password" value="sk_live_4f8a2c91d7e3b6a0" readonly aria-label="API 密钥"><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-toggle aria-label="显示密钥">${I("Eye")}</button><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="sm" data-secret-copy aria-label="复制">${I("Copy")}</button></div></div>
     </div></section>
     <div id="tpl-appearance"></div>
     <section class="xxd-group"><h2 class="xxd-group__title">关于</h2><div class="xxd-group__body">
@@ -84,10 +84,11 @@ const settings = `
 
 const detailPanel = `
 <div style="height:100%;position:relative;overflow:hidden">
-  <div class="xxd-grid" style="--grid-min:160px;padding:16px">${["#d65f32", "#3b74b8", "#5a8a3c", "#7b61b0", "#c98a1a", "#2a8a7a"].map((c, i) => `<a class="xxd-card" href="#"><div class="xxd-card__media" style="--ratio:3/4;background:${c}"><div class="xxd-card__marks"><span class="xxd-dot" style="background:#ff3f6d"></span></div></div><div class="xxd-card__body"><p class="xxd-card__title">编辑式海报 00${i + 1}</p><span class="xxd-card__meta">xxd-panel-00${i + 1}</span></div></a>`).join("")}</div>
+  <!-- 瀑布流：图片高矮不一，按列排（CSS columns）；收藏的那几张左上角一个点 -->
+  <div style="columns:150px;column-gap:12px;padding:16px">${[["1", "3/4"], ["2", "1/1"], ["3", "4/5"], ["4", "2/3"], ["5", "3/4"], ["6", "15/16"]].map(([n, r], i) => `<a class="xxd-card" href="#" style="break-inside:avoid;margin-bottom:12px"><div class="xxd-card__media" style="--ratio:${r};background:center / cover url(/demo/poster-${n}.svg)">${i % 3 === 0 ? `<div class="xxd-card__marks"><span class="xxd-dot" data-tone="danger"></span></div>` : ""}</div><div class="xxd-card__body"><p class="xxd-card__title">编辑式海报 00${i + 1}</p><span class="xxd-card__meta">xxd-panel-00${i + 1}</span></div></a>`).join("")}</div>
   <aside class="xxd-panel" data-open style="position:absolute" aria-label="提示词详情">
     <div class="xxd-panel__head"><h2 class="xxd-panel__title">编辑式海报 001</h2><button class="xxd-btn" data-variant="ghost" data-icon-only aria-label="复制提示词" data-tooltip="复制提示词">${I("Copy")}</button><button class="xxd-btn" data-variant="ghost" data-icon-only aria-label="关闭">${I("X")}</button></div>
-    <div class="xxd-panel__body"><div class="xxd-card__media" style="--ratio:4/3;background:#d65f32;border-radius:var(--r-md)"></div>
+    <div class="xxd-panel__body"><div class="xxd-card__media" style="--ratio:3/4;background:center / cover url(/demo/poster-1.svg);border-radius:var(--r-md)"></div>
       <div class="xxd-prose" style="margin-top:16px"><h3>提示词</h3><p>克制的编辑式粗野主义：纸色背景、清晰的黑线、干净的无衬线字、密但好读的中文。</p></div>
       <div class="xxd-cluster" style="margin-top:12px"><button class="xxd-chip" aria-pressed="true">海报</button><button class="xxd-chip">编辑式</button></div>
     </div>
@@ -124,16 +125,24 @@ const resourceList = `
   <div class="xxd-table-wrap"><table class="xxd-table" data-interactive>
     <thead><tr><th class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-all aria-label="全选"></th><th aria-sort="ascending"><button class="xxd-th-sort">插件</button></th><th>UI Kit</th><th aria-sort="none" data-align="end"><button class="xxd-th-sort">用户</button></th><th>状态</th><th class="xxd-table__actions"><span class="xxd-sr-only">操作</span></th></tr></thead>
     <tbody>
-      ${[["长文发布", "最新", "2,410", "success", "已上架"], ["排序链接", "落后 2", "830", "warning", "待发布"], ["批量存图", "未接入", "5,102", "", "已上架"], ["今日待办", "最新", "312", "action", "审核中"]].map(([n, v, u, t, s]) => `<tr><td class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-row aria-label="选择 ${n}"></td><td><span class="xxd-logo" data-size="sm"><span class="xxd-logo__mark"></span>${n}</span></td><td>${v}</td><td data-align="end">${u}</td><td><span class="xxd-badge" data-appearance="dot" ${t ? `data-tone="${t}"` : ""}>${s}</span></td><td class="xxd-table__actions"><button class="xxd-btn xxd-reveal" data-variant="ghost" data-size="xs">同步</button></td></tr>`).join("")}
+      ${[["长文发布", "最新", "2,410", "success", "已上架"], ["排序链接", "落后 2", "830", "warning", "待发布"], ["批量存图", "未接入", "5,102", "success", "已上架"], ["今日待办", "最新", "312", "", "审核中"]].map(([n, v, u, t, s]) => `<tr><td class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-row aria-label="选择 ${n}"></td><td><span class="xxd-logo" data-size="sm"><span class="xxd-logo__mark"></span>${n}</span></td><td>${v}</td><td data-align="end">${u}</td><td><span class="xxd-badge" data-appearance="dot" ${t ? `data-tone="${t}"` : ""}>${s}</span></td><td class="xxd-table__actions"><button class="xxd-btn xxd-reveal" data-variant="ghost" data-size="xs">同步</button></td></tr>`).join("")}
     </tbody>
   </table></div>
   <div class="xxd-pagination-bar" style="margin-top:12px"><span class="xxd-pagination__info"></span><nav class="xxd-pagination" data-xxd-pagination data-page="1" data-total="24" data-per-page="4" aria-label="分页"></nav></div>
 </div>`;
 
 const deleteConfirm = `
-<div style="height:100%;display:grid;place-items:center;gap:12px;align-content:center">
-  <p class="xxd-text" data-variant="secondary">不可恢复、影响大的删除：输入名字才能删。</p>
-  <button class="xxd-btn" data-variant="danger-outline" onclick="Xxd.confirmDelete({ name: '长文发布', what: '这个插件的全部记录和设置' }).then((ok) => ok && Xxd.toast('已删除', { tone: 'success' }))">删除插件…</button>
+<div style="height:100%;display:grid;place-items:center;gap:16px;align-content:center;padding:24px">
+  <!-- 对话框直接展开着看（真的用 Xxd.confirmDelete 打开；下面的按钮可以试） -->
+  <div class="xxd-dialog" data-static role="alertdialog" aria-labelledby="dc-title" aria-describedby="dc-desc" style="width:100%;max-width:400px">
+    <div class="xxd-dialog__head"><h2 class="xxd-dialog__title" id="dc-title">删除「长文发布」？</h2></div>
+    <div class="xxd-dialog__body">
+      <p id="dc-desc">会永久删除这个插件的全部记录和设置，不能恢复。</p>
+      <div class="xxd-field"><label class="xxd-label" for="dc-name">输入「长文发布」确认</label><input class="xxd-input" id="dc-name" autocomplete="off"></div>
+    </div>
+    <div class="xxd-dialog__actions"><button class="xxd-btn ui-dialog-cancel">取消</button><button class="xxd-btn" data-variant="danger" disabled>删除</button></div>
+  </div>
+  <button class="xxd-btn" data-variant="danger-outline" data-size="sm" onclick="Xxd.confirmDelete({ name: '长文发布', what: '这个插件的全部记录和设置' }).then((ok) => ok && Xxd.toast('已删除', { tone: 'success' }))">试一下：删除插件…</button>
   <p class="xxd-text" data-variant="caption">没那么严重的，用「两次确认」（模式）。</p>
 </div>`;
 
@@ -148,5 +157,5 @@ export const templates = [
   { slug: "detail-panel", zh: "会员站详情面板", summary: "瀑布流 + 右侧详情面板：标题栏、图、提示词、标签、底部 dock（上一个 / 下一个 / 下一步）。", markup: detailPanel, height: 680 },
   { slug: "article", zh: "文章阅读页", summary: "阅读排版 + 右侧目录（滚动高亮）。", markup: article, height: 760, flow: true },
   { slug: "resource-list", zh: "资源列表页", summary: "页面头、筛选、表格（全选 / 排序 / 悬停操作）、分页。", markup: resourceList, height: 620, flow: true },
-  { slug: "delete-confirm", zh: "删除确认", summary: "输入名字确认删除的对话框。", markup: deleteConfirm, height: 260 },
+  { slug: "delete-confirm", zh: "删除确认", summary: "输入名字确认删除的对话框。", markup: deleteConfirm, height: 460 },
 ];

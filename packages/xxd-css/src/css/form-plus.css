@@ -1,4 +1,4 @@
-/* 表单进阶（优化计划 O2）：输入组、密钥输入、可复制的值、自绘选择。 */
+/* 表单进阶（优化计划 O2）：输入组、密钥输入、可复制的值、自定义下拉。 */
 @layer xxd.components {
   /* 输入组：前后缀、内嵌按钮。整个组是一个框；聚焦时整组边框变深一次。
    *   <div class="xxd-input-group">
@@ -12,19 +12,19 @@
     align-items: center;
     min-width: 0;
     height: var(--control-h);
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--line-control);
     border-radius: var(--r-sm);
     background: var(--paper);
     transition: border-color var(--motion-quick) ease;
   }
 
   .xxd-input-group:hover {
-    border-color: color-mix(in srgb, var(--ink) 28%, var(--line-strong));
+    border-color: color-mix(in srgb, var(--ink) 28%, var(--line-control));
     transition-duration: 0s;
   }
 
   .xxd-input-group:focus-within {
-    border-color: color-mix(in srgb, var(--action) 70%, var(--line-strong));
+    border-color: color-mix(in srgb, var(--action) 70%, var(--line-control));
   }
 
   .xxd-input-group[aria-invalid="true"] {
@@ -123,7 +123,7 @@
     max-width: 100%;
     height: var(--control-h);
     padding: 0 4px 0 12px;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--line-control);
     border-radius: var(--r-sm);
     background: var(--wash);
   }
@@ -173,7 +173,7 @@
     }
   }
 
-  /* 自绘选择（Picker）：原生 <select> 做不到的 —— 分组、每项说明、图标、多选。
+  /* 自定义下拉（Picker）：原生 <select> 做不到的 —— 分组、每项说明、图标、多选。
    *   <div class="xxd-picker" data-xxd-picker data-name="quality">
    *     <button class="xxd-picker__trigger" type="button"><span class="xxd-picker__value">高</span></button>
    *     <div class="xxd-listbox" role="listbox" hidden>
@@ -194,7 +194,7 @@
     gap: 8px;
     height: var(--control-h);
     padding: 0 34px 0 12px;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--line-control);
     border-radius: var(--r-sm);
     background: var(--paper);
     color: var(--ink);
@@ -205,12 +205,12 @@
   }
 
   .xxd-picker__trigger:hover {
-    border-color: color-mix(in srgb, var(--ink) 28%, var(--line-strong));
+    border-color: color-mix(in srgb, var(--ink) 28%, var(--line-control));
     transition-duration: 0s;
   }
 
   .xxd-picker__trigger[aria-expanded="true"] {
-    border-color: color-mix(in srgb, var(--action) 70%, var(--line-strong));
+    border-color: color-mix(in srgb, var(--action) 70%, var(--line-control));
   }
 
   .xxd-picker__trigger::after {

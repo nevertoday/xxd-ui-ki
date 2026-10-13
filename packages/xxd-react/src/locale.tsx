@@ -1,5 +1,6 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { KumoLocaleProvider, type KumoTranslationsPartial } from "@cloudflare/kumo";
+import { APPEARANCE_LABELS } from "@xxd/css/labels";
 
 export type XxdLocale = "zh-CN" | "zh-Hant" | "en";
 
@@ -29,21 +30,30 @@ export interface XxdStrings {
   mainNav: string;
 }
 
+// 外观设置的叫法和原生版共用一份（@xxd/css/labels），两边不会各说各的
+const appearance = (locale: XxdLocale) => {
+  const L = APPEARANCE_LABELS[locale];
+  return {
+    appearance: L.group, theme: L.theme, light: L.light, dark: L.dark, system: L.system, corners: L.corners, cornersDesc: L.cornersDesc,
+    accent: L.accent, density: L.density, comfortable: L.comfortable, compact: L.compact, finish: L.finish, flat: L.flat, material: L.material,
+  };
+};
+
 const XXD: Record<XxdLocale, XxdStrings> = {
   "zh-CN": {
     clear: "清空", close: "关闭", confirm: "确定", cancel: "取消", confirmDelete: "确认删除", search: "搜索",
-    appearance: "外观", theme: "主题", light: "亮", dark: "暗", system: "跟随系统", corners: "圆角", cornersDesc: "关掉时所有角都是直角",
-    accent: "主色", density: "密度", comfortable: "舒适", compact: "紧凑", finish: "质感", flat: "平面", material: "立体", dropVeil: "松手，放进来", mainNav: "主导航",
+    ...appearance("zh-CN"),
+    dropVeil: "松手，放进来", mainNav: "主导航",
   },
   "zh-Hant": {
     clear: "清除", close: "關閉", confirm: "確定", cancel: "取消", confirmDelete: "確認刪除", search: "搜尋",
-    appearance: "外觀", theme: "主題", light: "亮", dark: "暗", system: "跟隨系統", corners: "圓角", cornersDesc: "關閉時所有角都是直角",
-    accent: "主色", density: "密度", comfortable: "舒適", compact: "緊湊", finish: "質感", flat: "平面", material: "立體", dropVeil: "放開，放進來", mainNav: "主導覽",
+    ...appearance("zh-Hant"),
+    dropVeil: "放開，放進來", mainNav: "主導覽",
   },
   en: {
     clear: "Clear", close: "Close", confirm: "OK", cancel: "Cancel", confirmDelete: "Confirm delete", search: "Search",
-    appearance: "Appearance", theme: "Theme", light: "Light", dark: "Dark", system: "System", corners: "Rounded corners", cornersDesc: "Off keeps every corner square",
-    accent: "Accent", density: "Density", comfortable: "Comfortable", compact: "Compact", finish: "Finish", flat: "Flat", material: "Material", dropVeil: "Drop to add", mainNav: "Main navigation",
+    ...appearance("en"),
+    dropVeil: "Drop to add", mainNav: "Main navigation",
   },
 };
 

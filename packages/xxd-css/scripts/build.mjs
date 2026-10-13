@@ -12,16 +12,20 @@ import { copyFileSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, w
 import { gzipSync } from "node:zlib";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { execFileSync } from "node:child_process";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 const tokensDir = join(root, "../xxd-tokens");
 const iconsDir = join(root, "../xxd-icons");
 
-// 令牌和图标：没构建过、或者源码比构建产物新，就先构建（以前只看 dist 在不在，改了 tokens.css 会用到旧的）
-for (const [dir, out] of [[tokensDir, "dist/tokens.json"], [iconsDir, "dist/icons.iife.js"]]) {
-  if (isStale(dir, out)) execFileSync("node", ["scripts/build.mjs"], { cwd: dir, stdio: "inherit" });
+// 令牌和图标由根目录的 pnpm xxd:build 按依赖顺序先构建（这里不替别的包构建）。
+// 没构建过就停下；源码比产物新就提醒（会用到旧的令牌 / 图标）。
+for (const [dir, out, name] of [[tokensDir, "dist/tokens.json", "@xxd/tokens"], [iconsDir, "dist/icons.iife.js", "@xxd/icons"]]) {
+  if (!existsSync(join(dir, out))) {
+    console.error(`✗ ${name} 还没构建：pnpm xxd:build（或 pnpm --filter ${name} build）`);
+    process.exit(1);
+  }
+  if (isStale(dir, out)) console.warn(`！${name} 的源码比构建产物新，这次用的是旧的；先 pnpm --filter ${name} build`);
 }
 
 /** 源码（src、scripts、包根目录的 .css / .js）里有比 out 新的文件。 */
@@ -53,7 +57,8 @@ const cssResult = await build({
   legalComments: "none",
 });
 const components = cssResult.outputFiles[0].text;
-const tokens = readFileSync(join(tokensDir, "tokens.css"), "utf8");
+// 用构建好的 tokens.css（多一段「没有 JS 时跟随系统暗色」的兜底）
+const tokens = readFileSync(join(tokensDir, "dist/tokens.css"), "utf8");
 writeFileSync(join(dist, "components.css"), `${banner}\n${components}`);
 writeFileSync(join(dist, "xxd.css"), `${banner}\n${tokens}\n${components}`);
 const shadow = toShadow(`${tokens}\n${components}`);

@@ -1,13 +1,24 @@
 // 构建：dist/icons.iife.js（无构建插件用，window.XxdIcons）、dist/sprite.svg、dist/svg/*.svg
 import { build } from "esbuild";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ICON_NAMES, ICON_NODES, iconSVG } from "../src/svg.js";
+import { generated } from "./generate.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 rmSync(dist, { recursive: true, force: true });
+
+// 生成到 src/（随包发布，不手改；改 nodes.js 后重新构建，测试会检查是不是最新的）
+for (const [file, text] of Object.entries(generated())) {
+  const path = join(root, "src", file);
+  let old = "";
+  try {
+    old = readFileSync(path, "utf8");
+  } catch {}
+  if (old !== text) writeFileSync(path, text);
+}
 mkdirSync(join(dist, "svg"), { recursive: true });
 
 await build({

@@ -5,6 +5,8 @@ import Site from "../layouts/Site.astro";
 import Demo from "../components/Demo.astro";
 import StateMatrix from "../components/StateMatrix.astro";
 import PropsTable from "../components/PropsTable.astro";
+import ReactProps from "../components/ReactProps.astro";
+import kumoRegistry from "@cloudflare/kumo/ai/component-registry.json";
 import { componentsFor } from "../lib/data.js";
 import { langOf, t, withLang } from "../i18n/index.js";
 import { richText } from "../lib/markup.js";
@@ -15,13 +17,18 @@ const { c } = Astro.props;
 const lang = langOf(Astro.url.pathname);
 const L = t(lang);
 const hasReact = `${c.name}Demo` in reactDemos;
+// React 组件名：registry 里写的第一个名字（「Dialog + DialogActions（@xxd/react）」→ Dialog）
+const reactName = c.react?.match(/^[A-Z]\w+/)?.[0];
+const hasReactProps = Boolean(reactName && kumoRegistry.components[reactName]);
 const related = componentsFor(lang).filter((x) => x.category === c.category && x.slug !== c.slug);
 const extraDemos = c.examples ?? [];
 const headings = [
+  ...(c.use?.length || c.avoid?.length ? [{ slug: "use", text: L.use }] : []),
   { slug: "demo", text: L.demo },
   ...extraDemos.map((e, i) => ({ slug: `example-${i}`, text: e.title, depth: 3 })),
   ...(c.sample && c.states ? [{ slug: "states", text: L.states }] : []),
   { slug: "props", text: L.props },
+  ...(hasReactProps ? [{ slug: "react-props", text: L.reactProps }] : []),
   ...(c.js ? [{ slug: "js", text: "JS" }] : []),
   ...(c.a11y ? [{ slug: "a11y", text: L.a11y }] : []),
   ...(c.rules?.length ? [{ slug: "rules", text: L.rules }] : []),
@@ -44,7 +51,28 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
     <p class="xxd-text" data-variant="caption">{L.componentCaption} · {c.categoryLabel}{hasReact && ` · ${L.bothImpl}`}</p>
     <h1 class="xxd-text" data-variant="display">{c.label} {(lang !== "en" || c.label !== c.name) && <span class="xxd-text" data-variant="mono-secondary">{c.name}</span>}</h1>
     {c.summary && <p class="site-lead" set:html={richText(c.summary)} />}
+    <p class="site-names">
+      <span>{L.classLine} <code class="xxd-code-inline">{c.classes[0]}</code></span>
+      {c.react && <span>React <code class="xxd-code-inline">{`<${reactName ?? c.react}>`}</code></span>}
+    </p>
   </header>
+
+  {
+    (c.use?.length || c.avoid?.length) && (
+      <>
+        <h2 class="site-h2" id="use">{L.use}</h2>
+        <div class="site-use">
+          {c.use?.length > 0 && <ul class="site-rules" data-kind="use">{c.use.map((r) => <li set:html={richText(r)} />)}</ul>}
+          {c.avoid?.length > 0 && (
+            <>
+              <h3 class="site-h3">{L.avoid}</h3>
+              <ul class="site-rules" data-kind="avoid">{c.avoid.map((r) => <li set:html={richText(r)} />)}</ul>
+            </>
+          )}
+        </div>
+      </>
+    )
+  }
 
   <h2 class="site-h2" id="demo">{L.demo}</h2>
   <Demo markup={c.markup} react={hasReact ? c.name : undefined} align={c.align} block={c.block} title={c.name} />
@@ -71,6 +99,15 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
 
   <h2 class="site-h2" id="props">{L.props}</h2>
   <PropsTable attributes={c.attributes} classes={c.classes} />
+
+  {
+    hasReactProps && (
+      <>
+        <h2 class="site-h2" id="react-props">{L.reactProps}</h2>
+        <ReactProps name={reactName} />
+      </>
+    )
+  }
 
   {
     c.js && (

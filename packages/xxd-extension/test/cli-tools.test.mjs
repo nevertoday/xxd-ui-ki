@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { buildAll, create, docComponent, init, parseArgs, status } from "../scripts/cli.mjs";
+import { buildExtension, create, docComponent, init, parseArgs, status } from "../scripts/cli.mjs";
 import { COMMANDS, GROUPS } from "../scripts/commands.mjs";
 import { findComponent, iconAs, listTokens, pageUrl, searchIcons } from "../scripts/lib/find.mjs";
 import { checkCss, checkI18n, checkMarkup, doctor } from "../scripts/lib/doctor.mjs";
@@ -24,14 +24,12 @@ describe("参数", () => {
     expect(parseArgs(["--no-vendor"]).noVendor).toBe(true);
   });
 
-  it("每个命令都有分组、中英文说明和例子，main 里都处理了", () => {
-    const src = readFileSync(join(import.meta.dirname, "../scripts/cli.mjs"), "utf8");
+  it("每个命令都有分组、中英文说明和例子", () => {
     for (const cmd of COMMANDS) {
       expect(GROUPS.some((g) => g.id === cmd.group), cmd.name).toBe(true);
       expect(cmd.zh && cmd.en && cmd.usage && cmd.usageEn && cmd.examples.length, cmd.name).toBeTruthy();
       // 英文页不能有汉字（audit 的「英文」一项也会查）
       for (const text of [cmd.en, cmd.usageEn, ...(cmd.examplesEn || cmd.examples)]) expect(text, cmd.name).not.toMatch(/[\u4e00-\u9fff]/);
-      expect(src.includes(`cmd === "${cmd.name}"`), `main 没处理 ${cmd.name}`).toBe(true);
     }
   });
 });
@@ -156,7 +154,7 @@ describe("体检：MV3、写死的文字、没接入", () => {
 
 describe("项目：init / doctor / 记住", () => {
   it("新建的插件体检只差上架图标；网站 init 后 status 认得出", async () => {
-    await buildAll({ quiet: true });
+    await buildExtension();
     const ext = join(base, "ext");
     await create(ext, { name: "今日待办", nameEn: "Today", slug: "today" });
     const r = doctor(ext);
@@ -184,5 +182,14 @@ describe("项目：init / doctor / 记住", () => {
     expect(listProjects().filter((p) => p === dir)).toHaveLength(1);
     expect(forgetProject(dir)).toBe(true);
     expect(forgetProject(dir)).toBe(false);
+  });
+});
+
+describe("命令表", () => {
+  it("commands.mjs 里的每个命令都有处理函数，每个处理函数都写进了 commands.mjs（help 和展示站从那里生成）", async () => {
+    const { HANDLERS, ALIASES } = await import("../scripts/cli.mjs");
+    const documented = COMMANDS.map((c) => c.name).sort();
+    expect(Object.keys(HANDLERS).sort()).toEqual(documented);
+    for (const target of Object.values(ALIASES)) expect(documented).toContain(target);
   });
 });

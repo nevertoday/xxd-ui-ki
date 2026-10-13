@@ -1,4 +1,4 @@
-// 自绘选择（Picker）与密钥输入。
+// 自定义下拉（Picker）与密钥输入。
 //   Picker：分组、每项说明、图标、多选；键盘 ↑ ↓ Home End、输入首字跳转、Enter / 空格选择、Esc 关；派发 xxd:change。
 //   <div class="xxd-picker" data-xxd-picker [data-multiple] [data-placeholder="请选择"]>…（结构见 form-plus.css）
 //   取值：picker.dataset.value（多选是逗号分隔）；表单里放 <input type="hidden" name="…"> 会被同步。
@@ -88,10 +88,25 @@ export function initPickers(root) {
     list.setAttribute("role", "listbox");
     list.setAttribute("data-picker", "");
     if (picker.hasAttribute("data-multiple")) list.setAttribute("aria-multiselectable", "true");
+    // 仅可选择的 combobox（APG Select-Only Combobox）：按钮本身是 combobox，高亮用 aria-activedescendant 指向选项
+    trigger.setAttribute("role", "combobox");
     trigger.setAttribute("aria-haspopup", "listbox");
     trigger.setAttribute("aria-controls", list.id);
     trigger.setAttribute("aria-expanded", "false");
     trigger.type = "button";
+    // 名字：字段名 + 当前值（「画质，高」）。字段名取 aria-labelledby，或者外层 .xxd-field 里的 .xxd-label
+    const value = parts(picker).value;
+    if (value) value.id ||= nextId("xxd-picker-value");
+    if (!trigger.hasAttribute("aria-label")) {
+      const label = trigger.getAttribute("aria-labelledby") || (() => {
+        const el = picker.closest(".xxd-field")?.querySelector(".xxd-label");
+        if (!el) return "";
+        el.id ||= nextId("xxd-picker-label");
+        return el.id;
+      })();
+      const ids = [...new Set([...label.split(/\s+/).filter(Boolean), value?.id].filter(Boolean))];
+      if (ids.length) trigger.setAttribute("aria-labelledby", ids.join(" "));
+    }
     for (const o of list.querySelectorAll(".xxd-option")) {
       o.id ||= nextId("xxd-opt");
       o.setAttribute("role", "option");
@@ -175,7 +190,8 @@ export function installSecrets(root, closestFrom) {
       const input = toggle.closest("[data-xxd-secret]").querySelector("input");
       const show = input.type === "password";
       input.type = show ? "text" : "password";
-      toggle.setAttribute("aria-label", show ? toggle.dataset.hideLabel || t("hide", null, toggle) : toggle.dataset.showLabel || t("show", null, toggle));
+      // 名字固定（「显示密钥」），状态只靠 aria-pressed：不会念成「隐藏，已按下」这种反话
+      toggle.setAttribute("aria-label", toggle.dataset.showLabel || t("showSecret", null, toggle));
       toggle.setAttribute("aria-pressed", String(show));
       toggle.innerHTML = show ? EYE_OFF : EYE;
       return;

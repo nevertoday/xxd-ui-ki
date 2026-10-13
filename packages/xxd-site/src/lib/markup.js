@@ -23,6 +23,36 @@ export function extractFunction(source, name) {
   return body.trim();
 }
 
+/**
+ * 给抽出来的演示函数补上 import 行（复制下来就能跑）：看源码文件开头的 import，只留这段代码里用到的名字。
+ */
+export function withImports(code, source) {
+  if (!code) return code;
+  const lines = [];
+  for (const m of source.matchAll(/import\s*\{([^}]*)\}\s*from\s*"([^"]+)";/g)) {
+    const names = m[1].split(",").map((n) => n.trim()).filter(Boolean);
+    const used = names.filter((n) => new RegExp(`\\b${n.replace(/^type\s+/, "")}\\b`).test(code));
+    if (used.length) lines.push(`import { ${used.join(", ")} } from "${m[2]}";`);
+  }
+  return lines.length ? `${lines.join("\n")}\n\n${code}` : code;
+}
+
+/**
+ * 给人看的示例代码：一整行塞了好几个元素的（压成一行的 HTML），在相邻的块级 / 按钮标签之间换行，缩进跟原来那一行。
+ * 只改显示和复制出去的代码，不改真的渲染。
+ */
+export function formatMarkup(markup) {
+  return markup
+    .trim()
+    .split("\n")
+    .map((line) => {
+      if (line.length <= 110) return line;
+      const indent = line.match(/^\s*/)[0];
+      return line.replace(/>\s*(?=<(?:div|button|section|header|footer|nav|ul|li|p|label|input|span class="xxd-|a class=)\b)/g, `>\n${indent}`);
+    })
+    .join("\n");
+}
+
 /** 状态矩阵的状态：每个都是「怎么改示例元素」 */
 export const STATES = {
   default: { label: "默认", en: "Default", attrs: "" },

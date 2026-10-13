@@ -32,11 +32,16 @@ export function chartTokens(el = document.documentElement) {
   };
 }
 
-/** 分类色：第一条是主色，后面是墨色按 72% / 52% / 36% / 24% 往纸色混。 */
+/**
+ * 分类色：第一条是主色，后面是墨色按 78% / 64% / 54% / 46% 往纸色混 —— 最浅的一档和纸色也有 3:1（WCAG 1.4.11）。
+ * 颜色只差深浅，所以第三条起折线还换线型（虚线、点线、点划线），不只靠颜色分（WCAG 1.4.1）。
+ */
 export function chartPalette(tokens = chartTokens()) {
   const mix = (p) => `color-mix(in srgb, ${tokens.ink} ${p}%, ${tokens.paper})`;
-  return [tokens.accent, mix(72), mix(52), mix(36), mix(24)];
+  return [tokens.accent, mix(78), mix(64), mix(54), mix(46)];
 }
+
+const LINE_TYPES = ["solid", "solid", "dashed", "dotted", [6, 3, 1, 3]];
 
 // ECharts 的 canvas 不认 color-mix()：在浏览器里把它算成 rgb()
 function resolveColor(value) {
@@ -76,13 +81,15 @@ export function chartOptions(option = {}, { el, tokens } = {}) {
   const color = chartPalette(t).map(resolveColor);
   const series = (Array.isArray(option.series) ? option.series : option.series ? [option.series] : []).map((s, i) => {
     const c = color[i % color.length];
-    if (s.type === "line") return merge({ symbol: "none", lineStyle: { width: i === 0 ? 2 : 1.5 }, emphasis: { focus: "series" }, color: c }, s);
+    if (s.type === "line") return merge({ symbol: "none", lineStyle: { width: i === 0 ? 2 : 1.5, type: LINE_TYPES[i % LINE_TYPES.length] }, emphasis: { focus: "series" }, color: c }, s);
     if (s.type === "bar") return merge({ barMaxWidth: 28, itemStyle: { borderRadius: 0 }, emphasis: { focus: "series" }, color: c }, s);
     return merge({ color: c }, s);
   });
   return {
     ...option,
     color,
+    // 读屏：ECharts 按数据自动生成一段描述，写到图表容器的 aria-label 上（canvas 本身读屏什么都读不到）
+    aria: merge({ enabled: true, label: { enabled: true } }, option.aria),
     backgroundColor: "transparent",
     textStyle: merge({ color: t.ink, fontFamily: t.font }, option.textStyle),
     grid: merge({ left: 8, right: 16, top: option.legend === undefined ? 16 : 40, bottom: 8, containLabel: true }, option.grid),

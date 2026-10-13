@@ -36,7 +36,7 @@ Don't hand-edit generated files: `theme-kumo.css`, `ai/*`, `src/primitives/*`, `
 ## Before you commit
 
 ```bash
-pnpm xxd:build && pnpm xxd:test           # XXD packages (including all contract tests)
+pnpm xxd:build && pnpm xxd:test           # XXD packages (including all contract tests); after changing packages/kumo, run pnpm --filter @cloudflare/kumo build first
 pnpm --filter @cloudflare/kumo test       # if you touched packages/kumo
 pnpm lint
 pnpm changeset                            # if users will notice the change: add a version note (see .changeset/README.md)

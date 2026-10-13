@@ -1,0 +1,50 @@
+---
+// React 版的属性表：从 Kumo 的组件清单（packages/kumo/ai/component-registry.json）生成。
+// 说明文字是 Kumo 的英文原文（中文页上标 lang="en"）。
+import registry from "@cloudflare/kumo/ai/component-registry.json";
+import { langOf, t } from "../i18n/index.js";
+interface Props {
+  name: string;
+}
+const { name } = Astro.props;
+const lang = langOf(Astro.url.pathname);
+const L = t(lang);
+const entry = registry.components[name];
+// 只列组件自己的属性：有说明、有可选值或有缺省值的（id、title、name 这些 HTML 通用属性不列）
+const KEEP = new Set(["disabled", "open", "defaultOpen", "onOpenChange", "value", "defaultValue", "onValueChange", "checked", "onCheckedChange"]);
+const props = entry
+  ? Object.entries(entry.props ?? {}).filter(([k, p]) => k !== "children" && k !== "className" && (p.description || p.values || p.default !== undefined || KEEP.has(k)))
+  : [];
+const subs = entry ? Object.keys(entry.subComponents ?? {}) : [];
+// Kumo 的说明是 Markdown：只认 `代码`
+const esc = (x) => x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const desc = (x = "") => esc(x).replace(/`([^`]+)`/g, '<code class="xxd-code-inline">$1</code>');
+// 类型可能很长（ToolbarRoot.Orientation）：只在「.」和「|」后面换行，不在单词中间断开
+const typeOf = (p) => esc(p.values ? p.values.map((v) => `"${v}"`).join(" | ") : p.type).replace(/\./g, ".<wbr>").replace(/ \| /g, " |<wbr> ");
+---
+
+{
+  entry && (
+    <>
+      <p class="site-p">
+        <code class="xxd-code-inline">{`import { ${name} } from "@xxd/react";`}</code>
+        {subs.length > 0 && <> · {L.reactSubs} {subs.map((s) => <code class="xxd-code-inline site-token">{`${name}.${s}`}</code>)}</>}
+      </p>
+      {props.length > 0 && (
+        <div class="xxd-table-wrap site-props-wrap"><table class="site-props">
+          <thead><tr><th>{L.reactProp}</th><th>{L.reactType}</th><th>{L.reactDefault}</th><th>{L.propsDesc}</th></tr></thead>
+          <tbody>
+            {props.map(([k, p]) => (
+              <tr>
+                <td>{k}{p.optional ? "?" : ""}</td>
+                <td class="xxd-text site-type" data-variant="mono-secondary" set:html={typeOf(p)} />
+                <td class="xxd-text" data-variant="mono-secondary">{p.default ?? "—"}</td>
+                <td lang={lang === "en" ? undefined : "en"} set:html={desc(p.description)} />
+              </tr>
+            ))}
+          </tbody>
+        </table></div>
+      )}
+    </>
+  )
+}

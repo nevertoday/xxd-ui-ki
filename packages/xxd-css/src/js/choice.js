@@ -60,6 +60,9 @@ export function initChoices(root) {
         panel.classList.add("xxd-tabpanel");
         if (t.id) panel.setAttribute("aria-labelledby", t.id);
         panel.hidden = t !== selected;
+        // 面板里没有能聚焦的东西：面板本身能聚焦，键盘用户从标签按 Tab 不会跳过正文（APG Tabs）
+        const focusable = panel.querySelector('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (!focusable && !panel.hasAttribute("tabindex")) panel.tabIndex = 0;
       }
     });
     if (!list.querySelector(":scope > .xxd-tabs__ink")) {

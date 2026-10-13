@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -139,6 +139,38 @@ describe("O5 小小东组件", () => {
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
   });
 
+  it("Sheet 是模态：role=dialog + aria-modal，背景 inert，焦点进去、Tab 在里面循环，宿主写 data-sheet-open", () => {
+    const { container, rerender } = render(
+      <SheetHost>
+        <main id="bg"><button>背景</button></main>
+        <Sheet open title="封面" onOpenChange={() => {}}>
+          <input aria-label="标题" />
+        </Sheet>
+      </SheetHost>,
+    );
+    const sheet = container.querySelector(".xxd-sheet")!;
+    expect(sheet.getAttribute("role")).toBe("dialog");
+    expect(sheet.getAttribute("aria-modal")).toBe("true");
+    expect(container.querySelector("#bg")!.hasAttribute("inert")).toBe(true);
+    expect(container.querySelector(".xxd-sheet-host")!.hasAttribute("data-sheet-open")).toBe(true);
+    expect(document.activeElement?.getAttribute("aria-label")).toBe("标题");
+    // 最后一个可聚焦的再按 Tab 回到第一个
+    const items = [...sheet.querySelectorAll<HTMLElement>("button, input")];
+    items.at(-1)!.focus();
+    fireEvent.keyDown(sheet, { key: "Tab" });
+    expect(document.activeElement).toBe(items[0]);
+    rerender(
+      <SheetHost>
+        <main id="bg"><button>背景</button></main>
+        <Sheet open={false} title="封面" onOpenChange={() => {}}>
+          <input aria-label="标题" />
+        </Sheet>
+      </SheetHost>,
+    );
+    expect(container.querySelector("#bg")!.hasAttribute("inert")).toBe(false);
+    expect(container.querySelector(".xxd-sheet-host")!.hasAttribute("data-sheet-open")).toBe(false);
+  });
+
   it("ConfirmTwiceButton：第一次变确认，第二次执行", () => {
     const onConfirm = vi.fn();
     render(<ConfirmTwiceButton onConfirm={onConfirm}>删除</ConfirmTwiceButton>);
@@ -157,6 +189,16 @@ describe("O5 小小东组件", () => {
     expect(container.querySelector(".xxd-statusline")).toBeNull();
     rerender(<StatusLine tone="warning">用完了</StatusLine>);
     expect(container.querySelector(".xxd-statusline")?.getAttribute("data-tone")).toBe("warning");
+  });
+
+  it("StatusLine：播报区一直挂着（没字时也在），只换文字", () => {
+    const { container, rerender } = render(<StatusLine>{""}</StatusLine>);
+    const live = container.querySelector('[role="status"]')!;
+    expect(live).toBeTruthy();
+    expect(live.textContent).toBe("");
+    rerender(<StatusLine>已保存</StatusLine>);
+    expect(container.querySelector('[role="status"]')).toBe(live);
+    expect(live.textContent).toBe("已保存");
   });
 
   it("DropTarget：拖进来出遮罩，松手交给 onFiles", () => {
@@ -315,4 +357,86 @@ describe("O8 React 与原生同源", () => {
     expect(used.size).toBeGreaterThan(30);
     expect([...used].filter((c) => !defined.has(c))).toEqual([]);
   });
+});
+
+describe("R6 XxdAppearanceProvider", () => {
+  it("服务端渲染和浏览器第一次渲染一样（水合不报错），挂载后读到存储里的设置", async () => {
+    const { renderToString } = await import("react-dom/server");
+    const { hydrateRoot } = await import("react-dom/client");
+    localStorage.setItem("ssr-ui", JSON.stringify({ theme: "dark", corners: "rounded" }));
+    const tree = (
+      <XxdAppearanceProvider storageKey="ssr-ui">
+        <AppearanceSettings />
+      </XxdAppearanceProvider>
+    );
+    const html = renderToString(tree);
+    const host = document.createElement("div");
+    host.innerHTML = html;
+    document.body.append(host);
+    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+    let root: ReturnType<typeof hydrateRoot>;
+    await act(async () => {
+      root = hydrateRoot(host, tree);
+    });
+    expect(errors).not.toHaveBeenCalled();
+    errors.mockRestore();
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    expect(document.documentElement.getAttribute("data-corners")).toBe("rounded");
+    await act(async () => root!.unmount());
+    host.remove();
+  });
+
+  it("lock 写成字面量：重新渲染不会每次都重新套外观", async () => {
+    function App({ n }: { n: number }) {
+      return (
+        <XxdAppearanceProvider storageKey="lock-ui" lock={{ corners: "square" }}>
+          <span>{n}</span>
+        </XxdAppearanceProvider>
+      );
+    }
+    const html = document.documentElement;
+    const { rerender } = render(<App n={1} />);
+    const before = html.getAttribute("data-theme");
+    const writes: string[] = [];
+    const spy = new MutationObserver((records) => records.forEach((r) => writes.push(r.attributeName ?? "")));
+    spy.observe(html, { attributes: true });
+    rerender(<App n={2} />);
+    rerender(<App n={3} />);
+    await new Promise((r) => setTimeout(r, 0));
+    spy.disconnect();
+    expect(html.getAttribute("data-theme")).toBe(before);
+    expect(writes).toEqual([]);
+  });
+});
+
+describe("R6 React 和原生对照", () => {
+  const registry = JSON.parse(readFileSync(join(import.meta.dirname, "../../xxd-css/registry.json"), "utf8")).components as { name: string; markup: string }[];
+  const native = (name: string, selector: string) => {
+    const host = document.createElement("div");
+    host.innerHTML = registry.find((c) => c.name === name)!.markup;
+    return host.querySelector(selector)!;
+  };
+  const xxdClasses = (root: Element) => new Set([root, ...root.querySelectorAll("*")].flatMap((el) => [...el.classList]).filter((c) => c.startsWith("xxd-")));
+  const roles = (root: Element) => [root, ...root.querySelectorAll("[role]")].map((el) => el.getAttribute("role")).filter(Boolean);
+
+  const CASES: [string, string, ReactNode][] = [
+    ["Segmented", ".xxd-segmented", <Segmented label="类型" value="a" onValueChange={() => {}} options={[{ value: "a", label: "文本" }, { value: "b", label: "图片" }]} />],
+    ["Chip", ".xxd-chip", <Chip pressed>海报</Chip>],
+    ["Dock", ".xxd-dock", <Dock status="已保存" tools={<button>x</button>} primary={<button>写入</button>} />],
+    ["SettingsGroup", ".xxd-group", <SettingsGroup title="写入"><SettingsRow title="写入标题" description="第一行" control={<input type="checkbox" role="switch" className="xxd-switch" aria-label="写入标题" />} /></SettingsGroup>],
+    ["Rail", ".xxd-rail", <Rail items={[{ href: "/", label: "首页", icon: "House" }, { href: "/b", label: "收藏", icon: "Bookmark" }]} current="/" />],
+  ];
+
+  for (const [name, selector, element] of CASES) {
+    it(`${name}：根元素同样的标签角色和类，React 没有原生示例里没有的 xxd-* 结构`, () => {
+      const n = native(name, selector);
+      const { container } = render(<XxdAppearanceProvider storageKey="parity-2">{element}</XxdAppearanceProvider>);
+      const r = container.querySelector(selector)!;
+      expect(r, `React 版没有 ${selector}`).toBeTruthy();
+      expect(r.tagName).toBe(n.tagName);
+      expect(r.getAttribute("role")).toBe(n.getAttribute("role"));
+      expect([...xxdClasses(r)].filter((c) => !xxdClasses(n).has(c))).toEqual([]);
+      expect([...new Set(roles(r))].sort()).toEqual([...new Set(roles(n))].sort());
+    });
+  }
 });

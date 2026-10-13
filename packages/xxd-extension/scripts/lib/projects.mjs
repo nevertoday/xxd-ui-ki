@@ -23,7 +23,7 @@ export function listProjects() {
 function save(projects) {
   const file = projectsFile();
   mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, JSON.stringify({ projects: [...new Set(projects)].sort() }, null, 2) + "\n");
+  writeFileSync(file, JSON.stringify({ projects: [...new Set(projects)].sort((a, b) => a.localeCompare(b)) }, null, 2) + "\n");
 }
 
 export function rememberProject(dir) {

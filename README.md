@@ -38,7 +38,7 @@ React 项目也能用（基于 Cloudflare 的 [Kumo](https://github.com/cloudfla
 | 怎么用 | 一个 CSS + 一个 JS，或 React 组件 | 把源码拷进项目 | npm 包 |
 | Chrome 插件 | 专门做了（vendor、Shadow DOM、三语、doctor） | 没有专门支持 | 没有专门支持 |
 | 中文 | 中文优先，三语 | 英文 | 中文、英文 |
-| 体量 | 59 个组件 + 13 个模式 | 组件多，社区大 | 组件最全 |
+| 体量 | 59 个组件 + 18 个模式 | 组件多，社区大 | 组件最全 |
 
 ## 快速开始
 
@@ -50,7 +50,7 @@ React 项目也能用（基于 Cloudflare 的 [Kumo](https://github.com/cloudfla
 git clone https://github.com/nevertoday/xxd-ui-kit.git
 cd xxd-ui-kit
 pnpm install
-pnpm xxd:build      # 构建令牌、图标、组件、插件套件
+pnpm xxd:build      # 构建令牌、图标、组件、插件套件和 React 版（第一次会先构建 Kumo）
 pnpm xxd link       # 可选：装成全局命令 xxd-ui，之后在任何目录都能用
 ```
 
@@ -82,9 +82,13 @@ xxd-ui sync ./my-site     # 以后组件更新了，拷入最新版
 
 ```js
 import "@xxd/css/dist/xxd.css";
-import { install, toast, confirmDialog } from "@xxd/css";
-install();
+import * as icons from "@xxd/icons";
+import { install, uninstall, useIcons, toast, confirmDialog } from "@xxd/css";
+useIcons(icons);  // <i data-xxd-icon="…"> 换成 SVG（经典脚本里自动用 icons.js）
+install();        // 也可以 install(root, { signal })；页面上的一块拿掉时 uninstall(root)
 ```
+
+图标按需打包：`import { Check } from "@xxd/icons/each"`，再 `iconSVG(Check)` 或 `<Icon icon={Check} />`；名字有类型（`IconName`），写错编辑器会提示。
 
 网站已经有一套 CSS 变量、不想改动现在的样子：看 [已有网站怎么接入](docs/existing-site.md)。
 
@@ -144,7 +148,7 @@ npm install ./packs/*.tgz
 xxd-ui ls               # 列出全部组件
 xxd-ui doc 对话框       # 一个组件的写法、属性和规则（中文名、拼错都行）
 xxd-ui doc Dialog --react
-xxd-ui icon 删除        # 找图标（500 个，中文关键词）；加 --svg / --react / --copy
+xxd-ui icon 删除        # 找图标（500 多个，中文关键词）；加 --svg / --react / --copy
 xxd-ui tokens line      # 令牌和亮 / 暗色值
 xxd-ui help             # 全部命令
 ```
@@ -156,7 +160,7 @@ xxd-ui help             # 全部命令
 从下往上三层，上层用下层：
 
 ```
-令牌     颜色、字号、间距、圆角这些变量          @xxd/tokens   @xxd/icons
+令牌     设计变量：颜色、字号、间距、圆角          @xxd/tokens   @xxd/icons
   ↓
 组件     不用框架的原生组件                      @xxd/css
          React 组件（Kumo 换皮）                 @xxd/react
@@ -167,8 +171,8 @@ xxd-ui help             # 全部命令
 | 包               | 一句话                                                                                     |
 | ---------------- | ------------------------------------------------------------------------------------------ |
 | `@xxd/tokens`    | 所有颜色、字号、间距、圆角的唯一来源；另带首帧脚本，页面打开第一眼就是用户选的主题         |
-| `@xxd/icons`     | 500 个图标，统一画法（24 网格、1.5 线宽、方角），可以按中文关键词搜                        |
-| `@xxd/css`       | 59 个原生组件和 13 个模式（拖放、图片查看器、两次确认……），自己实现键盘和读屏，audit 守着 |
+| `@xxd/icons`     | 500 多个图标，统一画法（24 网格、1.5 线宽、方角），可以按中文关键词搜                        |
+| `@xxd/css`       | 59 个原生组件和 18 个模式（拖放、图片查看器、两次确认、插件权限请求……），自己实现键盘和读屏，audit 守着 |
 | `@xxd/react`     | Kumo 的 React 组件换上小小东的样子（键盘、焦点、读屏由 Kumo 底层的 Base UI 负责），再加小小东独有组件和外观、语言两个 Provider |
 | `@xxd/extension` | Chrome 插件工具箱和命令行 `xxd-ui`                                                          |
 | `@xxd/site`      | 展示站：每个组件、模式、整页模板和设计原则，中英两版                                       |
@@ -188,7 +192,7 @@ pnpm dev                    # 展示站 http://localhost:4400
 ```bash
 pnpm --filter @xxd/site build
 pnpm --filter @xxd/site visual   # 截图对比：每页 × 4 种外观
-pnpm --filter @xxd/site audit    # 无障碍、长文字、恶意宿主页、高对比、英文漏翻、细节、浮层、冒烟
+pnpm --filter @xxd/site run audit    # 无障碍、长文字、恶意宿主页、高对比、英文漏翻、细节、浮层、冒烟
 ```
 
 几条硬规矩：卡片、行、按钮不加阴影；字重只用 400 / 500 / 600；动画只改透明度和位置；每个视觉决定都要能在 [设计原则](docs/DESIGN-PRINCIPLES.md) 里找到依据。

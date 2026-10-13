@@ -15,6 +15,8 @@ export const c = {
 /** 显示宽度：中日韩字符算 2 格（对齐表格用）。 */
 export function width(s) {
   let w = 0;
+  // 去掉终端颜色码（ESC [ … m）再量宽度
+  // eslint-disable-next-line no-control-regex
   for (const ch of String(s).replace(/\x1b\[[0-9;]*m/g, "")) w += /[ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦]/.test(ch) ? 2 : 1;
   return w;
 }

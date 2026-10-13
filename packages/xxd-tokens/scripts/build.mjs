@@ -45,8 +45,10 @@ function shadowSelector(list) {
     // `[data-finish=material] .xxd-btn` 这类：属性写在 host 上时也生效
     const attr = sel.match(ROOT_ATTR);
     if (attr && /^\s/.test(sel.slice(attr[0].length))) out.push(`:host(${attr[0]})${sel.slice(attr[0].length)}`);
+    // 光秃秃的 `[data-finish=material]`（设变量给里面继承）：写在 host 上时也生效
+    if (attr && attr[0] === sel && !out.includes(`:host(${sel})`)) out.push(`:host(${sel})`);
   }
-  return out.join(",\n");
+  return [...new Set(out)].join(",\n");
 }
 
 /**
@@ -105,13 +107,12 @@ export function parseBlocks(css) {
 /**
  * 给已有一套变量的老项目（会员站）用：整份令牌放进 @layer xxd.tokens。
  * 没进 layer 的样式永远赢过 layer 里的，所以老项目自己的同名变量不受影响（不管选择器优先级），
- * 只多出它还没有的变量。去掉全局的减少动效规则（老项目有自己的处理，不能替它决定）。
+ * 只多出它还没有的变量。（tokens.css 只有变量；全局规则在 base.css，老项目不引。）
  */
 export function toLayered(css) {
-  const withoutMotion = css.replace(/\/\* 减少动效[^*]*\*\/\s*@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\n\}\n?/, "");
   // :root → :where(:root)：layer 里本来就最弱，再去掉优先级；文字上也和老项目自己的 :root[...] 块区分开
   // （有些老测试按文本找第一个 `:root[data-theme="dark"] {`）。
-  const scoped = withoutMotion.replace(/:root((?:\[[^\]]+\])*)/g, (_, attrs) => `:where(:root${attrs})`);
+  const scoped = css.replace(/:root((?:\[[^\]]+\])*)/g, (_, attrs) => `:where(:root${attrs})`);
   return `/* @xxd/tokens（layered）— Copyright (c) 2026 小小东 (xiaoxiaodong.ai). MIT License. */\n@layer xxd.tokens {\n${scoped.trim()}\n}\n`;
 }
 
@@ -127,14 +128,26 @@ const MODE_NAMES = {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   rmSync(dist, { recursive: true, force: true });
   mkdirSync(dist, { recursive: true });
-  writeFileSync(join(dist, "tokens.css"), `/* @xxd/tokens — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). MIT License. */\n${source}`);
-  writeFileSync(join(dist, "tokens.shadow.css"), toShadow(source));
-  writeFileSync(join(dist, "tokens.layered.css"), toLayered(source));
-
   const blocks = parseBlocks(source);
+  // 没有 JS 时（boot.js 没跑、SSR 首屏）也跟随系统暗色：从暗色块生成一段 prefers-color-scheme 的兜底，只放进 dist。
+  const darkVars = Object.entries(blocks[':root[data-theme="dark"],\n[data-theme="dark"]'] ?? blocks[':root[data-theme="dark"]'] ?? {});
+  const fallback = darkVars.length
+    ? `\n/* 没有 JS 时也跟随系统暗色（scripts/build.mjs 从暗色块生成；boot.js 写了 data-theme 以后以它为准） */\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme]) {\n    color-scheme: dark;\n${darkVars.map(([k, v]) => `    ${k}: ${v};`).join("\n")}\n  }\n}\n`
+    : "";
+  const full = source + fallback;
+  writeFileSync(join(dist, "tokens.css"), `/* @xxd/tokens — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). MIT License. */\n${full}`);
+  writeFileSync(join(dist, "tokens.shadow.css"), toShadow(full));
+  writeFileSync(join(dist, "tokens.layered.css"), toLayered(full));
+  // 全局规则（减少动效、选中色、输入光标）：不是变量，单独一份
+  const base = readFileSync(join(root, "base.css"), "utf8");
+  writeFileSync(join(dist, "base.css"), `/* @xxd/tokens base — Copyright (c) 2026 小小东 (xiaoxiaodong.ai). MIT License. */\n${base}`);
+
   const json = {};
   for (const [selector, vars] of Object.entries(blocks)) {
-    const name = MODE_NAMES[selector] || (selector === ":root" ? "base" : null);
+    // 一个块可以写成「:root[data-x], [data-x]」（整页或页面里的一块都生效）：按第一个选择器认
+    const [first, second, ...more] = splitSelectors(selector);
+    const pair = !more.length && second && second === first.replace(/^:root/, "") ? MODE_NAMES[first] : null;
+    const name = MODE_NAMES[selector] || pair || (selector === ":root" ? "base" : null);
     if (name) json[name] = vars;
   }
   // @media (pointer: coarse) 里的 :root 会被解析成 ":root" 覆盖 base 的 --hit-min，单独还原。

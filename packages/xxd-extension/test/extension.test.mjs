@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { createAppearanceStore } from "../src/settings.js";
 import { mountXxdUI } from "../src/shadow.js";
 import { applyI18n, t, uiLocale } from "../src/i18n.js";
-import { adoptTokens, applyBlocks, buildAll, create, docComponent, listComponents, dropDeclarations, findFallbackConflicts, status, sync, upsertRegion } from "../scripts/cli.mjs";
+import { adoptTokens, applyBlocks, buildExtension, create, docComponent, listComponents, dropDeclarations, findFallbackConflicts, status, sync, upsertRegion } from "../scripts/cli.mjs";
 import { mkdirSync, writeFileSync } from "node:fs";
 
 function mockChrome() {
@@ -160,7 +160,7 @@ describe("i18n", () => {
 
 describe("CLI：new / sync / status", () => {
   it("缺省是最小的插件：合法的 MV3，三语齐全，没有登录、内容脚本和 WAR，vendor 拷好，没有残留占位符", async () => {
-    await buildAll({ quiet: true });
+    await buildExtension();
     const base = mkdtempSync(join(process.env.TMPDIR || tmpdir(), "xxd-cli-"));
     const dir = join(base, "demo");
     try {
