@@ -50,8 +50,14 @@ export const WALL = {
   Avatar: `<div class="xxd-cluster"><span class="xxd-avatar">东</span><span class="xxd-avatar" data-member>X</span><span class="xxd-avatar" style="--avatar-size:40px">林</span><span class="xxd-avatar" style="--avatar-size:24px">A</span></div>`,
 };
 
+/** 组件页的演示区也放这份静态展开的样子（浮层：只有一个「打开」按钮看不出长什么样） */
+export const WALL_PREVIEW = new Set(["Dialog", "Menu", "Popover", "Tooltip", "Toast", "Sheet", "Panel", "CommandPalette"]);
+
 /** 不上首页墙的：抽象的工具类（在各自的页面里看）。 */
 export const WALL_HIDE = new Set(["Interaction"]);
 
-/** 在墙上占两格宽的大组件。 */
+/** 在墙上占满一整行的：两张图表放得开。 */
+export const WALL_FULL = new Set(["Chart"]);
+
+/** 整行宽的组件在墙上至少占两列（其余组件按自己的宽度自动算，见 Home.astro）。 */
 export const WALL_WIDE = new Set(["Sidebar", "Appearance", "Chart", "Stat", "Table", "Layout", "LayerCard", "SettingsGroup", "Topbar", "PageHeader", "Toolbar", "Dock"]);

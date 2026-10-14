@@ -19,6 +19,30 @@
 2. 准备环境：Node 24.12 以上、pnpm 12；`pnpm install && pnpm xxd:build`。
 3. 本机看效果：`pnpm dev`（展示站 http://localhost:4400）。
 
+## 仓库里有什么
+
+从下往上三层，上层用下层：
+
+```
+令牌     颜色、字号、间距、圆角                  @xxd/tokens   @xxd/icons
+  ↓
+组件     不用框架的原生组件                      @xxd/css
+         React 组件（Kumo 换皮）                 @xxd/react
+  ↓
+插件套件 新建插件、同步组件、设置同步、命令行    @xxd/extension
+```
+
+| 包 | 一句话 |
+| --- | --- |
+| `@xxd/tokens` | 所有颜色、字号、间距、圆角的唯一来源；另带首帧脚本 `boot.js`，页面打开第一眼就是用户选的主题 |
+| `@xxd/icons` | 500 多个图标，统一画法（24 网格、1.5 线宽、方角），可以按中文关键词搜 |
+| `@xxd/css` | 59 个原生组件和 18 个模式，键盘和读屏是自己实现的，由 audit 守着 |
+| `@xxd/react` | Kumo 的 React 组件换上小小东的样子（键盘、焦点、读屏由底层的 Base UI 负责），再加小小东独有组件和外观、语言两个 Provider |
+| `@xxd/extension` | Chrome 插件工具箱和命令行 `xxd-ui` |
+| `@xxd/site` | 展示站，中英两版；`pnpm dev` 在 http://localhost:4400 打开 |
+
+`packages/kumo*` 是上游 Kumo 的代码：内部包名保持 `@cloudflare/kumo`，方便合并上游；对外用 `@xxd/react`。根目录的 `pnpm kumo:dev` 打开 Kumo 原版的文档站。
+
 ## 改哪里
 
 | 想改 | 只改这里 | 然后 |
@@ -42,13 +66,29 @@ pnpm lint
 pnpm changeset                            # 改了用户看得到的东西时，写一条版本记录（见 .changeset/README.md）
 ```
 
-展示站的两道检查（`visual` 截图对比、`audit` 压力测试）要无头 Chrome。没有条件跑的话，在 PR 里说一声，维护者来跑；`audit` 也会在 CI 里跑。
+展示站的两道检查要无头 Chrome（设置 `CHROME_EXE`）。没有条件跑的话，在 PR 里说一声，维护者来跑；`audit` 也会在 CI 里跑。
+
+```bash
+pnpm --filter @xxd/site build
+pnpm --filter @xxd/site visual       # 截图对比：每页 × 4 种外观
+pnpm --filter @xxd/site run audit    # 无障碍、长文字、恶意宿主页、高对比、英文漏翻、细节、浮层、冒烟、读屏走查
+```
 
 视觉改动：附四种外观的截图（亮 / 暗 × 直角 / 圆角，至少一种主色），说明对应原则的哪一条。
 
 ## 提交信息
 
 `feat(xxd): …` / `fix(xxd): …` / `docs: …`，说清楚做了什么、为什么。一个提交只做一件事。中文英文都可以。
+
+## 维护的人看这里
+
+| 想知道 | 看这里 |
+| --- | --- |
+| 路线和进度 | [维护者文档](docs/maintainers/)（计划、评审、开源清单） |
+| 展示站怎么搭、怎么部署 | [文档站](docs/DOCS-SITE.md) |
+| Kumo 的变量对应我们的哪个 | [令牌映射](docs/token-map.md) |
+| 怎么合并 Kumo 的新版本 | [同步上游](docs/UPSTREAM.md) |
+| 给 AI 助手的工程约定 | [AGENTS.md](AGENTS.md) |
 
 ## 许可
 

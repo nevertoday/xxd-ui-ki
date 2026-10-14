@@ -13,6 +13,8 @@ import { langOf, t, withLang } from "../i18n/index.js";
 import { richText } from "../lib/markup.js";
 import { principlesFor } from "../data/principles.js";
 import * as reactDemos from "../react/demos.tsx";
+import { WALL, WALL_PREVIEW } from "../data/wall.js";
+import { WALL as WALL_EN } from "../data/wall.en.js";
 
 const { c } = Astro.props;
 const lang = langOf(Astro.url.pathname);
@@ -76,7 +78,7 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
   }
 
   <h2 class="site-h2" id="demo">{L.demo}</h2>
-  <Demo markup={c.markup} react={hasReact ? c.name : undefined} align={c.align} block={c.block} title={c.name} />
+  <Demo markup={c.markup} react={hasReact ? c.name : undefined} align={c.align} block={c.block} title={c.name} preview={WALL_PREVIEW.has(c.name) ? (lang === "en" ? WALL_EN : WALL)[c.name] : undefined} />
 
   {
     extraDemos.map((e, i) => (

@@ -4,7 +4,7 @@ import Site from "../layouts/Site.astro";
 import { componentsFor } from "../lib/data.js";
 import { embed } from "../lib/markup.js";
 import { langOf, t, withLang } from "../i18n/index.js";
-import { WALL, WALL_HIDE, WALL_WIDE } from "../data/wall.js";
+import { WALL, WALL_FULL, WALL_HIDE, WALL_WIDE } from "../data/wall.js";
 import { WALL as WALL_EN } from "../data/wall.en.js";
 const lang = langOf(Astro.url.pathname);
 const L = t(lang);
@@ -43,14 +43,172 @@ const wall = componentsFor(lang).filter((c) => c.wall !== false && !WALL_HIDE.ha
   <section class="site-wall" aria-label={T.wall}>
     {
       wall.map((c) => (
-        <div class="site-wall__cell" data-wide={WALL_WIDE.has(c.name) ? "" : undefined}>
+        <div class="site-wall__cell" data-wide={WALL_WIDE.has(c.name) ? "" : undefined} data-full={WALL_FULL.has(c.name) ? "" : undefined}>
           <a class="site-wall__name" href={withLang(`/components/${c.slug}`, lang)}>
             {c.label}
             {lang !== "en" && <span>{c.name}</span>}
           </a>
-          <div class="site-wall__stage xxd-page" data-block={c.block && !staticForms[c.name] ? "" : undefined} set:html={embed(staticForms[c.name] ?? c.wall ?? fitWall(c.markup))} />
+          <div class="site-wall__stage xxd-page" data-block={c.block && !staticForms[c.name] ? "" : undefined} data-spread={WALL_FULL.has(c.name) ? "" : undefined} set:html={embed(staticForms[c.name] ?? c.wall ?? fitWall(c.markup))} />
         </div>
       ))
     }
   </section>
+  <script is:inline>
+    // 组件墙排版：每格占几列、几行按组件自己的大小算。
+    //   列：格子里每个元素都放得下自己的自然宽度（不被挤窄、不截字）；整行宽的组件（data-block）至少按 data-wide 给的列数。
+    //   行：在算好的宽度下，内容的实际高度 + 名字 + 上下留白，按 40px 一档向上取整，至少 4 档（160px）。
+    // 换窗口宽度、换外观（密度、圆角、质感会改尺寸）时重算。只有一列（手机）时不排，按内容自然长高。
+    (() => {
+      const wall = document.querySelector(".site-wall");
+      if (!wall) return;
+      const MIN_ROWS = 4;
+      const probe = document.createElement("div");
+      probe.setAttribute("aria-hidden", "true");
+      probe.style.cssText = "position:absolute;left:-10000px;top:0;visibility:hidden;pointer-events:none;contain:layout style";
+      function measure(stage) {
+        // 自然宽度：每个直接子元素单独放进 max-content 的盒子里量
+        probe.className = stage.className;
+        probe.removeAttribute("data-block");
+        probe.removeAttribute("data-spread");
+        probe.style.width = "max-content";
+        probe.style.display = "block";
+        probe.style.padding = "0";
+        let need = 0;
+        for (const child of stage.children) {
+          const clone = child.cloneNode(true);
+          probe.replaceChildren(clone);
+          need = Math.max(need, clone.getBoundingClientRect().width);
+        }
+        return need;
+      }
+      function heightAt(stage, inner) {
+        probe.className = stage.className;
+        probe.toggleAttribute("data-block", stage.hasAttribute("data-block"));
+        probe.toggleAttribute("data-spread", stage.hasAttribute("data-spread"));
+        probe.style.display = "";
+        probe.style.width = inner + "px";
+        probe.style.padding = "0";
+        probe.replaceChildren(...[...stage.children].map((c) => c.cloneNode(true)));
+        return probe.scrollHeight;
+      }
+      // 高矮不一的格子会在中间留下空洞：先把每格钉在现在的位置上，再让空洞上方（不行就左边）那一格伸长补上，
+      // 格子线就是完整的。只伸长、不挪动，所以不会把别的格子挤走。
+      function fillHoles(cols, colW, row, minRows) {
+        const top0 = wall.getBoundingClientRect().top + wall.clientTop;
+        const left0 = wall.getBoundingClientRect().left + wall.clientLeft;
+        const items = [...wall.querySelectorAll(":scope > .site-wall__cell")].map((cell) => {
+          const r = cell.getBoundingClientRect();
+          return { cell, c: Math.round((r.left - left0) / colW), r: Math.round((r.top - top0) / row), cs: Math.round(r.width / colW), rs: Math.round(r.height / row) };
+        });
+        for (const i of items) i.min = minRows.get(i.cell) || 1;
+        const total = Math.max(...items.map((i) => i.r + i.rs));
+        const grid = Array.from({ length: total }, () => Array(cols).fill(null));
+        const mark = (i) => { for (let y = i.r; y < i.r + i.rs; y += 1) for (let x = i.c; x < i.c + i.cs; x += 1) if (grid[y]) grid[y][x] = i; };
+        const remark = () => { for (const r of grid) r.fill(null); items.forEach(mark); };
+        items.forEach(mark);
+        // 伸进第 y 行时挡路的格子：每个都得正好从这一行开始（或在这一行结束），并且让出一行后内容还放得下
+        const yieldRow = (y, x0, x1, fromTop) => {
+          const blockers = new Set();
+          for (let x = x0; x < x1; x += 1) if (grid[y][x]) blockers.add(grid[y][x]);
+          for (const b of blockers) if (b.rs <= b.min || (fromTop ? b.r !== y : b.r + b.rs - 1 !== y)) return null;
+          return blockers;
+        };
+        const free = (y, x0, x1) => { for (let x = x0; x < x1; x += 1) if (!grid[y] || grid[y][x]) return false; return true; };
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (let y = 0; y < total; y += 1) {
+            for (let x = 0; x < cols; x += 1) {
+              if (grid[y][x]) continue;
+              const colFree = (i, xx) => { for (let yy = i.r; yy < i.r + i.rs; yy += 1) if (!grid[yy] || grid[yy][xx]) return false; return true; };
+              const above = y > 0 ? grid[y - 1][x] : null;
+              if (above && free(y, above.c, above.c + above.cs)) { above.rs += 1; mark(above); changed = true; continue; }
+              const below = y + 1 < total ? grid[y + 1][x] : null;
+              if (below && free(y, below.c, below.c + below.cs)) { below.r -= 1; below.rs += 1; mark(below); changed = true; continue; }
+              const left = x > 0 ? grid[y][x - 1] : null;
+              if (left && colFree(left, x)) { left.cs += 1; mark(left); changed = true; continue; }
+              const right = x + 1 < cols ? grid[y][x + 1] : null;
+              if (right && colFree(right, x)) { right.c -= 1; right.cs += 1; mark(right); changed = true; continue; }
+              // 四面都伸不进来：上面那格往下伸，挡路的格子从顶上让出一行；不行就下面那格往上伸，挡路的从底下让出一行
+              const down = above && yieldRow(y, above.c, above.c + above.cs, true);
+              if (down) { for (const b of down) { b.r += 1; b.rs -= 1; } above.rs += 1; remark(); changed = true; continue; }
+              const up = below && yieldRow(y, below.c, below.c + below.cs, false);
+              if (up) { for (const b of up) b.rs -= 1; below.r -= 1; below.rs += 1; remark(); changed = true; }
+            }
+          }
+        }
+        for (const i of items) {
+          i.cell.style.gridColumn = `${i.c + 1} / span ${i.cs}`;
+          i.cell.style.gridRow = `${i.r + 1} / span ${i.rs}`;
+        }
+        return grid.reduce((n, r) => n + r.filter((v) => !v).length, 0);
+      }
+      function layout() {
+        const cols = getComputedStyle(wall).gridTemplateColumns.split(" ").filter(Boolean).length;
+        if (cols < 2) {
+          wall.removeAttribute("data-packed");
+          for (const cell of wall.children) cell.style.gridColumn = cell.style.gridRow = "";
+          return;
+        }
+        const row = parseFloat(getComputedStyle(wall).getPropertyValue("--wall-row")) || 40;
+        const colW = (wall.clientWidth) / cols;
+        wall.appendChild(probe);
+        const spans = [];
+        for (const cell of wall.querySelectorAll(":scope > .site-wall__cell")) {
+          const stage = cell.querySelector(".site-wall__stage");
+          const cs = getComputedStyle(stage);
+          const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+          const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+          let span = cell.hasAttribute("data-full") ? cols : cell.hasAttribute("data-wide") ? 2 : 1;
+          if (!stage.hasAttribute("data-block")) {
+            const need = measure(stage);
+            while (span < cols && span * colW - padX - 1 < need) span += 1;
+          }
+          span = Math.min(span, cols);
+          const inner = span * colW - padX - 1;
+          const name = cell.querySelector(".site-wall__name");
+          const h = heightAt(stage, inner) + padY + name.getBoundingClientRect().height;
+          const need = Math.ceil(h / row);
+          spans.push([cell, span, Math.max(MIN_ROWS, need), Math.max(3, need)]);
+        }
+        probe.remove();
+        wall.setAttribute("data-packed", "");
+        // 排一次：q 是行数的取整档位（1 = 40px 一档，2 = 80px 一档）。返回补不上的空洞数
+        const place = (q) => {
+          for (const [cell, span, rows] of spans) {
+            cell.style.gridColumn = `span ${span}`;
+            cell.style.gridRow = `span ${Math.ceil(rows / q) * q}`;
+          }
+          // 量的是旁边的副本，和格子里的真实排版可能差几像素：真实格子里还放不下就再加一行。
+          // minRows：补洞时这一格最少还要几行（内容放得下，至少 3 行）
+          const minRows = new Map();
+          for (const [cell, , rows, need] of spans) {
+            const stage = cell.querySelector(".site-wall__stage");
+            const start = Math.ceil(rows / q) * q;
+            let n = start;
+            while (stage.scrollHeight > stage.clientHeight + 1 && n < start + 10) cell.style.gridRow = `span ${(n += 1)}`;
+            minRows.set(cell, n > start ? n : need);
+          }
+          return fillHoles(cols, colW, row, minRows);
+        };
+        // 先按细档排；还有洞就换粗一档再排，取洞最少的
+        let best = [Infinity, 1];
+        let last = 0;
+        for (const q of [1, 2, 3]) {
+          const holes = place((last = q));
+          if (holes < best[0]) best = [holes, q];
+          if (!holes) break;
+        }
+        if (last !== best[1]) place(best[1]);
+      }
+      layout();
+      let frame = 0;
+      const again = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(layout); };
+      document.addEventListener("DOMContentLoaded", again);
+      addEventListener("load", again);
+      document.addEventListener("xxd:appearance", again);
+      let lastW = wall.clientWidth;
+      new ResizeObserver(() => { if (wall.clientWidth !== lastW) { lastW = wall.clientWidth; again(); } }).observe(wall);
+    })();
+  </script>
 </Site>

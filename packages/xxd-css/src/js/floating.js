@@ -1,7 +1,9 @@
 // 把浮层放到锚点旁边：先按指定方向，放不下就翻到另一侧，再夹在视口里。
 export function place(anchor, floating, { placement = "bottom-start", offset = 6, padding = 8 } = {}) {
   const a = anchor.getBoundingClientRect();
-  const f = floating.getBoundingClientRect();
+  // 浮层的尺寸用布局尺寸：打开时有从 96% 放大的动画，getBoundingClientRect 会把缩放算进去，量矮了就不会往上翻、会伸出视口
+  const box = floating.getBoundingClientRect();
+  const f = { width: floating.offsetWidth || box.width, height: floating.offsetHeight || box.height };
   const vw = globalThis.innerWidth || document.documentElement.clientWidth;
   const vh = globalThis.innerHeight || document.documentElement.clientHeight;
   let [side, align = "center"] = placement.split("-");

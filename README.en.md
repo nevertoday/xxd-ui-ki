@@ -1,64 +1,35 @@
-# xxd-ui-kit · XXD UI Kit
+# XXD UI Kit
 
 [中文](README.md) · **English**
 
 [![CI](https://github.com/nevertoday/xxd-ui-kit/actions/workflows/xxd.yml/badge.svg)](https://github.com/nevertoday/xxd-ui-kit/actions/workflows/xxd.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
-![status: alpha](https://img.shields.io/badge/status-alpha-lightgrey.svg)
 
-A Chinese-first, framework-free UI kit: **one CSS file and one JS file**, with first-class support for Chrome extensions (MV3).
-React projects can use it too (built on Cloudflare's [Kumo](https://github.com/cloudflare/kumo), restyled).
+A quiet, restrained set of UI components: square corners, black, white and gray, hairlines, system fonts.
 
-It is the design system of XXD (小小东), an independent maker: the XXD member site and XXD's Chrome extensions all use it, and the author makes the design calls. The code is open source under the [MIT License](LICENSE) — you're welcome to use it.
+- Plain web pages: one CSS file and one JS file. No React needed.
+- Chrome extensions: one command sets up a side panel and a settings page, in Simplified Chinese, Traditional Chinese and English.
+- React projects: a matching set of components.
 
-**Browse every component live: <https://ui.xiaoxiaodong.ai/en/>**
+**See every component: <https://ui.xiaoxiaodong.ai/en/>**
 
-![The same extension side panel in four appearances: light / dark × square / rounded, the last two with an accent color](docs/assets/overview.png)
+![The same extension side panel four ways: light and dark, square and rounded](docs/assets/overview.png)
 
-> **Status: alpha (0.x).** Not on npm yet — use it from source (shown below). During 0.x, minor versions may include breaking changes; see the [changelog](CHANGELOG.en.md).
+> Early days (0.x). Not on npm yet, and versions may break things (see the [changelog](CHANGELOG.en.md)).
 
-## Good fit / not a good fit
+## Is it for you?
 
-**Good fit**
+Yes if you build Chrome extensions, small sites or tool pages, and like the look in the screenshot above.
 
-- Chrome extensions (MV3): component files are copied into the extension itself (extensions can't load remote code); UI injected into other people's pages is isolated in Shadow DOM; no flash on the first frame; Simplified Chinese, Traditional Chinese and English.
-- Small sites and tool pages that don't want React or Tailwind: one `<link>` and one `<script>`.
-- A quiet, restrained look: square corners by default, ink for emphasis, hairlines, system fonts, no web fonts.
-- Something that keeps you honest: `xxd-ui doctor` checks for hard-coded colors, shadows, weights and radii, misspelt icon and class names, and extension manifests and locales.
+Not if you need:
 
-**Not a good fit**
+- Big admin apps, complex forms and data tables: use [Ant Design](https://ant.design).
+- Component source copied into your project to edit freely: use [shadcn/ui](https://ui.shadcn.com).
+- A completely different style: you can change the accent color, corners and density, but not the style itself.
 
-- Large admin panels, complex forms and data grids: [Ant Design](https://ant.design) is far more mature there.
-- Copying component source into your project and restyling it: that's what [shadcn/ui](https://ui.shadcn.com) is for.
-- Heavy brand customization: the look is opinionated (you can change the accent, corners and density, but it won't become a different style).
+## Try it (nothing to install)
 
-|  | xxd-ui-kit | shadcn/ui | Ant Design |
-| --- | --- | --- | --- |
-| Framework | None (native), React version too | React + Tailwind | React |
-| How you use it | One CSS + one JS, or React components | Copy the source into your project | npm package |
-| Chrome extensions | Built for it (vendor files, Shadow DOM, three languages, doctor) | No specific support | No specific support |
-| Language | Chinese first, three languages | English | Chinese, English |
-| Size | 59 components + 18 patterns | Many components, big community | The most complete |
-
-## Quick start
-
-### 0. Set up
-
-You need Node 24.12 or later and pnpm 12 (if pnpm is missing, the version in `package.json` is downloaded automatically).
-
-```bash
-git clone https://github.com/nevertoday/xxd-ui-kit.git
-cd xxd-ui-kit
-pnpm install
-pnpm xxd:build      # build tokens, icons, components, the extension kit and React (builds Kumo first the first time)
-pnpm xxd link       # optional: install the global command xxd-ui so it works in any directory
-```
-
-Commands below are written as `xxd-ui …`; without `link`, run them inside the repo as `pnpm xxd …`.
-
-### Plain web page
-
-**Try it**: the showcase hosts versioned build files you can link directly:
+Paste this into a new HTML file and open it in a browser:
 
 ```html
 <script src="https://ui.xiaoxiaodong.ai/v/0.1.0/boot.js" data-key="my-site-ui"></script>
@@ -71,164 +42,86 @@ Commands below are written as `xxd-ui …`; without `link`, run them inside the 
 </body>
 ```
 
-**For real**: copy the files into your project and update them with one command:
+Every component on the showcase has markup you can copy.
+
+## Using it for real: install once
+
+You need Node 24.12+ and pnpm.
 
 ```bash
-xxd-ui init ./my-site     # writes xxd.config.json, copies the components, prints the lines for <head>
-xxd-ui sync ./my-site     # later: copy in the latest version
+git clone https://github.com/nevertoday/xxd-ui-kit.git
+cd xxd-ui-kit
+pnpm install
+pnpm xxd:build   # takes a few minutes the first time
+pnpm xxd link    # installs the xxd-ui command so it works from any folder
 ```
 
-**With a bundler (Vite etc.)**: pack `@xxd/css` with `xxd-ui pack` and install it (see the React section below), then:
+Then pick what you're doing:
 
-```js
-import "@xxd/css/dist/xxd.css";
-import * as icons from "@xxd/icons";
-import { install, uninstall, useIcons, toast, confirmDialog } from "@xxd/css";
-useIcons(icons);  // turns <i data-xxd-icon="…"> into SVG (the classic script uses icons.js automatically)
-install();        // or install(root, { signal }); uninstall(root) when that part of the page goes away
-```
-
-Icons, only the ones you use: `import { Check } from "@xxd/icons/each"`, then `iconSVG(Check)` or `<Icon icon={Check} />`. Names are typed (`IconName`), so typos show up in your editor.
-
-Your site already has its own CSS variables and you don't want anything to change: see [bringing in an existing site](docs/en/existing-site.md).
-
-### Chrome extension
+### Make a Chrome extension
 
 ```bash
-xxd-ui new ./today --name "Today" --slug today
+xxd-ui new ./today --name 今日待办 --name-en Today --slug today
 ```
 
-You get an extension you can load right away with “Load unpacked”: side panel, options page and three languages included. Add more when you need it:
+Open `chrome://extensions`, turn on Developer mode, click "Load unpacked" and pick the `today` folder. It works right away.
 
-| Option | Adds |
-| --- | --- |
-| `--popup` | The small window that opens from the toolbar icon |
-| `--content "https://example.com/*"` | A content script that puts UI into web pages (isolated in Shadow DOM) |
-| `--account` | Sign-in and membership pages (prices are placeholders) |
+Add more with flags: `--popup` for the small window behind the toolbar icon, `--content "https://example.com/*"` to put UI on web pages, `--account` for sign-in and membership pages.
+More in the [extension kit](docs/en/EXTENSION-KIT.md).
 
-When the components are updated:
+### Add it to an existing page or extension
 
 ```bash
-xxd-ui status          # which projects are behind (anything you've created, initialised or synced is remembered)
-xxd-ui sync --all      # update all of them
-xxd-ui doctor ./today  # check references, manifest, locales, MV3 rules and hard-coded styles
+xxd-ui init ./my-site
 ```
 
-How to wire up pages, store appearance settings and put UI into web pages: see the [extension kit](docs/en/EXTENSION-KIT.md).
+It copies the component files into `my-site` and tells you which lines to add to `<head>`.
 
-### React
+Your site already has its own color variables and shouldn't change: see [existing sites](docs/en/existing-site.md).
+Using a bundler like Vite: see [Get started](https://ui.xiaoxiaodong.ai/en/start) on the showcase.
+
+### Use it in React
+
+```bash
+xxd-ui pack ./packs          # in xxd-ui-kit: build the packages
+npm install ./packs/*.tgz    # in your project
+```
 
 ```tsx
-import { Button, Dialog, DialogActions, XxdAppearanceProvider } from "@xxd/react";
-import "@xxd/react/standalone.css"; // without Tailwind
+import { Button } from "@xxd/react";
+import "@xxd/react/standalone.css";
 ```
 
-With Tailwind v4, put this at the very top of your CSS:
+Tailwind, appearance and language settings: see [Get started](https://ui.xiaoxiaodong.ai/en/start).
 
-```css
-@layer properties, theme, base, xxd, components, utilities;
-@import "tailwindcss";
-@import "@xxd/react/styles.css";
-```
-
-It's not on npm yet. To use it in a project outside the repo:
+## When components get updated
 
 ```bash
-# in xxd-ui-kit: pack tokens, icons, css and react into four .tgz files
-xxd-ui pack ./packs
-# in your project
-npm install ./packs/*.tgz
+xxd-ui status          # which projects are on an old version
+xxd-ui sync --all      # update them all
+xxd-ui doctor ./today  # check for typos, hard-coded colors and extension config problems
 ```
 
-A complete example (an `App.tsx` with the providers) is on the showcase's [Getting started](https://ui.xiaoxiaodong.ai/en/start) page.
-
-## Looking things up
+## Finding components and icons
 
 ```bash
-xxd-ui ls               # every component
-xxd-ui doc Dialog       # one component's markup, attributes and rules (Chinese names and typos work too)
-xxd-ui doc Dialog --react
-xxd-ui icon trash       # find an icon (500+ of them); add --svg / --react / --copy
-xxd-ui tokens line      # tokens with their light / dark values
-xxd-ui help --en        # every command
+xxd-ui doc dialog   # how to write one component (English or Chinese name)
+xxd-ui icon delete  # find an icon among 500+
+xxd-ui help         # every command
 ```
 
-Or see [CLI and tools](https://ui.xiaoxiaodong.ai/en/tools) on the showcase. Every showcase page also has a `.md` version, plus `llms.txt` and a component registry endpoint for AI assistants.
+Or search the [showcase](https://ui.xiaoxiaodong.ai/en/).
 
-## What's inside
+## Contributing
 
-Three layers, bottom to top; each uses the one below:
+Start with [CONTRIBUTING](CONTRIBUTING.en.md): what's welcome, where to change things, how to run the tests.
+Why it looks the way it does: [design principles](https://ui.xiaoxiaodong.ai/en/principles). Found a security problem? Report it privately as described in [SECURITY.md](SECURITY.md).
 
-```
-Tokens      colors, type sizes, spacing, radii              @xxd/tokens   @xxd/icons
-  ↓
-Components  native, framework-free                          @xxd/css
-            React (Kumo, restyled)                          @xxd/react
-  ↓
-Extension   create extensions, sync components and          @xxd/extension
-kit         settings, the CLI
-```
+## Kumo
 
-| Package          | In one sentence                                                                                                       |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `@xxd/tokens`    | The single source of every color, type size, spacing step and radius, plus a first-frame script so pages open in the user's theme |
-| `@xxd/icons`     | 500+ icons drawn one way (24 grid, 1.5 stroke, square corners), searchable by Chinese keyword                         |
-| `@xxd/css`       | 59 native components and 18 patterns (drag and drop, image viewer, two-step confirm, extension permission requests…); keyboard and screen-reader behavior is our own, checked by the audit |
-| `@xxd/react`     | Kumo's React components in the XXD look (keyboard, focus and screen readers handled by Base UI underneath), plus XXD-only components and appearance and language providers |
-| `@xxd/extension` | The Chrome extension toolkit and the `xxd-ui` command                                                                  |
-| `@xxd/site`      | The showcase: every component, pattern, full-page template and design principle, in Chinese and English               |
-
-## Development
-
-```bash
-pnpm xxd:build              # build every XXD package
-pnpm xxd:test               # run every XXD test
-pnpm --filter @cloudflare/kumo test   # also run this if you touched packages/kumo
-pnpm lint
-pnpm dev                    # the showcase at http://localhost:4400
-```
-
-Two checks before release (both need headless Chrome via `CHROME_EXE`):
-
-```bash
-pnpm --filter @xxd/site build
-pnpm --filter @xxd/site visual   # screenshot diff: every page × 4 appearances
-pnpm --filter @xxd/site run audit    # accessibility, long text, hostile host page, forced colors, untranslated text, polish, overlays, smoke, screen-reader walk-through
-```
-
-A few hard rules: no shadows on cards, rows or buttons; weights 400 / 500 / 600 only; animate only opacity and position; every visual decision traces back to the [design principles](https://ui.xiaoxiaodong.ai/en/principles).
-How to contribute: [CONTRIBUTING](CONTRIBUTING.en.md).
-
-## Docs
-
-**Using it**
-
-| You want to know          | Read                                                     |
-| ------------------------- | -------------------------------------------------------- |
-| Why it looks this way     | [Design principles](https://ui.xiaoxiaodong.ai/en/principles) |
-| How to use it in an extension | [Extension kit](docs/en/EXTENSION-KIT.md)            |
-| How to bring in an existing site | [Existing sites](docs/en/existing-site.md)         |
-| What changed              | [Changelog](CHANGELOG.en.md)                              |
-| Reporting a security issue | [Security](SECURITY.md)                                 |
-
-**Maintaining it** (mostly in Chinese)
-
-| You want to know                   | Read                                                     |
-| ---------------------------------- | -------------------------------------------------------- |
-| Roadmap and progress               | [Maintainer docs](docs/maintainers/) (plans, review, open-source checklist) |
-| How the showcase is built and deployed | [Docs site](docs/DOCS-SITE.md)                        |
-| Which Kumo variable maps to which  | [Token map](docs/token-map.md)                           |
-| How to merge new Kumo versions     | [Syncing upstream](docs/UPSTREAM.md)                     |
-| Engineering conventions for AI assistants | [AGENTS.md](AGENTS.md)                            |
-
-## Kumo and Cloudflare
-
-The React components come from Cloudflare's open-source component library [Kumo](https://github.com/cloudflare/kumo) (MIT), restyled in the XXD look; the native components, tokens, icons and extension kit are this project's own.
-**This project is not affiliated with or endorsed by Cloudflare.** Cloudflare's brand components (logo etc.) are not exported from `@xxd/react`.
-
-The repository keeps Kumo's commit history (so upstream can be merged), which is why Kumo's authors top GitHub's contributor list.
-`packages/kumo*` is upstream code: its internal package name stays `@cloudflare/kumo` to keep merges easy — use `@xxd/react` instead. `pnpm kumo:dev` at the root opens Kumo's original docs site.
+The React components come from Cloudflare's open-source component library [Kumo](https://github.com/cloudflare/kumo) (MIT), restyled; everything else is this project's own.
+This project is not affiliated with or endorsed by Cloudflare. The repository keeps Kumo's commit history, which is why Kumo's authors top GitHub's contributor list.
 
 ## License
 
-MIT. XXD's parts are under [LICENSE](LICENSE); code from Kumo is MIT as well, with its original text in [LICENSE-KUMO](LICENSE-KUMO).
+MIT, see [LICENSE](LICENSE); code from Kumo is under [LICENSE-KUMO](LICENSE-KUMO).

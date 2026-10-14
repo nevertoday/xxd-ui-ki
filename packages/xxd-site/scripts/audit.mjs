@@ -396,6 +396,57 @@ async function polishAudit() {
     }
     await ctx.close();
   }
+  // 首页组件墙：每格按组件大小占几列几行（Home.astro 的脚本）。格子 overflow:hidden，被裁掉的东西上面查不到，单独查：
+  // 不截（内容超出格子）、不挤（一个元素比它的自然宽度窄，而墙上明明还有更宽的位置）、不留空洞（格子拼满整面墙）
+  for (const lang of ["", "/en"]) {
+    for (const [w, look] of [[1440, ""], [1100, ""], [820, ""], [1280, "rounded-compact"], [390, ""]]) {
+      const ctx = await browser.newContext({ viewport: { width: w, height: 900 }, reducedMotion: "reduce" });
+      const tab = await ctx.newPage();
+      await tab.goto(`${origin}${lang}/`, { waitUntil: "networkidle" });
+      if (look) {
+        await tab.evaluate(() => {
+          document.documentElement.setAttribute("data-corners", "rounded");
+          document.documentElement.setAttribute("data-density", "compact");
+          document.dispatchEvent(new CustomEvent("xxd:appearance"));
+        });
+      }
+      await tab.waitForTimeout(250);
+      const problems = await tab.evaluate(() => {
+        const out = [];
+        const wall = document.querySelector(".site-wall");
+        const cols = getComputedStyle(wall).gridTemplateColumns.split(" ").filter(Boolean).length;
+        const name = (c) => c.querySelector(".site-wall__name")?.textContent.trim().split(/\s+/).pop();
+        let area = 0;
+        for (const cell of wall.querySelectorAll(".site-wall__cell")) {
+          const st = cell.querySelector(".site-wall__stage");
+          const r = cell.getBoundingClientRect();
+          area += r.width * r.height;
+          if (st.scrollHeight > st.clientHeight + 1 || st.scrollWidth > st.clientWidth + 1) out.push(`${name(cell)} 被格子截掉（高 ${st.scrollHeight - st.clientHeight}px / 宽 ${st.scrollWidth - st.clientWidth}px）`);
+          if (st.hasAttribute("data-block")) continue;
+          const cs = getComputedStyle(st);
+          const inner = st.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+          const probe = document.createElement("div");
+          probe.className = st.className;
+          probe.style.cssText = "position:absolute;left:-10000px;top:0;width:max-content;display:block;padding:0;visibility:hidden";
+          document.body.appendChild(probe);
+          for (const child of st.children) {
+            probe.replaceChildren(child.cloneNode(true));
+            const need = probe.firstChild.getBoundingClientRect().width;
+            if (need > inner + 1 && need < wall.clientWidth - 64) out.push(`${name(cell)} 被挤窄：要 ${Math.round(need)}px，格子里只有 ${Math.round(inner)}px`);
+          }
+          probe.remove();
+        }
+        if (cols > 1) {
+          const wr = wall.getBoundingClientRect();
+          const inside = (wr.width - wall.clientLeft) * (wr.height - wall.clientTop);
+          if (inside - area > 2000) out.push(`墙上有空洞：约 ${Math.round((inside - area) / 1000)}k 平方像素没有格子`);
+        }
+        return out;
+      });
+      for (const x of problems) fail("细节", `[首页${lang || ""} ${w}${look ? " " + look : ""}] 组件墙 ${x}`);
+      await ctx.close();
+    }
+  }
   // 每个示例放进窄 / 中 / 宽的格子
   for (const lang of ["zh", "en"]) {
     for (const w of [260, 360, 560]) {
@@ -412,7 +463,7 @@ async function polishAudit() {
       await ctx.close();
     }
   }
-  console.log(`细节：${pages.length} 页 × 2 种宽度，每个组件和模式 × 中英 × 3 种格子宽`);
+  console.log(`细节：${pages.length} 页 × 2 种宽度，每个组件和模式 × 中英 × 3 种格子宽，首页组件墙 × 中英 × 5 种宽度 / 外观`);
 }
 
 /* ── 7. 浮层：真的打开每一个 ── */
@@ -445,7 +496,8 @@ async function overlayAudit() {
           const vh = innerHeight;
           const box = (el) => el.getBoundingClientRect();
           const inView = (b) => b.left >= -1 && b.top >= -1 && b.right <= vw + 1 && b.bottom <= vh + 1;
-          const layers = [...document.querySelectorAll("dialog[open], .xxd-sheet[data-open], .xxd-panel[data-open]")];
+          // 演示区里「打开后的样子」是静态的（inert，只给看），不算打开的浮层
+          const layers = [...document.querySelectorAll("dialog[open], .xxd-sheet[data-open], .xxd-panel[data-open]")].filter((el) => !el.closest("[inert]"));
           const pops = [...document.querySelectorAll(":popover-open")].filter((p) => !p.classList.contains("xxd-tooltip") && !p.classList.contains("xxd-bubble"));
           const toasts = [...document.querySelectorAll(".xxd-toast:not([data-leaving])")].slice(window.__toastsBefore);
           const active = document.activeElement;
@@ -489,10 +541,10 @@ async function overlayAudit() {
         for (let n = 0; n < 3; n += 1) {
           await tab.keyboard.press("Escape");
           await tab.waitForTimeout(160);
-          if (!(await tab.evaluate(() => document.querySelector("dialog[open], .xxd-sheet[data-open], .xxd-panel[data-open], .xxd-menu:popover-open")))) break;
+          if (!(await tab.evaluate(() => [...document.querySelectorAll("dialog[open], .xxd-sheet[data-open], .xxd-panel[data-open], .xxd-menu:popover-open")].some((e) => !e.closest("[inert]"))))) break;
         }
         const after = await tab.evaluate(() => ({
-          still: !!document.querySelector("dialog[open], .xxd-sheet[data-open], .xxd-panel[data-open], .xxd-menu:popover-open"),
+          still: !![...document.querySelectorAll("dialog[open], .xxd-sheet[data-open], .xxd-panel[data-open], .xxd-menu:popover-open")].some((e) => !e.closest("[inert]")),
           back: !!document.activeElement?.closest("[data-audit-opener]"),
         }));
         if (after.still) fail("浮层", `${label} Esc 关不掉`);
@@ -501,7 +553,7 @@ async function overlayAudit() {
         await tab.evaluate(() => {
           for (const d of document.querySelectorAll("dialog[open]")) d.close();
           for (const p of document.querySelectorAll(":popover-open")) p.hidePopover?.();
-          for (const l of document.querySelectorAll(".xxd-sheet[data-open], .xxd-panel[data-open]")) window.Xxd?.closeLayer?.(l);
+          for (const l of document.querySelectorAll(".xxd-sheet[data-open], .xxd-panel[data-open]")) if (!l.closest("[inert]")) window.Xxd?.closeLayer?.(l);
         });
       }
     }

@@ -19,6 +19,31 @@ A visual change has to trace back to one of the design principles; if it doesn't
 2. Set up: Node 24.12 or later, pnpm 12; `pnpm install && pnpm xxd:build`.
 3. See it locally: `pnpm dev` (the showcase at http://localhost:4400).
 
+## What's in the repository
+
+Three layers, bottom to top; each uses the one below:
+
+```
+Tokens      colors, type sizes, spacing, radii              @xxd/tokens   @xxd/icons
+  ↓
+Components  native, framework-free                          @xxd/css
+            React (Kumo, restyled)                          @xxd/react
+  ↓
+Extension   create extensions, sync components and          @xxd/extension
+kit         settings, the CLI
+```
+
+| Package | In one sentence |
+| --- | --- |
+| `@xxd/tokens` | The single source of every color, type size, spacing step and radius, plus a first-frame script (`boot.js`) so pages open in the user's theme |
+| `@xxd/icons` | 500+ icons drawn one way (24 grid, 1.5 stroke, square corners), searchable by Chinese keyword |
+| `@xxd/css` | 59 native components and 18 patterns; keyboard and screen-reader behavior is our own, checked by the audit |
+| `@xxd/react` | Kumo's React components in the XXD look (keyboard, focus and screen readers handled by Base UI underneath), plus XXD-only components and appearance and language providers |
+| `@xxd/extension` | The Chrome extension toolkit and the `xxd-ui` command |
+| `@xxd/site` | The showcase, in Chinese and English; `pnpm dev` opens it at http://localhost:4400 |
+
+`packages/kumo*` is upstream Kumo code: its internal package name stays `@cloudflare/kumo` to keep merges easy; use `@xxd/react` from outside. `pnpm kumo:dev` at the root opens Kumo's original docs site.
+
 ## Where to change things
 
 | To change | Edit only | Then |
@@ -42,13 +67,29 @@ pnpm lint
 pnpm changeset                            # if users will notice the change: add a version note (see .changeset/README.md)
 ```
 
-The showcase's two checks (`visual` screenshots and the `audit` stress test) need headless Chrome. If you can't run them, say so in the PR and a maintainer will; `audit` also runs in CI.
+The showcase's two checks need headless Chrome (set `CHROME_EXE`). If you can't run them, say so in the PR and a maintainer will; `audit` also runs in CI.
+
+```bash
+pnpm --filter @xxd/site build
+pnpm --filter @xxd/site visual       # screenshot diff: every page × 4 appearances
+pnpm --filter @xxd/site run audit    # accessibility, long text, hostile host page, forced colors, untranslated text, polish, overlays, smoke, screen-reader walk-through
+```
 
 Visual changes: attach screenshots of all four appearances (light / dark × square / rounded, with at least one accent) and name the principle it follows.
 
 ## Commit messages
 
 `feat(xxd): …` / `fix(xxd): …` / `docs: …`, saying what changed and why. One change per commit. Chinese or English are both fine.
+
+## For maintainers (mostly in Chinese)
+
+| You want to know | Read |
+| --- | --- |
+| Roadmap and progress | [Maintainer docs](docs/maintainers/) (plans, review, open-source checklist) |
+| How the showcase is built and deployed | [Docs site](docs/DOCS-SITE.md) |
+| Which Kumo variable maps to which | [Token map](docs/token-map.md) |
+| How to merge new Kumo versions | [Syncing upstream](docs/UPSTREAM.md) |
+| Engineering conventions for AI assistants | [AGENTS.md](AGENTS.md) |
 
 ## License
 

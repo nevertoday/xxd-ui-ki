@@ -3,7 +3,7 @@
 [中文](../existing-site.md) · **English**
 
 This is for a site that is already live, has its own `:root { --bg: …; --ink: … }`, and wants XXD's tokens, icons and components **without changing how anything looks today**.
-(A brand-new page doesn't need this: see [“Plain web page” in the README](../../README.en.md#plain-web-page).)
+(A brand-new page doesn't need this: see [“Try it” in the README](../../README.en.md#try-it-nothing-to-install).)
 
 There are three steps; you can stop after any of them.
 

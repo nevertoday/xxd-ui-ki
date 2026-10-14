@@ -13,8 +13,10 @@ interface Props {
   align?: "center" | "start";
   block?: boolean;
   title?: string;
+  /** 浮层这类不点开就看不出样子的：静态展开的样子，放在真的触发按钮旁边（不能操作，只给看） */
+  preview?: string;
 }
-const { markup, react, align = "center", block = false, title } = Astro.props;
+const { markup, react, align = "center", block = false, title, preview } = Astro.props;
 const lang = langOf(Astro.url.pathname);
 const L = t(lang);
 const id = nextId("demo");
@@ -25,7 +27,19 @@ const hasReact = Boolean(reactCode);
 
 <div class="site-demo" data-demo={title}>
   <div id={`${id}-native`}>
-    <div class="site-demo__stage" data-align={align} data-block={block ? "" : undefined} set:html={embed(markup)} />
+    {
+      preview ? (
+        <div class="site-demo__stage" data-align={align} data-preview>
+          <figure class="site-demo__preview" inert>
+            <div class="site-demo__preview-body" set:html={embed(preview)} />
+            <figcaption>{L.previewCaption}</figcaption>
+          </figure>
+          <div class="site-demo__live" set:html={embed(markup)} />
+        </div>
+      ) : (
+        <div class="site-demo__stage" data-align={align} data-block={block ? "" : undefined} set:html={embed(markup)} />
+      )
+    }
   </div>
   {
     hasReact && (
