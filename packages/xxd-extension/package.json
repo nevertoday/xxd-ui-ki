@@ -39,6 +39,7 @@
     "src",
     "dist",
     "template",
+    "template-mini",
     "scripts"
   ],
   "scripts": {

@@ -15,6 +15,7 @@ import { c, columns, copy, openUrl, suggest } from "./lib/term.mjs";
 import { forgetProject, isProject, listProjects, rememberProject } from "./lib/projects.mjs";
 import { catalog, findComponent, iconAs, iconName, listTokens, pageUrl, searchIcons } from "./lib/find.mjs";
 import { RULES, doctor } from "./lib/doctor.mjs";
+import { createMini } from "./lib/mini.mjs";
 import { isEn, say, setLang } from "./lib/lang.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -709,7 +710,7 @@ function printDoctor(result) {
   const { findings, dir, kind } = result;
   const errors = findings.filter((f) => f.level === "error").length;
   const warns = findings.length - errors;
-  const kinds = { extension: say("插件", "extension"), site: say("网站", "site"), unknown: say("还没接入", "not set up") };
+  const kinds = { extension: say("插件", "extension"), site: say("网站", "site"), mini: say("小程序", "mini program"), unknown: say("还没接入", "not set up") };
   console.log(`${c.bold(basename(dir))} ${c.dim(say(`（${kinds[kind]}）`, `(${kinds[kind]})`))}`);
   const byFile = new Map();
   for (const f of findings) byFile.set(f.file, [...(byFile.get(f.file) || []), f]);
@@ -745,6 +746,12 @@ export const HANDLERS = {
     const dir = await create(targets[0], args);
     rememberProject(dir);
     console.log(c.dim(say(`下一步：chrome://extensions →「加载已解压的扩展程序」→ 选 ${dir}；改完跑 ${BIN} doctor ${dir}`, `Next: chrome://extensions → Load unpacked → pick ${dir}; after changes run ${BIN} doctor ${dir}`)));
+  },
+  "new-mini": async ({ args, targets }) => {
+    if (!targets[0]) throw new Error(say(`用法：${BIN} new-mini <目录> --name 名字`, `Usage: ${BIN} new-mini <dir> --name Name`));
+    const { dir, vendor } = createMini(targets[0], { name: typeof args.name === "string" ? args.name : undefined, nameEn: args.nameEn, slug: args.slug });
+    console.log(`${c.green("✓")} ${say(`新建了 ${dir}（vendor/ 里：${vendor.join(" ")}）`, `Created ${dir} (vendor/: ${vendor.join(" ")})`)}`);
+    console.log(c.dim(say(`下一步：cd ${dir} && pnpm install && pnpm dev:weapp，然后微信开发者工具「导入项目」选这个目录；改完跑 ${BIN} doctor ${dir}`, `Next: cd ${dir} && pnpm install && pnpm dev:weapp, then WeChat DevTools → Import → pick this folder; after changes run ${BIN} doctor ${dir}`)));
   },
   init: async ({ args, cwd, targets }) => {
     const dir = targets[0] || cwd;

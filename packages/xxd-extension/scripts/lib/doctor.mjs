@@ -1,4 +1,4 @@
-// xxd doctor：检查一个插件或网站。四类问题：
+// xxd doctor：检查一个插件、网站或小程序。四类问题（小程序另有自己的规则，见 mini.mjs 的 checkMini）：
 //   接入  vendor/xxd 有没有、是不是最新、页面引用的文件在不在、manifest 和 _locales 对不对得上
 //   MV3   内联脚本、远程代码、eval、权限太宽、商店字数限制、图标尺寸、内容脚本的依赖顺序
 //   拼写  图标名、xxd- 类名有没有拼错（拼错了界面上什么都不显示，也不报错）；有 _locales 时写死的中文
@@ -8,6 +8,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { iconName, iconSuggestions, knownClasses } from "./find.mjs";
 import { say } from "./lang.mjs";
+import { checkMini, isMiniProject } from "./mini.mjs";
 import { suggest } from "./term.mjs";
 
 const SKIP_DIRS = /^(node_modules|\.git|dist|build|out|coverage|vendor|\.wrangler|\.astro|\.next|\.cache|test-results|playwright-report)$/;
@@ -27,6 +28,11 @@ const LABELS = {
   radius: ["圆角", "radius"],
   motion: ["动效", "motion"],
   font: ["字体", "font"],
+  mini: ["小程序接入", "mini program setup"],
+  wxss: ["WXSS", "WXSS"],
+  size: ["体积", "size"],
+  nav: ["导航栏", "nav bar"],
+  a11y: ["读屏", "screen reader"],
 };
 /** 规则 id → 这种语言的名字（RULES.color 等，给命令行显示）。 */
 export const RULES = new Proxy(LABELS, { get: (t, k) => (t[k] ? say(t[k][0], t[k][1]) : undefined) });
@@ -344,8 +350,11 @@ export function doctor(target, { now, bin = "xxd-ui" } = {}) {
       return { dir, kind: "unknown", findings: [{ rule: "setup", level: "error", file: configFile, message: say(`xxd.config.json 不是合法的 JSON：${err.message}`, `xxd.config.json isn't valid JSON: ${err.message}`) }] };
     }
   }
-  const kind = isExtension ? "extension" : existsSync(configFile) ? "site" : "unknown";
+  const isMini = !isExtension && isMiniProject(dir);
+  const kind = isExtension ? "extension" : isMini ? "mini" : existsSync(configFile) ? "site" : "unknown";
   const findings = [];
+  // 小程序（@xxd/mini）：组件从 npm 包来，不查 vendor/xxd；查小程序自己的规则
+  if (isMini) findings.push(...checkMini(dir));
   // 既不是插件也没有 xxd.config.json：说清楚还没接入，而不是「没发现问题」
   if (kind === "unknown") findings.push({ rule: "setup", level: "warn", file: dir, message: say(`这里还没接入（没有 manifest.json，也没有 xxd.config.json）—— 先运行 ${bin} init`, `This folder isn't set up yet (no manifest.json or xxd.config.json) — run ${bin} init first`) });
   const fixCmd = kind === "unknown" ? `${bin} init` : `${bin} sync`;
