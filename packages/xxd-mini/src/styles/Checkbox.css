@@ -1,0 +1,20 @@
+/* 手机上整块（控件 + 文字）都能点，至少 --hit-min 高 */
+.xxd-choice {
+  align-items: center;
+  min-height: var(--hit-min);
+}
+
+/* 控件自己已经变淡了（.is-disabled），文字跟着变淡 */
+.xxd-choice.is-disabled .xxd-choice__text {
+  opacity: 0.45;
+}
+
+.xxd-choice > .xxd-check,
+.xxd-choice > .xxd-radio {
+  margin-top: 0;
+}
+
+.xxd-choice__text {
+  flex: 1;
+  min-width: 0;
+}

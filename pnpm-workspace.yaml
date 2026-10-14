@@ -40,6 +40,11 @@ catalog:
   "@vitest/browser-playwright": 4.1.10
 allowBuilds:
   "@parcel/watcher": false
+  "@swc/core": false
+  "@tarojs/binding": false
+  "@tarojs/cli": false
+  core-js: false
+  core-js-pure: false
   esbuild: false
   msw: false
   sharp: false

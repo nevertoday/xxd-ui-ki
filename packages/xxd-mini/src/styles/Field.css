@@ -1,0 +1,31 @@
+/* 小程序的 input / textarea 是原生组件：宽度要写明白，字号至少 16px 才不会在 iOS 上放大页面（H5） */
+.xxd-input,
+.xxd-textarea {
+  width: 100%;
+  font-size: var(--text-lg);
+}
+
+.xxd-input {
+  height: max(var(--hit-min), var(--control-h));
+}
+
+.xxd-textarea {
+  min-height: 72px;
+  line-height: 22px;
+}
+
+/* placeholder-class 加的类名：网页版 ::placeholder 的颜色 */
+.is-placeholder {
+  color: var(--muted-2);
+}
+
+.xxd-label__optional {
+  margin-left: 6px;
+  color: var(--muted);
+  font-weight: var(--weight-regular);
+}
+
+/* 字数在右边 */
+.xxd-help.is-counter {
+  justify-self: end;
+}

@@ -1,0 +1,21 @@
+/* 自定义导航栏：吸在顶上；高度和右边留白由 NavBar 按胶囊按钮的位置算好写在行内 */
+.xxd-navbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-dock);
+  box-sizing: border-box;
+  padding-left: var(--space-2);
+  border-bottom: 0;
+}
+
+.xxd-navbar.is-divider {
+  border-bottom: 1px solid var(--line);
+}
+
+.xxd-navbar .xxd-topbar__title {
+  font-size: var(--text-md);
+}
+
+.xxd-navbar__back {
+  margin-right: -4px;
+}

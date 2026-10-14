@@ -41,6 +41,10 @@
       "types": "./src/theme.d.ts",
       "import": "./src/theme.js"
     },
+    "./resolve": {
+      "types": "./src/resolve.d.ts",
+      "import": "./src/resolve.js"
+    },
     "./dist/boot.js": "./dist/boot.js",
     "./dist/theme.js": "./dist/theme.js",
     "./dist/tokens.css": "./dist/tokens.css",
@@ -60,7 +64,8 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --test 'test/*.test.mjs'",
-    "prepack": "node scripts/build.mjs"
+    "prepack": "node scripts/build.mjs",
+    "fixture:color-mix": "node scripts/color-mix-fixture.mjs"
   },
   "devDependencies": {
     "esbuild": "0.28.1",

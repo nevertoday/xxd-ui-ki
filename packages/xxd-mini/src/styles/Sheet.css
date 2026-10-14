@@ -1,0 +1,109 @@
+/* 小程序里面板从屏幕底边升起（网页版从 dock 上方升起 10px）：贴底、占满宽度、留出安全区，只有上面两个角跟着圆角开关 */
+.xxd-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog);
+  background: var(--backdrop);
+}
+
+.xxd-sheet {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: calc(var(--z-dialog) + 1);
+  max-height: 85vh;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-width: 1px 0 0;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: var(--shadow-popover);
+  transform: translateY(100%);
+  opacity: 1;
+}
+
+.xxd-sheet.is-open {
+  transform: none;
+}
+
+/* 顶上一条把手：看得出能往下收 */
+.xxd-sheet:before {
+  content: "";
+  display: block;
+  width: 36px;
+  height: 4px;
+  margin: 8px auto 0;
+  border-radius: var(--r-pill);
+  background: var(--line-strong);
+}
+
+.xxd-sheet__head {
+  padding: 8px 8px 8px 16px;
+  min-height: 48px;
+}
+
+.xxd-sheet__title {
+  font-size: var(--text-md);
+}
+
+.xxd-sheet__body {
+  padding: 0 16px 16px;
+}
+
+.xxd-sheet__foot {
+  display: flex;
+  gap: var(--space-2);
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.xxd-sheet__foot > .xxd-btn {
+  flex: 1;
+}
+
+/* 一列操作 */
+.xxd-sheet.is-actions .xxd-sheet__body {
+  padding: 0;
+}
+
+.xxd-sheet__actions {
+  border-top: 1px solid var(--line);
+}
+
+.xxd-sheet__action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 8px 16px;
+  color: var(--ink);
+  font-size: var(--text-md);
+  text-align: center;
+}
+
+.xxd-sheet__action + .xxd-sheet__action {
+  border-top: 1px solid var(--line);
+}
+
+.xxd-sheet__action.is-hover {
+  background: var(--wash);
+}
+
+.xxd-sheet__action.is-tone-danger {
+  color: var(--danger);
+}
+
+.xxd-sheet__action.is-disabled {
+  opacity: 0.45;
+}
+
+.xxd-sheet__action-desc {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+/* 取消和上面的操作隔开一条粗一点的底色 */
+.xxd-sheet__action.is-cancel {
+  border-top: 8px solid var(--wash);
+}

@@ -1,0 +1,446 @@
+{
+  "$comment": "小程序版有哪些组件、各自用网页版的哪些类名（blocks：类名去掉 __ 后面的部分）。scripts/build-mini.mjs 照这张表把网页版 CSS 分到每个组件；没列进来的网页组件不进小程序产物。has：网页版的 :has() 在小程序里换成哪个类名（组件自己加）。",
+  "components": [
+    {
+      "name": "Layout",
+      "zh": "布局",
+      "en": "Layout",
+      "batch": 1,
+      "web": [
+        "Layout"
+      ],
+      "blocks": [
+        "xxd-stack",
+        "xxd-cluster",
+        "xxd-divider",
+        "xxd-sr-only",
+        "xxd-muted",
+        "xxd-mono",
+        "xxd-small",
+        "xxd-surface",
+        "xxd-frame"
+      ]
+    },
+    {
+      "name": "Text",
+      "zh": "文字",
+      "en": "Text",
+      "batch": 1,
+      "web": [
+        "Text"
+      ],
+      "blocks": [
+        "xxd-text",
+        "xxd-text-pair",
+        "xxd-heading",
+        "xxd-title"
+      ]
+    },
+    {
+      "name": "Icon",
+      "zh": "图标",
+      "en": "Icon",
+      "batch": 1,
+      "web": [],
+      "blocks": [
+        "ui-icon"
+      ]
+    },
+    {
+      "name": "Button",
+      "zh": "按钮",
+      "en": "Button",
+      "batch": 1,
+      "web": [
+        "Button",
+        "ButtonGroup",
+        "Link"
+      ],
+      "blocks": [
+        "xxd-btn",
+        "xxd-btn-group",
+        "xxd-label-text",
+        "xxd-link",
+        "ui-dialog-cancel"
+      ]
+    },
+    {
+      "name": "Cell",
+      "zh": "列表行",
+      "en": "Cell",
+      "batch": 1,
+      "web": [
+        "SettingsGroup",
+        "List"
+      ],
+      "blocks": [
+        "xxd-settings",
+        "xxd-group",
+        "xxd-row",
+        "xxd-list",
+        "xxd-cell"
+      ]
+    },
+    {
+      "name": "Field",
+      "zh": "输入框",
+      "en": "Field",
+      "batch": 1,
+      "web": [
+        "Field"
+      ],
+      "blocks": [
+        "xxd-field",
+        "xxd-label",
+        "xxd-help",
+        "xxd-error",
+        "xxd-input",
+        "xxd-textarea",
+        "xxd-count"
+      ]
+    },
+    {
+      "name": "Switch",
+      "zh": "开关",
+      "en": "Switch",
+      "batch": 1,
+      "web": [
+        "Switch"
+      ],
+      "blocks": [
+        "xxd-switch"
+      ]
+    },
+    {
+      "name": "Checkbox",
+      "zh": "复选",
+      "en": "Checkbox",
+      "batch": 1,
+      "web": [
+        "Checkbox"
+      ],
+      "blocks": [
+        "xxd-check",
+        "xxd-choice"
+      ]
+    },
+    {
+      "name": "Radio",
+      "zh": "单选",
+      "en": "Radio",
+      "batch": 1,
+      "web": [
+        "Radio"
+      ],
+      "blocks": [
+        "xxd-radio",
+        "xxd-choices"
+      ]
+    },
+    {
+      "name": "Segmented",
+      "zh": "分段选择",
+      "en": "Segmented",
+      "batch": 1,
+      "web": [
+        "Segmented"
+      ],
+      "blocks": [
+        "xxd-segmented"
+      ]
+    },
+    {
+      "name": "Tabs",
+      "zh": "标签页",
+      "en": "Tabs",
+      "batch": 1,
+      "web": [
+        "Tabs"
+      ],
+      "blocks": [
+        "xxd-tabs",
+        "xxd-tabpanel"
+      ]
+    },
+    {
+      "name": "Sheet",
+      "zh": "底部面板",
+      "en": "Sheet",
+      "batch": 1,
+      "web": [
+        "Sheet",
+        "Menu",
+        "Popover"
+      ],
+      "blocks": [
+        "xxd-sheet",
+        "xxd-scrim",
+        "xxd-surface-float"
+      ]
+    },
+    {
+      "name": "Dialog",
+      "zh": "对话框",
+      "en": "Dialog",
+      "batch": 1,
+      "web": [
+        "Dialog"
+      ],
+      "blocks": [
+        "xxd-dialog"
+      ]
+    },
+    {
+      "name": "Toast",
+      "zh": "轻提示",
+      "en": "Toast",
+      "batch": 1,
+      "web": [
+        "Toast"
+      ],
+      "blocks": [
+        "xxd-toast",
+        "xxd-toast-region"
+      ]
+    },
+    {
+      "name": "NavBar",
+      "zh": "导航栏",
+      "en": "NavBar",
+      "batch": 1,
+      "web": [
+        "Topbar"
+      ],
+      "blocks": [
+        "xxd-topbar",
+        "xxd-navbar"
+      ]
+    },
+    {
+      "name": "TabBar",
+      "zh": "标签栏",
+      "en": "TabBar",
+      "batch": 1,
+      "web": [
+        "Rail"
+      ],
+      "blocks": [
+        "xxd-tabbar"
+      ]
+    },
+    {
+      "name": "Empty",
+      "zh": "空状态",
+      "en": "Empty",
+      "batch": 1,
+      "web": [
+        "Empty"
+      ],
+      "blocks": [
+        "xxd-empty"
+      ]
+    },
+    {
+      "name": "Loading",
+      "zh": "加载",
+      "en": "Loading",
+      "batch": 1,
+      "web": [
+        "Progress"
+      ],
+      "blocks": [
+        "xxd-spinner",
+        "xxd-skeleton",
+        "xxd-loadbar"
+      ]
+    },
+    {
+      "name": "Badge",
+      "zh": "徽标",
+      "en": "Badge",
+      "batch": 1,
+      "web": [
+        "Badge",
+        "Dot"
+      ],
+      "blocks": [
+        "xxd-badge",
+        "xxd-dot"
+      ]
+    },
+    {
+      "name": "Avatar",
+      "zh": "头像",
+      "en": "Avatar",
+      "batch": 1,
+      "web": [
+        "Avatar"
+      ],
+      "blocks": [
+        "xxd-avatar"
+      ]
+    },
+    {
+      "name": "Tag",
+      "zh": "标签",
+      "en": "Tag",
+      "batch": 1,
+      "web": [
+        "Chip"
+      ],
+      "blocks": [
+        "xxd-chip"
+      ]
+    },
+    {
+      "name": "Card",
+      "zh": "卡片",
+      "en": "Card",
+      "batch": 1,
+      "web": [
+        "Card"
+      ],
+      "blocks": [
+        "xxd-card",
+        "xxd-grid",
+        "xxd-image-grid"
+      ]
+    },
+    {
+      "name": "Appearance",
+      "zh": "外观设置",
+      "en": "Appearance",
+      "batch": 1,
+      "web": [
+        "Appearance"
+      ],
+      "blocks": [
+        "xxd-swatches",
+        "xxd-swatch",
+        "xxd-appearance"
+      ]
+    },
+    {
+      "name": "SearchBar",
+      "zh": "搜索框",
+      "en": "SearchBar",
+      "batch": 2,
+      "web": [
+        "Search"
+      ],
+      "blocks": [
+        "xxd-input-wrap",
+        "xxd-input-clear",
+        "xxd-searchbar"
+      ]
+    },
+    {
+      "name": "LoadMore",
+      "zh": "加载更多",
+      "en": "LoadMore",
+      "batch": 2,
+      "web": [
+        "Pagination"
+      ],
+      "blocks": [
+        "xxd-loadmore"
+      ]
+    },
+    {
+      "name": "Progress",
+      "zh": "进度",
+      "en": "Progress",
+      "batch": 2,
+      "web": [
+        "Progress"
+      ],
+      "blocks": [
+        "xxd-progress",
+        "xxd-meter"
+      ]
+    },
+    {
+      "name": "Steps",
+      "zh": "步骤",
+      "en": "Steps",
+      "batch": 2,
+      "web": [],
+      "blocks": [
+        "xxd-steps"
+      ]
+    },
+    {
+      "name": "Collapse",
+      "zh": "折叠",
+      "en": "Collapse",
+      "batch": 2,
+      "web": [
+        "Collapsible"
+      ],
+      "blocks": [
+        "xxd-collapse"
+      ]
+    },
+    {
+      "name": "Swipe",
+      "zh": "左滑操作",
+      "en": "Swipe",
+      "batch": 2,
+      "web": [],
+      "blocks": [
+        "xxd-swipe"
+      ]
+    },
+    {
+      "name": "Picker",
+      "zh": "滚轮选择",
+      "en": "Picker",
+      "batch": 2,
+      "web": [
+        "Select"
+      ],
+      "blocks": [
+        "xxd-wheel"
+      ]
+    },
+    {
+      "name": "Uploader",
+      "zh": "选图上传",
+      "en": "Uploader",
+      "batch": 2,
+      "web": [
+        "DropZone"
+      ],
+      "blocks": [
+        "xxd-uploader"
+      ]
+    },
+    {
+      "name": "Stat",
+      "zh": "统计",
+      "en": "Stat",
+      "batch": 2,
+      "web": [
+        "Stat"
+      ],
+      "blocks": [
+        "xxd-stats",
+        "xxd-stat"
+      ]
+    },
+    {
+      "name": "Chart",
+      "zh": "图表",
+      "en": "Chart",
+      "batch": 2,
+      "web": [
+        "Chart"
+      ],
+      "blocks": [
+        "xxd-chart",
+        "xxd-chart-card"
+      ]
+    }
+  ],
+  "has": {}
+}

@@ -1,0 +1,24 @@
+/* 手机上色块大一点，点得到：28px 的圆、间距 10px，一行放得下 7 个 */
+.xxd-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.xxd-swatch {
+  width: 28px;
+  height: 28px;
+}
+
+.xxd-swatch.is-hover {
+  opacity: 0.8;
+}
+
+/* Cell 的 stack：控件占满一行 */
+.xxd-row.is-stack > .xxd-row__control {
+  width: 100%;
+}
+
+.xxd-row.is-stack > .xxd-row__control > .xxd-segmented {
+  flex: 1;
+}

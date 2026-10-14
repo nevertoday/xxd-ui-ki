@@ -125,7 +125,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     // 一个块可以写成「:root[data-x], [data-x]」（整页或页面里的一块都生效）：按第一个选择器认
     const [first, second, ...more] = selector.split(/,\s*/);
     const pair = !more.length && second && second === first.replace(/^:root/, "") ? MODE_NAMES[first] : null;
-    const name = MODE_NAMES[selector] || pair || (selector === ":root" ? "base" : null);
+    // 主色块写成「:root[data-accent], :root[data-accent] [data-theme="light"]」（页面里亮色的一块也跟着主色）：按第一个认
+    // 暗色主色块写成「:root[data-theme="dark"][data-accent], :root[data-accent] [data-theme="dark"]」：同样按第一个认
+    const scoped = !more.length && (second?.startsWith(`${first} `) || second === ':root[data-accent] [data-theme="dark"]') ? MODE_NAMES[first] : null;
+    const name = MODE_NAMES[selector] || pair || scoped || (selector === ":root" ? "base" : null);
     if (name) json[name] = vars;
   }
   json.coarse = blocks["@media (pointer: coarse) :root"];

@@ -1,0 +1,55 @@
+/* 手机上的行：至少 --hit-min 高，点得到；没有箭头的可点行不画箭头（网页版的 a.xxd-row 都带箭头） */
+.xxd-row {
+  min-height: max(var(--hit-min), calc(var(--control-h) + 8px));
+}
+
+.is-link.xxd-row:not(.is-chevron):after {
+  display: none;
+}
+
+/* 有箭头但不能点（只是展示去向）的行也画箭头 */
+.xxd-row.is-chevron:after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: var(--muted-2);
+  -webkit-mask: var(--xxd-chevron-right) center / contain no-repeat;
+  mask: var(--xxd-chevron-right) center / contain no-repeat;
+}
+
+.xxd-row.is-disabled {
+  opacity: 0.45;
+}
+
+.xxd-cell__leading {
+  flex: none;
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+}
+
+.xxd-cell__value {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/* 手机上组标题离屏幕边有点距离 */
+.xxd-group__title,
+.xxd-group__note {
+  padding: 0 var(--space-4);
+}
+
+/* 手机上整组贴屏幕两边：不要左右边框和圆角 */
+.xxd-group__body {
+  border-right: 0;
+  border-left: 0;
+  border-radius: 0;
+}
+
+.xxd-group.is-inset .xxd-group__body {
+  margin: 0 var(--space-4);
+  border-right: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  border-radius: var(--r-md);
+}

@@ -1,0 +1,15 @@
+/* 页面的一段：左右页边距 16px，段与段之间 24px */
+.xxd-section {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4) 0;
+}
+
+.xxd-section__title {
+  color: var(--muted);
+  font: var(--weight-medium) var(--text-xs) / 1.4 var(--font-body);
+}
+
+.xxd-cluster {
+  align-items: center;
+}

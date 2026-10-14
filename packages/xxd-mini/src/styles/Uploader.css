@@ -1,0 +1,51 @@
+.xxd-uploader__veil {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(var(--shadow-rgb), 0.45);
+  color: #ffffff;
+  font: var(--weight-medium) var(--text-xs) / 1 var(--font-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.xxd-uploader__veil.is-error {
+  background: rgba(var(--danger-rgb), 0.72);
+}
+
+.xxd-uploader__remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(var(--shadow-rgb), 0.55);
+  color: #ffffff;
+}
+
+.xxd-uploader__add {
+  border: 1px dashed var(--line-strong);
+  background: var(--paper);
+  color: var(--muted);
+}
+
+.xxd-uploader__add.is-hover {
+  background: var(--wash);
+}
+
+.xxd-uploader__add-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+}

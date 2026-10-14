@@ -1,0 +1,58 @@
+/* 小程序（和 Taro H5）的原生按钮自带 width: 100%、左右 margin: auto、相邻按钮的上边距：清掉，宽度由内容定 */
+.xxd-btn,
+.xxd-chip {
+  width: auto;
+  margin: 0;
+}
+
+/* 手机上点得到：按钮至少 --hit-min（44px）高的点击区（网页版靠 ::after 撑开，这里同样） */
+.xxd-btn.is-block {
+  display: flex;
+  width: 100%;
+}
+
+/* 加载中：转圈代替图标，字照样留着（宽度不跳） */
+.xxd-btn > .xxd-spinner {
+  width: 14px;
+  height: 14px;
+  color: inherit;
+}
+
+/* 原生 button 被禁用时，微信会把字变灰、底变浅：和网页版一样只降透明度 */
+.xxd-btn.is-disabled {
+  opacity: 0.45;
+}
+
+/* 一排按钮平分一行 */
+.xxd-btn-row.is-block {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.xxd-btn-row.is-block > .xxd-btn {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 实心按钮按下：比按下前再深 8%（网页版用 color-mix 和局部变量算，这里写成全局令牌） */
+.xxd-btn.is-variant-primary.is-active:not(.is-disabled) {
+  background: color-mix(in srgb, var(--action-fill-hover) 92%, #000000);
+}
+
+.xxd-btn.is-variant-danger.is-active:not(.is-disabled) {
+  background: color-mix(in srgb, color-mix(in srgb, var(--danger-strong) 88%, #000000) 92%, #000000);
+}
+
+/* 质感（material）的边：比底色深一档 */
+.is-finish-material .xxd-btn.is-variant-primary {
+  --btn-bd: color-mix(in srgb, var(--action-fill) 86%, #000000);
+}
+
+.is-finish-material .xxd-btn.is-variant-danger {
+  --btn-bd: color-mix(in srgb, var(--danger-strong) 86%, #000000);
+}
+
+/* 文字链接的下划线：40% 的字色 */
+.xxd-link {
+  text-decoration-color: color-mix(in srgb, var(--action-text) 40%, transparent);
+}

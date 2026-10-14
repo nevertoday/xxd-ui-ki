@@ -1,0 +1,10 @@
+/* 小程序里轻提示在底部安全区上面，盖在底部按钮条和标签栏之上 */
+.xxd-toast-region {
+  bottom: calc(72px + env(safe-area-inset-bottom));
+  z-index: var(--z-toast);
+}
+
+.xxd-toast__text {
+  flex: 1;
+  min-width: 0;
+}

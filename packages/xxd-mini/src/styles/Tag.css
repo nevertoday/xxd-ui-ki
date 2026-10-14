@@ -1,0 +1,8 @@
+.xxd-chip {
+  display: inline-flex;
+  align-items: center;
+}
+
+.xxd-chip.is-disabled {
+  opacity: 0.45;
+}
