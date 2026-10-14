@@ -114,7 +114,7 @@ const OVERLAYS = [
   ["Toast", ["保存", "Save"], ".xxd-toast"],
 ];
 for (const mode of MODES) {
-  for (const [name, [zh, en], sel] of OVERLAYS) {
+  for (const [name, [zh, en], sel] of /** @type {[string, [string, string], string][]} */ (OVERLAYS)) {
     const { ctx, page, errors } = await open(mode, `/pages/component/index?name=${name}`);
     const label = `${mode.id} ${name}「${mode.id.startsWith("en") ? en : zh}」`;
     await page.getByText(mode.id.startsWith("en") ? en : zh, { exact: true }).first().click();

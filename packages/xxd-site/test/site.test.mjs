@@ -32,7 +32,7 @@ test("embed：示例里的 main / aside 换成 div（不和站点的 main 打架
 });
 
 // ── 英文版 ─────────────────────────────────────────────
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { counterpart, langOf, mdHref, stripLang, withLang } from "../src/i18n/index.js";
 import { templates } from "../src/data/templates.js";
@@ -119,4 +119,19 @@ test("forceStates：输入框的 :focus 也算「聚焦」；「鼠标点时不�
   assert.match(out, /\.xxd-force-scope \.xxd-input\[data-force~="focus"\]/);
   assert.doesNotMatch(out, /data-input="pointer"/);
   assert.doesNotMatch(out, /focus-within/);
+});
+
+test("小程序版（M5）：mini.json 的每个组件中英两版都有页面，说明和名字都齐，英文里没有汉字", async () => {
+  const manifest = JSON.parse(readFileSync(new URL("../../xxd-mini/mini.json", import.meta.url), "utf8"));
+  const dist = new URL("../dist/", import.meta.url);
+  const built = existsSync(new URL("miniprogram/index.html", dist));
+  const slug = (n) => n.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+  for (const c of manifest.components) {
+    assert.ok(c.zh && c.en && c.summary && c.summaryEn, c.name);
+    assert.ok(!han.test(c.en) && !han.test(c.summaryEn), `${c.name} 的英文里有汉字`);
+    if (built) for (const pre of ["", "en/"]) assert.ok(existsSync(new URL(`${pre}miniprogram/${slug(c.name)}/index.html`, dist)), `${pre}miniprogram/${slug(c.name)} 没有页面（先 pnpm --filter @xxd/site build）`);
+  }
+  // 演示小程序里每个组件都有演示（组件页的「小程序」标签页和这一页都嵌它）
+  const demos = ["batch1", "batch2"].map((b) => readFileSync(new URL(`../../xxd-mini-demo/src/demos/${b}.tsx`, import.meta.url), "utf8")).join("\n");
+  for (const c of manifest.components) assert.match(demos, new RegExp(`name: "${c.name}"`), `${c.name} 没有演示`);
 });

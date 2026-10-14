@@ -94,6 +94,16 @@ import "@xxd/react/standalone.css";
 
 Tailwind, appearance and language settings: see [Get started](https://ui.xiaoxiaodong.ai/en/start).
 
+### Make a WeChat mini program
+
+```bash
+xxd-ui new-mini ./today-mini --name "Today" --slug today-mini
+cd ./today-mini && pnpm install && pnpm dev:weapp
+```
+
+Open WeChat DevTools and import the `today-mini` folder. It's Taro 4.2 + React with components from `@xxd/mini`, looking the same as the web kit.
+More on the showcase's [Mini program kit](https://ui.xiaoxiaodong.ai/en/miniprogram) page.
+
 ## When components get updated
 
 ```bash

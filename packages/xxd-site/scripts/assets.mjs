@@ -5,7 +5,7 @@
 //   public/xxd/kumo.css  React 组件的预编译样式（@cloudflare/kumo standalone，Kumo 换皮版）
 //   public/xxd/forced-states.css  状态矩阵用：把组件 CSS 里的 :hover / :focus-visible / :active 复制成 [data-force~="…"] 版本，
 //                                 这样「悬停 / 聚焦 / 按下」可以静态并排展示，用的是真实的组件规则而不是手写的模仿。
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { printSelector, ruleTree } from "../../xxd-tokens/scripts/selectors.mjs";
@@ -34,6 +34,13 @@ const version = JSON.parse(readFileSync(join(pkgs, "xxd-css/package.json"), "utf
 const versioned = join(here, "../public/v", version);
 mkdirSync(versioned, { recursive: true });
 for (const f of ["boot.js", "xxd.css", "xxd.min.css", "components.css", "xxd.js", "xxd.esm.js", "icons.js"]) copyFileSync(join(cssDist, f), join(versioned, f));
+
+// 小程序版的演示：演示小程序（packages/xxd-mini-demo）编出的 H5，放在 /mini/（组件页的「小程序」标签、/miniprogram/ 页嵌它）
+const miniH5 = join(pkgs, "xxd-mini-demo/dist-h5");
+if (existsSync(join(miniH5, "index.html"))) {
+  rmSync(join(here, "../public/mini"), { recursive: true, force: true });
+  cpSync(miniH5, join(here, "../public/mini"), { recursive: true });
+} else console.warn("！没有演示小程序的 H5：先跑 pnpm --filter @xxd/mini-demo build（小程序标签页会是空的）");
 
 // 图表组件页用的 ECharts（只在那一页加载）
 import { createRequire } from "node:module";

@@ -1193,4 +1193,98 @@
   .site-props-more > summary:hover {
     color: var(--ink);
   }
+
+  /* 小程序（@xxd/mini）：手机大小的框，里面是演示小程序编出的 H5 */
+  .site-mini {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .site-mini__phone {
+    width: min(375px, 100%);
+    height: var(--mini-h, 600px);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  .site-mini__frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .site-mini__note {
+    max-width: 375px;
+    color: var(--muted);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .site-mini-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  .site-mini-intro > div:first-child > .site-h2 {
+    margin-top: 0;
+  }
+
+  @media (max-width: 900px) {
+    .site-mini-intro {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .site-mini-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-2);
+    margin: 0 0 var(--space-6);
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-mini-list__item {
+    display: grid;
+    gap: 4px;
+    height: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--paper);
+    color: var(--ink);
+    text-decoration: none;
+    transition: border-color var(--motion-quick) ease;
+  }
+
+  .site-mini-list__item:hover {
+    border-color: var(--line-strong);
+  }
+
+  .site-mini-list__name {
+    font-weight: var(--weight-medium);
+  }
+
+  .site-mini-list__desc {
+    color: var(--muted);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  .site-mini-near {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-8);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+  }
 }

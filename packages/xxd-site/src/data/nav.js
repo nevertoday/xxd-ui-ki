@@ -1,6 +1,7 @@
 import { categoriesFor, componentsFor } from "../lib/data.js";
 import { patternsFor } from "./patterns.js";
 import { templatesFor } from "./templates.js";
+import { miniFor } from "../lib/mini.js";
 import { t, withLang } from "../i18n/index.js";
 import { PAGE_KEYWORDS, SEARCH_ALIASES } from "./search.js";
 
@@ -39,6 +40,10 @@ export function navFor(lang = "zh") {
     })),
     { title: L.navPatterns, items: patternsFor(lang).map((p) => ({ label: p.label, href: `/patterns/${p.slug}`, keywords: [p.name, SEARCH_ALIASES[p.name]].filter(Boolean).join(" ") })) },
     { title: L.navTemplates, items: templatesFor(lang).map((x) => ({ label: x.label, href: `/templates/${x.slug}` })) },
+    {
+      title: L.navMini,
+      items: [{ label: L.pageMini, href: "/miniprogram", keywords: "miniprogram weapp taro 小程序 微信" }, ...miniFor(lang).map((c) => ({ label: c.label, sub: lang === "en" ? undefined : c.name, href: `/miniprogram/${c.slug}`, keywords: `${c.name} 小程序 mini` }))],
+    },
     {
       title: L.navTools,
       items: [

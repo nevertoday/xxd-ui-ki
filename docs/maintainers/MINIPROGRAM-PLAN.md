@@ -1,6 +1,6 @@
 # 小程序方案（M1–M6）
 
-状态：方案已定，可以从 M1 开始。日期：2026-10-13 起草，2026-10-14 定稿（§13 的决定由维护者授权 AI 助手代定，包名由维护者定为 `@xxd/mini`）。
+状态：M1–M6 已做完（2026-10-14），实际做法和计划不同的地方见 §16。日期：2026-10-13 起草，2026-10-14 定稿（§13 的决定由维护者授权 AI 助手代定，包名由维护者定为 `@xxd/mini`）。
 目标：让 xxd-ui-kit 也能做微信小程序，样子和网页版、插件版是同一套（直角、墨色、暖黑、细线、系统字体），写法学 [Taro](https://github.com/NervJS/taro)。
 
 ## 1. 结论
@@ -45,9 +45,10 @@ Taro 是京东开源的多端框架（MIT，当前稳定版 4.2.x）。用 React
 ## 4. 方案总览
 
 ```
-@xxd/tokens   ──→ tokens.mini.css    page 上的变量；暗色媒体查询
+@xxd/tokens   ──→ resolve.js         不碰页面的求值：var() 和 color-mix() 算成具体颜色（appearanceVars）
+@xxd/mini 构建 ──→ tokens.mini.css    page 上的变量；暗色媒体查询（派生色要等组件样式改写完才知道有哪些，所以在这里出）
               ──→ theme.json         导航栏 / 标签栏的亮暗颜色
-              ──→ mini-vars.js       每种外观（主题 × 圆角 × 密度 × 质感）对应的变量表；派生色的算法
+              ──→ vars.js            各外观的令牌表和派生色，运行时算外观用
 @xxd/icons    ──→ 每个图标一个 SVG 数据地址，按名字引入
 @xxd/css      ──→ 每个组件一份 *.mini.css（构建脚本从网页版 CSS 改写，§6）
 @xxd/mini     ──→ React 组件（基于 @tarojs/components）+ XxdProvider / XxdPage（外观、语言、安全区）
@@ -66,7 +67,7 @@ packages/xxd-mini/              @xxd/mini（组件库，private: true，和别�
   mini.json                     清单：有哪些组件、每个对应网页版的哪些类名、属性怎么变类名
   src/
     provider.tsx                XxdProvider（放在 app.tsx）：外观、语言，存储读写
-    page.tsx                    XxdPage（每页的根）：page-meta 写变量、安全区、导航栏颜色
+    page.tsx                    XxdPage（每页的根）：根节点上写变量和外观类名、安全区、导航栏颜色
     button.tsx  cell.tsx  …     每个组件一个文件，自己 import 自己的样式
     icon.tsx
   styles/                       构建产物：tokens.mini.css、button.mini.css……（生成，不手改）
@@ -125,7 +126,7 @@ export default function Todo() {
 | `:is()`、`:where()` | 展开成几条 | `:is(.a, .b) .c` → `.a .c, .b .c` |
 | `:has()` | 组件加类名 | 13 处每处在 `mini.json` 里写明换成哪个类，没写的报错 |
 | `:root` | `page` | |
-| `[data-theme=dark]`、`[data-corners]`、`[data-density]`、`[data-finish]` 下的令牌 | 进 `mini-vars.js` 的变量表 | 由 XxdPage 写进 `page-style`（§7） |
+| `[data-theme=dark]`、`[data-corners]`、`[data-density]`、`[data-finish]` 下的令牌 | 进 `styles/vars.js` 的变量表 | 由 XxdPage 写在每页的根节点上（§7） |
 | `@layer` | 拍平，按原来的层顺序排 | |
 | `*` | 换成具体的标签或类名，换不了的报告 | |
 | `color-mix(in srgb, A p%, B)` | `var(--mix-A-p-B)` | `color-mix(in srgb, var(--action) 24%, transparent)` → `var(--mix-action-24-transparent)` |
@@ -140,7 +141,7 @@ export default function Todo() {
 
 **缺省外观不靠 JS。** `tokens.mini.css` 把缺省外观（亮色、直角、宽松、纯平、墨色）的变量写在 `page` 上，暗色写在 `@media (prefers-color-scheme: dark) { page { … } }` 里。什么都不做，「跟随系统」就是对的；60 种派生色也按缺省主色在构建时算好写进去。
 
-**别的外观靠 `page-style`。** 用户选了强制暗色、圆角、紧凑、某个主色时，XxdPage 从 `mini-vars.js` 拼出这一组变量，写进 `page-meta` 的 `page-style`。行内样式比样式表优先，所以能盖过媒体查询（比如系统是暗色、用户选了亮色）。`root-portal` 里的浮层也挂在 `page` 下，同样拿到这些变量。
+**别的外观写在每页的根节点上。** 用户选了强制暗色、圆角、紧凑、某个主色时，XxdPage 算出和缺省不一样的那些变量，写在页面根节点的行内样式里，同时挂上外观类名（`is-theme-dark`、`is-corners-rounded`……）。行内样式比样式表优先，所以能盖过媒体查询（比如系统是暗色、用户选了亮色）。`root-portal` 把浮层挪到页面最外层，继承不到根节点，所以浮层的根节点上再写一遍。（原计划写进 `page-meta` 的 `page-style`；Taro 要每一页的配置都打开 `enablePageMeta` 它才生效，改成了根节点。）
 
 - **主色**：用 `accentPalette()` 算，和网页版同一套算法、同样 18 个预设；跟主色有关的派生色同时重算。
 - **导航栏、标签栏**：跟随系统时用 `theme.json`；强制亮 / 暗时调用 `setNavigationBarColor`、`setTabBarStyle` 跟着换。
@@ -156,7 +157,7 @@ export default function Todo() {
 | 原则（`docs/DESIGN-PRINCIPLES.md`） | 小程序里 |
 | --- | --- |
 | 默认直角；圆角是一个开关 | 同。`--r-*` 令牌照旧 |
-| 黑白灰，强调靠墨色；主色 18 个预设 | 同。主色在运行时算，写进 `page-style`，全页面跟着变 |
+| 黑白灰，强调靠墨色；主色 18 个预设 | 同。主色在运行时算，写在页面根节点上，全页面跟着变 |
 | 暗色是暖黑 | 同一组颜色。导航栏、标签栏的颜色也跟着变 |
 | 只用系统无衬线字；字重 400 / 500 / 600 | 同。小程序本来就用系统字体 |
 | 发丝线 1px | 1px 不换算，不会在有的手机上变成 0.5px 发虚或者消失 |
@@ -236,7 +237,8 @@ export default function Todo() {
 - **检查**：
   - 改写规则有单元测试，跟 `@xxd/css` 的测试一起跑。
   - H5 版进现有的截图对比和审计（axe、长文字、细节、浮层）。
-  - 真机行为用微信官方的自动化工具（`miniprogram-automator`）驱动开发者工具：每页亮暗各截一张；打开每个浮层；切主色、圆角、密度；查每个控件的角色和状态属性。这一项需要本机装开发者工具，放在 CI 之外，像现在的 `visual` 一样本机跑。
+  - 真机行为用微信官方的自动化工具（`miniprogram-automator`）驱动开发者工具：每页亮暗各截一张；打开每个浮层；切主色、圆角、密度；查每个控件的角色和状态属性。这一项需要本机装开发者工具，放在 CI 之外，像现在的 `visual` 一样本机跑。**还没做**：做的这台机器上没有微信开发者工具（§16）。
+  - 没有开发者工具也能查的，都做成了脚本：`pnpm --filter @xxd/mini-demo check:weapp` 查微信版产物（压缩后的 WXSS 再过一遍门禁、主包大小、暗色、最低基础库、模板里的读屏属性、有没有 rpx）；`pnpm --filter @xxd/mini-demo check` 查 H5 版（每个组件 × 两种外观的 axe、两种宽度不溢出、浮层落在屏幕里、待办和外观页真的操作一遍）。
   - 构建报告（§6）里 WebView 那一列不是 0 就失败。
   - 包大小：组件样式加起来不超过 60 KB，演示小程序主包不超过 1 MB，超了就失败。
 
@@ -290,3 +292,33 @@ M1、M2 只动这个仓库里的构建脚本和测试，不需要装微信开发
 - `root-portal`（基础库 2.25.2 起，`enable` 2.26.1 起）：<https://developers.weixin.qq.com/miniprogram/dev/component/root-portal.html>
 - 无障碍属性（基础库 2.7.1 起）：<https://developers.weixin.qq.com/miniprogram/dev/component/aria-component.html>
 - NutUI React（Taro 版）主题：<https://github.com/jdf2e/nutui-react>
+
+## 16. 进度与实际做法（2026-10-14）
+
+| 步 | 状态 | 在哪 |
+| --- | --- | --- |
+| M1 令牌 | 做完 | `packages/xxd-tokens/src/resolve.js`（和 Chrome 对过 242 个 color-mix 表达式，`test/fixtures/color-mix.chrome.json`）；`tokens.json` 补上主色两块 |
+| M2 样式改写 | 做完 | `packages/xxd-mini/scripts/build-mini.mjs`、`mini.json`、`styles/REPORT.md`；WebView 一列 0 |
+| M3 第一批组件 | 做完 | `packages/xxd-mini/src/`；演示小程序 `packages/xxd-mini-demo`（组件目录、待办、外观） |
+| M4 工具 | 做完 | `xxd-ui new-mini`、`doctor` 的小程序规则（`packages/xxd-extension/scripts/lib/mini.mjs`） |
+| M5 展示 | 做完 | 组件页的「小程序」标签、`/miniprogram/` 总说明和每个组件一页（中英）、H5 放在 `/mini/` |
+| M6 扩展 | 第二批组件、Skyline 做完；支付宝 / 抖音没做 | Skyline：`scripts/skyline.mjs` 给每条 Skyline 不支持的声明写后备，报告和压缩后的产物里都是 0 |
+
+**和计划不一样的地方**
+
+- **Taro 版本**：用的 4.2.1。动手时 4.3.0 已经出了（2026-09-29），刚出的大版本先不追，等它稳一点再升，升级时跑全部检查。
+- **外观写在哪**：根节点，不是 `page-meta`（§7）。
+- **读屏属性要一个 Taro 插件**：Taro 4.2 编微信小程序时，view、text、button 等组件的模板里没有 `aria-*`，写了也会被丢掉。`@xxd/mini/taro-plugin` 在构建时把这些属性登记进模板，运行时再登记一遍同样的属性（两边都读 `aria.json`，不一样的话 Taro 的属性编号会错位，连 `hover-class` 都会坏）。没装插件时运行时不登记，组件照样能用，只是读屏属性不生效，开发时会提醒。
+- **H5 的几处适配**：Taro 的 H5 没有 `page` 元素，令牌同时写给 `.xxd-h5-root`（运行时挂到 `<html>` 上）；组件库在 `node_modules` 里，Taro 的 H5 不改写里面的 `Taro.xxx`，所以组件库按名字导入 Taro 的 API；H5 的 Image / Input 要经 `nativeProps` 才能给里面真正的 `<img>`、`<input>` 写 alt 和读屏名字。
+- **新建项目带着组件**：`new-mini` 把 `@xxd/mini`、`@xxd/tokens`、`@xxd/icons` 打成包放进项目的 `vendor/`（和插件的 `vendor/xxd` 一个道理）。软链到仓库会让 `react`、`@tarojs/shared` 各有两份，读屏属性登记到另一份上。
+- **图表**：没用 ECharts，画成 SVG 图片（折线、柱状、迷你折线），配色和网页版 `chartPalette` 同一个算法。主包小，也不用装 ECharts 的小程序版。
+- **Skyline 的做法**：同一份 WXSS 两种引擎都用，所以不改原来的写法，而是在每条 Skyline 不支持的声明前面先写一条它认得的（grid → flex 竖排、inline-flex → flex、currentColor → 跟着文字颜色走的变量、em → px、sticky → relative、overflow: auto → hidden、多层阴影 → 第一层）。最低微信 8.0.50（`:nth-child`、兄弟选择器、`:not` 从这一版起都支持）。在 Skyline 里会差一点的：网格退成一列，`overflow: auto` 的地方滚不动（底部面板的内容区已经换成 scroll-view）。
+- **体积门禁**按压缩后的大小算（Taro 正式构建会压缩）：现在 57 KB，上限 60 KB。网页版里小程序用不到的修饰（`mini.json` 的 `skip`）和声明（`cursor` 等）不进产物。
+
+**还没验证的（要微信开发者工具或真机）**
+
+- 微信开发者工具里打开演示小程序、`new-mini` 新建的项目；`miniprogram-automator` 的检查（§11）。这台机器上只有微信客户端，没有开发者工具。
+- Skyline 引擎下真的跑一遍：页面配置里打开 `renderer: "skyline"`，看后备声明是不是都生效。
+- 真机读屏：iOS 旁白、安卓 TalkBack。
+- 支付宝、抖音小程序：代码没用微信专有的 API（读屏插件对这几个平台也登记），按 §13 第 4 条，等要用的时候再加平台插件、跑一遍检查。
+

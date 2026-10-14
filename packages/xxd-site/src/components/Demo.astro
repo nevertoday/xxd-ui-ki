@@ -1,10 +1,13 @@
 ---
-// 活演示：上面是真的组件，下面是代码（默认展开，限高；太长时底部有「展开全部」）。有 React 版时多一个「React」标签页，两种实现并排。
+// 活演示：上面是真的组件，下面是代码（默认展开，限高；太长时底部有「展开全部」）。有 React 版时多一个「React」标签页，两种实现并排；
+// 有小程序版（@xxd/mini）时再多一个「小程序」标签页：手机框里是演示小程序的 H5。
 import { icon } from "../lib/data.js";
 import { embed, extractFunction, formatMarkup, nextId, withImports } from "../lib/markup.js";
 import ReactDemo from "../react/ReactDemo.tsx";
 import demoSource from "../react/demos.tsx?raw";
 import demoSourceEn from "../react/demos.en.tsx?raw";
+import MiniFrame from "./MiniFrame.astro";
+import { miniCode } from "../lib/mini.js";
 import { langOf, t } from "../i18n/index.js";
 
 interface Props {
@@ -15,14 +18,17 @@ interface Props {
   title?: string;
   /** 浮层这类不点开就看不出样子的：静态展开的样子，放在真的触发按钮旁边（不能操作，只给看） */
   preview?: string;
+  /** 小程序版的组件（mini.json 的名字和这种语言的叫法） */
+  mini?: { name: string; label: string };
 }
-const { markup, react, align = "center", block = false, title, preview } = Astro.props;
+const { markup, react, align = "center", block = false, title, preview, mini } = Astro.props;
 const lang = langOf(Astro.url.pathname);
 const L = t(lang);
 const id = nextId("demo");
 const reactSource = lang === "en" ? demoSourceEn : demoSource;
 const reactCode = react ? withImports(extractFunction(reactSource, `${react}Demo`), reactSource) : "";
 const hasReact = Boolean(reactCode);
+const miniSource = mini ? miniCode(mini.name, lang) : "";
 ---
 
 <div class="site-demo" data-demo={title}>
@@ -50,10 +56,20 @@ const hasReact = Boolean(reactCode);
       </div>
     )
   }
+  {
+    mini && (
+      <div id={`${id}-mini`} hidden>
+        <div class="site-demo__stage" data-align="center">
+          <MiniFrame name={mini.name} label={mini.label} height={560} />
+        </div>
+      </div>
+    )
+  }
   <div class="site-demo__bar">
     <div class="xxd-tabs" data-xxd-tabs data-size="sm" aria-label={L.impl}>
       <button role="tab" id={`${id}-t1`} aria-controls={`${id}-native ${id}-code1`} aria-selected="true">{L.native}</button>
       {hasReact && <button role="tab" id={`${id}-t2`} aria-controls={`${id}-react ${id}-code2`}>React</button>}
+      {mini && <button role="tab" id={`${id}-t3`} aria-controls={`${id}-mini ${id}-code3`}>{L.miniTab}</button>}
     </div>
     <button class="xxd-btn" data-variant="ghost" data-size="sm" data-site-code-wrap aria-pressed="false">{L.codeWrap}</button>
     <button class="xxd-btn" data-variant="ghost" data-size="sm" data-site-code-toggle aria-expanded="true">
@@ -70,6 +86,15 @@ const hasReact = Boolean(reactCode);
       <div class="site-demo__code" id={`${id}-code2`} hidden>
         <pre class="site-code" tabindex="0"><code>{reactCode}</code></pre>
         <button class="xxd-btn site-code__copy" data-variant="ghost" data-icon-only data-size="sm" aria-label={L.copy} data-copy-target={`#${id}-code2 code`} set:html={icon("Copy", 14)} />
+        <button class="xxd-btn site-code__more" data-variant="ghost" data-size="sm" aria-expanded="false" data-all={L.codeAll} data-less={L.codeLess} hidden>{L.codeAll}</button>
+      </div>
+    )
+  }
+  {
+    mini && (
+      <div class="site-demo__code" id={`${id}-code3`} hidden>
+        <pre class="site-code" tabindex="0"><code>{miniSource}</code></pre>
+        <button class="xxd-btn site-code__copy" data-variant="ghost" data-icon-only data-size="sm" aria-label={L.copy} data-copy-target={`#${id}-code3 code`} set:html={icon("Copy", 14)} />
         <button class="xxd-btn site-code__more" data-variant="ghost" data-size="sm" aria-expanded="false" data-all={L.codeAll} data-less={L.codeLess} hidden>{L.codeAll}</button>
       </div>
     )

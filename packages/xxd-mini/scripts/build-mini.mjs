@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { appearanceVars } from "@xxd/tokens/resolve";
+import { addSkylineFallbacks, skylineGaps, splitDecls } from "./skyline.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const require = createRequire(join(root, "package.json"));
@@ -149,7 +150,10 @@ export function convertSelector(selector, { has = {} } = {}) {
           for (const x of inner) {
             const one = { type: "pseudo-class", kind: "not", selectors: [x] };
             const key = printSelector([one]);
-            if (!seen.has(key)) out.push(one), seen.add(key);
+            if (!seen.has(key)) {
+              out.push(one);
+              seen.add(key);
+            }
           }
           if (!inner.length && !always) return { drop: ":not()" };
         } else if (c.kind === "has") {
@@ -231,6 +235,13 @@ function approximateMix(expr) {
   return first >= 50 ? color(a) : color(b);
 }
 
+// 小程序里没用的声明（没有鼠标、没有网页的排版特性）：去掉，规则空了就不写
+const USELESS_PROPS = /^\s*(cursor|text-spacing-trim|text-wrap|text-wrap-style|field-sizing|interpolate-size|scrollbar-width|scrollbar-color|scrollbar-gutter|-moz-osx-font-smoothing|content-visibility|contain-intrinsic-size|container-type|container-name|anchor-name|position-anchor)\s*:/i;
+export function dropUseless(body) {
+  const pieces = splitDecls(body);
+  return pieces.filter((p) => !USELESS_PROPS.test(p.replace(/\/\*[\s\S]*?\*\//g, ""))).join(";");
+}
+
 /** 声明块里的 color-mix() 换成派生令牌（记进 mixes）；dvh → vh（老的 WebView 不认 dvh） */
 export function convertBody(body, mixes, { known = null, approx = null } = {}) {
   let text = body;
@@ -297,6 +308,9 @@ export function wrapperAction(w) {
   if (w.type === "media") {
     if (/\(hover:\s*none\)|\(pointer:\s*coarse\)/.test(w.prelude)) return "unwrap"; // 手机就是这样
     if (/\(hover:\s*hover\)|\(pointer:\s*fine\)|forced-colors|prefers-contrast|print/.test(w.prelude)) return "drop";
+    // 网页版给窄屏的样子（max-width 480 以上）：小程序就是手机，直接用（Skyline 只认暗色的媒体查询）
+    const max = w.prelude.match(/^@media\s*\(max-width:\s*(\d+)px\)$/);
+    if (max && Number(max[1]) >= 480) return "unwrap";
     return "keep";
   }
   if (w.type === "starting-style" || w.type === "container" || w.type === "supports") return "drop";
@@ -339,9 +353,7 @@ export function audit(css) {
       else if (c.type === "pseudo-class") {
         if (!ALLOWED_PSEUDO.has(c.kind)) webview.push(`伪类 :${c.kind}：${where}`);
         if (c.kind === "not") for (const s of c.selectors) check(s, where);
-        if (KEEP_PSEUDO.has(c.kind)) skyline.push(`结构伪类 :${c.kind}：${where}`);
       } else if (c.type === "pseudo-element" && c.kind !== "before" && c.kind !== "after") webview.push(`伪元素：${where}`);
-      else if (c.type === "combinator" && c.value !== "descendant" && c.value !== "child") skyline.push(`兄弟组合符 ${c.value}：${where}`);
     }
   };
   transform({
@@ -364,19 +376,12 @@ export function audit(css) {
   if (/color-mix\(/.test(css)) webview.push("color-mix()");
   if (/:root\b/.test(css)) webview.push(":root");
   if (/@container|@starting-style|@supports/.test(css)) webview.push("@container / @starting-style / @supports");
-  // Skyline 的限制（Skyline 样式文档）
-  const decls = css.replace(/\/\*[\s\S]*?\*\//g, "");
-  for (const [re, label] of [
-    [/currentcolor/gi, "currentColor"],
-    [/\d(?:\.\d+)?em\b/g, "em 单位"],
-    [/position:\s*sticky/g, "position: sticky"],
-    [/overflow(?:-[xy])?:\s*scroll/g, "overflow: scroll"],
-  ]) {
-    const n = (decls.match(re) || []).length;
-    for (let i = 0; i < n; i += 1) skyline.push(label);
-  }
-  for (const m of decls.matchAll(/box-shadow:([^;}]*)/g)) if (/\)\s*,|px\s*[^;,]*,\s*[\d-]/.test(m[1]) && m[1].split(/,(?![^(]*\))/).length > 1) skyline.push("多层阴影");
-  return { webview, skyline };
+  // Skyline：每条它不支持的声明前面要有后备（scripts/skyline.mjs）；@media 只认暗色
+  const gaps = skylineGaps(css);
+  skyline.push(...gaps.missing);
+  // Skyline 只认暗色的媒体查询：别的（减少动效）在 Skyline 里不生效，样子不受影响，单独列出来
+  const notes = gaps.media.map((m) => `@media ${m}`);
+  return { webview, skyline, notes };
 }
 
 /* ───────────── 令牌 ───────────── */
@@ -469,6 +474,12 @@ export function buildMini({ componentsCss, modes, manifest, extraCss = {} }) {
             bump(report.web, owner.unknown);
             continue;
           }
+          // 小程序版的组件不会加的修饰类名（mini.json 的 skip）：这条只在网页版用得到
+          const skipped = owner?.skip?.find((k) => out.some((c) => c.type === "class" && c.name === k));
+          if (skipped) {
+            bump(report.dropped, `小程序版不用的修饰 .${skipped}`);
+            continue;
+          }
           const key = owner ? owner.name : "";
           if (!byOwner.has(key)) byOwner.set(key, new Set());
           const text = printSelector(out);
@@ -480,7 +491,11 @@ export function buildMini({ componentsCss, modes, manifest, extraCss = {} }) {
     }
     if (!byOwner.size) continue;
     const before = mixes.size;
-    const body = convertBody(rule.body, mixes, { known, approx });
+    const body = convertBody(dropUseless(rule.body), mixes, { known, approx });
+    if (!body.replace(/\/\*[\s\S]*?\*\//g, "").trim()) {
+      bump(report.dropped, "只有小程序里没用的声明（cursor 等）");
+      continue;
+    }
     report.rewritten.mix += (rule.body.match(/color-mix\(/g) || []).length;
     void before;
     const kept = rule.wrappers.filter((w, i) => actions[i] === "keep");
@@ -504,7 +519,10 @@ export function buildMini({ componentsCss, modes, manifest, extraCss = {} }) {
   const baseOwn = extraCss.base ? convertBody(extraCss.base, mixes, { known }) : "";
   const tokens = `${HEADER}\n${BANNER}\n${tokensCss(modes, mixes)}\n/* 基础（网页版改写） */\n${base.join("\n\n")}\n\n/* 基础（小程序专有） */\n${baseOwn}\n\n/* 动画 */\n${frames.join("\n\n")}\n`;
   report.approx = approx;
-  return { files: out, tokens, mixes, report };
+  // Skyline 的后备声明：每条规则的声明块都过一遍（只处理最里层的块，@media 里的规则也算）
+  const sky = (css) => css.replace(/([^{}]*)\{([^{}]*)\}/g, (m, sel, body) => `${sel}{${addSkylineFallbacks(body, sel)}}`);
+  for (const [k, v] of out) out.set(k, sky(v));
+  return { files: out, tokens: sky(tokens), mixes, report };
 }
 
 function reportMarkdown({ report, files, tokens, mixes, problems }) {
@@ -522,7 +540,7 @@ function reportMarkdown({ report, files, tokens, mixes, problems }) {
 | 引擎 | 不允许的写法 |
 | --- | --- |
 | WebView（第一版保证） | **${problems.webview.length}** |
-| Skyline（M6） | ${problems.skyline.length} |
+| Skyline（最低微信 8.0.50） | ${problems.skyline.length} |
 
 网页版 ${report.rules} 条规则，小程序版写出 ${report.kept} 条。样式一共 ${(total / 1024).toFixed(1)} KB（令牌和基础 ${(Buffer.byteLength(tokens) / 1024).toFixed(1)} KB）。
 
@@ -563,9 +581,17 @@ ${rows(report.web)}
 
 ## Skyline 还差什么
 
+Skyline 不支持的声明（grid、inline-flex、currentColor、em、sticky、overflow: auto、多层阴影……）前面都写了一条它认得的后备声明（\`scripts/skyline.mjs\`），WebView 照旧用原来的。下面是没有后备的：
+
 | 写法 | 处 |
 | --- | --- |
 ${rows(sky) || "| — | 0 |"}
+
+Skyline 里不生效、但样子不受影响的（Skyline 只认暗色的媒体查询）：
+
+${[...new Set(problems.notes)].map((n) => `- \`${n}\`（${problems.notes.filter((x) => x === n).length} 处）`).join("\n") || "- 没有"}
+
+还要知道的：Skyline 没有 grid，网格（卡片、图片宫格、统计）在 Skyline 里退成一列；\`overflow: auto\` 退成 \`hidden\`，很长的底部面板在 Skyline 里滚不动（要滚的地方用 scroll-view）。
 
 ## 每个组件的大小
 
@@ -598,15 +624,16 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const outDir = join(root, "styles");
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
-  const problems = { webview: [], skyline: [] };
+  const problems = { webview: [], skyline: [], notes: [] };
   const all = [["tokens.mini.css", result.tokens], ...[...result.files].map(([n, css]) => [`${n.toLowerCase()}.mini.css`, css])];
   for (const [file, css] of all) {
     writeFileSync(join(outDir, file), css);
     const p = audit(css);
     problems.webview.push(...p.webview.map((x) => `${file}：${x}`));
     problems.skyline.push(...p.skyline);
+    problems.notes.push(...p.notes);
   }
-  const mixes = Object.fromEntries([...result.mixes].sort());
+  const mixes = Object.fromEntries([...result.mixes].sort(([a], [b]) => a.localeCompare(b)));
   const { prefersContrast, ...runtimeModes } = modes;
   void prefersContrast;
   writeFileSync(join(outDir, "vars.js"), `// 由 scripts/build-mini.mjs 生成，请勿手改。\n// 运行时（XxdPage）用：各外观的令牌（@xxd/tokens 的 tokens.json）和派生色（网页版的 color-mix，小程序里由 JS 算好）\nexport const MODES = ${JSON.stringify(runtimeModes)};\nexport const MIXES = ${JSON.stringify(mixes)};\n`);
@@ -619,7 +646,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const minified = all.reduce((n, [, css]) => n + Buffer.byteLength(transformSync(css, { loader: "css", minify: true }).code), 0);
   console.log(`@xxd/mini 样式：${all.length} 个文件，${(total / 1024).toFixed(1)} KB（压缩后 ${(minified / 1024).toFixed(1)} KB）；派生色 ${result.mixes.size} 种；WebView 不允许的写法 ${problems.webview.length}，Skyline 还差 ${problems.skyline.length}`);
   if (problems.webview.length) {
-    for (const p of problems.webview.slice(0, 20)) console.error(`  ✗ ${p}`);
+    for (const p of problems.webview.slice(0, 20)) console.error(`  ✗ ${String(p)}`);
     process.exit(1);
   }
   if (minified > SIZE_BUDGET) {

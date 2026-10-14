@@ -779,6 +779,12 @@ importers:
       '@xxd/icons':
         specifier: workspace:*
         version: link:../xxd-icons
+      '@xxd/mini':
+        specifier: workspace:*
+        version: link:../xxd-mini
+      '@xxd/mini-demo':
+        specifier: workspace:*
+        version: link:../xxd-mini-demo
       '@xxd/react':
         specifier: workspace:*
         version: link:../xxd-react

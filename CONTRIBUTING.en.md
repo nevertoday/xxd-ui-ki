@@ -28,6 +28,7 @@ Tokens      colors, type sizes, spacing, radii              @xxd/tokens   @xxd/i
   ↓
 Components  native, framework-free                          @xxd/css
             React (Kumo, restyled)                          @xxd/react
+            Mini program (Taro + React)                     @xxd/mini
   ↓
 Extension   create extensions, sync components and          @xxd/extension
 kit         settings, the CLI
@@ -39,6 +40,8 @@ kit         settings, the CLI
 | `@xxd/icons` | 500+ icons drawn one way (24 grid, 1.5 stroke, square corners), searchable by Chinese keyword |
 | `@xxd/css` | 59 native components and 18 patterns; keyboard and screen-reader behavior is our own, checked by the audit |
 | `@xxd/react` | Kumo's React components in the XXD look (keyboard, focus and screen readers handled by Base UI underneath), plus XXD-only components and appearance and language providers |
+| `@xxd/mini` | The WeChat mini program kit: React components on Taro, with styles rewritten from `@xxd/css` at build time (`styles/REPORT.md` lists what changed) and the same appearance as the web |
+| `@xxd/mini-demo` | The demo mini program: component catalog, to-do list, appearance settings; its web build is embedded in the showcase's "Mini program" tab |
 | `@xxd/extension` | The Chrome extension toolkit and the `xxd-ui` command |
 | `@xxd/site` | The showcase, in Chinese and English; `pnpm dev` opens it at http://localhost:4400 |
 
@@ -54,9 +57,10 @@ kit         settings, the CLI
 | How React components map to colors | `packages/kumo/scripts/theme-generator/xxd-overrides.ts` | `pnpm --filter @cloudflare/kumo codegen:themes`, update `docs/token-map.md` |
 | React component internals | `packages/kumo/src/components/…` | Change as little as possible (we merge upstream); explain why in the commit message |
 | Extension template / CLI | `packages/xxd-extension/`; the command list is `scripts/commands.mjs` | Generate one with `pnpm xxd new` and look at it |
+| Mini program components | `packages/xxd-mini/src/` (components), `src/styles/` (mini-program-only styles), `mini.json` (the component list and which web classes each owns) | `pnpm --filter @xxd/mini build && pnpm --filter @xxd/mini-demo build && pnpm --filter @xxd/mini-demo check`; add a demo for every new component |
 | Showcase pages | `packages/xxd-site/src/views/` (the body), with an entry in both `src/pages/` and `src/pages/en/` | Both languages are required (the tests check) |
 
-Don't hand-edit generated files: `theme-kumo.css`, `ai/*`, `src/primitives/*`, `packages/xxd-react/src/kumo-exports.ts`, any package's `dist/`, or a project's `vendor/xxd/`, `xxd:tokens` region and `xxd-icon-nodes.js`.
+Don't hand-edit generated files: `theme-kumo.css`, `ai/*`, `src/primitives/*`, `packages/xxd-react/src/kumo-exports.ts`, any package's `dist/`, `packages/xxd-mini/styles/`, or a project's `vendor/xxd/`, `xxd:tokens` region and `xxd-icon-nodes.js`.
 
 ## Before you commit
 

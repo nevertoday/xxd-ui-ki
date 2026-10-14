@@ -46,6 +46,8 @@
 }
 
 .xxd-sheet__body {
+  box-sizing: border-box;
+  max-height: calc(85vh - 120px);
   padding: 0 16px 16px;
 }
 

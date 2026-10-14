@@ -96,7 +96,7 @@ test("audit 认得出不允许的写法", () => {
   assert.deepEqual(audit("page,.xxd-h5-root{--a:1} view.xxd-x .y:first-child::after{color:red}").webview, []);
 });
 
-test("真的 @xxd/css：改写后每个文件 WebView 一列是 0，开头不换算 px，压缩后不超过体积上限", async () => {
+test("真的 @xxd/css：改写后每个文件 WebView、Skyline 两列都是 0，开头不换算 px，压缩后不超过体积上限", async () => {
   const extraCss = {};
   const { readdirSync } = await import("node:fs");
   for (const f of readdirSync(new URL("src/styles/", root))) extraCss[f.replace(/\.css$/, "")] = readFileSync(new URL(`src/styles/${f}`, root), "utf8");
@@ -106,6 +106,7 @@ test("真的 @xxd/css：改写后每个文件 WebView 一列是 0，开头不换
   for (const [name, css] of [["tokens", tokens], ...files]) {
     assert.ok(css.startsWith(HEADER), `${name} 开头要写 ${HEADER}`);
     assert.deepEqual(audit(css).webview, [], name);
+    assert.deepEqual(audit(css).skyline, [], `${name}：Skyline 不支持、又没有后备的写法`);
     total += Buffer.byteLength(transformSync(css, { loader: "css", minify: true }).code);
   }
   assert.ok(total <= SIZE_BUDGET, `压缩后 ${total} 字节`);

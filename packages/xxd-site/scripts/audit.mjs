@@ -66,6 +66,8 @@ const pages = [];
 (function walk(d) {
   for (const name of readdirSync(d)) {
     const f = join(d, name);
+    // /mini/ 是演示小程序编出的 H5（Taro 的页面，不是展示站的页）：它有自己的检查（pnpm --filter @xxd/mini-demo check）
+    if (d === dist && name === "mini") continue;
     if (statSync(f).isDirectory()) walk(f);
     else if (name === "index.html") pages.push(`/${relative(dist, d).split("\\").join("/")}/`.replace(/^\/\/$/, "/"));
   }

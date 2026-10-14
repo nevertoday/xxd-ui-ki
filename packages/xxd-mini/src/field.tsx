@@ -81,7 +81,11 @@ export interface InputProps extends InputBase {
 function useValue(value: string | undefined, defaultValue: string | undefined, onValueChange?: (v: string) => void) {
   const [inner, setInner] = useState(defaultValue ?? "");
   const current = value ?? inner;
-  return [current, (v: string) => (value == null ? setInner(v) : undefined, onValueChange?.(v))] as const;
+  const set = (v: string) => {
+    if (value == null) setInner(v);
+    onValueChange?.(v);
+  };
+  return [current, set] as const;
 }
 
 function Counter({ length, max }: { length: number; max: number }) {

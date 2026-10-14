@@ -15,11 +15,14 @@ import { principlesFor } from "../data/principles.js";
 import * as reactDemos from "../react/demos.tsx";
 import { WALL, WALL_PREVIEW } from "../data/wall.js";
 import { WALL as WALL_EN } from "../data/wall.en.js";
+import { miniOfWeb } from "../lib/mini.js";
 
 const { c } = Astro.props;
 const lang = langOf(Astro.url.pathname);
 const L = t(lang);
 const hasReact = `${c.name}Demo` in reactDemos;
+// 小程序版（@xxd/mini）里对应的组件：演示多一个「小程序」标签页
+const mini = miniOfWeb(c.name, lang);
 // React 组件名：registry 里写的第一个名字（「Dialog + DialogActions（@xxd/react）」→ Dialog）
 const reactName = c.react?.match(/^[A-Z]\w+/)?.[0];
 const hasReactProps = Boolean(reactName && (kumoRegistry.components[reactName] || xxdReactProps[reactName]));
@@ -57,6 +60,7 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
     <p class="site-names">
       <span>{L.classLine} <code class="xxd-code-inline">{c.classes[0]}</code></span>
       {c.react && <span>React <code class="xxd-code-inline">{`<${reactName ?? c.react}>`}</code></span>}
+      {mini && <span><a class="xxd-link" href={withLang(`/miniprogram/${mini.slug}`, lang)}>{L.miniTab}</a> <code class="xxd-code-inline">{`<${mini.name}>`}</code></span>}
     </p>
   </header>
 
@@ -78,7 +82,7 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
   }
 
   <h2 class="site-h2" id="demo">{L.demo}</h2>
-  <Demo markup={c.markup} react={hasReact ? c.name : undefined} align={c.align} block={c.block} title={c.name} preview={WALL_PREVIEW.has(c.name) ? (lang === "en" ? WALL_EN : WALL)[c.name] : undefined} />
+  <Demo markup={c.markup} react={hasReact ? c.name : undefined} align={c.align} block={c.block} title={c.name} preview={WALL_PREVIEW.has(c.name) ? (lang === "en" ? WALL_EN : WALL)[c.name] : undefined} mini={mini && { name: mini.name, label: mini.label }} />
 
   {
     extraDemos.map((e, i) => (

@@ -23,6 +23,8 @@
     "@xxd/css": "workspace:*",
     "@xxd/extension": "workspace:*",
     "@xxd/icons": "workspace:*",
+    "@xxd/mini": "workspace:*",
+    "@xxd/mini-demo": "workspace:*",
     "@xxd/react": "workspace:*",
     "@xxd/tokens": "workspace:*",
     "astro": "7.2.8",

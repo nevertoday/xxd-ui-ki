@@ -38,7 +38,7 @@ test("和 Chrome 算的 color-mix 一样（每个通道差 ≤ 1，透明度差 
     assert.ok(want, `对照表里没有 ${expr}：pnpm --filter @xxd/tokens fixture:color-mix`);
     const got = parseColor(resolveValue(expr, {}));
     assert.ok(got, `算不出 ${expr}`);
-    for (let i = 0; i < 3; i += 1) assert.ok(Math.abs(got[i] - want[i]) <= 1, `${expr}: ${got} ≠ ${want}`);
+    for (let i = 0; i < 3; i += 1) assert.ok(Math.abs(got[i] - want[i]) <= 1, `${expr}: ${got.join(",")} ≠ ${want.join(",")}`);
     assert.ok(Math.abs(got[3] - want[3]) <= 0.005, `${expr}: 透明度 ${got[3]} ≠ ${want[3]}`);
   }
 });

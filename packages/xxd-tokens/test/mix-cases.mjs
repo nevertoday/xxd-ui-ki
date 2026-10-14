@@ -21,5 +21,5 @@ export function mixExpressions() {
       }
     }
   }
-  return [...set].sort();
+  return [...set].sort((a, b) => a.localeCompare(b));
 }

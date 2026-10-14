@@ -1,7 +1,7 @@
 // 底部面板：手机上一切「更多操作」都放这里——网页版的菜单、浮动卡片在小程序里都换成它（§5）。
 //   <Sheet open={open} onOpenChange={setOpen} title="封面">…</Sheet>
 //   <ActionSheet open … actions={[{ label: "删除", danger: true, onClick }]} />   一列操作 + 取消
-import { View, Text } from "@tarojs/components";
+import { ScrollView, View, Text } from "@tarojs/components";
 import { X } from "@xxd/icons/each";
 import type { ReactNode } from "react";
 import "../styles/sheet.mini.css";
@@ -41,7 +41,10 @@ export function Sheet({ open, onOpenChange, title, children, closable = true, di
             {closable && <Button variant="ghost" size="sm" icon={X} label={t.close} onClick={close} />}
           </View>
         )}
-        <View className="xxd-sheet__body">{children}</View>
+        {/* 内容多了在面板里滚：用 scroll-view（Skyline 没有 overflow: auto） */}
+        <ScrollView className="xxd-sheet__body" scrollY enhanced showScrollbar={false}>
+          {children}
+        </ScrollView>
         {footer != null && <View className="xxd-sheet__foot">{footer}</View>}
       </View>
     </Portal>

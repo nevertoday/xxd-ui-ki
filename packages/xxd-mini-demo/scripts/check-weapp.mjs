@@ -1,5 +1,5 @@
 // 微信小程序产物（dist/）的检查：本机没有微信开发者工具也能跑（§11）。
-//   - 所有 .wxss：没有 WXSS 不允许的写法（和 @xxd/mini 构建报告同一个门禁）
+//   - 所有 .wxss：没有 WXSS 不允许的写法；Skyline 不支持的声明都有后备（和 @xxd/mini 构建报告同一个门禁，压缩以后再查一遍）
 //   - 主包不超过 1 MB（2 MB 是微信的硬上限）
 //   - app.json 开了 darkmode、theme.json 在；project.config.json 写了最低基础库 3.0.0
 //   - 模板里带上了读屏属性（@xxd/mini/taro-plugin 生效了）
@@ -22,7 +22,11 @@ const walk = (dir) => {
     if (st.isDirectory()) walk(p);
     else {
       size += st.size;
-      if (f.endsWith(".wxss")) for (const x of audit(readFileSync(p, "utf8")).webview) problems.push(`${p.slice(dist.length + 1)}：${x}`);
+      if (f.endsWith(".wxss")) {
+        const r = audit(readFileSync(p, "utf8"));
+        for (const x of r.webview) problems.push(`${p.slice(dist.length + 1)}：${x}`);
+        for (const x of r.skyline) problems.push(`${p.slice(dist.length + 1)}（Skyline）：${x}`);
+      }
     }
   }
 };
@@ -50,4 +54,4 @@ if (problems.length) {
   for (const p of problems.slice(0, 40)) console.error(`  ${p}`);
   process.exit(1);
 }
-console.log(`✓ 微信版产物：${(size / 1024).toFixed(0)} KB，WXSS 门禁 0，暗色、最低基础库、读屏属性都在`);
+console.log(`✓ 微信版产物：${(size / 1024).toFixed(0)} KB，WXSS 门禁 0（WebView、Skyline），暗色、最低基础库、读屏属性都在`);

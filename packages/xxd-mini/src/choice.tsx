@@ -22,7 +22,11 @@ interface ToggleBase {
 function useChecked(checked: boolean | undefined, defaultChecked: boolean | undefined, onChange?: (v: boolean) => void) {
   const [inner, setInner] = useState(Boolean(defaultChecked));
   const current = checked ?? inner;
-  return [current, (v: boolean) => (checked == null ? setInner(v) : undefined, onChange?.(v))] as const;
+  const set = (v: boolean) => {
+    if (checked == null) setInner(v);
+    onChange?.(v);
+  };
+  return [current, set] as const;
 }
 
 /** 控件和文字一起点：整块都是点按区（手机上点得到） */

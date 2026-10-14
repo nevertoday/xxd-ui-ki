@@ -56,7 +56,7 @@ pnpm xxd:build   # 第一次要几分钟
 pnpm xxd link    # 装好命令 xxd-ui，之后在哪个目录都能用
 ```
 
-然后按你要做的事，选一条：
+然后按你要做的事，选一条（插件、已有网页、React、微信小程序）：
 
 ### 做一个 Chrome 插件
 
@@ -93,6 +93,16 @@ import "@xxd/react/standalone.css";
 ```
 
 用 Tailwind、要加外观和语言设置：看[开始使用](https://ui.xiaoxiaodong.ai/start)。
+
+### 做一个微信小程序
+
+```bash
+xxd-ui new-mini ./today-mini --name 今日待办 --slug today-mini
+cd ./today-mini && pnpm install && pnpm dev:weapp
+```
+
+打开微信开发者工具，「导入项目」选 `today-mini` 文件夹。基于 Taro 4.2 + React，组件来自 `@xxd/mini`，样子和网页版一样。
+详细见展示站的[小程序版](https://ui.xiaoxiaodong.ai/miniprogram)。
 
 ## 以后组件更新了
 

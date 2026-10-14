@@ -1,5 +1,5 @@
 {
-  "$comment": "小程序版有哪些组件、各自用网页版的哪些类名（blocks：类名去掉 __ 后面的部分）。scripts/build-mini.mjs 照这张表把网页版 CSS 分到每个组件；没列进来的网页组件不进小程序产物。has：网页版的 :has() 在小程序里换成哪个类名（组件自己加）。",
+  "$comment": "小程序版有哪些组件、各自用网页版的哪些类名（blocks：类名去掉 __ 后面的部分）。scripts/build-mini.mjs 照这张表把网页版 CSS 分到每个组件；没列进来的网页组件不进小程序产物。has：网页版的 :has() 在小程序里换成哪个类名（组件自己加）。 skip：小程序版组件不会加的修饰类名，带它的规则不进产物。",
   "components": [
     {
       "name": "Layout",
@@ -19,7 +19,9 @@
         "xxd-small",
         "xxd-surface",
         "xxd-frame"
-      ]
+      ],
+      "summary": "竖排、横排、分隔线、页面的一段：间距都从令牌来。",
+      "summaryEn": "Stacks, rows, dividers and page sections, with gaps from the tokens."
     },
     {
       "name": "Text",
@@ -34,7 +36,9 @@
         "xxd-text-pair",
         "xxd-heading",
         "xxd-title"
-      ]
+      ],
+      "summary": "标题、正文、说明、等宽字的固定几档：层级靠字号和字重。",
+      "summaryEn": "Fixed steps for headings, body, captions and mono: hierarchy from size and weight."
     },
     {
       "name": "Icon",
@@ -44,7 +48,9 @@
       "web": [],
       "blocks": [
         "ui-icon"
-      ]
+      ],
+      "summary": "和网页版同一套图标，颜色跟着文字走；按需引入，没用到的不进包。",
+      "summaryEn": "The same icon set as the web kit, colored by the text; import only what you use."
     },
     {
       "name": "Button",
@@ -53,15 +59,23 @@
       "batch": 1,
       "web": [
         "Button",
-        "ButtonGroup",
-        "Link"
+        "ButtonGroup"
       ],
       "blocks": [
         "xxd-btn",
         "xxd-btn-group",
         "xxd-label-text",
-        "xxd-link",
         "ui-dialog-cancel"
+      ],
+      "summary": "实心、次要、幽灵、危险四种；加载中、整行宽；照样能用小程序的分享、手机号这些开放能力。",
+      "summaryEn": "Primary, secondary, ghost and danger; loading and full-width; open abilities like share still work.",
+      "skip": [
+        "is-confirming",
+        "is-target-blank",
+        "is-external",
+        "is-variant-outline",
+        "is-variant-danger-outline",
+        "xxd-label-text"
       ]
     },
     {
@@ -79,7 +93,9 @@
         "xxd-row",
         "xxd-list",
         "xxd-cell"
-      ]
+      ],
+      "summary": "手机上最常用的一行：标题、说明，右边是值、开关或箭头。",
+      "summaryEn": "The most common row on phones: title and description, with a value, control or arrow on the right."
     },
     {
       "name": "Field",
@@ -97,7 +113,9 @@
         "xxd-input",
         "xxd-textarea",
         "xxd-count"
-      ]
+      ],
+      "summary": "标签、输入框、说明、出错、字数，一个字段一块。",
+      "summaryEn": "Label, input, help, error and counter, one field per block."
     },
     {
       "name": "Switch",
@@ -109,7 +127,9 @@
       ],
       "blocks": [
         "xxd-switch"
-      ]
+      ],
+      "summary": "自己画的开关，和网页版一模一样：直角模式下也是方的。",
+      "summaryEn": "A self-drawn switch, identical to the web one: square in square mode too."
     },
     {
       "name": "Checkbox",
@@ -122,7 +142,9 @@
       "blocks": [
         "xxd-check",
         "xxd-choice"
-      ]
+      ],
+      "summary": "自己画的复选框，支持半选；整块（框和文字）都能点。",
+      "summaryEn": "A self-drawn checkbox with an indeterminate state; the whole row is tappable."
     },
     {
       "name": "Radio",
@@ -135,7 +157,9 @@
       "blocks": [
         "xxd-radio",
         "xxd-choices"
-      ]
+      ],
+      "summary": "一组单选：竖排或横排，可以整组禁用。",
+      "summaryEn": "A radio group, stacked or inline, which can be disabled as a whole."
     },
     {
       "name": "Segmented",
@@ -147,7 +171,9 @@
       ],
       "blocks": [
         "xxd-segmented"
-      ]
+      ],
+      "summary": "两三个选项里选一个：显示方式、时间范围。",
+      "summaryEn": "Pick one of two or three options: a view mode or a time range."
     },
     {
       "name": "Tabs",
@@ -160,7 +186,9 @@
       "blocks": [
         "xxd-tabs",
         "xxd-tabpanel"
-      ]
+      ],
+      "summary": "一排标签，选中的下面一条墨色线；多了能左右滑。",
+      "summaryEn": "A row of tabs with an ink underline; scrolls sideways when there are many."
     },
     {
       "name": "Sheet",
@@ -176,7 +204,9 @@
         "xxd-sheet",
         "xxd-scrim",
         "xxd-surface-float"
-      ]
+      ],
+      "summary": "从屏幕底部升起的面板。手机上的菜单、浮动卡片都换成它；还有一列操作的 ActionSheet。",
+      "summaryEn": "A panel that rises from the bottom. Menus and popovers become sheets on phones; ActionSheet lists actions."
     },
     {
       "name": "Dialog",
@@ -188,7 +218,9 @@
       ],
       "blocks": [
         "xxd-dialog"
-      ]
+      ],
+      "summary": "盖在屏幕中间的确认和提醒；按手机的返回键先关它。",
+      "summaryEn": "A centered confirm or notice; the phone's back gesture closes it first."
     },
     {
       "name": "Toast",
@@ -201,7 +233,9 @@
       "blocks": [
         "xxd-toast",
         "xxd-toast-region"
-      ]
+      ],
+      "summary": "自己画的轻提示：成功、出错、可撤销，在底部安全区上面。",
+      "summaryEn": "Self-drawn toasts for success, errors and undo, above the bottom safe area."
     },
     {
       "name": "NavBar",
@@ -214,7 +248,9 @@
       "blocks": [
         "xxd-topbar",
         "xxd-navbar"
-      ]
+      ],
+      "summary": "自定义导航栏：给右上角的胶囊按钮让位，标题和胶囊对齐。",
+      "summaryEn": "A custom nav bar that leaves room for the capsule button and lines the title up with it."
     },
     {
       "name": "TabBar",
@@ -226,7 +262,9 @@
       ],
       "blocks": [
         "xxd-tabbar"
-      ]
+      ],
+      "summary": "底部标签栏：图标加字、角标，留出安全区。",
+      "summaryEn": "A bottom tab bar with icons, labels, badges and the safe area."
     },
     {
       "name": "Empty",
@@ -238,7 +276,9 @@
       ],
       "blocks": [
         "xxd-empty"
-      ]
+      ],
+      "summary": "还没有内容时：一个图标、一句话、一个按钮。",
+      "summaryEn": "When there's nothing yet: an icon, a line and a button."
     },
     {
       "name": "Loading",
@@ -252,7 +292,9 @@
         "xxd-spinner",
         "xxd-skeleton",
         "xxd-loadbar"
-      ]
+      ],
+      "summary": "转圈、整块加载、骨架、页面顶上的加载条。",
+      "summaryEn": "Spinners, a loading block, skeletons and a top load bar."
     },
     {
       "name": "Badge",
@@ -266,7 +308,9 @@
       "blocks": [
         "xxd-badge",
         "xxd-dot"
-      ]
+      ],
+      "summary": "徽标和状态点：草稿、已写入、待更新、运行中。",
+      "summaryEn": "Badges and dots: draft, saved, outdated, running."
     },
     {
       "name": "Avatar",
@@ -278,7 +322,9 @@
       ],
       "blocks": [
         "xxd-avatar"
-      ]
+      ],
+      "summary": "头像：图片或名字的第一个字，会员外面一圈主色。",
+      "summaryEn": "Avatars with a photo or the first letter; members get an accent ring."
     },
     {
       "name": "Tag",
@@ -290,7 +336,9 @@
       ],
       "blocks": [
         "xxd-chip"
-      ]
+      ],
+      "summary": "可点选的小块：筛选、分类。",
+      "summaryEn": "Tappable chips for filters and categories."
     },
     {
       "name": "Card",
@@ -304,7 +352,9 @@
         "xxd-card",
         "xxd-grid",
         "xxd-image-grid"
-      ]
+      ],
+      "summary": "卡片和图片宫格：点图放大看。",
+      "summaryEn": "Cards and image grids; tap an image to preview it."
     },
     {
       "name": "Appearance",
@@ -318,7 +368,9 @@
         "xxd-swatches",
         "xxd-swatch",
         "xxd-appearance"
-      ]
+      ],
+      "summary": "外观设置：主题、圆角、主色、密度、按钮质感，改了全小程序马上生效。",
+      "summaryEn": "Appearance settings: theme, corners, accent, density and finish, applied everywhere at once."
     },
     {
       "name": "SearchBar",
@@ -332,7 +384,9 @@
         "xxd-input-wrap",
         "xxd-input-clear",
         "xxd-searchbar"
-      ]
+      ],
+      "summary": "搜索框：放大镜、清空、键盘上的「搜索」提交，可以带「取消」。",
+      "summaryEn": "A search box with clear, keyboard search and an optional Cancel."
     },
     {
       "name": "LoadMore",
@@ -344,7 +398,9 @@
       ],
       "blocks": [
         "xxd-loadmore"
-      ]
+      ],
+      "summary": "列表底下的一行：加载中、没有更多了、出错了重试。",
+      "summaryEn": "The row under a list: loading, no more, or retry on error."
     },
     {
       "name": "Progress",
@@ -357,7 +413,9 @@
       "blocks": [
         "xxd-progress",
         "xxd-meter"
-      ]
+      ],
+      "summary": "进度条和用量条：上传、完成度、本月用量。",
+      "summaryEn": "Progress and usage bars: uploads, completion, monthly usage."
     },
     {
       "name": "Steps",
@@ -367,7 +425,9 @@
       "web": [],
       "blocks": [
         "xxd-steps"
-      ]
+      ],
+      "summary": "一件事分几步：横排看进度，竖排带说明。",
+      "summaryEn": "Multi-step flows: horizontal for progress, vertical with notes."
     },
     {
       "name": "Collapse",
@@ -379,7 +439,9 @@
       ],
       "blocks": [
         "xxd-collapse"
-      ]
+      ],
+      "summary": "折叠：常见问题、更多说明，可以一次只开一个。",
+      "summaryEn": "Collapsible sections for FAQs and details, optionally one at a time."
     },
     {
       "name": "Swipe",
@@ -389,7 +451,9 @@
       "web": [],
       "blocks": [
         "xxd-swipe"
-      ]
+      ],
+      "summary": "左滑出操作：删除、置顶；竖着滑不会误打开。",
+      "summaryEn": "Swipe left for actions like delete or pin; vertical scrolling won't trigger it."
     },
     {
       "name": "Picker",
@@ -401,7 +465,9 @@
       ],
       "blocks": [
         "xxd-wheel"
-      ]
+      ],
+      "summary": "底部面板里的滚轮：时间、地区、数量，手感和系统一样。",
+      "summaryEn": "Wheels in a bottom sheet for times, places or amounts, with native feel."
     },
     {
       "name": "Uploader",
@@ -413,7 +479,9 @@
       ],
       "blocks": [
         "xxd-uploader"
-      ]
+      ],
+      "summary": "选图上传：宫格、进度、出错重试、移除；怎么上传由你定。",
+      "summaryEn": "Pick and upload images: grid, progress, retry and remove; you decide where they go."
     },
     {
       "name": "Stat",
@@ -426,7 +494,9 @@
       "blocks": [
         "xxd-stats",
         "xxd-stat"
-      ]
+      ],
+      "summary": "一个数字和它的变化，带小趋势图。",
+      "summaryEn": "A number and how it changed, with a sparkline."
     },
     {
       "name": "Chart",
@@ -439,7 +509,9 @@
       "blocks": [
         "xxd-chart",
         "xxd-chart-card"
-      ]
+      ],
+      "summary": "折线、柱状、迷你折线：画成图片，不用装 ECharts；配色和网页版同一个算法。",
+      "summaryEn": "Line, bar and spark charts drawn as images, no ECharts needed; same palette as the web kit."
     }
   ],
   "has": {}

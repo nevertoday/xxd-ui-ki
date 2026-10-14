@@ -45,16 +45,14 @@ scroll-view,
 
 /* 微信的原生按钮自带边框（::after）、外边距和行高：清掉，样式全由 .xxd-btn 定 */
 button.xxd-btn,
-button.xxd-chip,
-button.xxd-link {
+button.xxd-chip {
   margin: 0;
   line-height: 1;
   overflow: visible;
 }
 
 button.xxd-btn::after,
-button.xxd-chip::after,
-button.xxd-link::after {
+button.xxd-chip::after {
   border: 0;
   border-radius: 0;
   transform: none;

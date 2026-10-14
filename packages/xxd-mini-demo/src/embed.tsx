@@ -2,9 +2,8 @@
 //   第一帧：地址上的 theme / corners / accent / density / finish；
 //   之后：展示站切外观时 postMessage({ type: "xxd:appearance", settings })。
 // 嵌入时不读写存储（persist={false}），不覆盖小程序自己的设置。
-import { useXxd } from "@xxd/mini";
+import { useXxd, type XxdSettings } from "@xxd/mini";
 import { useEffect } from "react";
-import type { XxdSettings } from "@xxd/tokens";
 
 export const EMBED = process.env.TARO_ENV === "h5" && /[?&#]embed=1\b/.test(globalThis.location?.href ?? "");
 

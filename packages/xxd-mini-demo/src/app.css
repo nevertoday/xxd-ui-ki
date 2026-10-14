@@ -30,6 +30,7 @@
 }
 
 .demo-bar {
+  position: relative; /* Skyline 没有 sticky */
   position: sticky;
   bottom: 0;
   display: flex;

@@ -7,7 +7,7 @@ import "../styles/searchbar.mini.css";
 import { a11y } from "./aria";
 import { Icon } from "./icon";
 import { useXxd } from "./provider";
-import { cx, IS_H5, mods } from "./util";
+import { cx, IS_H5 } from "./util";
 
 export interface SearchBarProps {
   value?: string;
@@ -34,7 +34,7 @@ export function SearchBar({ value, defaultValue, onValueChange, onSearch, placeh
       <View className="xxd-input-wrap">
         <Icon icon={Search} />
         <Input
-          className={cx("xxd-input", mods({ "placeholder-shown": !current }))}
+          className="xxd-input"
           placeholderClass="is-placeholder"
           type="text"
           confirmType="search"

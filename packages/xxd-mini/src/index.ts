@@ -21,6 +21,7 @@ export { Empty, Spinner, Loading, Skeleton, LoadBar, Badge, Dot, Avatar, Tag, Te
 export { Card, CardGrid, ImageGrid, type CardProps, type ImageGridProps } from "./card";
 export { usePresence, BackGuard, Portal } from "./overlay";
 export { cx, mods } from "./util";
+export type { XxdSettings } from "@xxd/tokens";
 export { Swatches, AppearanceSettings, type SwatchesProps, type AppearanceSettingsProps } from "./appearance-settings";
 export { SearchBar, type SearchBarProps } from "./searchbar";
 export { LoadMore, type LoadMoreProps } from "./loadmore";

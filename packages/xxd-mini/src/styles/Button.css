@@ -51,8 +51,3 @@
 .is-finish-material .xxd-btn.is-variant-danger {
   --btn-bd: color-mix(in srgb, var(--danger-strong) 86%, #000000);
 }
-
-/* 文字链接的下划线：40% 的字色 */
-.xxd-link {
-  text-decoration-color: color-mix(in srgb, var(--action-text) 40%, transparent);
-}

@@ -28,6 +28,7 @@
   ↓
 组件     不用框架的原生组件                      @xxd/css
          React 组件（Kumo 换皮）                 @xxd/react
+         小程序组件（Taro + React）              @xxd/mini
   ↓
 插件套件 新建插件、同步组件、设置同步、命令行    @xxd/extension
 ```
@@ -38,6 +39,8 @@
 | `@xxd/icons` | 500 多个图标，统一画法（24 网格、1.5 线宽、方角），可以按中文关键词搜 |
 | `@xxd/css` | 59 个原生组件和 18 个模式，键盘和读屏是自己实现的，由 audit 守着 |
 | `@xxd/react` | Kumo 的 React 组件换上小小东的样子（键盘、焦点、读屏由底层的 Base UI 负责），再加小小东独有组件和外观、语言两个 Provider |
+| `@xxd/mini` | 微信小程序版：基于 Taro 的 React 组件，样式在构建时从 `@xxd/css` 改写过来（`styles/REPORT.md` 列着改了什么），外观和网页版同一套 |
+| `@xxd/mini-demo` | 演示小程序：组件目录、待办、外观设置；它的 H5 版嵌在展示站的「小程序」标签里 |
 | `@xxd/extension` | Chrome 插件工具箱和命令行 `xxd-ui` |
 | `@xxd/site` | 展示站，中英两版；`pnpm dev` 在 http://localhost:4400 打开 |
 
@@ -53,9 +56,10 @@
 | React 组件的颜色映射 | `packages/kumo/scripts/theme-generator/xxd-overrides.ts` | `pnpm --filter @cloudflare/kumo codegen:themes`，更新 `docs/token-map.md` |
 | React 组件内部 | `packages/kumo/src/components/…` | 尽量少改（要合并上游）；改了在提交信息里写清楚为什么 |
 | 插件模板 / 命令行 | `packages/xxd-extension/`，命令清单在 `scripts/commands.mjs` | `pnpm xxd new` 生成一个看看 |
+| 小程序组件 | `packages/xxd-mini/src/`（组件）、`src/styles/`（小程序专有的样式）、`mini.json`（组件清单和网页版类名的归属） | `pnpm --filter @xxd/mini build && pnpm --filter @xxd/mini-demo build && pnpm --filter @xxd/mini-demo check`；新组件要在演示小程序里加演示 |
 | 展示站页面 | `packages/xxd-site/src/views/`（正文），`src/pages/` 和 `src/pages/en/` 各放一个入口 | 中英两版都要有（测试会查） |
 
-不要手改生成的文件：`theme-kumo.css`、`ai/*`、`src/primitives/*`、`packages/xxd-react/src/kumo-exports.ts`、各包的 `dist/`，以及任何项目里的 `vendor/xxd/`、`xxd:tokens` 标记区域、`xxd-icon-nodes.js`。
+不要手改生成的文件：`theme-kumo.css`、`ai/*`、`src/primitives/*`、`packages/xxd-react/src/kumo-exports.ts`、各包的 `dist/`、`packages/xxd-mini/styles/`，以及任何项目里的 `vendor/xxd/`、`xxd:tokens` 标记区域、`xxd-icon-nodes.js`。
 
 ## 提交前
 
