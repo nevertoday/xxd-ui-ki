@@ -148,7 +148,7 @@ export function TagInputDemo() {
   return <TagInput className="w-72" defaultValue={["海报"]} placeholder="回车添加" />;
 }
 
-const accents = ["墨色", "X 蓝", "湖蓝", "苔绿"];
+const accents = ["墨色", "湖蓝", "苔绿", "胭脂"];
 export function ComboboxDemo() {
   const [value, setValue] = useState<string | null>("湖蓝");
   return (

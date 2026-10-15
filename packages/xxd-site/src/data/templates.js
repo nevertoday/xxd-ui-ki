@@ -109,7 +109,7 @@ const article = `
     <p>所有颜色、圆角、阴影都来自 <code>tokens.css</code>。</p>
     <pre><code>--r-sm: 0px; /* 默认直角 */</code></pre>
     <h3 id="a4">主色</h3>
-    <ul><li>18 个预设</li><li>自动提亮或加深，保证对比度</li></ul>
+    <ul><li>12 个预设</li><li>自动提亮或加深，保证对比度</li></ul>
   </article>
   <aside style="position:sticky;top:24px;align-self:start"><p class="xxd-toc__title">本文</p><ul class="xxd-toc" data-spy><li><a href="#a1" aria-current="true">一个人的设计系统</a></li><li><a href="#a2">为什么是直角</a></li><li><a href="#a3">令牌</a></li><li data-depth="3"><a href="#a4">主色</a></li></ul></aside>
 </div>`;

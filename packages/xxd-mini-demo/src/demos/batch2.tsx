@@ -143,7 +143,7 @@ export const BATCH2: Demo[] = [
         defaultOpen={["a"]}
         items={[
           { key: "a", title: tr("为什么默认直角？", "Why square corners?"), content: tr("直角更安静，内容是主角。想要圆角可以在外观里打开。", "Square corners keep things quiet. Turn on rounded corners in Appearance.") },
-          { key: "b", title: tr("主色怎么挑？", "How do I pick an accent?"), content: tr("18 个预设，墨色是第一个也是缺省。", "18 presets; ink is the first and the default.") },
+          { key: "b", title: tr("主色怎么挑？", "How do I pick an accent?"), content: tr("12 个预设，墨色是第一个也是缺省。", "12 presets; ink is the first and the default.") },
           { key: "c", title: tr("和网页版一样吗？", "Same as the web kit?"), content: tr("同一套令牌和样式，构建时改写成小程序能用的样子。", "Same tokens and styles, rewritten for mini programs at build time.") },
         ]}
       />

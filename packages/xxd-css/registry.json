@@ -541,7 +541,7 @@
         "xxd-option",
         "xxd-option__hint"
       ],
-      "markup": "<div data-xxd-combobox style=\"width:100%;max-width:280px\"><input class=\"xxd-input\" placeholder=\"输入筛选\" aria-label=\"主色\"><ul class=\"xxd-listbox\"><li class=\"xxd-option\" data-value=\"ink\">墨色</li><li class=\"xxd-option\" data-value=\"#1d9bf0\">X 蓝</li><li class=\"xxd-option\" data-value=\"#3b74b8\">湖蓝</li><li class=\"xxd-option\" data-value=\"#5a8a3c\">苔绿</li></ul></div>\n<div data-xxd-combobox data-multiple data-creatable style=\"width:100%;max-width:280px\"><div class=\"xxd-taginput\"><input placeholder=\"选或新建标签\" aria-label=\"标签\"></div><ul class=\"xxd-listbox\"><li class=\"xxd-option\">海报</li><li class=\"xxd-option\">封面</li><li class=\"xxd-option\">卡片</li></ul></div>",
+      "markup": "<div data-xxd-combobox style=\"width:100%;max-width:280px\"><input class=\"xxd-input\" placeholder=\"输入筛选\" aria-label=\"主色\"><ul class=\"xxd-listbox\"><li class=\"xxd-option\" data-value=\"ink\">墨色</li><li class=\"xxd-option\" data-value=\"#4386ba\">湖蓝</li><li class=\"xxd-option\" data-value=\"#638e4d\">苔绿</li><li class=\"xxd-option\" data-value=\"#b7665c\">胭脂</li></ul></div>\n<div data-xxd-combobox data-multiple data-creatable style=\"width:100%;max-width:280px\"><div class=\"xxd-taginput\"><input placeholder=\"选或新建标签\" aria-label=\"标签\"></div><ul class=\"xxd-listbox\"><li class=\"xxd-option\">海报</li><li class=\"xxd-option\">封面</li><li class=\"xxd-option\">卡片</li></ul></div>",
       "js": "wrap.addEventListener(\"xxd:change\", (e) => e.detail.value)",
       "react": "Combobox",
       "attributes": {
@@ -1385,7 +1385,7 @@
       "classes": [
         "xxd-collapse"
       ],
-      "markup": "<details class=\"xxd-collapse\" name=\"faq\" open><summary>为什么默认直角？</summary><p>会员站的硬规则：对话框、卡片、按钮、输入框都不许圆角。</p></details>\n<details class=\"xxd-collapse\" name=\"faq\"><summary>主色怎么挑？</summary><p>18 个预设，墨色是第一个也是默认。</p></details>\n<details class=\"xxd-collapse\" name=\"faq\"><summary>能用 React 吗？</summary><p>@xxd/react，同一套令牌。</p></details>",
+      "markup": "<details class=\"xxd-collapse\" name=\"faq\" open><summary>为什么默认直角？</summary><p>会员站的硬规则：对话框、卡片、按钮、输入框都不许圆角。</p></details>\n<details class=\"xxd-collapse\" name=\"faq\"><summary>主色怎么挑？</summary><p>12 个预设，墨色是第一个也是默认；也可以填任意颜色。</p></details>\n<details class=\"xxd-collapse\" name=\"faq\"><summary>能用 React 吗？</summary><p>@xxd/react，同一套令牌。</p></details>",
       "react": "Collapsible",
       "attributes": {
         "name（details）": "同名的一组只开一个（手风琴，浏览器原生）"

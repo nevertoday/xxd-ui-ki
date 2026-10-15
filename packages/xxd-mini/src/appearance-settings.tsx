@@ -21,7 +21,7 @@ export interface SwatchesProps {
   label?: string;
 }
 
-/** 主色色块：墨色 + 18 个预设，一组单选 */
+/** 主色色块：墨色 + 11 个预设，一组单选 */
 export function Swatches({ value, onValueChange, presets = ACCENT_PRESETS, label }: SwatchesProps) {
   const { lang } = useXxd();
   return (

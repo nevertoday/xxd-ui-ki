@@ -148,7 +148,7 @@ export function TagInputDemo() {
   return <TagInput className="w-72" defaultValue={["Poster"]} placeholder="Press Enter to add" />;
 }
 
-const accents = ["Ink", "X blue", "Lake blue", "Moss"];
+const accents = ["Ink", "Lake blue", "Moss", "Rouge"];
 export function ComboboxDemo() {
   const [value, setValue] = useState<string | null>("Lake blue");
   return (

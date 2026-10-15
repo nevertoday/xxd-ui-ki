@@ -793,6 +793,37 @@
     font-size: var(--text-xs);
   }
 
+  /* 颜色页：一个主色变出的颜色（亮 / 暗两块预览，主色只作用在这一块上） */
+  .site-derive {
+    display: grid;
+    gap: var(--space-4);
+    margin: var(--space-3) 0 var(--space-8);
+  }
+
+  .site-derive__preview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .site-derive__pane {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  @media (max-width: 640px) {
+    .site-derive__preview {
+      grid-template-columns: 1fr;
+    }
+  }
+
   /* 两种实现对照（/tools/parity） */
   .site-parity {
     display: grid;

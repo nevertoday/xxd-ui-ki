@@ -6,6 +6,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   theme: "light", // light | dark | system
   corners: "square", // square | rounded
   accent: "", // "" = 墨色，或 #rrggbb
+  accentMode: "auto", // auto（自动提亮或加深，保证对比度）| exact（品牌色原样出现在按钮和标记上）
   density: "comfortable", // comfortable | compact
   finish: "flat", // flat | material（实心按钮的质感）
 });
@@ -62,7 +63,7 @@ export function applySettings(settings = {}, { element = globalThis.document?.do
   element.setAttribute("data-corners", s.corners === "rounded" ? "rounded" : "square");
   element.setAttribute("data-density", s.density === "compact" ? "compact" : "comfortable");
   element.setAttribute("data-finish", s.finish === "material" ? "material" : "flat");
-  const accent = applyAccent(element, normalizeAccent(s.accent));
+  const accent = applyAccent(element, normalizeAccent(s.accent), { exact: s.accentMode === "exact" });
   return { ...s, theme: s.theme, resolvedTheme: theme, accent };
 }
 

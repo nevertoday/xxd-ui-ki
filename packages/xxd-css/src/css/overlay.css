@@ -1,6 +1,15 @@
 /* 浮层：对话框、dock + sheet、菜单、popover、tooltip、toast、右侧详情面板。
  * 只有浮层有阴影；浮层保留一条安静的边（--line），因为阴影已经把它托起来了。 */
 @layer xxd.components {
+  /* 抬起来的一层：浮层里面的纸、悬停底、线都换成 *-raised（亮色时值不变；暗色亮一档，层次不靠看不见的阴影）。
+     里面的输入框、菜单项、分隔线跟着一起抬，不用一个个改（设计师评审 V4-3） */
+  :is(.xxd-surface-float, .xxd-dialog, .xxd-menu, .xxd-popover, .xxd-sheet, .xxd-panel, .xxd-toast, .xxd-palette) {
+    --paper: var(--paper-raised);
+    --wash: var(--wash-raised);
+    --wash-strong: var(--wash-strong-raised);
+    --line: var(--line-raised);
+  }
+
   .xxd-surface-float {
     border: 1px solid var(--line);
     border-radius: var(--r-md);

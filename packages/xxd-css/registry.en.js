@@ -378,7 +378,7 @@ export const components = {
       "data-create-label": "Custom text for “Create”",
       ".xxd-option-group": "Groups (a group hides when all of it is filtered out)",
     },
-    markup: `<div data-xxd-combobox style="width:100%;max-width:280px"><input class="xxd-input" placeholder="Type to filter" aria-label="Accent"><ul class="xxd-listbox"><li class="xxd-option" data-value="ink">Ink</li><li class="xxd-option" data-value="#1d9bf0">X blue</li><li class="xxd-option" data-value="#3b74b8">Lake blue</li><li class="xxd-option" data-value="#5a8a3c">Moss</li></ul></div>
+    markup: `<div data-xxd-combobox style="width:100%;max-width:280px"><input class="xxd-input" placeholder="Type to filter" aria-label="Accent"><ul class="xxd-listbox"><li class="xxd-option" data-value="ink">Ink</li><li class="xxd-option" data-value="#4386ba">Lake blue</li><li class="xxd-option" data-value="#638e4d">Moss</li><li class="xxd-option" data-value="#b7665c">Rouge</li></ul></div>
 <div data-xxd-combobox data-multiple data-creatable style="width:100%;max-width:280px"><div class="xxd-taginput"><input placeholder="Pick or create a tag" aria-label="Tags"></div><ul class="xxd-listbox"><li class="xxd-option">Poster</li><li class="xxd-option">Cover</li><li class="xxd-option">Card</li></ul></div>`,
     a11y: [
       "The input has role=combobox + aria-expanded, the list role=listbox, and the highlighted option uses aria-activedescendant",
@@ -918,7 +918,7 @@ Xxd.bindCommandPalette(items)  // ⌘K / Ctrl+K`,
     summary: "Native <details>: FAQs and optional advanced settings. With a shared name only one stays open.",
     attributes: { "name (details)": "Only one open per group with the same name (accordion, native to the browser)" },
     markup: `<details class="xxd-collapse" name="faq" open><summary>Why square corners by default?</summary><p>It's a hard rule on the member site: no rounded dialogs, cards, buttons or inputs.</p></details>
-<details class="xxd-collapse" name="faq"><summary>How do I pick an accent?</summary><p>There are 18 presets; ink is the first one and the default.</p></details>
+<details class="xxd-collapse" name="faq"><summary>How do I pick an accent?</summary><p>There are 12 presets; ink is the first one and the default. Any other color works too.</p></details>
 <details class="xxd-collapse" name="faq"><summary>Can I use React?</summary><p>@xxd/react, with the same tokens.</p></details>`,
     rules: ["Expanding only fades in with a small shift — no height animation"],
     a11y: [

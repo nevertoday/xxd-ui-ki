@@ -7,6 +7,8 @@ const en = lang === "en";
 const surfaces = ["--bg", "--paper", "--wash", "--wash-strong", "--selected-bg", "--line", "--line-strong"];
 const inks = ["--ink", "--muted", "--muted-2", "--on-ink"];
 const meaning = ["--success", "--danger", "--warning", "--success-strong", "--danger-strong", "--warning-strong"];
+const raised = ["--paper-raised", "--wash-raised", "--wash-strong-raised", "--line-raised"];
+const disabled = ["--disabled-ink", "--disabled-bg", "--disabled-line"];
 const dark = { ...tokens.base, ...tokens.dark };
 const ratio = (fg, bg) => contrast(toRgb(fg), toRgb(bg)).toFixed(2);
 const accents = ACCENT_PRESETS.slice(1).map((p) => {
@@ -20,7 +22,12 @@ const T = en
   ? {
       title: "Color", caption: "Foundations",
       lead: "Black, white and gray, with ink for emphasis; color is reserved for meaning and the optional accent. Swatches show the color in the current appearance; the light and dark values are written below.",
-      groups: ["Paper and lines", "Ink and text", "Meaning colors"], accent: "18 accents", light: "Light", dark: "Dark",
+      groups: ["Paper and lines", "Ink and text", "Meaning colors", "Raised layer (overlays)", "Disabled"], accent: "12 accents", light: "Light", dark: "Dark",
+      groupNotes: { raised: "Dialogs, menus, popovers, panels, sheets and toasts sit one step up. In light mode it equals paper (the shadow lifts it); in dark mode it is one step lighter, because shadows don't show on a dark background. Hovers and dividers inside move up with it.", disabled: "Disabled controls use these instead of transparency (transparency over an accent, dark paper or an image is unpredictable and can't be specced). Disabled text doesn't need 4.5:1, but must be clearly different from enabled text." },
+      derive: "What one accent turns into", deriveLead: "Pick any color. In Auto (the default) the accent is lightened or darkened until it is readable; in Exact the solid fills and marks use your color as is, and the text on them switches to near-black if white isn't readable. Links stay darkened in both.",
+      pick: "Accent", mode: "Mode", auto: "Auto", exact: "Exact (brand color as is)", deriveCols: ["Variable", "Used for", "Light", "Dark"],
+      uses: { "--action-custom": "Marks: switches, tab underline, focus, selection", "--action-text-custom": "Text: links, small labels (≥ 4.5:1)", "--action-fill-custom": "Solid fills: primary button, solid badge, checked box", "--on-action-custom": "Text on the solid fill", "--action-fill-hover-custom": "Solid fill on hover" },
+      sample: "Post", link: "A link",
       gate: "Contrast (enforced by tests): body and secondary text ≥ 4.5 on paper / bg / wash; meaning colors ≥ 4.5; white text on *-strong fills ≥ 4.5.",
       accentNote: "Accents are lightened or darkened automatically: marks (switches, tab underlines, focus) ≥ 3:1; text ≥ 4.5:1; solid fills (primary buttons, solid badges) are darkened a little more so white text on them is ≥ 4.5:1. This holds on both light and dark paper. The first one is ink, the default.",
       cols: ["Accent", "Light · mark", "Light · text (contrast)", "Dark · mark", "Dark · text (contrast)", "Solid button light / dark"],
@@ -28,13 +35,18 @@ const T = en
   : {
       title: "颜色", caption: "基础",
       lead: "黑 / 白 / 灰，强调靠墨色；颜色只留给意义和可选的主色。色块显示当前外观下的颜色，下面写着亮 / 暗两套值。",
-      groups: ["纸与线", "墨与文字", "语义色"], accent: "18 个主色", light: "亮", dark: "暗",
+      groups: ["纸与线", "墨与文字", "语义色", "抬起来的一层（浮层）", "禁用"], accent: "12 个主色", light: "亮", dark: "暗",
+      groupNotes: { raised: "对话框、菜单、popover、面板、sheet、toast 抬起来一层。亮色时和纸一样（靠阴影托起）；暗色时亮一档，因为暗底上阴影看不出来。里面的悬停底、分隔线跟着一起抬。", disabled: "禁用的控件用这三个，不用半透明（半透明叠在主色、暗纸、图片上颜色没法预测，设计稿也没法标）。禁用的字不要求 4.5:1，但要和能用的一眼分开。" },
+      derive: "一个主色变出的颜色", deriveLead: "随便选一个颜色。「自动」（缺省）会把它提亮或加深到看得清；「原样」让实心底和标记直接用你的颜色，白字看不清时底上的字换成近黑。链接两种模式下都会加深。",
+      pick: "主色", mode: "模式", auto: "自动", exact: "原样（品牌色不变）", deriveCols: ["变量", "用在哪", "亮", "暗"],
+      uses: { "--action-custom": "标记：开关、tab 下划线、焦点、选中", "--action-text-custom": "文字：链接、小标签（≥ 4.5:1）", "--action-fill-custom": "实心底：主按钮、实心徽标、勾选框", "--on-action-custom": "实心底上的字", "--action-fill-hover-custom": "实心底悬停" },
+      sample: "写入", link: "一个链接",
       gate: "对比度（测试门禁）：正文与次要文字在 paper / bg / wash 上 ≥ 4.5；语义色 ≥ 4.5；*-strong 做底时白字 ≥ 4.5。",
       accentNote: "主色会被自动提亮或加深：标记（开关、tab 下划线、焦点）≥ 3:1；文字 ≥ 4.5:1；实心底（主按钮、实心徽标）单独压暗一点，让上面的白字 ≥ 4.5:1。亮暗两种纸上都成立。第一个是墨色，也是默认。",
       cols: ["主色", "亮 · 标记", "亮 · 文字（对比度）", "暗 · 标记", "暗 · 文字（对比度）", "实心按钮 亮 / 暗"],
     };
-const sections = [["surfaces", T.groups[0], surfaces], ["ink", T.groups[1], inks], ["meaning", T.groups[2], meaning]];
-const headings = [...sections.map(([slug, text]) => ({ slug, text })), { slug: "accent", text: T.accent }];
+const sections = [["surfaces", T.groups[0], surfaces], ["ink", T.groups[1], inks], ["meaning", T.groups[2], meaning], ["raised", T.groups[3], raised], ["disabled", T.groups[4], disabled]];
+const headings = [...sections.map(([slug, text]) => ({ slug, text })), { slug: "accent", text: T.accent }, { slug: "derive", text: T.derive }];
 const swatch = (name) => ({ name, light: tokens.base[name], dark: dark[name] });
 ---
 
@@ -47,6 +59,7 @@ const swatch = (name) => ({ name, light: tokens.base[name], dark: dark[name] });
   {sections.map(([id, title, names]) => (
     <section>
       <h2 class="site-h2" id={id}>{title}</h2>
+      {T.groupNotes[id] && <p class="site-p">{T.groupNotes[id]}</p>}
       <div class="site-swatches">
         {names.map((n) => { const s = swatch(n); return (
           <div class="site-swatch"><i style={`background:var(${n})`}></i><div><b class="xxd-text" data-variant="mono" style="font-size:11px">{n}</b><code>{T.light} {s.light}</code><code>{T.dark} {s.dark}</code></div></div>
@@ -73,4 +86,61 @@ const swatch = (name) => ({ name, light: tokens.base[name], dark: dark[name] });
       ))}
     </tbody>
   </table></div>
+
+  <h2 class="site-h2" id="derive">{T.derive}</h2>
+  <p class="site-p">{T.deriveLead}</p>
+  <div class="site-derive" id="site-derive" data-uses={JSON.stringify(T.uses)}>
+    <div class="xxd-cluster">
+      <label class="xxd-choice"><input type="color" value="#4386ba" aria-label={T.pick} data-derive-color /> {T.pick} <code class="xxd-code-inline" data-derive-hex>#4386ba</code></label>
+      <div class="xxd-segmented" data-xxd-segmented aria-label={T.mode} data-derive-mode>
+        <button role="radio" data-value="auto" aria-checked="true">{T.auto}</button>
+        <button role="radio" data-value="exact" aria-checked="false">{T.exact}</button>
+      </div>
+    </div>
+    <div class="site-derive__preview">
+      {["light", "dark"].map((m) => (
+        <div class="site-derive__pane" data-theme={m} data-derive-pane={m}>
+          <button class="xxd-btn" data-variant="primary">{T.sample}</button>
+          <input type="checkbox" role="switch" class="xxd-switch" checked aria-label={T.sample} />
+          <a class="xxd-link" href="#derive">{T.link}</a>
+        </div>
+      ))}
+    </div>
+    <div class="xxd-table-wrap"><table class="xxd-table">
+      <thead><tr>{T.deriveCols.map((c) => <th>{c}</th>)}</tr></thead>
+      <tbody data-derive-rows></tbody>
+    </table></div>
+  </div>
+  <script is:inline>
+    (() => {
+      const box = document.getElementById("site-derive");
+      const A = window.XxdTheme && window.XxdTheme.accent;
+      if (!box || !A) return;
+      const uses = JSON.parse(box.dataset.uses);
+      const color = box.querySelector("[data-derive-color]");
+      let mode = "auto";
+      const ratio = (a, b) => A.contrast(A.toRgb(a), A.toRgb(b)).toFixed(2);
+      const render = () => {
+        const hex = color.value;
+        box.querySelector("[data-derive-hex]").textContent = hex;
+        const p = A.accentPalette(hex, "", { exact: mode === "exact" });
+        // 主色只作用在这两块预览上：直接把派生值写成这一块的强调变量（亮 / 暗各用自己的那一套）
+        for (const pane of box.querySelectorAll("[data-derive-pane]")) {
+          const d = pane.dataset.derivePane === "dark" ? "-dark" : "";
+          const map = { "--action": "action-custom", "--action-text": "action-text-custom", "--action-fill": "action-fill-custom", "--action-fill-hover": "action-fill-hover-custom", "--on-action": "on-action-custom", "--switch-on": "action-custom" };
+          for (const [k, v] of Object.entries(map)) pane.style.setProperty(k, p[`--${v}${d}`]);
+        }
+        const rows = Object.keys(uses).map((k) => {
+          const l = p[k], d = p[k.replace("-custom", "-custom-dark")];
+          const note = (v, paper) => k === "--action-text-custom" ? ` · ${ratio(v, paper)}` : "";
+          const chip = (v, paper) => `<span class="xxd-dot" style="background:${v}"></span> <code class="xxd-code-inline">${v}</code>${note(v, paper)}`;
+          return `<tr><td><code class="xxd-code-inline">${k}</code></td><td data-wrap>${uses[k]}</td><td>${chip(l, "#ffffff")}</td><td>${chip(d, "#201f1a")}</td></tr>`;
+        });
+        box.querySelector("[data-derive-rows]").innerHTML = rows.join("");
+      };
+      color.addEventListener("input", render);
+      box.querySelector("[data-derive-mode]").addEventListener("xxd:change", (e) => { mode = e.detail.value; render(); });
+      render();
+    })();
+  </script>
 </Site>

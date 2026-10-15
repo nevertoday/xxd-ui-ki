@@ -105,12 +105,17 @@ export function mountAppearance(container, options = {}) {
   swatches.setAttribute("aria-label", L.accent);
   // 和分段控件同一套键盘：← → ↑ ↓ Home End 选择，Tab 只停在选中的那一个
   swatches.setAttribute("data-xxd-segmented", "");
+  const nameOf = (id) => {
+    const p = presets.find((x) => x.id === (id || ""));
+    if (!p) return id || L.ink;
+    return p.id ? (locale === "en" ? p.name : p.zh || p.name) : L.ink;
+  };
   for (const p of presets) {
     const b = doc.createElement("button");
     b.type = "button";
     b.className = "xxd-swatch";
     b.setAttribute("role", "radio");
-    const name = p.id ? (locale === "en" ? p.name : p.zh || p.name) : L.ink;
+    const name = nameOf(p.id);
     b.setAttribute("aria-label", name);
     b.dataset.tooltip = name;
     b.dataset.value = p.id;
@@ -121,12 +126,19 @@ export function mountAppearance(container, options = {}) {
   }
   if (![...swatches.children].some((b) => b.tabIndex === 0)) swatches.firstElementChild.tabIndex = 0;
   // 点击和方向键都由 install() 的分段控件委托处理，派发 xxd:change
+  // 选中的那个颜色的名字直接写在标题旁边（设计师评审 E2：以前只能悬停一个个看）
+  const current = doc.createElement("span");
+  current.className = "xxd-text";
+  current.dataset.variant = "secondary";
+  current.textContent = nameOf(s.accent);
   swatches.addEventListener("xxd:change", (event) => {
     event.stopPropagation();
     set({ accent: event.detail.value });
+    current.textContent = nameOf(event.detail.value);
     emit(group, "xxd:appearance", get());
   });
   const accentRow = row(doc, L.accent, L.accentDesc, swatches);
+  accentRow.querySelector(".xxd-row__title").append(" · ", current);
   accentRow.setAttribute("data-stack", "");
   body.append(accentRow);
 

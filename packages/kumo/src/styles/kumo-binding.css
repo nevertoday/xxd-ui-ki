@@ -753,4 +753,19 @@
   label:has(+ [data-kumo-component="Switch"]:disabled) {
     color: var(--disabled-ink, #adaaa5);
   }
+
+  /* ── 抬起来的一层（设计师评审 V4-3）：浮层的根上把纸、悬停底、线换成 *-raised，和原生一样。
+     Kumo 的 --color-kumo-* 在 :root 上就算好了，这里要在浮层上重新指一次，里面的东西才跟着变 ── */
+  :is([role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], .kumo-popover-popup)[class*="bg-kumo"] {
+    --paper: var(--paper-raised, #ffffff);
+    --wash: var(--wash-raised, #f6f4f1);
+    --wash-strong: var(--wash-strong-raised, #eeece9);
+    --line: var(--line-raised, #e9e7e4);
+    --color-kumo-base: var(--paper-raised, #ffffff);
+    --color-kumo-control: var(--paper-raised, #ffffff);
+    --color-kumo-overlay: var(--paper-raised, #ffffff);
+    --color-kumo-tint: var(--wash-raised, #f6f4f1);
+    --color-kumo-line: var(--line-raised, #e9e7e4);
+    --color-kumo-hairline: var(--line-raised, #e9e7e4);
+  }
 }

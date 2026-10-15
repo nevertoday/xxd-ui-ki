@@ -36,6 +36,12 @@
   /* 控件的边（输入框、复选、单选、开关、滑块）：要认得出这是个控件，和底色至少 3:1（WCAG 1.4.11）。
      卡片、分隔线、列表线仍然用安静的 --line / --line-strong。 */
   --line-control: #898681;
+  /* 抬起来的一层（浮层：对话框、菜单、popover、面板、sheet、toast）：亮色和纸一样（靠阴影托起），
+     暗色亮一档——暗底上阴影看不出来，层次靠这一档（设计师评审 E3）。浮层里的悬停底、分隔线也跟着抬一档。 */
+  --paper-raised: #ffffff;
+  --wash-raised: #f6f4f1;
+  --wash-strong-raised: #eeece9;
+  --line-raised: #e9e7e4;
   --paper-rgb: 255, 255, 255;
   --shadow-rgb: 17, 17, 17;
   /* 禁用（设计师评审 V2-3）：不用半透明，用这三个值；字不要求 4.5:1（WCAG 对禁用控件豁免），但和可用的一眼分得开 */
@@ -227,6 +233,10 @@
   --line: #34322b;
   --line-strong: #4c483f;
   --line-control: #807a6e;
+  --paper-raised: #292720;
+  --wash-raised: #33302a;
+  --wash-strong-raised: #3b3830;
+  --line-raised: #3f3c34;
   --paper-rgb: 32, 31, 26;
   --shadow-rgb: 0, 0, 0;
   --disabled-ink: #66635d;
@@ -273,6 +283,10 @@
   --line: #e9e7e4;
   --line-strong: #ccc9c5;
   --line-control: #898681;
+  --paper-raised: #ffffff;
+  --wash-raised: #f6f4f1;
+  --wash-strong-raised: #eeece9;
+  --line-raised: #e9e7e4;
   --paper-rgb: 255, 255, 255;
   --shadow-rgb: 17, 17, 17;
   --disabled-ink: #adaaa5;
@@ -329,6 +343,9 @@
   --wash-strong: color-mix(in srgb, #eeece9 90%, var(--action));
   --line: color-mix(in srgb, #e9e7e4 90%, var(--action));
   --line-strong: color-mix(in srgb, #ccc9c5 88%, var(--action));
+  --wash-raised: var(--wash);
+  --wash-strong-raised: var(--wash-strong);
+  --line-raised: var(--line);
   --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 45%, transparent);
 }
 
@@ -346,6 +363,10 @@
   --wash-strong: color-mix(in srgb, #312f28 92%, var(--action));
   --line: color-mix(in srgb, #34322b 90%, var(--action));
   --line-strong: color-mix(in srgb, #4c483f 88%, var(--action));
+  --paper-raised: color-mix(in srgb, #292720 97%, var(--action));
+  --wash-raised: color-mix(in srgb, #33302a 94%, var(--action));
+  --wash-strong-raised: color-mix(in srgb, #3b3830 92%, var(--action));
+  --line-raised: color-mix(in srgb, #3f3c34 90%, var(--action));
   --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 55%, transparent);
 }
 
@@ -358,6 +379,7 @@
     --muted: #5b5955;
     --muted-2: #6d6b67;
     --line: #b7b4b0;
+    --line-raised: #b7b4b0;
     --line-strong: #898681;
     --line-control: #6e6b67;
   }
@@ -368,6 +390,7 @@
     --muted: #c9c3b6;
     --muted-2: #a7a194;
     --line: #5a564c;
+    --line-raised: #5a564c;
     --line-strong: #8a8478;
     --line-control: #a39d90;
   }

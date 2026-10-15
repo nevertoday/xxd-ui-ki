@@ -4,6 +4,8 @@ export interface XxdSettings {
   theme?: ThemeMode;
   corners?: "square" | "rounded";
   accent?: string;
+  /** auto（缺省）：自动提亮或加深保证对比度；exact：品牌色原样出现在按钮和标记上 */
+  accentMode?: "auto" | "exact";
   density?: "comfortable" | "compact";
   finish?: "flat" | "material";
 }

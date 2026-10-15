@@ -50,8 +50,8 @@ test("语义色做底：白字 ≥ 4.5，暗纸上做标记 ≥ 3", () => {
   }
 });
 
-test("18 个主色 × 亮/暗：标记 ≥ 3，文字版 ≥ 4.5，实心底（含 hover）上的字 ≥ 4.5", () => {
-  assert.equal(ACCENT_PRESETS.length, 18);
+test("12 个主色 × 亮/暗：标记 ≥ 3，文字版 ≥ 4.5，实心底（含 hover）上的字 ≥ 4.5", () => {
+  assert.equal(ACCENT_PRESETS.length, 12);
   assert.equal(ACCENT_PRESETS[0].id, "", "第一个是墨色");
   for (const preset of ACCENT_PRESETS.slice(1)) {
     const p = accentPalette(preset.id);
@@ -264,4 +264,63 @@ test("tokens.css 只放变量；减少动效、选中色、光标在 base.css", 
   const base = readFileSync(new URL("../base.css", import.meta.url), "utf8");
   assert.match(base, /prefers-reduced-motion: reduce/);
   assert.match(base, /:root\[data-accent\] ::selection/);
+});
+
+// OKLCH（明度、彩度、色相）：预设看起来一样重（设计师评审 D25）
+function oklch(hex) {
+  const lin = (c) => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const [r, g, b] = rgb(hex).map(lin);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const L = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
+  const A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+  const B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+  return [L, Math.hypot(A, B), ((Math.atan2(B, A) * 180) / Math.PI + 360) % 360];
+}
+
+test("主色预设：明度差 ≤ 0.04、有彩色的彩度差 ≤ 0.01、色相两两隔开 ≥ 25°，没有第三方品牌色", () => {
+  const colored = ACCENT_PRESETS.slice(1).map((p) => ({ ...p, lch: oklch(p.id) }));
+  const Ls = colored.map((p) => p.lch[0]);
+  assert.ok(Math.max(...Ls) - Math.min(...Ls) <= 0.04, `明度 ${Math.min(...Ls).toFixed(3)}–${Math.max(...Ls).toFixed(3)}`);
+  const vivid = colored.filter((p) => p.lch[1] > 0.05);
+  const Cs = vivid.map((p) => p.lch[1]);
+  assert.ok(Math.max(...Cs) - Math.min(...Cs) <= 0.01, `彩度 ${Math.min(...Cs).toFixed(3)}–${Math.max(...Cs).toFixed(3)}`);
+  for (const a of vivid) for (const b of vivid) {
+    if (a === b) continue;
+    const d = Math.abs(a.lch[2] - b.lch[2]);
+    assert.ok(Math.min(d, 360 - d) >= 25, `${a.name} 和 ${b.name} 色相只差 ${Math.min(d, 360 - d).toFixed(0)}°`);
+  }
+  assert.ok(!ACCENT_PRESETS.some((p) => /\bX\b|twitter/i.test(p.name)), "预设里不放第三方品牌色");
+});
+
+test("原样（accentMode: exact）：实心底和标记就是原色；底上的字 ≥ 4.5（白字不够就换近黑字）；文字版照样 ≥ 4.5", () => {
+  for (const hex of ["#1d9bf0", "#ffcc00", "#b7665c", "#0f172a"]) {
+    const p = accentPalette(hex, "", { exact: true });
+    assert.equal(p["--action-fill-custom"], hex);
+    assert.equal(p["--action-custom"], hex);
+    assert.equal(p["--action-fill-custom-dark"], hex);
+    assert.ok(contrast(rgb(p["--on-action-custom"]), rgb(hex)) >= 4.5, `${hex} 上的字`);
+    assert.ok(contrast(rgb(p["--action-text-custom"]), LIGHT_PAPER) >= 4.5 - 0.01, `${hex} 文字版`);
+  }
+  const el = fakeElement();
+  applySettings({ accent: "#1d9bf0", accentMode: "exact" }, { element: el });
+  assert.equal(el.getAttribute("data-accent-exact"), "");
+  applySettings({ accent: "#1d9bf0" }, { element: el });
+  assert.equal(el.getAttribute("data-accent-exact"), null);
+});
+
+test("抬起来的一层（浮层）：暗色比纸亮一档；上面的正文、次要文字、控件边的对比度照样够", () => {
+  const blocks = parseBlocks(readFileSync(new URL("../tokens.css", import.meta.url), "utf8"));
+  const base = blocks[":root"];
+  const dark = { ...base, ...blocks[':root[data-theme="dark"],\n[data-theme="dark"]'] };
+  for (const [mode, v] of [["亮", base], ["暗", dark]]) {
+    for (const bg of ["--paper-raised", "--wash-raised", "--wash-strong-raised"]) {
+      assert.ok(contrast(toRgb(v["--ink"]), toRgb(v[bg])) >= 4.5, `${mode} --ink on ${bg}`);
+      assert.ok(contrast(toRgb(v["--muted"]), toRgb(v[bg])) >= 4.5, `${mode} --muted on ${bg}`);
+    }
+    assert.ok(contrast(toRgb(v["--line-control"]), toRgb(v["--paper-raised"])) >= 3, `${mode} --line-control on --paper-raised`);
+  }
+  assert.equal(base["--paper-raised"], base["--paper"], "亮色的浮层和纸一样（靠阴影托起）");
+  assert.notEqual(dark["--paper-raised"], dark["--paper"], "暗色的浮层亮一档");
 });

@@ -79,7 +79,7 @@ const pages = [];
 async function axeAudit() {
   const modes = [
     { id: "亮·直角·墨色", s: { theme: "light", corners: "square", accent: "", density: "comfortable", finish: "flat" } },
-    { id: "暗·圆角·X 蓝", s: { theme: "dark", corners: "rounded", accent: "#1d9bf0", density: "comfortable", finish: "material" } },
+    { id: "暗·圆角·自定义蓝", s: { theme: "dark", corners: "rounded", accent: "#1d9bf0", density: "comfortable", finish: "material" } },
   ];
   let count = 0;
   for (const mode of modes) {

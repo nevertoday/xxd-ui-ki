@@ -109,7 +109,7 @@ const article = `
     <p>Every color, radius and shadow comes from <code>tokens.css</code>.</p>
     <pre><code>--r-sm: 0px; /* square by default */</code></pre>
     <h3 id="a4">Accent</h3>
-    <ul><li>18 presets</li><li>Lightened or darkened automatically to keep contrast</li></ul>
+    <ul><li>12 presets</li><li>Lightened or darkened automatically to keep contrast</li></ul>
   </article>
   <aside style="position:sticky;top:24px;align-self:start"><p class="xxd-toc__title">On this page</p><ul class="xxd-toc" data-spy><li><a href="#a1" aria-current="true">A design system for one</a></li><li><a href="#a2">Why square corners</a></li><li><a href="#a3">Tokens</a></li><li data-depth="3"><a href="#a4">Accent</a></li></ul></aside>
 </div>`;

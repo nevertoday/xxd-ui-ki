@@ -157,7 +157,7 @@ export function appearanceVars(settings = {}, { modes, extra = {}, system = "lig
   if (s.corners === "rounded") Object.assign(vars, modes.rounded);
   if (s.density === "compact") Object.assign(vars, modes.compact);
   if (accent) {
-    Object.assign(vars, accentPalette(accent), modes.accent);
+    Object.assign(vars, accentPalette(accent, "", { exact: s.accentMode === "exact" }), modes.accent);
     if (theme === "dark") Object.assign(vars, modes.darkAccent);
   }
   Object.assign(vars, extra);

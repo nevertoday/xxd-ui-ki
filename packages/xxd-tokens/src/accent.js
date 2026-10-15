@@ -1,33 +1,33 @@
-// 主色：一个颜色定整个界面的调子。移植自 xPoster src/accent-color.js（同一套算法与 18 个预设）。
+// 主色：一个颜色定整个界面的调子。算法移植自 xPoster src/accent-color.js。
 // - 空值 = 墨色（默认），什么都不写。
 // - 太浅的颜色在亮纸上压暗一点、太深的在暗纸上提亮一点，直到 3:1，保证按钮和标记看得见。
 // - 「标记」（开关、tab 下划线、选中、焦点）用原色，只保证在纸上 3:1。
-// - 「实心底」（主按钮、实心徽标、勾选框）上面要放字：另算一个 fill，把原色压暗一点直到白字 4.5:1
-//   （18 个预设最多压暗 22%）；压暗后在暗纸上不足 3:1 才改用近黑字。hover 色同样保证 4.5:1。
+// - 「实心底」（主按钮、实心徽标、勾选框）上面要放字：另算一个 fill，把原色压暗一点直到白字 4.5:1；
+//   压暗后在暗纸上不足 3:1 才改用近黑字。hover 色同样保证 4.5:1。
 // - 另有一个更深的「文字版」（链接、小标签），在纸上达到 4.5:1。
+// - accentMode: "exact"（品牌色原样）时，标记和实心底都用原色，白字不够就换近黑字；文字版照样加深。
 // tokens.css 根据这些变量推出其余一切：hover/选中淡层、焦点、灰色和线条里的一点色调。
 
-/** 第一个是默认墨色；其余是一圈色相里的安静颜色（暖 → 绿 → 蓝 → 紫 → 粉 → 灰），外加 X 蓝。name 是 i18n key。 */
+/**
+ * 第一个是默认墨色；其余 10 个在 OKLCH 里明度相同（L 0.60）、彩度相同（C 0.105），色相每隔 36° 一个，
+ * 看起来一样「安静」、一样重，哪个都不跳出来（设计师评审 D25：以前 18 个明度从 0.52 到 0.69、彩度从 0.03 到 0.16，
+ * 还有两对几乎一样的颜色和一个第三方品牌色）；最后一个是低彩度的雾灰蓝。name 是 i18n key。
+ * 想用自己的品牌色：accent 写任意 #rrggbb，不必是预设。
+ */
 export const ACCENT_PRESETS = Object.freeze(
   [
     { id: "", name: "Ink", zh: "墨色" },
-    { id: "#d65f32", name: "Warm orange", zh: "暖橙" },
-    { id: "#e07a5f", name: "Coral", zh: "珊瑚" },
-    { id: "#c98a1a", name: "Amber", zh: "琥珀" },
-    { id: "#9c7a4a", name: "Camel", zh: "驼色" },
-    { id: "#7d8b3a", name: "Olive", zh: "橄榄" },
-    { id: "#5a8a3c", name: "Moss", zh: "苔绿" },
-    { id: "#3f9a6b", name: "Jade", zh: "玉绿" },
-    { id: "#2a8a7a", name: "Teal", zh: "青绿" },
-    { id: "#2f8fa8", name: "Peacock blue", zh: "孔雀蓝" },
-    { id: "#1d9bf0", name: "X blue", zh: "X 蓝" },
-    { id: "#3b74b8", name: "Lake blue", zh: "湖蓝" },
-    { id: "#4f5fb8", name: "Indigo", zh: "靛蓝" },
-    { id: "#7b61b0", name: "Wisteria", zh: "紫藤" },
-    { id: "#a05aa6", name: "Grape", zh: "葡萄紫" },
-    { id: "#cf5d8a", name: "Sakura pink", zh: "樱粉" },
-    { id: "#c4495a", name: "Rouge", zh: "胭脂" },
-    { id: "#5f7380", name: "Misty slate", zh: "雾灰蓝" },
+    { id: "#b7665c", name: "Rouge", zh: "胭脂" },
+    { id: "#ac7236", name: "Ochre", zh: "赭石" },
+    { id: "#8f812d", name: "Mustard", zh: "芥黄" },
+    { id: "#638e4d", name: "Moss", zh: "苔绿" },
+    { id: "#279479", name: "Teal", zh: "青绿" },
+    { id: "#0191a0", name: "Peacock blue", zh: "孔雀蓝" },
+    { id: "#4386ba", name: "Lake blue", zh: "湖蓝" },
+    { id: "#7478be", name: "Indigo", zh: "靛蓝" },
+    { id: "#996caa", name: "Wisteria", zh: "紫藤" },
+    { id: "#b06587", name: "Sakura pink", zh: "樱粉" },
+    { id: "#718391", name: "Misty slate", zh: "雾灰蓝" },
   ].map((preset) => Object.freeze(preset)),
 );
 
@@ -106,18 +106,27 @@ export const ACCENT_KEYS = Object.freeze([
   "action-fill-hover-custom-dark",
 ]);
 
-/** 一个主色的全部变量；墨色返回 null。prefix 用于作用域（如注入第三方页面时用 "xxd-"）。 */
-export function accentPalette(value, prefix = "") {
+/** 原样：实心底直接用原色；白字不到 4.5 就换成近黑字（品牌色保真，设计师评审 D21） */
+function exactFill(mark) {
+  return { fill: mark, on: contrast(mark, WHITE) >= 4.5 ? WHITE : NEAR_BLACK };
+}
+
+/**
+ * 一个主色的全部变量；墨色返回 null。prefix 用于作用域（如注入第三方页面时用 "xxd-"）。
+ * exact：品牌色原样出现在实心底和标记（开关、tab 下划线、焦点）上，不提亮也不压暗；正文里的强调文字（链接）仍然加深到 4.5:1。
+ *   代价：浅的品牌色做标记时可能不到 3:1——这是产品自己的选择，缺省（auto）仍然自动调整。
+ */
+export function accentPalette(value, prefix = "", { exact = false } = {}) {
   const hex = normalizeAccent(value);
   if (!hex) return null;
   const base = toRgb(hex);
-  const light = ensureContrast(base, LIGHT_PAPER, [0, 0, 0]);
-  const dark = ensureContrast(base, DARK_PAPER, [255, 255, 255]);
+  const light = exact ? base : ensureContrast(base, LIGHT_PAPER, [0, 0, 0]);
+  const dark = exact ? base : ensureContrast(base, DARK_PAPER, [255, 255, 255]);
   // 文字版要在纸上和「选中底」（tokens.css 的 --selected-bg：亮 13%、暗 18% 主色）上都 ≥ 4.5
   const lightText = ensureContrast(base, clampRgb(mix(LIGHT_PAPER, light, 0.13)), [0, 0, 0], 4.5);
   const darkText = ensureContrast(base, clampRgb(mix(DARK_PAPER, dark, 0.18)), [255, 255, 255], 4.5);
-  const lightFill = accentFill(light, LIGHT_PAPER);
-  const darkFill = accentFill(dark, DARK_PAPER);
+  const lightFill = exact ? exactFill(base) : accentFill(light, LIGHT_PAPER);
+  const darkFill = exact ? exactFill(base) : accentFill(dark, DARK_PAPER);
   const name = (key) => `--${prefix}${key}`;
   return {
     [name("action-custom")]: toHex(light),
@@ -136,9 +145,11 @@ export function accentPalette(value, prefix = "") {
 }
 
 /** 写到元素上（页面里是 <html>，Shadow DOM 里是 host）。返回生效的 hex，墨色返回 ""。 */
-export function applyAccent(element, value, { attr = "data-accent", prefix = "" } = {}) {
+export function applyAccent(element, value, { attr = "data-accent", prefix = "", exact = false } = {}) {
   if (!element?.style) return "";
-  const vars = accentPalette(value, prefix);
+  const vars = accentPalette(value, prefix, { exact });
+  if (vars && exact) element.setAttribute(`${attr}-exact`, "");
+  else element.removeAttribute(`${attr}-exact`);
   if (!vars) {
     element.removeAttribute(attr);
     ACCENT_KEYS.forEach((key) => element.style.removeProperty(`--${prefix}${key}`));

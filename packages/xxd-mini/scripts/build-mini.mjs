@@ -602,8 +602,10 @@ ${sizes.map(([n, s]) => `| ${n} | ${s} |`).join("\n")}
 `;
 }
 
-/** 组件样式加起来的上限（§11）：压缩后 60 KB */
-export const SIZE_BUDGET = 60 * 1024;
+/** 组件样式加起来的上限（§11）：压缩后 64 KB */
+// 2026-10-15 从 60 KB 调到 64 KB：设计师评审加了禁用、浮层抬起一层、半档间距这些令牌（亮暗各一份）和浮层规则，约 2 KB。
+// 微信主包上限 2 MB，样式这一块仍然很小；再往上涨要先看能不能删。
+export const SIZE_BUDGET = 64 * 1024;
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const tokensJson = join(tokensDir, "dist/tokens.json");
