@@ -173,7 +173,8 @@
   }
 
   .xxd-select[data-variant="bare"] > select {
-    height: auto;
+    /* 和设置行里的其他控件（小按钮、分段）一样高（设计师评审 V3-2） */
+    height: var(--control-h-sm);
     padding: var(--space-1) calc(var(--icon-md) + var(--space-2)) var(--space-1) var(--space-1);
     border-color: transparent;
     background: transparent;
@@ -244,7 +245,8 @@
     appearance: none;
     position: relative;
     flex: none;
-    width: 34px;
+    /* 36 × 20：落在 4px 刻度上，长宽比 1.8，直角模式下也一眼和 16px 的方形复选框分开（设计师评审 V3-5） */
+    width: 36px;
     height: 20px;
     margin: 0;
     border: 1px solid var(--line-control);
@@ -273,7 +275,7 @@
   }
 
   .xxd-switch:checked::before {
-    transform: translateX(14px);
+    transform: translateX(16px);
   }
 
   .xxd-switch:disabled {

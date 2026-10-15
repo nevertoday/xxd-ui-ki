@@ -72,7 +72,7 @@
   }
 
   .xxd-tabs[data-size="sm"] > [role="tab"] {
-    height: 34px;
+    height: var(--control-h-sm);
     font-size: var(--text-xs);
   }
 

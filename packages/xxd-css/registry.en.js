@@ -676,6 +676,9 @@ await Xxd.confirmDelete({ name: "Long-form publisher", what: "all records of thi
   },
   Panel: {
     title: "Details panel",
+    attributes: {
+      ".xxd-panel-room": "Content next to the panel makes room while it is open instead of being covered (on narrow screens the panel is a bottom drawer and nothing moves)",
+    },
     use: ["Clicking an item in a list to see details or edit a few fields, with the main content still beside it", "Slides in from the right on desktop"],
     avoid: ["A question that must be answered first: use Dialog", "A narrow extension side panel: use Sheet"],
     summary: "A details panel that slides in from the right (resource details on the member site).",

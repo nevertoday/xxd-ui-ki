@@ -77,6 +77,22 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
           <span class="site-accent-dot" aria-hidden="true"></span><span class="site-accent__label">{L.appearanceButton}</span>
         </button>
         <div class="xxd-popover site-accents" id="site-accents" popover data-placement="bottom-end" aria-label={L.appearanceMore}>
+          {/* 窄屏：顶栏放不下的主题、圆角收进这里（设计师评审 V3-8），宽屏不显示 */}
+          <div class="site-more__compact" data-show="phone">
+            <p class="site-more__label">{L.theme}</p>
+            <div class="xxd-segmented" data-xxd-segmented data-name="theme" aria-label={L.theme}>
+              <button role="radio" data-value="light">{L.light}</button>
+              <button role="radio" data-value="dark">{L.dark}</button>
+              <button role="radio" data-value="system">{L.system}</button>
+            </div>
+          </div>
+          <div class="site-more__compact" data-show="narrow">
+            <p class="site-more__label">{L.corners}</p>
+            <div class="xxd-segmented" data-xxd-segmented data-name="corners" aria-label={L.corners}>
+              <button role="radio" data-value="square">{L.square}</button>
+              <button role="radio" data-value="rounded">{L.rounded}</button>
+            </div>
+          </div>
           <p class="site-more__label">{L.accent}</p>
           <div class="xxd-swatches" role="radiogroup" aria-label={L.accent} id="site-swatches"></div>
           <div class="site-more">
@@ -90,6 +106,7 @@ const strings = JSON.stringify({ placeholder: L.searchPlaceholder, empty: L.sear
               <button role="radio" data-value="material">{L.material}</button>
             </div>
           </div>
+          <div class="site-more__compact site-more__github" data-show="phone"><a class="xxd-link" href={REPO}>{L.github}</a></div>
         </div>
         <a class="xxd-btn site-lang" data-size="sm" data-variant="ghost" href={other} hreflang={HTML_LANG[otherLang]} lang={HTML_LANG[otherLang]} aria-label={L.switchLangLabel}><span class="site-lang__full">{L.switchLang}</span><span class="site-lang__short" aria-hidden="true">{lang === "en" ? "中" : "EN"}</span></a>
         <a class="xxd-btn site-github" data-size="sm" data-variant="ghost" data-icon-only href={REPO} aria-label={L.github} data-tooltip={L.github} set:html={GITHUB_MARK} />

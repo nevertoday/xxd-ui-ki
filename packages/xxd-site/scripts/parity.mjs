@@ -29,7 +29,8 @@ export const PARTS = {
   ],
   badge: [["徽标", ".xxd-badge", "span", ["height", "paddingLeft", "fontSize", "fontWeight", "color", "background", "edge", "radius"]]],
   table: [
-    ["外框", ".xxd-table-wrap", "div:has(> table)", ["edge", "radius", "background"]],
+    // 外框只比底色：原生的 .xxd-table-wrap 另有「还能横向滑」的渐隐提示（背景图），React 的表格外框是用的人自己写的
+    ["外框", ".xxd-table-wrap", "div:has(> table)", ["edge", "radius", "backgroundColor"]],
     ["表头", "th", "th", ["height", "paddingLeft", "fontSize", "fontWeight", "color", "background"]],
     ["单元格", "td", "td", ["height", "paddingLeft", "fontSize", "fontWeight", "color"]],
     ["数字列", "td:last-child", "td:last-child", ["textAlign", "numeric"]],
@@ -96,6 +97,7 @@ function measure([cellSel, sel, props]) {
       const layers = s.boxShadow === "none" ? [] : s.boxShadow.split(/,(?![^(]*\))/);
       out.highlight = layers.some((l) => /inset/.test(l) && norm(l.match(/(?:rgba?|color|oklch|oklab)\([^)]*\)|#\w+/)?.[0]) !== "transparent") ? "有" : "无";
     }
+    else if (p === "backgroundColor") out.backgroundColor = norm(s.backgroundColor);
     else if (p === "background") out.background = s.backgroundImage !== "none" ? `image ${s.backgroundImage.slice(0, 30)}` : norm(s.backgroundColor);
     else if (p === "radius") out.radius = s.borderTopLeftRadius;
     else if (p === "opacity") { let o = 1; for (let e = el; e && e !== cell; e = e.parentElement) o *= parseFloat(getComputedStyle(e).opacity); out.opacity = o.toFixed(2); }

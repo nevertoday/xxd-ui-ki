@@ -96,7 +96,7 @@
 }
 
 .xxd-sheet__action.is-disabled {
-  opacity: 0.45;
+  color: var(--disabled-ink);
 }
 
 .xxd-sheet__action-desc {

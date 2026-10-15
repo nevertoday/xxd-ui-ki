@@ -4,5 +4,6 @@
 }
 
 .xxd-chip.is-disabled {
-  opacity: 0.45;
+  background: var(--disabled-bg);
+  color: var(--disabled-ink);
 }

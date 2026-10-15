@@ -172,22 +172,30 @@ globalThis.xxdPolish = function xxdPolish(root = document.body, { orphans = true
     out.push({ kind: "行高不在网格", where: name(el), detail: `${fs}px / ${Math.round(lh * 100) / 100}px` });
   }
 
-  // 6. 同一行文字不齐：表格同一行，各格第一行字的基线（字框底边往上 0.2 个字号）差 1.5px 以上
+  // 6. 同一行文字不齐：表格同一行，各格第一行字的基线差 1.5px 以上。
+  //    基线是真量出来的：在第一段字前面临时放一个 0 × 0、按基线对齐的行内块，它的底边就是这一行的基线（等宽字、不同字号都准）。
   //    只看组件的表格（.xxd-table）；展示站自己的属性表另算
   for (const tr of root.querySelectorAll(".xxd-table tr")) {
     if (!shown(tr)) continue;
     const marks = [];
     for (const cell of tr.cells) {
-      const rects = textRects(cell);
-      if (!rects.length) continue;
-      const first = rects.sort((a, b) => a.top - b.top)[0];
-      const textEl = document.elementFromPoint(first.left + 1, first.top + first.height / 2) ?? cell;
-      const fs = parseFloat(getComputedStyle(textEl).fontSize);
-      marks.push({ cell, base: first.bottom - 0.2 * fs });
+      const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+      let first = null;
+      // 按钮、chip、徽标（实心的）是居中的盒子，不按字的基线比；像字一样的（排序表头、带点的状态）照样比
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) if (n.nodeValue.trim() && !n.parentElement.closest("svg, .xxd-sr-only, [hidden], .xxd-btn, .xxd-chip, .xxd-badge:not([data-appearance='dot']), input, select, textarea")) { first = n; break; }
+      if (!first) continue;
+      // 先用一个临时 span 包住这段字再放探针：字在 flex 容器里时，直接插进去的探针会自己变成一个居中的 flex 项
+      const wrap = document.createElement("span");
+      const probe = document.createElement("span");
+      probe.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline;margin:0;padding:0;border:0";
+      first.parentNode.insertBefore(wrap, first);
+      wrap.append(probe, first);
+      marks.push(probe.getBoundingClientRect().bottom);
+      wrap.parentNode.insertBefore(first, wrap);
+      wrap.remove();
     }
     if (marks.length < 2) continue;
-    const bases = marks.map((m) => m.base);
-    const spread = Math.max(...bases) - Math.min(...bases);
+    const spread = Math.max(...marks) - Math.min(...marks);
     if (spread > 1.5) out.push({ kind: "同一行文字不齐", where: name(tr), detail: `各格基线相差 ${spread.toFixed(1)}px` });
   }
 

@@ -98,6 +98,41 @@
     min-width: 0;
   }
 
+  /* 「外观」弹出层里只在窄屏出现的那两组（主题 ≤ 480、圆角 ≤ 820；宽屏时它们在顶栏上） */
+  .site-more__compact {
+    display: none;
+    margin-bottom: var(--space-3);
+  }
+
+  .site-more__github {
+    margin: var(--space-3) 0 0;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--line);
+  }
+
+  .site-more__compact .xxd-segmented {
+    width: 100%;
+  }
+
+  @media (max-width: 820px) {
+    .site-more__compact[data-show="narrow"] {
+      display: grid;
+      gap: var(--space-2);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .site-more__compact[data-show="phone"] {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .site-appearance > .xxd-segmented[data-name="theme"],
+    .site-appearance > .site-github {
+      display: none;
+    }
+  }
+
   .site-more {
     display: grid;
     gap: 8px;

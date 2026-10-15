@@ -85,10 +85,10 @@ const settings = `
 const detailPanel = `
 <div style="height:100%;position:relative;overflow:hidden">
   <!-- 瀑布流：图片高矮不一，按列排（CSS columns）；收藏的那几张左上角一个点 -->
-  <div style="columns:150px;column-gap:12px;padding:16px">${[["1", "3/4"], ["2", "1/1"], ["3", "4/5"], ["4", "2/3"], ["5", "3/4"], ["6", "15/16"]].map(([n, r], i) => `<a class="xxd-card" href="#" style="break-inside:avoid;margin-bottom:12px"><div class="xxd-card__media" style="--ratio:${r};background:center / cover url(/demo/poster-${n}.svg)">${i % 3 === 0 ? `<div class="xxd-card__marks"><span class="xxd-dot" data-tone="danger"></span></div>` : ""}</div><div class="xxd-card__body"><p class="xxd-card__title">编辑式海报 00${i + 1}</p><span class="xxd-card__meta">xxd-panel-00${i + 1}</span></div></a>`).join("")}</div>
+  <div class="xxd-panel-room" style="height:100%;overflow:auto"><div style="columns:150px;column-gap:12px;padding:16px">${[["1", "3/4"], ["2", "1/1"], ["3", "4/5"], ["4", "2/3"], ["5", "3/4"], ["6", "15/16"]].map(([n, r], i) => `<a class="xxd-card" href="#" style="break-inside:avoid;margin-bottom:12px"><div class="xxd-card__media" style="--ratio:${r};background:center / cover url(/demo/poster-${n}.svg)">${i % 3 === 0 ? `<div class="xxd-card__marks"><span class="xxd-dot" data-tone="danger"></span></div>` : ""}</div><div class="xxd-card__body"><p class="xxd-card__title">编辑式海报 00${i + 1}</p><span class="xxd-card__meta">xxd-panel-00${i + 1}</span></div></a>`).join("")}</div></div>
   <aside class="xxd-panel" data-open style="position:absolute" aria-label="提示词详情">
     <div class="xxd-panel__head"><h2 class="xxd-panel__title">编辑式海报 001</h2><button class="xxd-btn" data-variant="ghost" data-icon-only aria-label="复制提示词" data-tooltip="复制提示词">${I("Copy")}</button><button class="xxd-btn" data-variant="ghost" data-icon-only aria-label="关闭">${I("X")}</button></div>
-    <div class="xxd-panel__body"><div class="xxd-card__media" style="--ratio:3/4;background:center / cover url(/demo/poster-1.svg);border-radius:var(--r-md)"></div>
+    <div class="xxd-panel__body"><div class="xxd-card__media" style="--ratio:3/4;width:100%;max-height:min(420px, 50vh);background:center / contain no-repeat url(/demo/poster-1.svg) var(--wash);border-radius:var(--r-md)"></div>
       <div class="xxd-prose" style="margin-top:16px"><h3>提示词</h3><p>克制的编辑式粗野主义：纸色背景、清晰的黑线、干净的无衬线字、密但好读的中文。</p></div>
       <div class="xxd-cluster" style="margin-top:12px"><button class="xxd-chip" aria-pressed="true">海报</button><button class="xxd-chip">编辑式</button></div>
     </div>

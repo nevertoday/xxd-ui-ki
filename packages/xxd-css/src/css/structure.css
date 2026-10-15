@@ -410,12 +410,18 @@
     gap: var(--space-2);
   }
 
+  /* 窄的时候按读的顺序排：标题 → 说明 → 操作 → 标签页（设计师评审 V3-3：以前按钮插在标题和说明中间） */
   @container (max-width: 480px) {
     .xxd-page-header__actions {
       grid-column: 1 / -1;
       grid-row: auto;
+      order: 1;
       justify-content: flex-start;
       margin-top: var(--space-2);
+    }
+
+    .xxd-page-header > .xxd-tabs {
+      order: 2;
     }
   }
 

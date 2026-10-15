@@ -506,7 +506,7 @@
     display: flex;
     flex-direction: column;
     /* 100% 而不是 100vw：fixed 时就是视口宽；放进容器里（模板预览、局部面板）时按容器宽，不撑出去 */
-    width: min(560px, 100%);
+    width: min(var(--panel-w, 560px), 100%);
     border-left: 1px solid var(--line);
     background: var(--paper);
     box-shadow: var(--shadow-sheet);
@@ -515,6 +515,12 @@
     transition:
       transform var(--motion-panel) var(--ease-out-quart),
       visibility 0s linear var(--motion-panel);
+  }
+
+  /* 面板打开时，旁边的内容让出位置（不被盖住半张卡片，设计师评审 V3-4）：
+       <div class="xxd-panel-room">内容</div><aside class="xxd-panel" data-open>…</aside>。窄屏上面板是全宽的底部抽屉，不让位。 */
+  .xxd-panel-room:has(~ .xxd-panel[data-open]) {
+    padding-right: min(var(--panel-w, 560px), 100%);
   }
 
   .xxd-panel[data-open] {
@@ -734,6 +740,10 @@
       margin: var(--space-2) auto 0;
       border-radius: var(--r-pill);
       background: var(--line-strong);
+    }
+
+    .xxd-panel-room:has(~ .xxd-panel[data-open]) {
+      padding-right: 0;
     }
 
     .xxd-panel {

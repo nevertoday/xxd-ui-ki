@@ -575,9 +575,9 @@
     gap: var(--space-2, 8px);
   }
 
-  /* ── 开关：34 × 20，边 --line-control；开的时候底和边都是 --switch-on ── */
+  /* ── 开关：36 × 20，边 --line-control；开的时候底和边都是 --switch-on ── */
   [data-kumo-component="Switch"][data-kumo-component][data-kumo-component] {
-    width: 34px;
+    width: 36px;
     height: 20px;
     background-color: var(--wash-strong, #eeece9);
     --tw-ring-color: var(--line-control, #898681);
@@ -594,7 +594,7 @@
     box-shadow: 0 0 0 0.5px rgba(var(--shadow-rgb, 17, 17, 17), 0.18);
   }
   [data-kumo-component="Switch"][data-kumo-component][data-checked] > div {
-    left: 17px;
+    left: 19px;
   }
 
   /* ── 标签页（underline）：文字在基线上，短墨线只在文字下；高 = 控件高，13px，标签之间 20px ── */

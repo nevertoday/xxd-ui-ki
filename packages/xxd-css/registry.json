@@ -1001,7 +1001,8 @@
         "xxd-panel__head",
         "xxd-panel__title",
         "xxd-panel__body",
-        "xxd-panel-scrim"
+        "xxd-panel-scrim",
+        "xxd-panel-room"
       ],
       "markup": "<aside class=\"xxd-panel\" id=\"pd\" aria-labelledby=\"pd-title\"><div class=\"xxd-panel__head\"><h2 class=\"xxd-panel__title\" id=\"pd-title\">详情</h2><button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-xxd-panel-close aria-label=\"关闭\"><i data-xxd-icon=\"X\"></i></button></div><div class=\"xxd-panel__body\">…</div></aside>\n<button class=\"xxd-btn\" data-xxd-panel-open=\"pd\">详情</button>",
       "js": "Xxd.openPanel(el); Xxd.toast(\"已保存\", { within: el.querySelector(\".xxd-panel__body\") })",
@@ -1021,7 +1022,10 @@
       "avoid": [
         "要用户先回答的问题：用 Dialog",
         "窄的插件侧边栏：用 Sheet"
-      ]
+      ],
+      "attributes": {
+        ".xxd-panel-room": "放在面板旁边的内容上：面板打开时让出位置，不被盖住（窄屏上面板是底部抽屉，不让位）"
+      }
     },
     {
       "name": "Menu",

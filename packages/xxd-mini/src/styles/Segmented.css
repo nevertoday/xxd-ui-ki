@@ -11,7 +11,7 @@
 }
 
 .xxd-segmented > .is-role-radio.is-disabled {
-  opacity: 0.45;
+  color: var(--disabled-ink);
 }
 
 /* 不占满一行的：在竖排里也按内容宽，不被拉伸 */

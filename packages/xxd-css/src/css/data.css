@@ -54,7 +54,8 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
-    margin: 0 -4px;
+    /* 上下的内边距用负外边距抵掉：按钮不把表头的行框撑高，排序表头的字和旁边普通表头的字在一条线上 */
+    margin: calc(-1 * var(--space-0-5)) calc(-1 * var(--space-1));
     padding: var(--space-0-5) var(--space-1);
     border: 0;
     border-radius: var(--r-xs);

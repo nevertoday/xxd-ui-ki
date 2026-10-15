@@ -18,9 +18,9 @@
   color: inherit;
 }
 
-/* 原生 button 被禁用时，微信会把字变灰、底变浅：和网页版一样只降透明度 */
+/* 原生 button 被禁用时，微信会把字变灰、底变浅：网页版的禁用令牌（--disabled-*）已经改写过来，这里只要不再叠半透明 */
 .xxd-btn.is-disabled {
-  opacity: 0.45;
+  opacity: 1;
 }
 
 /* 一排按钮平分一行 */

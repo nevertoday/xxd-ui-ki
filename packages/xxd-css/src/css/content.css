@@ -32,6 +32,13 @@
     white-space: normal;
   }
 
+  /* 有会折行的格子：这一行顶端对齐，各格第一行字在一条线上（不然折成三行的格子一居中，旁边的字就比它的第一行低半截）。
+     上下内边距 = (44 - 20) / 2，只有一行时看起来和居中一样（设计师评审 V2-7 的「同一行文字不齐」） */
+  .xxd-table tr:has(> [data-wrap]) > :is(td, th) {
+    padding-block: calc((44px - var(--leading-sm)) / 2);
+    vertical-align: top;
+  }
+
   .xxd-table tbody tr + tr td {
     border-top: 1px solid var(--line);
   }
@@ -58,11 +65,18 @@
     font-size: var(--text-xs);
   }
 
+  /* 窄了横向滚动；还有内容没露出来的那一边有一道渐隐（设计师评审 V3-3：手机上最后一列被切一半、看不出能滑）。
+     纯背景做的：local 的纸色盖住 scroll 的灰影，滑到头时纸色跟着内容移过来，灰影就看不见了。这是「还有内容」的提示，不是浮起的阴影。 */
   .xxd-table-wrap {
     overflow-x: auto;
     border: 1px solid var(--line);
     border-radius: var(--r-md);
-    background: var(--paper);
+    background:
+      linear-gradient(to right, var(--paper) 40%, transparent) left / var(--space-6) 100% no-repeat local,
+      linear-gradient(to left, var(--paper) 40%, transparent) right / var(--space-6) 100% no-repeat local,
+      linear-gradient(to right, rgba(var(--shadow-rgb), 0.14), transparent) left / var(--space-3) 100% no-repeat scroll,
+      linear-gradient(to left, rgba(var(--shadow-rgb), 0.14), transparent) right / var(--space-3) 100% no-repeat scroll,
+      var(--paper);
   }
 
   /* 折叠：<details class="xxd-collapse"><summary>标题</summary>内容</details> */
@@ -355,8 +369,15 @@
     margin: 0;
   }
 
+  /* 段距：段落之间 16px；代码块、引用、列表、表格、图前后都是 20px（设计师评审 V3-6：以前代码块像挂在段落上）。
+     标题的上距更大、和自己的内容靠得更近，写在后面的规则里 */
   .xxd-prose > * + * {
-    margin-top: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .xxd-prose > * + :is(pre, blockquote, table, figure, ul, ol, img, video),
+  .xxd-prose > :is(pre, blockquote, table, figure, ul, ol, img, video) + * {
+    margin-top: var(--space-5);
   }
 
   .xxd-prose h1,
@@ -370,6 +391,7 @@
 
   .xxd-prose h1 {
     font-size: var(--text-display);
+    line-height: var(--leading-display);
   }
 
   .xxd-prose h2 {
@@ -380,6 +402,7 @@
   .xxd-prose h3 {
     margin-top: var(--space-6);
     font-size: var(--text-lg);
+    line-height: var(--leading-md);
   }
 
   .xxd-prose h2 + *,
