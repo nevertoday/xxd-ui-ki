@@ -518,13 +518,13 @@
     "vitest": "catalog:",
     "vitest-browser-react": "^2.0.5",
     "wrangler": "catalog:",
-    "zod": "^4.0.0"
+    "zod": "^4.6.6"
   },
   "peerDependencies": {
     "echarts": "^6.0.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "zod": "^4.0.0"
+    "zod": "^4.6.6"
   },
   "peerDependenciesMeta": {
     "zod": {
