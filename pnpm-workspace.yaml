@@ -32,7 +32,7 @@ catalog:
   tsx: ^4.19.2
   typescript: ^5.9.2
   vite: npm:@voidzero-dev/vite-plus-core@0.3.1
-  vite-plugin-dts: ^4.3.0
+  vite-plugin-dts: ^5.1.2
   vite-tsconfig-paths: ^5.1.4
   vitest: 4.1.10
   wrangler: 4.127.1
