@@ -751,6 +751,47 @@
     text-underline-offset: 3px;
   }
 
+  /* 组件页 React 名字旁边的对照标记 */
+  .site-parity-mark {
+    margin-left: var(--space-2);
+    color: var(--muted);
+    font-size: var(--text-xs);
+  }
+
+  /* 两种实现对照（/tools/parity） */
+  .site-parity {
+    display: grid;
+    margin: var(--space-4) 0 var(--space-8);
+  }
+
+  .site-parity__row {
+    display: grid;
+    grid-template-columns: 160px 1fr 1fr;
+    gap: var(--space-4);
+    align-items: center;
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .site-parity__row:first-child {
+    border-top: 0;
+  }
+
+  .site-parity__head {
+    padding-block: 0 var(--space-2);
+    color: var(--muted);
+    font-size: var(--text-xs);
+  }
+
+  .site-parity__name {
+    color: var(--muted);
+    font-size: var(--text-xs);
+  }
+
+  .site-parity__cell {
+    min-width: 0;
+  }
+
   /* 好 / 不好 */
   .site-dodont {
     display: grid;
@@ -1053,6 +1094,14 @@
 
     .site-dodont {
       grid-template-columns: 1fr;
+    }
+
+    .site-parity__row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .site-parity__name {
+      grid-column: 1 / -1;
     }
 
     .site-demo__stage {

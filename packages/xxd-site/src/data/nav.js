@@ -50,6 +50,7 @@ export function navFor(lang = "zh") {
         { label: L.pageTools, href: "/tools" },
         { label: L.pageVisual, href: "/tools#visual" },
         { label: L.pageAi, href: "/tools#ai" },
+        { label: L.pageParity, href: "/tools/parity" },
         { label: L.pageChangelog, href: "/changelog" },
       ],
     },

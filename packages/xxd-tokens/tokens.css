@@ -140,6 +140,14 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 
+  /* ── 质感：实心按钮（主按钮、危险按钮）缺省纯平；data-finish="material" 时有顶部 1px 内高光、深一点的边、按下下沉 0.5px。
+   * 原生（@xxd/css）和 React（@xxd/react）都读这几个变量；离按钮最近的 data-finish 说了算（变量会继承）。 ── */
+  --btn-edge: 100%; /* 边 = 底色掺多少黑（100% = 不掺） */
+  /* 纯平时写成一层看不见的阴影（不写 none）：React 版把它拼进 Tailwind 的多层 box-shadow，none 会让整条失效 */
+  --btn-highlight: 0 0 #0000;
+  --btn-highlight-pressed: 0 0 #0000;
+  --btn-press-y: 0px;
+
   /* ── 层级 ── */
   --z-dock: 20;
   --z-popover: 50;
@@ -168,6 +176,20 @@
   --row-pad-y: 8px;
   --row-pad-x: 12px;
   --list-row-pad-y: 4px;
+}
+
+[data-finish="material"] {
+  --btn-edge: 86%;
+  --btn-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --btn-highlight-pressed: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --btn-press-y: 0.5px;
+}
+
+[data-finish="flat"] {
+  --btn-edge: 100%;
+  --btn-highlight: 0 0 #0000;
+  --btn-highlight-pressed: 0 0 #0000;
+  --btn-press-y: 0px;
 }
 
 /* 暗色：整页（<html data-theme>，boot.js 写）或者页面里的一块（任何元素上的 data-theme="dark"） */

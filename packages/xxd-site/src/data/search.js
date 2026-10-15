@@ -75,5 +75,6 @@ export const PAGE_KEYWORDS = {
   "/foundations/icons": "icon icons svg 图标",
   "/start": "install setup getting-started quick-start cdn 安装 开始 上手 快速开始",
   "/tools": "cli command doctor sync init 命令行 工具 体检 同步",
+  "/tools/parity": "parity react html compare same 对照 一致 两种实现 react 版",
   "/principles": "principles guidelines rules 原则 规则 设计",
 };

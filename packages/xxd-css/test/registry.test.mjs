@@ -139,6 +139,9 @@ describe("示例不写死样子", () => {
 it("质感：离按钮最近的 data-finish 说了算（不用会被外层 flat 一起匹配的祖先选择器）", () => {
   const css = readFileSync(join(root, "src/css/button.css"), "utf8");
   expect(css).not.toMatch(/:not\(\[data-finish="flat"\] \*/);
-  expect(css).toMatch(/\[data-finish="material"\] \{\n\s+--btn-edge/);
-  expect(css).toMatch(/\[data-finish="flat"\] \{\n\s+--btn-edge: 100%/);
+  // 变量放在 @xxd/tokens 里（原生和 React 读同一组，设计师评审 V1）
+  const tokens = readFileSync(join(root, "../xxd-tokens/tokens.css"), "utf8");
+  expect(tokens).toMatch(/\[data-finish="material"\] \{\n\s+--btn-edge/);
+  expect(tokens).toMatch(/\[data-finish="flat"\] \{\n\s+--btn-edge: 100%/);
+  expect(css).toMatch(/var\(--btn-highlight/);
 });

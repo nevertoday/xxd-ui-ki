@@ -206,10 +206,10 @@ export function DialogDemo() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={(p) => <Button {...p}>打开</Button>} />
-      <Dialog className="p-6">
+      <Dialog className="p-5">
         <Dialog.Title className="text-lg font-semibold">写入哪篇文章？</Dialog.Title>
         <Dialog.Description className="mt-2 text-kumo-subtle">默认不会替换已有内容。</Dialog.Description>
-        <DialogActions className="mt-6">
+        <DialogActions className="mt-4">
           <Dialog.Close render={(p) => <Button variant="ghost" data-xxd-cancel {...p}>取消</Button>} />
           <Dialog.Close render={(p) => <Button variant="primary" {...p}>写入为新文章</Button>} />
         </DialogActions>
@@ -297,25 +297,28 @@ export function ProgressDemo() {
 }
 
 export function TableDemo() {
+  // 表格放在一个带框的容器里（和原生的 .xxd-table-wrap 一样：--line 的边、--r-md 的圆角、窄了横向滚动）
   return (
-    <Table>
-      <Table.Header>
-        <Table.Row>
-          <Table.Head>插件</Table.Head>
-          <Table.Head>用户</Table.Head>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        <Table.Row>
-          <Table.Cell>长文发布</Table.Cell>
-          <Table.Cell>2,410</Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.Cell>批量存图</Table.Cell>
-          <Table.Cell>5,102</Table.Cell>
-        </Table.Row>
-      </Table.Body>
-    </Table>
+    <div className="overflow-x-auto rounded-xl border border-kumo-line bg-kumo-base">
+      <Table>
+        <Table.Header>
+          <Table.Row>
+            <Table.Head>插件</Table.Head>
+            <Table.Head className="text-right">用户</Table.Head>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell>长文发布</Table.Cell>
+            <Table.Cell className="text-right">2,410</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>批量存图</Table.Cell>
+            <Table.Cell className="text-right">5,102</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table>
+    </div>
   );
 }
 

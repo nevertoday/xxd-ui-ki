@@ -135,3 +135,17 @@ test("小程序版（M5）：mini.json 的每个组件中英两版都有页面�
   const demos = ["batch1", "batch2"].map((b) => readFileSync(new URL(`../../xxd-mini-demo/src/demos/${b}.tsx`, import.meta.url), "utf8")).join("\n");
   for (const c of manifest.components) assert.match(demos, new RegExp(`name: "${c.name}"`), `${c.name} 没有演示`);
 });
+
+test("两种实现对照（V1）：PARITY 里的每一对，对照页的 HTML 一侧和 React 一侧都有，组件名在注册表里", async () => {
+  const { PARITY } = await import("../src/data/parity.js");
+  const view = readFileSync(new URL("../src/views/Parity.astro", import.meta.url), "utf8");
+  const react = readFileSync(new URL("../src/react/Parity.tsx", import.meta.url), "utf8");
+  const names = new Set(JSON.parse(readFileSync(new URL("../../xxd-css/registry.json", import.meta.url), "utf8")).components.map((c) => c.name));
+  for (const [name, pairs] of Object.entries(PARITY)) {
+    assert.ok(names.has(name), `${name} 不在注册表里`);
+    for (const id of pairs) {
+      assert.match(view, new RegExp(`\\["${id}",`), `对照页没有 ${id} 的 HTML 一侧`);
+      assert.match(react, new RegExp(`["]?${id}["]?: \\(tr\\)`), `对照页没有 ${id} 的 React 一侧`);
+    }
+  }
+});

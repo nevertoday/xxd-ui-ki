@@ -14,7 +14,8 @@
 //      toast 不被别的东西盖住。以前截图只拍关着的浮层，对话框跑到左上角也没人发现。
 //   8. 真实浏览器冒烟（评审 R1）：happy-dom 看不到的东西 —— 层叠层顺序（Tailwind 的工具类能盖住 xxd）、
 //      带 *{margin:0} reset 时对话框仍居中、mountXxdUI 之后 host 的定位不被清掉。
-// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site run audit [--only=axe|long|shadow|forced|en|polish|overlay|smoke|sr]
+//   10. 对照（设计师评审 V1）：/tools/parity 上同一组件的原生 HTML 和 React 逐项比较（尺寸、字号、字重、颜色、边、圆角、底色），以 HTML 为准。
+// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site run audit [--only=axe|long|shadow|forced|en|polish|overlay|smoke|sr|parity]
 // 需要 Chromium：CHROME_EXE=<chrome-headless-shell 路径>（缺省用 Playwright 自带的）。
 import { createServer } from "node:http";
 import { createReadStream, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -23,6 +24,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { createRequire } from "node:module";
 import { chromium } from "playwright";
 import { srAudit } from "./sr.mjs";
+import { compareOverlays, compareParity, OVERLAYS, PARITY_LOOKS } from "./parity.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -610,7 +612,25 @@ async function smokeAudit() {
 /* ── 9. 读屏：键盘走关键流程，读无障碍树和播报区（scripts/sr.mjs） ── */
 const srSection = () => srAudit({ browser, origin, fail, transcriptFile: join(root, "visual/sr-transcript.txt") });
 
-const sections = { axe: axeAudit, long: longAudit, shadow: hostileAudit, forced: forcedAudit, en: englishAudit, polish: polishAudit, overlay: overlayAudit, smoke: smokeAudit, sr: srSection };
+/* ── 10. 对照（设计师评审 V1）：/tools/parity 上同一组件的 HTML 和 React 逐项比较，以 HTML 为准（scripts/parity.mjs） ── */
+async function paritySection() {
+  let pairs = 0;
+  for (const look of PARITY_LOOKS) {
+    for (const lang of ["", "/en"]) {
+      const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+      await ctx.addInitScript((s) => localStorage.setItem("xxd-site", JSON.stringify(s)), look);
+      const tab = await ctx.newPage();
+      await tab.goto(`${origin}${lang}/tools/parity/`, { waitUntil: "networkidle" });
+      for (const d of await compareParity(tab)) fail("对照", `${look.theme}·${look.corners}·${look.density}·${look.finish}${lang} ${d}`);
+      pairs += await tab.$$eval('[data-impl="html"]', (c) => c.length);
+      await ctx.close();
+    }
+    for (const d of await compareOverlays(browser, origin, look)) fail("对照", `${look.theme}·${look.corners}·${look.density}·${look.finish} ${d}`);
+  }
+  console.log(`对照：${pairs} 对 × 逐项（${PARITY_LOOKS.length} 种外观 × 中英），另外打开 ${OVERLAYS.length} 种浮层比较`);
+}
+
+const sections = { axe: axeAudit, long: longAudit, shadow: hostileAudit, forced: forcedAudit, en: englishAudit, polish: polishAudit, overlay: overlayAudit, smoke: smokeAudit, sr: srSection, parity: paritySection };
 for (const [name, run] of Object.entries(sections)) if (!only || only === name) await run();
 await browser.close();
 server.close();

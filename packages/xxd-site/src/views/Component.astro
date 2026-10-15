@@ -6,6 +6,7 @@ import Demo from "../components/Demo.astro";
 import StateMatrix from "../components/StateMatrix.astro";
 import PropsTable from "../components/PropsTable.astro";
 import ReactProps from "../components/ReactProps.astro";
+import { PARITY } from "../data/parity.js";
 import kumoRegistry from "@cloudflare/kumo/ai/component-registry.json";
 import xxdReactProps from "@xxd/react/props.json";
 import { componentsFor } from "../lib/data.js";
@@ -59,7 +60,7 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
     {c.summary && <p class="site-lead" set:html={richText(c.summary)} />}
     <p class="site-names">
       <span>{L.classLine} <code class="xxd-code-inline">{c.classes[0]}</code></span>
-      {c.react && <span>React <code class="xxd-code-inline">{`<${reactName ?? c.react}>`}</code></span>}
+      {c.react && <span>React <code class="xxd-code-inline">{`<${reactName ?? c.react}>`}</code>{hasReact && (PARITY[c.name] ? <a class="xxd-link site-parity-mark" href={withLang("/tools/parity", lang)}>{L.parityOk}</a> : <span class="site-parity-mark">{L.parityTodo}</span>)}</span>}
       {mini && <span><a class="xxd-link" href={withLang(`/miniprogram/${mini.slug}`, lang)}>{L.miniTab}</a> <code class="xxd-code-inline">{`<${mini.name}>`}</code></span>}
     </p>
   </header>

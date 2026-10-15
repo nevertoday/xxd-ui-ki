@@ -197,22 +197,7 @@
   }
 
   /* 质感（data-finish="material"）：只给实心按钮；这是材质，不是浮起 —— 没有外阴影。
-   * 离按钮最近的 data-finish 说了算：<html data-finish="flat"> 里的一块 material、material 里再一块 flat 都行。
-   * 所以用继承的变量，不用祖先选择器（祖先选择器会被更外层的 flat 一起匹配上）。 */
-  [data-finish="material"] {
-    --btn-edge: 86%;
-    --btn-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.16);
-    --btn-highlight-pressed: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    --btn-press-y: 0.5px;
-  }
-
-  [data-finish="flat"] {
-    --btn-edge: 100%;
-    --btn-highlight: none;
-    --btn-highlight-pressed: none;
-    --btn-press-y: 0px;
-  }
-
+   * 变量（--btn-edge / --btn-highlight / --btn-press-y）在 @xxd/tokens 里：离按钮最近的 data-finish 说了算，React 版读同一组。 */
   .xxd-btn:is([data-variant="primary"], [data-variant="danger"]) {
     --btn-bd: color-mix(in srgb, var(--btn-bg) var(--btn-edge, 100%), #000000);
     box-shadow: var(--btn-highlight, none);

@@ -206,10 +206,10 @@ export function DialogDemo() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={(p) => <Button {...p}>Open</Button>} />
-      <Dialog className="p-6">
+      <Dialog className="p-5">
         <Dialog.Title className="text-lg font-semibold">Which post should this go into?</Dialog.Title>
         <Dialog.Description className="mt-2 text-kumo-subtle">Existing content is never replaced by default.</Dialog.Description>
-        <DialogActions className="mt-6">
+        <DialogActions className="mt-4">
           <Dialog.Close render={(p) => <Button variant="ghost" data-xxd-cancel {...p}>Cancel</Button>} />
           <Dialog.Close render={(p) => <Button variant="primary" {...p}>Write as a new post</Button>} />
         </DialogActions>
@@ -297,25 +297,28 @@ export function ProgressDemo() {
 }
 
 export function TableDemo() {
+  // The table sits in a framed box (same as native .xxd-table-wrap: --line border, --r-md corners, scrolls sideways when narrow)
   return (
-    <Table>
-      <Table.Header>
-        <Table.Row>
-          <Table.Head>Extension</Table.Head>
-          <Table.Head>Users</Table.Head>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        <Table.Row>
-          <Table.Cell>Long-form publisher</Table.Cell>
-          <Table.Cell>2,410</Table.Cell>
-        </Table.Row>
-        <Table.Row>
-          <Table.Cell>Bulk image saver</Table.Cell>
-          <Table.Cell>5,102</Table.Cell>
-        </Table.Row>
-      </Table.Body>
-    </Table>
+    <div className="overflow-x-auto rounded-xl border border-kumo-line bg-kumo-base">
+      <Table>
+        <Table.Header>
+          <Table.Row>
+            <Table.Head>Extension</Table.Head>
+            <Table.Head className="text-right">Users</Table.Head>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell>Long-form publisher</Table.Cell>
+            <Table.Cell className="text-right">2,410</Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Bulk image saver</Table.Cell>
+            <Table.Cell className="text-right">5,102</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table>
+    </div>
   );
 }
 

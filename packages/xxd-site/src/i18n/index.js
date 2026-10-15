@@ -59,6 +59,8 @@ const zh = {
   // 组件页
   componentCaption: "组件",
   bothImpl: "原生 HTML 与 React",
+  parityOk: "和 HTML 一致",
+  parityTodo: "还没和 HTML 对照",
   demo: "演示",
   states: "状态",
   statesNote: "同一个元素的各种状态并排。悬停、聚焦、按下用的是组件 CSS 里真实的规则（构建时复制成强制状态），不是手画的。",
@@ -127,6 +129,7 @@ const zh = {
   pageVisual: "截图回归",
   pageAi: "给 AI 看",
   pageChangelog: "更新日志",
+  pageParity: "两种实现对照",
 };
 
 const en = {
@@ -163,6 +166,8 @@ const en = {
   github: "Source on GitHub",
   componentCaption: "Component",
   bothImpl: "native HTML and React",
+  parityOk: "matches HTML",
+  parityTodo: "not yet checked against HTML",
   demo: "Demo",
   states: "States",
   statesNote: "Every state of the same element side by side. Hover, focus and pressed use the real rules from the component CSS (copied into forced states at build time), not hand-drawn ones.",
@@ -229,6 +234,7 @@ const en = {
   pageVisual: "Visual regression",
   pageAi: "For AI",
   pageChangelog: "Changelog",
+  pageParity: "HTML and React side by side",
 };
 
 export const UI = { zh, en };
