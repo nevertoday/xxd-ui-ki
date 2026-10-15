@@ -14,7 +14,7 @@
   min-height: var(--hit-min);
   padding: var(--space-3) 0;
   color: var(--ink);
-  font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+  font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body);
 }
 
 .xxd-collapse__summary.is-hover {
@@ -39,6 +39,6 @@
   padding: 0 0 var(--space-4);
   color: var(--muted);
   font-size: var(--text-sm);
-  line-height: 1.6;
+  line-height: var(--leading-sm);
   animation: xxd-fade-in var(--motion-quick) ease;
 }

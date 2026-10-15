@@ -36,7 +36,7 @@
 }
 
 .xxd-steps__title {
-  font: var(--weight-medium) var(--text-xs) / 1.4 var(--font-body);
+  font: var(--weight-medium) var(--text-xs) / var(--leading-xs) var(--font-body);
 }
 
 .xxd-steps__item.is-state-current {
@@ -46,7 +46,7 @@
 .xxd-steps__desc {
   color: var(--muted);
   font-size: var(--text-xs);
-  line-height: 1.5;
+  line-height: var(--leading-sm);
 }
 
 /* 竖排：左边一个圆标记，标记之间一条竖线 */

@@ -19,15 +19,15 @@
 
   .xxd-group {
     display: grid;
-    gap: 6px;
+    gap: var(--space-1-5);
     min-width: 0;
   }
 
   .xxd-group__title {
     margin: 0;
-    padding: 0 2px;
+    padding: 0 var(--space-0-5);
     color: var(--muted);
-    font: var(--weight-medium) var(--text-xs) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-xs) / var(--leading-xs) var(--font-body);
   }
 
   .xxd-group__body {
@@ -38,10 +38,10 @@
   }
 
   .xxd-group__note {
-    margin: 2px 2px 0;
+    margin: var(--space-0-5) var(--space-0-5) 0;
     color: var(--muted);
     font-size: var(--text-xs);
-    line-height: 1.5;
+    line-height: var(--leading-sm);
   }
 
   .xxd-row {
@@ -74,14 +74,14 @@
 
   .xxd-row__title {
     color: var(--ink);
-    font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body);
   }
 
   .xxd-row__desc {
-    margin-top: 2px;
+    margin-top: var(--space-0-5);
     color: var(--muted);
     font-size: var(--text-xs);
-    line-height: 1.5;
+    line-height: var(--leading-sm);
   }
 
   .xxd-row__control {
@@ -179,7 +179,7 @@
 
   .xxd-list__title {
     overflow: hidden;
-    font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body);
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -207,6 +207,7 @@
     background: transparent;
     color: var(--ink);
     font-size: var(--text-lg);
+    line-height: 1;
     cursor: pointer;
   }
 

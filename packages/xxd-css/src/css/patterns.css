@@ -4,7 +4,7 @@
   .xxd-dropzone {
     display: grid;
     justify-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-8) var(--space-4);
     border: 1px dashed var(--line-strong);
     border-radius: var(--r-md);
@@ -23,7 +23,7 @@
   .xxd-dropzone__title {
     margin: 0;
     color: var(--ink);
-    font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body);
   }
 
   .xxd-dropzone[data-over] {
@@ -37,11 +37,11 @@
     z-index: var(--z-dialog);
     display: grid;
     place-items: center;
-    border: 1.5px dashed var(--action);
+    border: 1px dashed var(--action);
     border-radius: var(--r-lg);
     background: color-mix(in srgb, var(--paper) 88%, transparent);
     color: var(--ink);
-    font: var(--weight-medium) var(--text-base) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-base) / var(--leading-sm) var(--font-body);
     backdrop-filter: blur(2px);
     opacity: 0;
     pointer-events: none;
@@ -79,8 +79,8 @@
   .xxd-viewer__bar {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-3);
     font-size: var(--text-xs);
     color: rgba(255, 255, 255, 0.72);
     font-variant-numeric: tabular-nums;
@@ -91,7 +91,7 @@
     display: grid;
     place-items: center;
     min-height: 0;
-    padding: 0 56px;
+    padding: 0 calc(var(--icon-button) + var(--space-4)); /* 两边留出翻页按钮 */
   }
 
   .xxd-viewer__stage img {
@@ -128,7 +128,7 @@
 
   .xxd-viewer .xxd-pill {
     justify-self: center;
-    margin: 12px;
+    margin: var(--space-3);
   }
 
   .xxd-viewer .xxd-btn[data-variant="ghost"] {
@@ -140,8 +140,8 @@
   .xxd-pill {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    padding: 3px;
+    gap: var(--space-0-5);
+    padding: var(--space-1);
     border-radius: var(--r-pill);
     background: rgba(5, 5, 5, 0.64);
     color: #ffffff;
@@ -150,9 +150,9 @@
   .xxd-pill > button {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1-5);
     height: 28px;
-    padding: 0 10px;
+    padding: 0 var(--space-3);
     border: 0;
     border-radius: var(--r-pill);
     background: transparent;
@@ -208,10 +208,10 @@
   }
 
   .xxd-history__day {
-    margin: 0 0 6px;
-    padding: 0 2px;
+    margin: 0 0 var(--space-1-5);
+    padding: 0 var(--space-0-5);
     color: var(--muted);
-    font: var(--weight-medium) var(--text-xs) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-xs) / var(--leading-xs) var(--font-body);
   }
 
   /* 固定宽度（最多叠 3 张）：一张、两张、三张的行，标题都从同一条线开始 */
@@ -255,15 +255,15 @@
   }
 
   .xxd-auth__name {
-    margin: 4px 0 0;
-    font: var(--weight-strong) var(--text-lg) / 1.3 var(--font-body);
+    margin: var(--space-1) 0 0;
+    font: var(--weight-strong) var(--text-lg) / var(--leading-md) var(--font-body);
   }
 
   .xxd-auth__line {
     margin: 0;
     color: var(--muted);
     font-size: var(--text-xs);
-    line-height: 1.6;
+    line-height: var(--leading-sm);
   }
 
   .xxd-auth__gift {
@@ -273,7 +273,7 @@
 
   .xxd-auth form {
     display: grid;
-    gap: 10px;
+    gap: var(--space-3);
     width: 100%;
     margin-top: var(--space-2);
     text-align: left;
@@ -282,7 +282,7 @@
   .xxd-auth__or {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-3);
     color: var(--muted);
     font-size: var(--text-2xs);
   }
@@ -301,7 +301,7 @@
     margin-top: var(--space-2);
     color: var(--muted);
     font-size: var(--text-2xs);
-    line-height: 1.6;
+    line-height: var(--leading-xs);
   }
 
   /* 「服务条款」「隐私政策」这类短链接不拆成两行 */
@@ -320,7 +320,7 @@
 
   .xxd-auth [data-step][data-active] {
     display: grid;
-    gap: 10px;
+    gap: var(--space-3);
     animation: xxd-fade-in var(--motion-quick) ease;
   }
 
@@ -330,8 +330,8 @@
     flex-wrap: wrap;
     justify-content: flex-end;
     align-items: center;
-    gap: 8px 12px;
-    padding: 14px;
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-4);
   }
 
   .xxd-account__main {
@@ -341,7 +341,7 @@
 
   .xxd-account__name {
     overflow: hidden;
-    font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body);
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -373,8 +373,8 @@
   .xxd-plan {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 14px;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
     cursor: pointer;
   }
 
@@ -388,7 +388,7 @@
 
   .xxd-plan__name {
     flex: 1;
-    font: var(--weight-medium) var(--text-sm) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body);
   }
 
   .xxd-plan__name small {
@@ -406,7 +406,7 @@
   .xxd-qr {
     display: grid;
     justify-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-4);
     border: 1px solid var(--line);
     border-radius: var(--r-md);
@@ -419,7 +419,7 @@
   .xxd-qr__code {
     width: 148px;
     height: 148px;
-    padding: 8px;
+    padding: var(--space-2);
     background: #ffffff;
   }
 
@@ -427,12 +427,12 @@
   .xxd-statusline {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     min-height: 32px;
-    padding: 6px 14px;
+    padding: var(--space-1-5) var(--space-4);
     color: var(--muted);
     font-size: var(--text-xs);
-    line-height: 1.5;
+    line-height: var(--leading-sm);
   }
 
   .xxd-statusline:empty,
@@ -461,9 +461,9 @@
   .xxd-progress-pill {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     height: 30px;
-    padding: 0 12px 0 10px;
+    padding: 0 var(--space-3) 0 var(--space-3);
     border-radius: var(--r-pill);
     background: rgba(17, 17, 17, 0.86);
     color: #ffffff;
@@ -526,7 +526,7 @@
   .xxd-celebrate {
     display: grid;
     justify-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     text-align: center;
   }
 

@@ -15,7 +15,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: var(--space-1-5);
     height: var(--control-h);
     /* 组件级令牌（缺省值落在 4px 刻度上；紧凑密度在 tokens.css 里一起变） */
     padding: 0 var(--control-pad-x, 16px);
@@ -117,8 +117,8 @@
 
   .xxd-btn[data-size="xs"] {
     height: var(--control-h-xs);
-    gap: 4px;
-    padding: 0 8px;
+    gap: var(--space-1);
+    padding: 0 var(--space-2);
     font-size: var(--text-2xs);
   }
 
@@ -131,7 +131,7 @@
   .xxd-btn[data-size="lg"] {
     height: calc(var(--control-h) + 8px);
     padding: 0 var(--control-pad-x-lg, 20px);
-    font-size: var(--text-md);
+    font-size: var(--text-base);
   }
 
   .xxd-btn[data-icon-only] {
@@ -160,11 +160,22 @@
     width: 100%;
   }
 
+  /* 禁用：不用半透明（叠在主色、暗色、图片上颜色没法预测），换成三个禁用令牌；所有实心变体都变成同一种灰 */
   .xxd-btn:disabled,
   .xxd-btn[aria-disabled="true"] {
-    opacity: 0.45;
+    --btn-fg: var(--disabled-ink);
+    --btn-bg: var(--disabled-bg);
+    --btn-bd: var(--disabled-line);
     cursor: not-allowed;
     pointer-events: none;
+  }
+
+  .xxd-btn:is([data-variant="ghost"], [data-variant="outline"], .ui-dialog-cancel):is(:disabled, [aria-disabled="true"]) {
+    --btn-bg: transparent;
+  }
+
+  .xxd-btn:is([data-variant="ghost"], .ui-dialog-cancel):is(:disabled, [aria-disabled="true"]) {
+    --btn-bd: transparent;
   }
 
   /* 进行中：文字和图标保留但透明，宽度不跳；转圈画在正中。 */
@@ -205,6 +216,11 @@
 
   .xxd-btn:is([data-variant="primary"], [data-variant="danger"]):active:not(:disabled, [aria-disabled="true"]) {
     box-shadow: var(--btn-highlight-pressed, none);
+  }
+
+  .xxd-btn:is([data-variant="primary"], [data-variant="danger"]):is(:disabled, [aria-disabled="true"]) {
+    --btn-bd: var(--disabled-line);
+    box-shadow: none;
   }
 
   .xxd-btn:not([data-variant="ghost"], .ui-dialog-cancel):active:not(:disabled, [aria-disabled="true"]) {

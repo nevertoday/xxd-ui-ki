@@ -476,7 +476,7 @@
     font-size: var(--text-sm, 13px);
   }
   :is([data-kumo-component="Button"], [data-kumo-component="LinkButton"], .group.w-max.shrink-0.select-none)[data-kumo-component].ring-kumo-line {
-    --tw-ring-color: var(--line-strong, #c9c9ce);
+    --tw-ring-color: var(--line-strong, #ccc9c5);
   }
 
   /* 实心按钮（primary / destructive）：上游叠了一层渐变（span.absolute），小小东缺省纯平 —— 去掉这一层，底色就是原色。
@@ -512,12 +512,12 @@
   [data-kumo-component="SensitiveInput"][data-kumo-component] {
     font-size: var(--text-sm, 13px);
     font-weight: var(--weight-regular, 400);
-    --tw-ring-color: var(--line-control, #86868b);
+    --tw-ring-color: var(--line-control, #898681);
   }
   :is(input, textarea)[class*="ring-kumo-line"][class*="bg-kumo-control"]:focus,
   [data-kumo-component="Select"][data-kumo-part="trigger"][data-kumo-component]:focus {
     --tw-ring-shadow: 0 0 0 1px var(--tw-ring-color);
-    --tw-ring-color: color-mix(in srgb, var(--action, #111111) 70%, var(--line-control, #86868b));
+    --tw-ring-color: color-mix(in srgb, var(--action, #111111) 70%, var(--line-control, #898681));
   }
   /* 原生的下拉没有单独的底色（透明，落在纸上）；React 的触发按钮用纸色，看起来一样，这里对齐成同一个值 */
   [data-kumo-component="Select"][data-kumo-part="trigger"][data-kumo-component] {
@@ -528,7 +528,7 @@
   [data-kumo-component="Select"][data-kumo-part="trigger"][data-kumo-component] > span[aria-hidden="true"]:last-child {
     width: 14px;
     height: 14px;
-    background: var(--muted, #6b6b6b);
+    background: var(--muted, #6d6b67);
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
   }
@@ -538,7 +538,7 @@
 
   /* ── 复选、单选：16px，边 --line-control；选中时边和底都是强调色 ── */
   :is([data-kumo-component="Checkbox"], [data-kumo-component="Radio"][data-kumo-part="item"])[data-kumo-component] {
-    --tw-ring-color: var(--line-control, #86868b);
+    --tw-ring-color: var(--line-control, #898681);
   }
   [data-kumo-component="Checkbox"][data-kumo-component]:is([data-checked], [data-indeterminate]) {
     --tw-ring-color: var(--action-fill, #111111);
@@ -569,7 +569,7 @@
     font-weight: var(--weight-medium, 500);
   }
   [data-kumo-component="Radio"][data-kumo-part="items"][data-kumo-component] {
-    gap: 10px;
+    gap: var(--space-3, 12px);
   }
   fieldset:has(> [data-kumo-component="Radio"][data-kumo-part="items"]) {
     gap: var(--space-2, 8px);
@@ -579,8 +579,8 @@
   [data-kumo-component="Switch"][data-kumo-component][data-kumo-component] {
     width: 34px;
     height: 20px;
-    background-color: var(--wash-strong, #ececee);
-    --tw-ring-color: var(--line-control, #86868b);
+    background-color: var(--wash-strong, #eeece9);
+    --tw-ring-color: var(--line-control, #898681);
   }
   [data-kumo-component="Switch"][data-kumo-component][data-kumo-component][data-checked] {
     background-color: var(--switch-on, #111111);
@@ -603,7 +603,7 @@
     height: calc(var(--tab-h, var(--control-h, 40px)) + 1px);
     gap: var(--space-5, 20px);
     padding-bottom: 0;
-    border-color: var(--line, #e7e7ea);
+    border-color: var(--line, #e9e7e4);
   }
   .kumo-tabs-list.border-b > [data-kumo-component="Tabs"][data-kumo-part="tab"][data-kumo-component] {
     height: 100%;
@@ -611,7 +611,7 @@
     border-radius: 0;
     font-size: var(--text-sm, 13px);
     font-weight: var(--weight-medium, 500);
-    color: var(--muted, #6b6b6b);
+    color: var(--muted, #6d6b67);
     background: none;
   }
   .kumo-tabs-list.border-b > [data-kumo-component="Tabs"][data-kumo-part="tab"][data-kumo-component]:is([aria-selected="true"], :hover) {
@@ -640,23 +640,23 @@
   }
   table:has(> thead.group\/header) th {
     height: 36px;
-    padding: 0 12px;
-    border-bottom-color: var(--line-strong, #c9c9ce);
+    padding: 0 var(--space-3, 12px);
+    border-bottom-color: var(--line-strong, #ccc9c5);
     background: transparent;
-    color: var(--muted, #6b6b6b);
+    color: var(--muted, #6d6b67);
     font-size: var(--text-xs, 12px);
     font-weight: var(--weight-medium, 500);
     line-height: 1.3;
   }
   table:has(> thead.group\/header) td {
     height: 44px;
-    padding: 6px 12px;
+    padding: var(--space-1-5, 6px) var(--space-3, 12px);
   }
   table:has(> thead.group\/header) tr.even\:bg-kumo-elevated:nth-child(even) {
     background-color: transparent;
   }
   table:has(> thead.group\/header) tbody tr + tr td {
-    border-top: 1px solid var(--line, #e7e7ea);
+    border-top: 1px solid var(--line, #e9e7e4);
   }
 
   /* ── 对话框：缺省 440 宽、--r-lg 圆角、--shadow-dialog、垂直居中（原生 <dialog> 是居中的，上游贴在顶部 64px） ──
@@ -685,7 +685,7 @@
   }
   /* 取消是辅助操作：灰字、内容宽度（原生 .ui-dialog-cancel）；移上去变正文色 */
   [data-xxd-cancel][data-kumo-component] {
-    color: var(--muted, #6b6b6b);
+    color: var(--muted, #6d6b67);
   }
   [data-xxd-cancel][data-kumo-component]:hover {
     color: var(--ink, #111111);
@@ -693,24 +693,64 @@
 
   /* ── 菜单：4px 内边距、--r-md、浮层阴影；每项 32px 高、12px / 500、左右 10px ── */
   [role="menu"].ring-kumo-line.shadow-lg {
-    padding: 4px;
+    padding: var(--space-1, 4px);
     border-radius: var(--r-md, 0px);
     --tw-shadow: var(--shadow-popover, 0 18px 44px rgba(17, 17, 17, 0.16));
   }
   [data-kumo-component="DropdownMenu"][data-kumo-part="item"][data-kumo-component] {
     min-height: 32px;
-    gap: 8px;
-    padding: 0 10px;
+    gap: var(--space-2, 8px);
+    padding: 0 var(--space-3, 12px);
     border-radius: var(--r-xs, 0px);
     font-size: var(--text-xs, 12px);
     font-weight: var(--weight-medium, 500);
     line-height: 1.3;
   }
   [data-kumo-component="DropdownMenu"][data-kumo-part="item"][data-kumo-component][data-highlighted]:not(.text-kumo-danger) {
-    background: var(--wash, #f4f4f5);
+    background: var(--wash, #f6f4f1);
   }
   [role="menu"].ring-kumo-line.shadow-lg > [role="separator"] {
-    margin: 4px -4px;
-    background: var(--line, #e7e7ea);
+    margin: var(--space-1, 4px) calc(-1 * var(--space-1, 4px));
+    background: var(--line, #e9e7e4);
+  }
+
+  /* ── 禁用（设计师评审 V2-3）：和原生一样用 --disabled-ink / -bg / -line，不用半透明 ── */
+  :is([data-kumo-component="Button"], [data-kumo-component="LinkButton"], .group.w-max.shrink-0.select-none)[data-kumo-component][data-kumo-component]:is(:disabled, [aria-disabled="true"], [data-disabled]) {
+    background: var(--disabled-bg, #f6f4f1);
+    color: var(--disabled-ink, #adaaa5) !important;
+    opacity: 1;
+    --tw-ring-color: var(--disabled-line, #e9e7e4);
+    --tw-inset-shadow: 0 0 #0000;
+  }
+  :is([data-kumo-component="Button"], [data-kumo-component="LinkButton"], .group.w-max.shrink-0.select-none)[data-kumo-component][data-kumo-component]:is(.bg-inherit, .bg-transparent):is(:disabled, [aria-disabled="true"], [data-disabled]) {
+    background: transparent;
+  }
+  :is(input, textarea)[class*="ring-kumo-line"][class*="bg-kumo-control"]:disabled {
+    background: var(--disabled-bg, #f6f4f1);
+    color: var(--disabled-ink, #adaaa5);
+    opacity: 1;
+    --tw-ring-color: var(--disabled-line, #e9e7e4);
+  }
+  :is([data-kumo-component="Checkbox"], [data-kumo-component="Radio"][data-kumo-part="item"])[data-kumo-component][data-disabled] {
+    opacity: 1;
+    background-color: var(--disabled-bg, #f6f4f1);
+    --tw-ring-color: var(--disabled-line, #e9e7e4);
+  }
+  :is([data-kumo-component="Checkbox"], [data-kumo-component="Radio"][data-kumo-part="item"])[data-kumo-component][data-disabled]:is([data-checked], [data-indeterminate]) {
+    background-color: var(--disabled-ink, #adaaa5);
+    --tw-ring-color: var(--disabled-ink, #adaaa5);
+  }
+  [data-kumo-component="Switch"][data-kumo-component][data-kumo-component]:is(:disabled, [data-disabled]) {
+    opacity: 1;
+    background-color: var(--disabled-bg, #f6f4f1);
+    --tw-ring-color: var(--disabled-line, #e9e7e4);
+  }
+  [data-kumo-component="Switch"][data-kumo-component][data-kumo-component]:is(:disabled, [data-disabled])[data-checked] {
+    background-color: var(--disabled-ink, #adaaa5);
+    --tw-ring-color: var(--disabled-ink, #adaaa5);
+  }
+  label:has(> [data-kumo-component="Checkbox"][data-disabled]),
+  label:has(+ [data-kumo-component="Switch"]:disabled) {
+    color: var(--disabled-ink, #adaaa5);
   }
 }

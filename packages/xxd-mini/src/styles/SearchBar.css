@@ -27,7 +27,7 @@
 
 .xxd-searchbar__cancel {
   color: var(--action-text);
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
 }
 
 .xxd-searchbar__cancel.is-hover {

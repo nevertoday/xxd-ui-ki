@@ -106,13 +106,13 @@
   /* 文字层级 */
   .xxd-title {
     margin: 0;
-    font: var(--weight-strong) var(--text-display) / 1.25 var(--font-title);
+    font: var(--weight-strong) var(--text-display) / var(--leading-display) var(--font-title);
     color: var(--ink);
   }
 
   .xxd-heading {
     margin: 0;
-    font: var(--weight-strong) var(--text-lg) / 1.4 var(--font-body);
+    font: var(--weight-strong) var(--text-lg) / var(--leading-md) var(--font-body);
     color: var(--ink);
   }
 

@@ -1225,7 +1225,11 @@
       "avoid": [
         "只是显示状态：用 Badge"
       ],
-      "react": "Chip（@xxd/react）"
+      "react": "Chip（@xxd/react）",
+      "attributes": {
+        "aria-pressed": "选中",
+        "data-size": "sm：和小号输入框、按钮放在同一行时（32px，一样高）"
+      }
     },
     {
       "name": "Dot",

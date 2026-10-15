@@ -19,25 +19,29 @@
   color-scheme: light;
 
   /* ── 颜色：纸 / 墨 / 线 ───────────────────────── */
-  --bg: #fcfcfc;
+  --bg: #fdfcfb;
   --paper: #ffffff;
-  --wash: #f4f4f5;
-  --wash-strong: #ececee;
-  --selected-bg: #ededed;
-  --switch-on: #56565b;
+  --wash: #f6f4f1;
+  --wash-strong: #eeece9;
+  --selected-bg: #eeece9; /* 和 --wash-strong 同一个值（以前差 1，肉眼分不出；设计师评审 V2-4） */
+  --switch-on: #111111; /* 开关「开」是墨色（设计师评审 D22：以前的深灰在亮纸上像禁用） */
   --ink: #111111;
   --ink-rgb: 17, 17, 17;
   --on-ink: #ffffff;
-  /* #777 在白底只有 4.48:1，小字需要 4.5；#6b6b6b 是 5.3（wash 上 4.85、选中底 / wash-strong 上 4.5）。 */
-  --muted: #6b6b6b;
+  /* #777 在白底只有 4.48:1，小字需要 4.5；#6d6b67 是 5.3（wash 上 4.85、选中底 / wash-strong 上 4.5）。 */
+  --muted: #6d6b67;
   --muted-2: #9a968d; /* 只做装饰（图标、分隔点、行号），不当文字色：在白底只有 2.9:1 */
-  --line: #e7e7ea;
-  --line-strong: #c9c9ce;
+  --line: #e9e7e4;
+  --line-strong: #ccc9c5;
   /* 控件的边（输入框、复选、单选、开关、滑块）：要认得出这是个控件，和底色至少 3:1（WCAG 1.4.11）。
      卡片、分隔线、列表线仍然用安静的 --line / --line-strong。 */
-  --line-control: #86868b;
+  --line-control: #898681;
   --paper-rgb: 255, 255, 255;
   --shadow-rgb: 17, 17, 17;
+  /* 禁用（设计师评审 V2-3）：不用半透明，用这三个值；字不要求 4.5:1（WCAG 对禁用控件豁免），但和可用的一眼分得开 */
+  --disabled-ink: #adaaa5;
+  --disabled-bg: #f6f4f1;
+  --disabled-line: #e9e7e4;
 
   /* 语义色：只表达意义 */
   --success: #15803d;
@@ -89,12 +93,15 @@
   --text-xs: 12px;  /* 菜单、次要信息 */
   --text-sm: 13px;  /* 导航、控件（最常用） */
   --text-base: 14px;
-  --text-md: 15px;
+  --text-md: 15px; /* 已不用（设计师评审 D20：阶梯去掉 15）：保留变量名只为兼容老代码，新代码用 --text-base 或 --text-lg */
   --text-lg: 16px;
   --text-xl: 20px;
   --text-xxl: 24px; /* 页面大标题（不叫 --text-2xl，避免和 Tailwind 的同名变量冲突） */
   --text-display: 28px; /* 展示标题 */
-  /* 行高落在 4px 网格上：字号和它的行高成对用（13 / 20、16 / 24、20 / 28、24 / 32、28 / 36） */
+  /* 行高落在 4px 网格上，字号和行高成对用（设计师评审 D20）：
+   *   11 / 16、12 / 16（一行的标签）、12 / 20（说明文字，会折行）、13 / 20、14 / 20、16 / 24（标题）、16 / 28（阅读正文）、
+   *   20 / 28、24 / 32、28 / 36。固定高度的单行控件（按钮、标签页、徽标）行高写 1，由控件高度居中。
+   *   门禁：audit「细节」里，文字的行高必须是下面之一，或者等于字号（单行控件）。 */
   --leading-xs: 16px;
   --leading-sm: 20px;
   --leading-md: 24px;
@@ -106,14 +113,23 @@
   --weight-strong: 600;
   --read-width: 680px; /* 阅读列：正文、预览、列表 */
 
-  /* ── 间距：4px 基准 ── */
+  /* ── 间距：4px 基准（设计师评审 V2：组件里的 padding / gap / margin 只用这些，或者由它们和图标尺寸算出来） ──
+   * 两个半档只给光学上的小间隔：--space-0-5（2px：托盘内缩、标签和角标）、--space-1-5（6px：图标和字之间）。 */
+  --space-0-5: 2px;
   --space-1: 4px;
+  --space-1-5: 6px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
+
+  /* ── 断点（设计师评审 V2-6）：只有三个，出稿也按这三个宽度出。CSS 的 @media 里不能用变量，组件写字面值，测试只放行这三个。
+   *   480：手机（窄屏的分页、一列）；640：窄屏（对话框和右侧面板变成底部抽屉、设置一列）；1024：桌面（侧栏和目录同时出现）。 ── */
+  --bp-phone: 480px;
+  --bp-narrow: 640px;
+  --bp-desktop: 1024px;
 
   /* ── 控件尺寸：会员站 40px；侧边栏用 data-density="compact" ── */
   --control-h: 40px;
@@ -213,6 +229,9 @@
   --line-control: #807a6e;
   --paper-rgb: 32, 31, 26;
   --shadow-rgb: 0, 0, 0;
+  --disabled-ink: #66635d;
+  --disabled-bg: #2a2822;
+  --disabled-line: #34322b;
   /* 暗色的语义色和暖黑同一个调子：偏暖、低一档饱和（不用冷的荧光绿 / 红）。字用的版本对暗纸 ≥ 4.5；
      *-strong 是实心底（白字 ≥ 4.5、对暗纸 ≥ 3） */
   --success: #7cc48a;
@@ -240,22 +259,25 @@
 /* 亮色的一块：暗色页面里某一块要亮（比如并排对比）。只放颜色，和 :root 的亮色值一样（测试会对一遍）。 */
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #fcfcfc;
+  --bg: #fdfcfb;
   --paper: #ffffff;
-  --wash: #f4f4f5;
-  --wash-strong: #ececee;
-  --selected-bg: #ededed;
-  --switch-on: #56565b;
+  --wash: #f6f4f1;
+  --wash-strong: #eeece9;
+  --selected-bg: #eeece9;
+  --switch-on: #111111;
   --ink: #111111;
   --ink-rgb: 17, 17, 17;
   --on-ink: #ffffff;
-  --muted: #6b6b6b;
+  --muted: #6d6b67;
   --muted-2: #9a968d;
-  --line: #e7e7ea;
-  --line-strong: #c9c9ce;
-  --line-control: #86868b;
+  --line: #e9e7e4;
+  --line-strong: #ccc9c5;
+  --line-control: #898681;
   --paper-rgb: 255, 255, 255;
   --shadow-rgb: 17, 17, 17;
+  --disabled-ink: #adaaa5;
+  --disabled-bg: #f6f4f1;
+  --disabled-line: #e9e7e4;
   --success: #15803d;
   --success-rgb: 21, 128, 61;
   --danger: #b42318;
@@ -302,11 +324,11 @@
   --action-fill-hover: var(--action-fill-hover-custom);
   --switch-on: var(--action);
   --selected-bg: color-mix(in srgb, var(--action) 13%, #ffffff);
-  --bg: color-mix(in srgb, #fcfcfc 97%, var(--action));
-  --wash: color-mix(in srgb, #f4f4f5 92%, var(--action));
-  --wash-strong: color-mix(in srgb, #ececee 90%, var(--action));
-  --line: color-mix(in srgb, #e7e7ea 90%, var(--action));
-  --line-strong: color-mix(in srgb, #c9c9ce 88%, var(--action));
+  --bg: color-mix(in srgb, #fdfcfb 97%, var(--action));
+  --wash: color-mix(in srgb, #f6f4f1 92%, var(--action));
+  --wash-strong: color-mix(in srgb, #eeece9 90%, var(--action));
+  --line: color-mix(in srgb, #e9e7e4 90%, var(--action));
+  --line-strong: color-mix(in srgb, #ccc9c5 88%, var(--action));
   --focus-ring: 0 0 0 2px color-mix(in srgb, var(--action) 45%, transparent);
 }
 
@@ -333,11 +355,11 @@
   :root,
   :root[data-accent],
   [data-theme="light"] {
-    --muted: #595959;
-    --muted-2: #6b6b6b;
-    --line: #b4b4ba;
-    --line-strong: #86868b;
-    --line-control: #6b6b70;
+    --muted: #5b5955;
+    --muted-2: #6d6b67;
+    --line: #b7b4b0;
+    --line-strong: #898681;
+    --line-control: #6e6b67;
   }
 
   :root[data-theme="dark"],

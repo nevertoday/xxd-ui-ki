@@ -35,11 +35,11 @@
     flex: 1;
     min-width: 5ch;
     height: 100%;
-    padding: 0 12px;
+    padding: 0 var(--space-3);
     border: 0;
     background: transparent;
     color: var(--ink);
-    font: var(--weight-regular) var(--text-sm) / 1.4 var(--font-body);
+    font: var(--weight-regular) var(--text-sm) / var(--leading-sm) var(--font-body);
     outline: none;
   }
 
@@ -56,7 +56,7 @@
     overflow: hidden;
     color: var(--muted);
     font-size: var(--text-sm);
-    line-height: 1.4;
+    line-height: var(--leading-sm);
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -64,15 +64,15 @@
   /* 前缀（「https://」）通常很短：尽量不缩，先缩后缀 */
   .xxd-input-group__addon {
     flex-shrink: 0.2;
-    padding-left: 12px;
+    padding-left: var(--space-3);
   }
 
   .xxd-input-group__addon + input {
-    padding-left: 4px;
+    padding-left: var(--space-1);
   }
 
   .xxd-input-group__suffix {
-    padding-right: 12px;
+    padding-right: var(--space-3);
   }
 
   input + .xxd-input-group__suffix {
@@ -81,7 +81,7 @@
 
   .xxd-input-group > .xxd-btn {
     flex: none;
-    margin-right: 4px;
+    margin-right: var(--space-1);
   }
 
   .xxd-input-group > .xxd-btn + .xxd-btn {
@@ -119,10 +119,10 @@
   .xxd-clipboard {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
     max-width: 100%;
     height: var(--control-h);
-    padding: 0 4px 0 12px;
+    padding: 0 var(--space-1) 0 var(--space-3);
     border: 1px solid var(--line-control);
     border-radius: var(--r-sm);
     background: var(--wash);
@@ -146,7 +146,7 @@
   .xxd-inline-copy {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
+    gap: var(--space-0-5);
     padding: 0;
     border: 0;
     background: none;
@@ -191,9 +191,9 @@
   .xxd-picker__trigger {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     height: var(--control-h);
-    padding: 0 34px 0 12px;
+    padding: 0 calc(var(--space-3) + var(--icon-md) + var(--space-2)) 0 var(--space-3);
     border: 1px solid var(--line-control);
     border-radius: var(--r-sm);
     background: var(--paper);
@@ -238,7 +238,7 @@
 
   .xxd-picker[data-size="sm"] .xxd-picker__trigger {
     height: var(--control-h-sm);
-    padding-left: 10px;
+    padding-left: var(--space-3);
     font-size: var(--text-xs);
   }
 
@@ -253,13 +253,13 @@
   }
 
   .xxd-option-group + .xxd-option-group {
-    margin-top: 4px;
-    padding-top: 4px;
+    margin-top: var(--space-1);
+    padding-top: var(--space-1);
     border-top: 1px solid var(--line);
   }
 
   .xxd-option-group__label {
-    padding: 6px 10px 2px;
+    padding: var(--space-1-5) var(--space-3) var(--space-0-5);
     color: var(--muted);
     font-size: var(--text-2xs);
   }
@@ -268,7 +268,7 @@
     display: block;
     color: var(--muted);
     font-size: var(--text-2xs);
-    line-height: 1.4;
+    line-height: var(--leading-xs);
   }
 
   .xxd-option > .ui-icon {
@@ -276,13 +276,13 @@
   }
 
   .xxd-option[aria-disabled="true"] {
-    opacity: 0.45;
+    color: var(--disabled-ink);
     cursor: not-allowed;
   }
 
   .xxd-option:has(small) {
     align-items: flex-start;
-    padding-block: 6px;
+    padding-block: var(--space-1-5);
   }
 
   .xxd-listbox[data-picker] {

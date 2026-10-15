@@ -121,7 +121,7 @@ const resourceList = `
     <div class="xxd-page-header__row"><h1 class="xxd-page-header__title">Extensions</h1><div class="xxd-page-header__actions"><button class="xxd-btn">Import</button><button class="xxd-btn" data-variant="primary">${I("Plus")}New extension</button></div></div>
     <p class="xxd-page-header__desc">Every extension on XXD UI: whether its version is current and when it was last published.</p>
   </header>
-  <div class="xxd-cluster" style="margin-bottom:12px"><div class="xxd-input-wrap" style="width:260px">${I("Search")}<input class="xxd-input" data-size="sm" type="search" placeholder="Search extensions" aria-label="Search extensions"></div><button class="xxd-chip" aria-pressed="true">All</button><button class="xxd-chip">Behind</button><button class="xxd-chip">To publish</button></div>
+  <div class="xxd-cluster" style="margin-bottom:12px"><div class="xxd-input-wrap" style="width:260px">${I("Search")}<input class="xxd-input" data-size="sm" type="search" placeholder="Search extensions" aria-label="Search extensions"></div><button class="xxd-chip" data-size="sm" aria-pressed="true">All</button><button class="xxd-chip" data-size="sm">Behind</button><button class="xxd-chip" data-size="sm">To publish</button></div>
   <div class="xxd-table-wrap"><table class="xxd-table" data-interactive>
     <thead><tr><th class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-all aria-label="Select all"></th><th aria-sort="ascending"><button class="xxd-th-sort">Extension</button></th><th>UI Kit</th><th aria-sort="none" data-align="end"><button class="xxd-th-sort">Users</button></th><th>Status</th><th class="xxd-table__actions"><span class="xxd-sr-only">Actions</span></th></tr></thead>
     <tbody>

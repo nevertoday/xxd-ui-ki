@@ -809,6 +809,10 @@ Xxd.bindCommandPalette(items)  // ⌘K / Ctrl+K`,
   },
   Chip: {
     title: "Chip",
+    attributes: {
+      "aria-pressed": "Selected",
+      "data-size": "sm: in the same row as a small input or button (32px, same height)",
+    },
     use: ["A clickable filter or a removable tag"],
     avoid: ["Just showing a state: use Badge"],
     summary: "A tag you can toggle: filters, multi-select markers.",

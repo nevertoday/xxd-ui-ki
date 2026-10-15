@@ -6,9 +6,9 @@ import { Badge, Button, Checkbox, Input, Radio, Select, Switch, Table, Tabs, Xxd
 type Tr = (zh: string, en: string) => string;
 
 // Kumo 的 Switch 只认受控的 checked
-function SwitchOn({ label }: { label: string }) {
+function SwitchOn({ label, disabled }: { label: string; disabled?: boolean }) {
   const [on, setOn] = useState(true);
-  return <Switch label={label} checked={on} onCheckedChange={setOn} />;
+  return <Switch label={label} checked={on} onCheckedChange={setOn} disabled={disabled} />;
 }
 
 export const REACT_PAIRS: Record<string, (tr: Tr) => JSX.Element> = {
@@ -18,10 +18,15 @@ export const REACT_PAIRS: Record<string, (tr: Tr) => JSX.Element> = {
   "button-outline": (tr) => <Button variant="outline">{tr("导出", "Export")}</Button>,
   "button-danger": (tr) => <Button variant="destructive">{tr("删除", "Delete")}</Button>,
   "button-sm": (tr) => <Button size="sm">{tr("复制", "Copy")}</Button>,
+  "button-primary-disabled": (tr) => <Button variant="primary" disabled>{tr("写入", "Post")}</Button>,
+  "button-secondary-disabled": (tr) => <Button disabled>{tr("保存草稿", "Save draft")}</Button>,
   input: (tr) => <Input aria-label={tr("标题", "Title")} placeholder={tr("给这篇文章起个名字", "Name this post")} className="w-60" />,
+  "input-disabled": (tr) => <Input aria-label={tr("标题", "Title")} defaultValue={tr("已发布", "Published")} className="w-60" disabled />,
   select: (tr) => <Select aria-label={tr("图片质量", "Image quality")} className="w-40" defaultValue="high" items={{ high: tr("高", "High"), standard: tr("标准", "Standard") }} />,
   checkbox: (tr) => <Checkbox label={tr("智能标点", "Smart punctuation")} defaultChecked />,
   "checkbox-off": (tr) => <Checkbox label={tr("写入标题", "Write title")} />,
+  "checkbox-disabled": (tr) => <Checkbox label={tr("智能标点", "Smart punctuation")} defaultChecked disabled />,
+  "switch-disabled": (tr) => <SwitchOn label={tr("完成音效", "Done sound")} disabled />,
   switch: (tr) => <SwitchOn label={tr("完成音效", "Done sound")} />,
   "switch-off": (tr) => <Switch label={tr("自动保存", "Autosave")} />,
   radio: (tr) => (

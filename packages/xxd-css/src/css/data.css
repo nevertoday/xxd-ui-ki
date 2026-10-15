@@ -7,7 +7,7 @@
 
   .xxd-table[data-density="compact"] td {
     height: 34px;
-    padding-block: 3px;
+    padding-block: var(--space-1);
     font-size: var(--text-xs);
   }
 
@@ -53,9 +53,9 @@
   .xxd-th-sort {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
     margin: 0 -4px;
-    padding: 2px 4px;
+    padding: var(--space-0-5) var(--space-1);
     border: 0;
     border-radius: var(--r-xs);
     background: transparent;
@@ -153,7 +153,7 @@
     }
   }
 
-  @media (max-width: 419px) {
+  @media (max-width: 480px) {
     .xxd-pagination:not([data-simple]) > [data-page-to]:not(:first-child, :last-child),
     .xxd-pagination:not([data-simple]) > .xxd-pagination__gap {
       display: none;
@@ -173,7 +173,7 @@
   .xxd-pagination__size {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1-5);
     margin-left: auto;
     color: var(--muted);
     font-size: var(--text-xs);
@@ -287,13 +287,13 @@
   .xxd-code__head {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     min-height: 34px;
-    padding: 0 6px 0 12px;
+    padding: 0 var(--space-1-5) 0 var(--space-3);
     border-bottom: 1px solid var(--line);
     background: color-mix(in srgb, var(--action) 3%, var(--paper));
     color: var(--muted);
-    font: var(--text-2xs) var(--font-mono);
+    font: var(--text-2xs) / var(--leading-xs) var(--font-mono);
   }
 
   .xxd-code__head > .xxd-btn {
@@ -313,7 +313,7 @@
     content: counter(line);
     display: inline-block;
     width: 2.4em;
-    margin-right: 12px;
+    margin-right: var(--space-3);
     color: var(--muted-2);
     text-align: right;
   }
@@ -356,7 +356,7 @@
   }
 
   .xxd-banner[data-size="sm"] {
-    padding: 8px 12px;
+    padding: var(--space-2) var(--space-3);
     font-size: var(--text-xs);
   }
 
@@ -370,7 +370,7 @@
   }
 
   .xxd-empty[data-size="lg"] {
-    padding: 64px var(--space-4);
+    padding: calc(var(--space-8) * 2) var(--space-4);
   }
 
   .xxd-empty[data-size="lg"] > .ui-icon {
@@ -383,7 +383,7 @@
   }
 
   .xxd-empty .xxd-clipboard {
-    margin-top: 6px;
+    margin-top: var(--space-1-5);
   }
 
   /* ── tab 溢出：两端渐隐（JS 写 data-overflow-start / -end），选中项自动滚进视野 ── */
@@ -404,7 +404,7 @@
 
   /* ── 面包屑：太长时中间折叠成「…」（JS） ── */
   .xxd-breadcrumbs__more {
-    padding: 0 4px;
+    padding: 0 var(--space-1);
     border: 0;
     border-radius: var(--r-xs);
     background: transparent;

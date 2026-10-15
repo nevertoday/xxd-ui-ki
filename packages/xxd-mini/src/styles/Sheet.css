@@ -42,7 +42,7 @@
 }
 
 .xxd-sheet__title {
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
 }
 
 .xxd-sheet__body {
@@ -79,7 +79,7 @@
   min-height: 52px;
   padding: 8px 16px;
   color: var(--ink);
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
   text-align: center;
 }
 

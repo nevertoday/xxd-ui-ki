@@ -635,6 +635,8 @@ for (const [name, run] of Object.entries(sections)) if (!only || only === name) 
 await browser.close();
 server.close();
 
+// AUDIT_OUT=<文件>：把全部问题写进文件（终端只显示前 80 处）
+if (process.env.AUDIT_OUT) (await import("node:fs")).writeFileSync(process.env.AUDIT_OUT, failures.join("\n") + "\n");
 if (failures.length) {
   console.log(`\n✗ ${failures.length} 处问题：`);
   for (const f of failures.slice(0, 80)) console.log("  " + f);

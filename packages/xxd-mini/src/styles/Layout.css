@@ -7,7 +7,7 @@
 
 .xxd-section__title {
   color: var(--muted);
-  font: var(--weight-medium) var(--text-xs) / 1.4 var(--font-body);
+  font: var(--weight-medium) var(--text-xs) / var(--leading-xs) var(--font-body);
 }
 
 .xxd-cluster {

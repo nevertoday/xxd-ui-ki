@@ -94,11 +94,11 @@
   .xxd-bubble {
     position: fixed;
     z-index: var(--z-toast);
-    padding: 3px 8px;
+    padding: var(--space-1) var(--space-2);
     border-radius: var(--r-xs);
     background: var(--ink);
     color: var(--on-ink);
-    font: var(--weight-medium) var(--text-2xs) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-2xs) / var(--leading-xs) var(--font-body);
     pointer-events: none;
     opacity: 0;
     transform: translateY(2px);

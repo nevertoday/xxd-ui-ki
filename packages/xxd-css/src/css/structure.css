@@ -31,7 +31,7 @@
   }
 
   .xxd-sidebar[data-variant="floating"] {
-    margin: 8px;
+    margin: var(--space-2);
     height: calc(100% - 16px);
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
@@ -47,9 +47,9 @@
   .xxd-sidebar__foot {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     min-height: 56px;
-    padding: 0 12px;
+    padding: 0 var(--space-3);
   }
 
   .xxd-sidebar__head {
@@ -64,34 +64,34 @@
   .xxd-sidebar__body {
     flex: 1;
     min-height: 0;
-    padding: 8px;
+    padding: var(--space-2);
     overflow-y: auto;
     scrollbar-width: thin;
   }
 
   .xxd-sidebar__group + .xxd-sidebar__group {
-    margin-top: 16px;
+    margin-top: var(--space-4);
   }
 
   .xxd-sidebar__label {
-    padding: 4px 8px;
+    padding: var(--space-1) var(--space-2);
     color: var(--muted);
-    font: var(--weight-medium) var(--text-2xs) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-2xs) / var(--leading-xs) var(--font-body);
     white-space: nowrap;
   }
 
   .xxd-sidebar__item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-3);
     width: 100%;
     min-height: 34px;
-    padding: 0 8px;
+    padding: 0 var(--space-2);
     border: 0;
     border-radius: var(--r-sm);
     background: transparent;
     color: color-mix(in srgb, var(--ink) 78%, var(--muted));
-    font: var(--weight-medium) var(--text-sm) / 1.3 var(--font-body);
+    font: var(--weight-medium) var(--text-sm) / var(--leading-sm) var(--font-body);
     text-align: left;
     text-decoration: none;
     white-space: nowrap;
@@ -139,8 +139,8 @@
   }
 
   .xxd-sidebar__sub {
-    margin: 2px 0 4px 18px;
-    padding-left: 10px;
+    margin: var(--space-0-5) 0 var(--space-1) calc(var(--space-2) + var(--icon-rail) / 2); /* 竖线对准上一级图标的中线 */
+    padding-left: var(--space-3);
     border-left: 1px solid var(--line);
   }
 
@@ -209,9 +209,9 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 2px;
+    gap: var(--space-0-5);
     min-height: 40px;
-    padding: 4px;
+    padding: var(--space-1);
   }
 
   .xxd-toolbar[data-framed] {
@@ -224,10 +224,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: var(--space-1);
     min-width: 30px;
     height: 30px;
-    padding: 0 6px;
+    padding: 0 var(--space-1-5);
     border: 0;
     border-radius: var(--r-xs);
     background: transparent;
@@ -249,7 +249,7 @@
   }
 
   .xxd-toolbar__item:disabled {
-    opacity: 0.4;
+    color: var(--disabled-ink);
     cursor: not-allowed;
   }
 
@@ -257,7 +257,7 @@
     flex: none;
     width: 1px;
     height: 18px;
-    margin: 0 4px;
+    margin: 0 var(--space-1);
     background: var(--line);
   }
 
@@ -289,15 +289,15 @@
   .xxd-layer__secondary {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     min-height: 36px;
-    padding: 6px 14px;
+    padding: var(--space-1-5) var(--space-4);
     color: var(--muted);
     font-size: var(--text-xs);
   }
 
   .xxd-layer__primary {
-    padding: 14px;
+    padding: var(--space-4);
     border-top: 1px solid var(--line);
     background: var(--paper);
     color: var(--ink);
@@ -432,14 +432,14 @@
   }
 
   .xxd-toc__title {
-    margin: 0 0 6px;
+    margin: 0 0 var(--space-1-5);
     color: var(--muted);
-    font: var(--weight-medium) var(--text-2xs) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-2xs) / var(--leading-xs) var(--font-body);
   }
 
   .xxd-toc a {
     display: block;
-    padding: 4px 0 4px 10px;
+    padding: var(--space-1) 0 var(--space-1) var(--space-3);
     border-left: 1px solid var(--line);
     color: var(--muted);
     text-decoration: none;
@@ -457,14 +457,14 @@
   }
 
   .xxd-toc [data-depth="3"] a {
-    padding-left: 22px;
+    padding-left: var(--space-6);
   }
 
   /* ── 小小东标志：暖黑方块上四个由满到淡的小方块（各插件的同一个标），可带字 ── */
   .xxd-logo {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     color: var(--ink);
     font: var(--weight-strong) var(--text-base) / 1 var(--font-body);
     text-decoration: none;

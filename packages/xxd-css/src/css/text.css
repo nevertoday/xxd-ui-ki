@@ -39,7 +39,7 @@
   .xxd-text[data-variant="mono"],
   .xxd-text[data-variant="mono-secondary"] {
     font-family: var(--font-mono);
-    font-size: 0.92em;
+    font-size: calc(1em - 1px); /* 比周围小一号，总是整数像素（以前 0.92em 会出 11.96px） */
   }
 
   .xxd-text[data-variant="mono-secondary"] {
@@ -83,6 +83,6 @@
   /* 标题和它的说明：说明紧贴标题（相关的字靠得更近） */
   .xxd-text-pair {
     display: grid;
-    gap: 2px;
+    gap: var(--space-0-5);
   }
 }

@@ -105,7 +105,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     /* overflow 会按行盒裁，行高 1 时 g / y 的下伸部会被切掉 */
-    line-height: 1.35;
+    line-height: var(--leading-xs);
   }
 
   .xxd-breadcrumbs > li > :is(a, span) {

@@ -2,11 +2,11 @@
 // 组件页在 React 名字旁边标「和 HTML 一致」；没在这里的组件，React 版标「还没进对照」。
 // 键是注册表里的组件名，值是对照页上的 data-pair（一个组件可以有几对）。
 export const PARITY = {
-  Button: ["button-primary", "button-secondary", "button-ghost", "button-outline", "button-danger", "button-sm"],
-  Field: ["input"],
+  Button: ["button-primary", "button-secondary", "button-ghost", "button-outline", "button-danger", "button-sm", "button-primary-disabled", "button-secondary-disabled"],
+  Field: ["input", "input-disabled"],
   Select: ["select"],
-  Checkbox: ["checkbox", "checkbox-off"],
-  Switch: ["switch", "switch-off"],
+  Checkbox: ["checkbox", "checkbox-off", "checkbox-disabled"],
+  Switch: ["switch", "switch-off", "switch-disabled"],
   Radio: ["radio"],
   Tabs: ["tabs"],
   Badge: ["badge"],

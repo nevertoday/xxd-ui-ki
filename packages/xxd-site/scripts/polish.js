@@ -7,6 +7,9 @@
 //   挤成一字一行 文字被旁边的按钮、图挤到不到 3 个字宽，竖着排
 //   重叠      文字、按钮、图标互相压住
 //   图标没对齐 图标和旁边第一行字的垂直中心差太多
+//   行高不在网格（设计师评审 V2-7） 组件里的字，行高不是 --leading-*（16 / 20 / 24 / 28 / 32 / 36），也不是单行控件的「行高 = 字号」
+//   同一行文字不齐（V2-7） 表格同一行里各格的字不在一条基线上（差 1.5px 以上）
+//   同一行控件高度不一（V2-7） 一排并列的控件（按钮、输入框、下拉、chip、分段）高度不一样
 globalThis.xxdPolish = function xxdPolish(root = document.body, { orphans = true } = {}) {
   const out = [];
   const HIDE = "[hidden], template, [popover]:not(:popover-open), dialog:not([open]), .xxd-sr-only, .xxd-sheet:not([data-open]), .xxd-panel:not([data-open]), [inert], details:not([open]) > :not(summary), script, style, svg *";
@@ -152,6 +155,58 @@ globalThis.xxdPolish = function xxdPolish(root = document.body, { orphans = true
     const block = next.nodeType === 1 ? next.getBoundingClientRect() : null;
     const blockDiff = block ? ir.top + ir.height / 2 - (block.top + block.height / 2) : Infinity;
     if (Math.abs(diff) > 2.5 && Math.abs(blockDiff) > 2.5) out.push({ kind: "图标没对齐", where: name(row), detail: `图标中心比第一行字${diff > 0 ? "低" : "高"} ${Math.abs(diff).toFixed(1)}px` });
+  }
+  // 5. 行高不在网格：只看组件（最近的带类名的祖先是 xxd- 开头，不是展示站自己的 site-）
+  const LEADING = new Set([16, 20, 24, 28, 32, 36]);
+  for (const el of root.querySelectorAll("*")) {
+    if (el.matches("input, textarea, select, option, svg, svg *") || el.closest("pre, code, .xxd-code, .xxd-kbd, svg, .xxd-sr-only")) continue;
+    if (![...el.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim())) continue;
+    const owner = el.closest("[class]");
+    const cls = owner && typeof owner.className === "string" ? owner.className : "";
+    if (!/(^|\s)xxd-/.test(cls) || /(^|\s)site-/.test(cls) || !shown(el)) continue;
+    const cs = getComputedStyle(el);
+    if (cs.display === "inline") continue; // 行内的字跟着所在的段落走，看段落本身
+    const lh = parseFloat(cs.lineHeight);
+    const fs = parseFloat(cs.fontSize);
+    if (cs.lineHeight === "normal" || Math.abs(lh - fs) < 0.5 || LEADING.has(Math.round(lh * 100) / 100)) continue;
+    out.push({ kind: "行高不在网格", where: name(el), detail: `${fs}px / ${Math.round(lh * 100) / 100}px` });
+  }
+
+  // 6. 同一行文字不齐：表格同一行，各格第一行字的基线（字框底边往上 0.2 个字号）差 1.5px 以上
+  //    只看组件的表格（.xxd-table）；展示站自己的属性表另算
+  for (const tr of root.querySelectorAll(".xxd-table tr")) {
+    if (!shown(tr)) continue;
+    const marks = [];
+    for (const cell of tr.cells) {
+      const rects = textRects(cell);
+      if (!rects.length) continue;
+      const first = rects.sort((a, b) => a.top - b.top)[0];
+      const textEl = document.elementFromPoint(first.left + 1, first.top + first.height / 2) ?? cell;
+      const fs = parseFloat(getComputedStyle(textEl).fontSize);
+      marks.push({ cell, base: first.bottom - 0.2 * fs });
+    }
+    if (marks.length < 2) continue;
+    const bases = marks.map((m) => m.base);
+    const spread = Math.max(...bases) - Math.min(...bases);
+    if (spread > 1.5) out.push({ kind: "同一行文字不齐", where: name(tr), detail: `各格基线相差 ${spread.toFixed(1)}px` });
+  }
+
+  // 7. 同一行控件高度不一：一个横排的 flex 容器里，并排（竖直方向重叠）的几个控件高度要一样
+  const FIELD = ".xxd-btn:not([data-icon-only]), .xxd-input, .xxd-select, .xxd-input-wrap, .xxd-input-group, .xxd-chip, .xxd-segmented, .xxd-picker__trigger, .xxd-search";
+  for (const box of root.querySelectorAll("*")) {
+    const cs = getComputedStyle(box);
+    if (!cs.display.includes("flex") || cs.flexDirection.startsWith("column") || !shown(box)) continue;
+    const items = [...box.children].filter((c) => c.matches(FIELD) && shown(c));
+    if (items.length < 2) continue;
+    const rows = groupLines(items.map((c) => c.getBoundingClientRect()));
+    for (const line of rows) {
+      // 故意并排展示不同尺寸（写了不同的 data-size）不算：同一个 data-size 的才要求一样高
+      const inLine = items.filter((c) => sameLine(c.getBoundingClientRect(), line));
+      const sized = new Set(inLine.map((c) => c.dataset.size ?? "md"));
+      if (sized.size > 1) continue;
+      const heights = [...new Set(inLine.map((c) => Math.round(c.getBoundingClientRect().height)))];
+      if (heights.length > 1) out.push({ kind: "同一行控件高度不一", where: name(box), detail: inLine.map((c) => `${name(c).split("›").pop().trim()} ${Math.round(c.getBoundingClientRect().height)}px`).join("、") });
+    }
   }
   return out;
 };

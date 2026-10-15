@@ -4,15 +4,15 @@
 
 /** 每一对：[部位, HTML 里的选择器, React 里的选择器, 要比的属性] */
 export const PARTS = {
-  button: [["按钮", "button", "button", ["height", "paddingLeft", "fontSize", "fontWeight", "color", "background", "edge", "radius", "highlight"]]],
-  input: [["输入框", "input", "input", ["height", "paddingLeft", "fontSize", "fontWeight", "color", "background", "edge", "radius"]]],
+  button: [["按钮", "button", "button", ["height", "paddingLeft", "fontSize", "fontWeight", "color", "background", "edge", "radius", "highlight", "opacity"]]],
+  input: [["输入框", "input", "input", ["height", "paddingLeft", "fontSize", "fontWeight", "color", "background", "edge", "radius", "opacity"]]],
   select: [["选择框", ".xxd-select select", "[data-kumo-component=Select], button", ["height", "fontSize", "fontWeight", "color", "background", "edge", "radius"]]],
   checkbox: [
-    ["方框", "input", "[role=checkbox]", ["width", "height", "background", "edge", "radius"]],
+    ["方框", "input", "[role=checkbox]", ["width", "height", "background", "edge", "radius", "opacity"]],
     ["文字", "label", "label", ["fontSize", "fontWeight", "color"]],
   ],
   switch: [
-    ["开关", "input", "[role=switch]", ["width", "height", "background", "edge", "radius"]],
+    ["开关", "input", "[role=switch]", ["width", "height", "background", "edge", "radius", "opacity"]],
     ["文字", "label", "label", ["fontSize", "fontWeight", "color"]],
   ],
   radio: [
@@ -44,7 +44,7 @@ export const PARITY_LOOKS = [
   { theme: "light", corners: "rounded", accent: "#c4495a", density: "comfortable", finish: "material" },
 ];
 
-const kindOf = (id) => id.replace(/-(primary|secondary|ghost|outline|danger|sm|off)$/, "");
+const kindOf = (id) => id.split("-")[0];
 
 /** 在页面里读一个部位的样式（序列化成字符串好比较） */
 function measure([cellSel, sel, props]) {
@@ -98,6 +98,7 @@ function measure([cellSel, sel, props]) {
     }
     else if (p === "background") out.background = s.backgroundImage !== "none" ? `image ${s.backgroundImage.slice(0, 30)}` : norm(s.backgroundColor);
     else if (p === "radius") out.radius = s.borderTopLeftRadius;
+    else if (p === "opacity") { let o = 1; for (let e = el; e && e !== cell; e = e.parentElement) o *= parseFloat(getComputedStyle(e).opacity); out.opacity = o.toFixed(2); }
     else if (p === "textAlign") { const t = el.textContent.trim(); const range = document.createRange(); range.selectNodeContents(el); const tr = range.getBoundingClientRect(); out.textAlign = Math.abs(tr.right - (r.right - parseFloat(s.paddingRight))) < 2 ? "右" : "左"; }
     else if (p === "numeric") out.numeric = s.fontVariantNumeric.includes("tabular") ? "等宽" : "比例";
     else if (p === "rowLine") { const cells = [...el.children]; const c = getComputedStyle(cells[0] ?? el); const w = Math.max(parseFloat(s.borderBottomWidth) || 0, parseFloat(c.borderBottomWidth) || 0, parseFloat(s.borderTopWidth) || 0, parseFloat(c.borderTopWidth) || 0); out.rowLine = w > 0 ? "有" : "无"; }

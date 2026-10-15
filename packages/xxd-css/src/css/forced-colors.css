@@ -50,7 +50,6 @@
     .xxd-check:disabled,
     .xxd-radio:disabled {
       border-color: GrayText;
-      opacity: 1;
     }
 
     /* 进度：轨道描边，进度是 Highlight */

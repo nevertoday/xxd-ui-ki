@@ -40,7 +40,7 @@
 }
 
 .xxd-tabbar__label {
-  font: var(--weight-medium) var(--text-2xs) / 1.2 var(--font-body);
+  font: var(--weight-medium) var(--text-2xs) / var(--leading-xs) var(--font-body);
 }
 
 .xxd-tabbar__badge {

@@ -11,7 +11,7 @@
 
 .xxd-textarea {
   min-height: 72px;
-  line-height: 22px;
+  line-height: var(--leading-md);
 }
 
 /* placeholder-class 加的类名：网页版 ::placeholder 的颜色 */

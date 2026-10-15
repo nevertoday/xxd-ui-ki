@@ -121,7 +121,7 @@ const resourceList = `
     <div class="xxd-page-header__row"><h1 class="xxd-page-header__title">插件</h1><div class="xxd-page-header__actions"><button class="xxd-btn">导入</button><button class="xxd-btn" data-variant="primary">${I("Plus")}新建插件</button></div></div>
     <p class="xxd-page-header__desc">所有接入小小东 UI 的插件，版本是否最新、上次发布时间。</p>
   </header>
-  <div class="xxd-cluster" style="margin-bottom:12px"><div class="xxd-input-wrap" style="width:260px">${I("Search")}<input class="xxd-input" data-size="sm" type="search" placeholder="搜索插件" aria-label="搜索插件"></div><button class="xxd-chip" aria-pressed="true">全部</button><button class="xxd-chip">落后</button><button class="xxd-chip">待发布</button></div>
+  <div class="xxd-cluster" style="margin-bottom:12px"><div class="xxd-input-wrap" style="width:260px">${I("Search")}<input class="xxd-input" data-size="sm" type="search" placeholder="搜索插件" aria-label="搜索插件"></div><button class="xxd-chip" data-size="sm" aria-pressed="true">全部</button><button class="xxd-chip" data-size="sm">落后</button><button class="xxd-chip" data-size="sm">待发布</button></div>
   <div class="xxd-table-wrap"><table class="xxd-table" data-interactive>
     <thead><tr><th class="xxd-table__check"><input type="checkbox" class="xxd-check" data-select-all aria-label="全选"></th><th aria-sort="ascending"><button class="xxd-th-sort">插件</button></th><th>UI Kit</th><th aria-sort="none" data-align="end"><button class="xxd-th-sort">用户</button></th><th>状态</th><th class="xxd-table__actions"><span class="xxd-sr-only">操作</span></th></tr></thead>
     <tbody>

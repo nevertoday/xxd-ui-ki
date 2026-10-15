@@ -4,9 +4,9 @@
   .xxd-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
     height: 20px;
-    padding: 0 8px;
+    padding: 0 var(--space-2);
     border-radius: var(--r-pill);
     background: var(--wash-strong);
     color: var(--ink);
@@ -64,9 +64,10 @@
   .xxd-chip {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    height: 26px;
-    padding: 0 10px;
+    gap: var(--space-1);
+    /* 28px（紧凑 24），落在 4px 刻度上；和小号输入框、按钮并排时写 data-size="sm"，一样高 */
+    height: calc(var(--control-h-xs) + var(--space-1));
+    padding: 0 var(--space-3);
     border: 1px solid transparent;
     border-radius: var(--r-pill);
     background: var(--wash);
@@ -75,6 +76,10 @@
     white-space: nowrap;
     cursor: pointer;
     transition: background-color var(--motion-quick) ease, color var(--motion-quick) ease;
+  }
+
+  .xxd-chip[data-size="sm"] {
+    height: var(--control-h-sm);
   }
 
   .xxd-chip:hover {
@@ -141,18 +146,18 @@
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto auto;
     align-items: start;
-    gap: 10px;
-    padding: 12px 14px;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
     border: 1px solid var(--line);
     border-radius: var(--r-md);
     background: var(--wash);
     color: var(--ink);
     font-size: var(--text-sm);
-    line-height: 1.55;
+    line-height: var(--leading-sm);
   }
 
   .xxd-banner > .ui-icon {
-    margin-top: 2px;
+    margin-top: var(--space-0-5);
     color: var(--muted);
   }
 
@@ -162,20 +167,20 @@
   }
 
   .xxd-banner__text {
-    margin: 2px 0 0;
+    margin: var(--space-0-5) 0 0;
     color: var(--muted);
     font-size: var(--text-xs);
   }
 
   /* 横幅里的几条（更新说明） */
   .xxd-banner__list {
-    margin: 2px 0 0;
+    margin: var(--space-0-5) 0 0;
     padding-inline-start: 1.2em;
     list-style: disc;
   }
 
   .xxd-banner__list > li + li {
-    margin-top: 2px;
+    margin-top: var(--space-0-5);
   }
 
   .xxd-banner > * {
@@ -191,7 +196,7 @@
     grid-column: 3;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--space-2);
   }
 
   .xxd-banner > .xxd-banner__close {
@@ -261,7 +266,7 @@
   .xxd-empty {
     display: grid;
     justify-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-8) var(--space-4);
     color: var(--muted);
     text-align: center;
@@ -276,18 +281,18 @@
   .xxd-empty__title {
     margin: 0;
     color: var(--ink);
-    font: var(--weight-medium) var(--text-base) / 1.4 var(--font-body);
+    font: var(--weight-medium) var(--text-base) / var(--leading-sm) var(--font-body);
   }
 
   .xxd-empty__text {
     max-width: 320px;
     margin: 0;
     font-size: var(--text-xs);
-    line-height: 1.6;
+    line-height: var(--leading-sm);
   }
 
   .xxd-empty__actions {
-    margin-top: 6px;
+    margin-top: var(--space-1-5);
   }
 
   /* 加载 */
@@ -380,7 +385,7 @@
   /* 计量：<meter class="xxd-meter"> 或自绘 */
   .xxd-meter {
     display: grid;
-    gap: 6px;
+    gap: var(--space-1-5);
     font-size: var(--text-xs);
   }
 

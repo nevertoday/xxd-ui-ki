@@ -4,23 +4,28 @@ import { tokens } from "../lib/data.js";
 import { langOf } from "../i18n/index.js";
 const en = langOf(Astro.url.pathname) === "en";
 const space = Object.entries(tokens.base).filter(([k]) => k.startsWith("--space-"));
+const bps = Object.entries(tokens.base).filter(([k]) => k.startsWith("--bp-"));
 const controls = [["--control-h-xs", "xs"], ["--control-h-sm", "sm"], ["--control-h", "md"]];
 const T = en
   ? {
       title: "Spacing and sizing", caption: "Foundations", space: "Spacing", controls: "Control height and density",
       controlsLong: "Control height and density (switch density under Appearance in the top right)",
-      lead: "A 4px base. Controls come in two densities: the member site uses standard (40px), side panels and popups use compact (32px); hit areas are always ≥ 40px (44px for coarse pointers).",
+      lead: "A 4px base. Components use only these steps for padding, gaps and margins; two half steps are for optical gaps only: 2px (tray insets, labels next to badges) and 6px (between an icon and its text). Indents that line up with an icon are written as icon size + gap, not as a computed number. Controls come in two densities: the member site uses standard (40px), side panels and popups use compact (32px); hit areas are always ≥ 40px (44px for coarse pointers).",
+      bp: "Breakpoints", bpLead: "Only three. Design at these widths (plus 1280 for roomy desktop). CSS media queries can't read variables, so components write the numbers and a test only allows these three.",
+      bpUse: { "--bp-phone": "Phone: compact pagination, one column", "--bp-narrow": "Narrow: dialogs and the side panel become bottom drawers, settings in one column", "--bp-desktop": "Desktop: sidebar and table of contents both visible" },
       input: "Input",
     }
   : {
       title: "间距与尺寸", caption: "基础", space: "间距", controls: "控件高度与密度",
       controlsLong: "控件高度与密度（右上角「外观」里切换密度）",
-      lead: "4px 基准。控件有标准和紧凑两档密度：会员站用标准（40px），侧边栏和 popup 用紧凑（32px）；点击区永远 ≥ 40px（粗指针 44px）。",
+      lead: "4px 基准。组件的内边距、间隔、外边距只用这些档；两个半档只给光学上的小间隔：2px（托盘内缩、标签和角标）、6px（图标和字之间）。和图标对齐的缩进写成「图标尺寸 + 间距」，不写算好的数字。控件有标准和紧凑两档密度：会员站用标准（40px），侧边栏和 popup 用紧凑（32px）；点击区永远 ≥ 40px（粗指针 44px）。",
+      bp: "断点", bpLead: "只有三个。出稿按这三个宽度出（另加 1280 看桌面的宽松版）。CSS 的 @media 里不能用变量，组件写字面值，测试只放行这三个。",
+      bpUse: { "--bp-phone": "手机：分页收紧、一列", "--bp-narrow": "窄屏：对话框和右侧面板变成底部抽屉、设置一列", "--bp-desktop": "桌面：侧栏和目录同时出现" },
       input: "输入框",
     };
 ---
 
-<Site title={T.title} headings={[{ slug: "space", text: T.space }, { slug: "controls", text: T.controls }]}>
+<Site title={T.title} headings={[{ slug: "space", text: T.space }, { slug: "controls", text: T.controls }, { slug: "breakpoints", text: T.bp }]}>
   <header class="site-head">
     <p class="xxd-text" data-variant="caption">{T.caption}</p>
     <h1 class="xxd-text" data-variant="display">{T.title}</h1>
@@ -35,4 +40,9 @@ const T = en
     {controls.map(([k, size]) => (<button class="xxd-btn" data-size={size === "md" ? undefined : size}>{size} · var({k})</button>))}
     <input class="xxd-input" style="width:160px" placeholder={T.input} aria-label={T.input} />
   </div></div>
+  <h2 class="site-h2" id="breakpoints">{T.bp}</h2>
+  <p class="site-lead">{T.bpLead}</p>
+  <div class="xxd-group__body">
+    {bps.map(([k, v]) => (<div class="xxd-row"><div class="xxd-row__text"><span class="xxd-text" data-variant="mono">{k}</span><span class="xxd-row__desc">{T.bpUse[k]}</span></div><div class="xxd-row__control xxd-text" data-variant="caption">{v}</div></div>))}
+  </div>
 </Site>
