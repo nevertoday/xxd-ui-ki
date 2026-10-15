@@ -50,6 +50,7 @@
     "./dist/tokens.css": "./dist/tokens.css",
     "./dist/tokens.d.ts": "./dist/tokens.d.ts",
     "./dist/tokens.json": "./dist/tokens.json",
+    "./dist/tokens.resolved.json": "./dist/tokens.resolved.json",
     "./dist/tokens.layered.css": "./dist/tokens.layered.css",
     "./dist/tokens.shadow.css": "./dist/tokens.shadow.css",
     "./package.json": "./package.json",

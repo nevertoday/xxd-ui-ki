@@ -7,6 +7,8 @@ import StateMatrix from "../components/StateMatrix.astro";
 import PropsTable from "../components/PropsTable.astro";
 import ReactProps from "../components/ReactProps.astro";
 import { PARITY } from "../data/parity.js";
+import { SPECS } from "../data/specs.js";
+import SpecTable from "../components/SpecTable.astro";
 import kumoRegistry from "@cloudflare/kumo/ai/component-registry.json";
 import xxdReactProps from "@xxd/react/props.json";
 import { componentsFor } from "../lib/data.js";
@@ -34,6 +36,7 @@ const headings = [
   { slug: "demo", text: L.demo },
   ...extraDemos.map((e, i) => ({ slug: `example-${i}`, text: e.title, depth: 3 })),
   ...(c.sample && c.states ? [{ slug: "states", text: L.states }] : []),
+  ...(SPECS[c.name] ? [{ slug: "spec", text: L.spec }] : []),
   { slug: "props", text: L.props },
   ...(hasReactProps ? [{ slug: "react-props", text: L.reactProps }] : []),
   ...(c.js ? [{ slug: "js", text: "JS" }] : []),
@@ -101,6 +104,16 @@ const description = c.summary ?? (lang === "en" ? `${c.label} — an XXD UI comp
         <h2 class="site-h2" id="states">{L.states}</h2>
         <p class="site-p">{L.statesNote}</p>
         <StateMatrix sample={c.sample} states={c.states} />
+      </>
+    )
+  }
+
+  {
+    SPECS[c.name] && (
+      <>
+        <h2 class="site-h2" id="spec">{L.spec}</h2>
+        <p class="site-p">{L.specNote}</p>
+        <SpecTable name={c.name} lang={lang} />
       </>
     )
   }

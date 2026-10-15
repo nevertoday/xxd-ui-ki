@@ -529,8 +529,8 @@
     width: 14px;
     height: 14px;
     background: var(--muted, #6d6b67);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 9 6 6 6-6' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 9 6 6 6-6' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / contain no-repeat;
   }
   [data-kumo-component="Select"][data-kumo-part="trigger"][data-kumo-component] > span[aria-hidden="true"]:last-child > svg {
     display: none;
@@ -577,8 +577,8 @@
 
   /* ── 开关：36 × 20，边 --line-control；开的时候底和边都是 --switch-on ── */
   [data-kumo-component="Switch"][data-kumo-component][data-kumo-component] {
-    width: 36px;
-    height: 20px;
+    width: var(--switch-w, 36px);
+    height: var(--switch-h, 20px);
     background-color: var(--wash-strong, #eeece9);
     --tw-ring-color: var(--line-control, #898681);
   }
@@ -590,11 +590,11 @@
     top: 3px;
     bottom: 3px;
     left: 3px;
-    width: 14px;
+    width: calc(var(--switch-h, 20px) - 6px);
     box-shadow: 0 0 0 0.5px rgba(var(--shadow-rgb, 17, 17, 17), 0.18);
   }
   [data-kumo-component="Switch"][data-kumo-component][data-checked] > div {
-    left: 19px;
+    left: calc(var(--switch-w, 36px) - var(--switch-h, 20px) + 3px);
   }
 
   /* ── 标签页（underline）：文字在基线上，短墨线只在文字下；高 = 控件高，13px，标签之间 20px ── */

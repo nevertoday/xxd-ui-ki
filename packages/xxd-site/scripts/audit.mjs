@@ -15,7 +15,8 @@
 //   8. 真实浏览器冒烟（评审 R1）：happy-dom 看不到的东西 —— 层叠层顺序（Tailwind 的工具类能盖住 xxd）、
 //      带 *{margin:0} reset 时对话框仍居中、mountXxdUI 之后 host 的定位不被清掉。
 //   10. 对照（设计师评审 V1）：/tools/parity 上同一组件的原生 HTML 和 React 逐项比较（尺寸、字号、字重、颜色、边、圆角、底色），以 HTML 为准。
-// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site run audit [--only=axe|long|shadow|forced|en|polish|overlay|smoke|sr|parity]
+//   11. 规格（设计师评审 V5-1）：组件页的规格表（样品 × 4 种外观量出来的尺寸、内边距、圆角、字号）每一格都对得上一个令牌。
+// 用法：pnpm --filter @xxd/site build && pnpm --filter @xxd/site run audit [--only=axe|long|shadow|forced|en|polish|overlay|smoke|sr|parity|spec]
 // 需要 Chromium：CHROME_EXE=<chrome-headless-shell 路径>（缺省用 Playwright 自带的）。
 import { createServer } from "node:http";
 import { createReadStream, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -630,7 +631,32 @@ async function paritySection() {
   console.log(`对照：${pairs} 对 × 逐项（${PARITY_LOOKS.length} 种外观 × 中英），另外打开 ${OVERLAYS.length} 种浮层比较`);
 }
 
-const sections = { axe: axeAudit, long: longAudit, shadow: hostileAudit, forced: forcedAudit, en: englishAudit, polish: polishAudit, overlay: overlayAudit, smoke: smokeAudit, sr: srSection, parity: paritySection };
+/* ── 11. 规格（设计师评审 V5-1）：组件页的规格表在浏览器里量出来、反查令牌；每一格都要对得上一个令牌 ── */
+async function specSection() {
+  const { SPECS } = await import("../src/data/specs.js");
+  const slug = (n) => n.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+  let cells = 0;
+  for (const name of Object.keys(SPECS)) {
+    for (const lang of ["", "/en"]) {
+      const tab = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await tab.goto(`${origin}${lang}/components/${slug(name)}/`, { waitUntil: "load" });
+      await tab.waitForFunction(() => document.querySelector(".site-spec td[data-mode]") && ![...document.querySelectorAll(".site-spec td[data-mode]")].some((td) => td.textContent.trim() === "…"), null, { timeout: 10000 }).catch(() => {});
+      const r = await tab.evaluate(() => ({
+        cells: document.querySelectorAll(".site-spec td[data-mode]").length,
+        left: [...document.querySelectorAll(".site-spec td[data-mode]")].filter((td) => ["…", "—"].includes(td.textContent.trim())).length,
+        bad: [...document.querySelectorAll(".site-spec [data-untokened]")].map((u) => `${u.closest("tr").dataset.sel} ${u.closest("tr").dataset.prop} ${u.closest("td").dataset.mode}：${u.closest("td").textContent.trim()}`),
+      }));
+      if (!r.cells) fail("规格", `${lang}/components/${slug(name)}/ 没有规格表`);
+      if (r.left) fail("规格", `${lang}/components/${slug(name)}/ 有 ${r.left} 格没量出来（选择器在样品里找不到）`);
+      for (const b of r.bad) fail("规格", `${lang}/components/${slug(name)}/ ${b}`);
+      cells += r.cells;
+      await tab.close();
+    }
+  }
+  console.log(`规格：${Object.keys(SPECS).length} 个组件 × 中英，${cells} 格都对得上令牌`);
+}
+
+const sections = { axe: axeAudit, long: longAudit, shadow: hostileAudit, forced: forcedAudit, en: englishAudit, polish: polishAudit, overlay: overlayAudit, smoke: smokeAudit, sr: srSection, parity: paritySection, spec: specSection };
 for (const [name, run] of Object.entries(sections)) if (!only || only === name) await run();
 await browser.close();
 server.close();

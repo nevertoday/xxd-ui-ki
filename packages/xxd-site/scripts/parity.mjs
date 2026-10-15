@@ -145,7 +145,8 @@ export const OVERLAYS = [
   {
     slug: "dialog",
     html: { open: '[data-xxd-dialog-open="d1"]', parts: { 外框: "dialog[open]", 标题: "dialog[open] .xxd-dialog__title", 正文: "dialog[open] .xxd-dialog__body p", 主按钮: "dialog[open] .xxd-dialog__actions .xxd-btn:last-child", 取消: "dialog[open] .ui-dialog-cancel" } },
-    react: { parts: { 外框: "[role=dialog]", 标题: "[role=dialog] h2", 正文: "[role=dialog] p", 主按钮: "[role=dialog] [data-xxd-part=dialog-actions] > :last-child", 取消: "[role=dialog] [data-xxd-cancel]" } },
+    // 只认打开着的那个（组件页的规格样品也是 role="dialog"）
+    react: { parts: { 外框: "[role=dialog][data-open]", 标题: "[role=dialog][data-open] h2", 正文: "[role=dialog][data-open] p", 主按钮: "[role=dialog][data-open] [data-xxd-part=dialog-actions] > :last-child", 取消: "[role=dialog][data-open] [data-xxd-cancel]" } },
     props: { 外框: ["width", "radius", "edge", "background"], 标题: ["fontSize", "fontWeight", "color"], 正文: ["fontSize", "color"], 主按钮: ["height", "fontSize", "fontWeight", "color", "background"], 取消: ["height", "fontSize", "color"] },
     centered: true,
   },
@@ -181,7 +182,7 @@ export async function compareOverlays(browser, origin, look) {
     await trigger.waitFor({ timeout: 10000 });
     for (let i = 0; i < 10; i += 1) {
       await trigger.click();
-      const opened = await tab.locator(`${o.react.parts.外框}[data-open]`).first().waitFor({ timeout: 1000 }).then(() => true, () => false);
+      const opened = await tab.locator(o.react.parts.外框.includes("[data-open]") ? o.react.parts.外框 : `${o.react.parts.外框}[data-open]`).first().waitFor({ timeout: 1000 }).then(() => true, () => false);
       if (opened) break;
     }
     await tab.waitForTimeout(350);

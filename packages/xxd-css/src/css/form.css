@@ -154,7 +154,7 @@
 
   .xxd-select > select {
     appearance: none;
-    padding-right: calc(var(--space-3) + var(--icon-md) + var(--space-2)); /* 右边距 + chevron + 间隔 */
+    padding-right: var(--field-icon-slot); /* 右边距 + chevron + 间隔 */
     cursor: pointer;
   }
 
@@ -209,7 +209,7 @@
   }
 
   .xxd-input-wrap > .xxd-input {
-    padding-left: calc(var(--space-3) + var(--icon-md) + var(--space-2)); /* 左边距 + 图标 + 间隔 */
+    padding-left: var(--field-icon-slot); /* 左边距 + 图标 + 间隔 */
   }
 
   .xxd-input-wrap > .xxd-input-clear {
@@ -246,8 +246,8 @@
     position: relative;
     flex: none;
     /* 36 × 20：落在 4px 刻度上，长宽比 1.8，直角模式下也一眼和 16px 的方形复选框分开（设计师评审 V3-5） */
-    width: 36px;
-    height: 20px;
+    width: var(--switch-w);
+    height: var(--switch-h);
     margin: 0;
     border: 1px solid var(--line-control);
     border-radius: var(--r-pill);
@@ -261,8 +261,8 @@
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 14px;
-    height: 14px;
+    width: calc(var(--switch-h) - 6px);
+    height: calc(var(--switch-h) - 6px);
     border-radius: var(--r-pill);
     background: var(--paper);
     box-shadow: 0 0 0 0.5px rgba(var(--shadow-rgb), 0.18);
@@ -275,7 +275,7 @@
   }
 
   .xxd-switch:checked::before {
-    transform: translateX(16px);
+    transform: translateX(calc(var(--switch-w) - var(--switch-h)));
   }
 
   .xxd-switch:disabled {
@@ -296,8 +296,8 @@
     appearance: none;
     position: relative;
     flex: none;
-    width: 16px;
-    height: 16px;
+    width: var(--choice-size);
+    height: var(--choice-size);
     margin: var(--space-0-5) 0 0;
     border: 1px solid var(--line-control);
     background: var(--paper);
@@ -500,9 +500,10 @@
 /* 控件里用到的小图标（mask），24 网格、斜接角。勾在 16px 里要 1.5px，所以 viewBox 里写 2.25。 */
 :root,
 :host {
-  --xxd-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  --xxd-chevron-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E");
-  --xxd-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 12 4 4 8-8'/%3E%3C/svg%3E");
-  --xxd-external: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='M11 4H4v16h16v-7M14 4h6v6m-10 4L20 4'/%3E%3C/svg%3E");
-  --xxd-minus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M6 12h12'/%3E%3C/svg%3E");
+  /* 遮罩用的小图标：线宽固定 1.5px（vector-effect），和行内 SVG 图标一样（设计师评审 D23） */
+  --xxd-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 9 6 6 6-6' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --xxd-chevron-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m9 6 6 6-6 6' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --xxd-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='m6 12 4 4 8-8' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --xxd-external: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='miter'%3E%3Cpath d='M11 4H4v16h16v-7M14 4h6v6m-10 4L20 4' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --xxd-minus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round'%3E%3Cpath d='M6 12h12' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
 }

@@ -143,6 +143,19 @@
   --control-h-xs: 24px;
   --icon-button: 40px; /* 和 --control-h 一样高：同一行的图标按钮、输入框、按钮上下对齐 */
   --hit-min: 40px;
+  /* 组件级的内边距（标准密度；紧凑密度在下面的 data-density="compact" 里一起收） */
+  --control-pad-x: 16px; /* 按钮左右 */
+  --control-pad-x-sm: 12px;
+  --control-pad-x-lg: 20px;
+  --field-pad-x: 12px; /* 输入框、下拉左右 */
+  --row-pad-y: 12px; /* 设置行 */
+  --row-pad-x: 16px;
+  --list-row-pad-y: 8px; /* 列表行 */
+  /* 小控件的尺寸（设计师评审 V5-1：组件页的规格表能标出它们是哪个令牌） */
+  --choice-size: 16px; /* 复选框、单选的圆点 */
+  --switch-w: 36px; /* 开关：36 × 20，滑块 = 高 - 6 */
+  --switch-h: 20px;
+  --field-icon-slot: 34px; /* 输入框、下拉里给图标 / 箭头留的位置：边距 12 + 图标 14 + 间隔 8 */
 
   /* ── 图标：24 网格、1.5 线宽、圆头、斜接角（方角） ── */
   --ui-icon-stroke: 1.5;

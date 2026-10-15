@@ -37,7 +37,8 @@ const esc = (v: string | number) => String(v).replace(/&/g, "&amp;").replace(/"/
 /** 图标数据 → SVG 文本 */
 export function iconSvg(node: IconNode): string {
   const attrs = Object.entries(ICON_SVG_ATTRS).map(([k, v]) => `${k}="${v}"`).join(" ");
-  const body = node.map(([tag, a]) => `<${tag} ${Object.entries(a).map(([k, v]) => `${k}="${esc(v)}"`).join(" ")}/>`).join("");
+  // 线宽固定 1.5px，不跟着图标缩小（和网页版一样，设计师评审 D23）
+  const body = node.map(([tag, a]) => `<${tag} ${Object.entries(a).map(([k, v]) => `${k}="${esc(v)}"`).join(" ")} vector-effect="non-scaling-stroke"/>`).join("");
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ${attrs}>${body}</svg>`;
 }
 

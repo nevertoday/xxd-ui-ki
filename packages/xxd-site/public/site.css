@@ -786,6 +786,45 @@
     text-underline-offset: 3px;
   }
 
+  /* 组件页的规格（V5-1）：四个样品并排，下面一张量出来的表 */
+  .site-spec {
+    display: grid;
+    gap: var(--space-4);
+    margin: var(--space-3) 0 var(--space-8);
+  }
+
+  .site-spec__samples {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .site-spec__sample {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .site-spec__stage {
+    display: grid;
+    place-items: center;
+    min-height: 120px;
+    padding: var(--space-5);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--bg);
+  }
+
+  .site-spec__sample figcaption {
+    color: var(--muted);
+    font-size: var(--text-xs);
+  }
+
+  .site-spec__table td {
+    white-space: nowrap;
+  }
+
   /* 组件页 React 名字旁边的对照标记 */
   .site-parity-mark {
     margin-left: var(--space-2);
@@ -1164,6 +1203,10 @@
 
     .site-parity__row {
       grid-template-columns: 1fr 1fr;
+    }
+
+    .site-spec__samples {
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .site-parity__name {

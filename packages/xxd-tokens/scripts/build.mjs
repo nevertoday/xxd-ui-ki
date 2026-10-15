@@ -134,6 +134,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   json.coarse = blocks["@media (pointer: coarse) :root"];
   writeFileSync(join(dist, "tokens.json"), JSON.stringify(json, null, 2) + "\n");
 
+  // 算好的值（设计师评审 V5-4）：亮 / 暗 × 直角 / 圆角 × 标准 / 紧凑，每个令牌一个具体值（没有 var() / color-mix()）。
+  // 给规格标注、颜色页、llms.txt 和不读 CSS 的工具用；主色另算（主色是运行时选的，见 accentPalette）。
+  const { appearanceVars } = await import("../src/resolve.js");
+  const resolved = { $comment: "@xxd/tokens 算好的值：键是「亮/暗-直角/圆角-标准/紧凑」，值是每个令牌的具体值。由 scripts/build.mjs 从 tokens.css 生成，不要手改。" };
+  for (const theme of ["light", "dark"]) for (const corners of ["square", "rounded"]) for (const density of ["comfortable", "compact"]) {
+    resolved[`${theme}-${corners}-${density}`] = appearanceVars({ theme, corners, density }, { modes: json }).vars;
+  }
+  writeFileSync(join(dist, "tokens.resolved.json"), JSON.stringify(resolved, null, 2) + "\n");
+
   const names = Object.keys(json.base).sort();
   writeFileSync(
     join(dist, "tokens.d.ts"),

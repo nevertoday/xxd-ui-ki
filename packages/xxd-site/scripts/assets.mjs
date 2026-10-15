@@ -3,11 +3,13 @@
 //   public/v/<版本>/  同一批文件带版本号的一份（README「先试一下」引用它）
 //   public/xxd/echarts.js  图表组件页用（echarts/dist/echarts.min.js）
 //   public/xxd/kumo.css  React 组件的预编译样式（@cloudflare/kumo standalone，Kumo 换皮版）
+//   public/xxd/xxd-icons-svg.zip  图标页「下载全部 SVG」：每个图标一个 24 × 24 的 SVG，加一份中英关键词表（设计师评审 V5-2）
 //   public/xxd/forced-states.css  状态矩阵用：把组件 CSS 里的 :hover / :focus-visible / :active 复制成 [data-force~="…"] 版本，
 //                                 这样「悬停 / 聚焦 / 按下」可以静态并排展示，用的是真实的组件规则而不是手写的模仿。
 import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { crc32 } from "node:zlib";
 import { printSelector, ruleTree } from "../../xxd-tokens/scripts/selectors.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -98,7 +100,65 @@ export function forceStates(css) {
   return `/* 由 scripts/assets.mjs 生成：状态矩阵用的强制状态（请勿手改） */\n@layer xxd.components {\n${out.join("\n")}\n}\n`;
 }
 
+/** 最简单的 zip（只存不压：SVG 本来就小，设计工具都能直接打开）。files：[[文件名, Buffer]] */
+export function zipStore(files) {
+  const locals = [];
+  const centrals = [];
+  let offset = 0;
+  for (const [name, data] of files) {
+    const nameBuf = Buffer.from(name, "utf8");
+    const crc = crc32(data) >>> 0;
+    const local = Buffer.alloc(30);
+    local.writeUInt32LE(0x04034b50, 0);
+    local.writeUInt16LE(20, 4);
+    local.writeUInt16LE(0x0800, 6); // 文件名是 UTF-8
+    local.writeUInt16LE(0, 8); // 不压缩
+    local.writeUInt32LE(0, 10); // 时间日期写 0，产物每次一样
+    local.writeUInt32LE(crc, 14);
+    local.writeUInt32LE(data.length, 18);
+    local.writeUInt32LE(data.length, 22);
+    local.writeUInt16LE(nameBuf.length, 26);
+    locals.push(local, nameBuf, data);
+    const central = Buffer.alloc(46);
+    central.writeUInt32LE(0x02014b50, 0);
+    central.writeUInt16LE(20, 4);
+    central.writeUInt16LE(20, 6);
+    central.writeUInt16LE(0x0800, 8);
+    central.writeUInt32LE(crc, 16);
+    central.writeUInt32LE(data.length, 20);
+    central.writeUInt32LE(data.length, 24);
+    central.writeUInt16LE(nameBuf.length, 28);
+    central.writeUInt32LE(offset, 42);
+    centrals.push(central, nameBuf);
+    offset += 30 + nameBuf.length + data.length;
+  }
+  const dir = Buffer.concat(centrals);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(files.length, 8);
+  end.writeUInt16LE(files.length, 10);
+  end.writeUInt32LE(dir.length, 12);
+  end.writeUInt32LE(offset, 16);
+  return Buffer.concat([...locals, dir, end]);
+}
+
+/** 图标包：icons/<名字>.svg（24 网格、1.5 线宽、currentColor），keywords.json（中英关键词、分类），README.txt */
+export async function iconsZip() {
+  const { ICON_NAMES, iconSVG } = await import("@xxd/icons");
+  const { ICON_GROUPS } = await import("@xxd/icons/meta");
+  const files = ICON_NAMES.map((name) => {
+    const svg = iconSVG(name, { size: 24 }).replace(/ class="ui-icon"/, ' xmlns="http://www.w3.org/2000/svg"').replace(/ aria-hidden="true" focusable="false"/, "");
+    return [`icons/${name}.svg`, Buffer.from(svg + "\n")];
+  });
+  const keywords = {};
+  for (const g of ICON_GROUPS) for (const [name, kw] of Object.entries(g.icons)) keywords[name] = { group: { zh: g.zh, en: g.en }, keywords: kw };
+  files.push(["keywords.json", Buffer.from(JSON.stringify(keywords, null, 2) + "\n")]);
+  files.push(["README.txt", Buffer.from(`小小东 UI 图标 / XXD UI icons (MIT)\n${ICON_NAMES.length} 个 SVG：24 × 24 网格、1.5 线宽、圆头、斜接角、不填充，颜色是 currentColor。\n放大缩小时把线宽保持 1.5px（设计工具里关掉「缩放描边」）。\n${ICON_NAMES.length} SVGs on a 24 × 24 grid, 1.5 stroke, round caps, miter joins, no fill, currentColor.\nKeep the stroke at 1.5px when resizing (turn off "scale strokes").\nhttps://ui.xiaoxiaodong.ai/foundations/icons\n`)]);
+  return zipStore(files);
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  writeFileSync(join(out, "xxd-icons-svg.zip"), await iconsZip());
   const components = readFileSync(join(cssDist, "components.css"), "utf8");
   writeFileSync(join(out, "forced-states.css"), forceStates(components));
   console.log("xxd-site assets → public/xxd/");

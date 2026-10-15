@@ -324,3 +324,18 @@ test("抬起来的一层（浮层）：暗色比纸亮一档；上面的正文�
   assert.equal(base["--paper-raised"], base["--paper"], "亮色的浮层和纸一样（靠阴影托起）");
   assert.notEqual(dark["--paper-raised"], dark["--paper"], "暗色的浮层亮一档");
 });
+
+test("tokens.resolved.json：8 种外观，每个令牌都是具体值，和 tokens.css 对得上", () => {
+  const resolved = JSON.parse(readFileSync(new URL("../dist/tokens.resolved.json", import.meta.url), "utf8"));
+  const modes = JSON.parse(readFileSync(new URL("../dist/tokens.json", import.meta.url), "utf8"));
+  const keys = Object.keys(resolved).filter((k) => !k.startsWith("$"));
+  assert.equal(keys.length, 8);
+  for (const k of keys) {
+    for (const name of Object.keys(modes.base)) assert.ok(resolved[k][name] !== undefined, `${k} 缺 ${name}`);
+    for (const [name, v] of Object.entries(resolved[k])) assert.ok(!/var\(|color-mix\(/.test(v), `${k} ${name} 还没算完：${v}`);
+  }
+  assert.equal(resolved["light-square-comfortable"]["--paper"], modes.base["--paper"]);
+  assert.equal(resolved["dark-square-comfortable"]["--paper"], modes.dark["--paper"]);
+  assert.equal(resolved["light-rounded-comfortable"]["--r-md"], modes.rounded["--r-md"]);
+  assert.equal(resolved["light-square-compact"]["--control-h"], modes.compact["--control-h"]);
+});
