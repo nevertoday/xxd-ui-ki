@@ -862,7 +862,14 @@ Xxd.bindCommandPalette(items)  // ⌘K / Ctrl+K`,
     attributes: { "data-size": "sm | lg" },
     markup: `<div class="xxd-empty" data-size="sm"><i data-xxd-icon="FileText"></i><p class="xxd-empty__title">No history yet</p></div>
 <div class="xxd-empty"><i data-xxd-icon="Package"></i><p class="xxd-empty__title">No extensions yet</p><p class="xxd-empty__text">Create one with a single command.</p><div class="xxd-clipboard" data-size="sm"><code>pnpm xxd new ./today</code><button class="xxd-btn" data-variant="ghost" data-icon-only data-size="xs" aria-label="Copy" data-copy="pnpm xxd new ./today"><i data-xxd-icon="Copy" data-size="14"></i></button></div></div>`,
-    rules: ["An explanation + one clear next step"],
+    use: ["A list, search or history with nothing in it yet: say why it's empty and what to do next"],
+    avoid: ["Loading: use Progress or Loading", "An error: use Banner and say what went wrong and how to retry"],
+    rules: [
+      "An explanation + one clear next step",
+      "By default a single icon (24 grid, 1.5 stroke, drawn like every other icon), not a colorful illustration",
+      "Only first-run screens that need to explain what a feature does get an illustration: line art, one color (ink or a tint of the accent), the same stroke as the icons, no gradients or people",
+      "The title states the situation (No history yet), the text gives the reason or how, the button names the next step (Import your first post)",
+    ],
     a11y: ["The icon is decoration (aria-hidden); the title states the fact, the text gives the next step", "The next step is a button or a link, reachable by keyboard"],
   },
   Progress: {
@@ -1046,6 +1053,12 @@ Xxd.toast("Saved", { tone: "success" });</code></pre>
   },
   Chart: {
     title: "Chart",
+    rules: [
+      "Series colors are fixed: series 1 is the accent, series 2–5 are ink mixed toward paper at 78% / 64% / 54% / 46% (the lightest still has 3:1 on paper)",
+      "Colors differ only in lightness, so lines change style from series 3 on: solid, solid, dashed, dotted, dash-dot (WCAG 1.4.1: never color alone); series 1 is 2px wide, the rest 1.5px",
+      "More than 5 series: split the chart, or highlight one and draw the rest as --muted-2 background lines",
+      "Put a one-line conclusion or a data table next to the chart so screen readers and people who skip the chart get it too",
+    ],
     summary: "ECharts + Xxd.chartOptions(): one highlighted line in the accent, the rest in shades of ink; hairline grid; redraws automatically when the theme or accent changes. Also works straight in Kumo's <Chart options>.",
     markup: `<div class="xxd-stack" style="--stack-gap:16px;width:100%;max-width:720px">
 <div class="xxd-chart-card">

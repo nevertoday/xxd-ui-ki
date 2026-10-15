@@ -18,6 +18,7 @@ export function navFor(lang = "zh") {
       items: [
         { label: L.pageHome, href: "/" },
         { label: L.pageStart, href: "/start" },
+        { label: L.pageDesigners, href: "/designers" },
         { label: L.pagePrinciples, href: "/principles" },
       ],
     },

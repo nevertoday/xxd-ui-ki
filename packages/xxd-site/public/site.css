@@ -786,6 +786,90 @@
     text-underline-offset: 3px;
   }
 
+  /* 小程序出稿规范：一部按比例缩小的手机（375 × 812 的一半），标出状态栏、导航栏、胶囊、标签栏、安全区 */
+  .site-mini-design {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .site-phone-fig {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: center;
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--text-xs);
+  }
+
+  .site-phone {
+    display: grid;
+    grid-template-rows: 22px 22px 1fr 25px 17px;
+    width: 188px;
+    height: 406px;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-lg);
+    background: var(--paper);
+    color: var(--muted);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-xs);
+  }
+
+  .site-phone > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .site-phone__nav {
+    position: relative;
+    justify-content: flex-start !important;
+    padding-left: var(--space-2);
+  }
+
+  .site-phone__capsule {
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    width: 44px;
+    height: 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-pill);
+  }
+
+  .site-phone__content {
+    background: var(--wash);
+  }
+
+  .site-phone__safe {
+    border-bottom: 0 !important;
+    background: repeating-linear-gradient(45deg, transparent 0 4px, var(--wash-strong) 4px 5px);
+  }
+
+  @media (max-width: 640px) {
+    .site-mini-design {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* 设计师页的要点列表 */
+  .site-list {
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--read-width);
+    margin: var(--space-3) 0;
+    padding-left: 1.2em;
+    color: color-mix(in srgb, var(--ink) 86%, var(--muted));
+    line-height: var(--leading-sm);
+  }
+
+  .site-list > li::marker {
+    color: var(--muted-2);
+  }
+
   /* 组件页的规格（V5-1）：四个样品并排，下面一张量出来的表 */
   .site-spec {
     display: grid;

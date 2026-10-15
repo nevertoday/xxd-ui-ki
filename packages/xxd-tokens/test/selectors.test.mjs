@@ -25,7 +25,7 @@ test("声明原样保留（var()、color-mix、斜杠简写都不改写）", () 
 test("外观属性开头的选择器多一个 :host() 版本；@keyframes 不动", () => {
   const out = body(toShadow(`[data-finish="material"] .b { color: red }\n[data-finish="material"] { --e: 1 }\n@keyframes k { from { opacity: 0 } to { opacity: 1 } }`));
   assert.match(out, /\[data-finish="material"\] \.b,\n:host\(\[data-finish="material"\]\) \.b \{/);
-  assert.match(out, /\[data-finish="material"\],\n:host\(\[data-finish="material"\]\) \{/);
+  assert.match(out, /\[data-finish="material"\],\n:host\(\[data-finish="material"\]\),\n:host\(\[data-finish="material"\]\) > \* \{/);
   assert.match(out, /@keyframes k \{ from \{ opacity: 0 \} to \{ opacity: 1 \} \}/);
 });
 

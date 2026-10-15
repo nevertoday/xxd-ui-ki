@@ -101,7 +101,7 @@ function measure([cellSel, sel, props]) {
     else if (p === "background") out.background = s.backgroundImage !== "none" ? `image ${s.backgroundImage.slice(0, 30)}` : norm(s.backgroundColor);
     else if (p === "radius") out.radius = s.borderTopLeftRadius;
     else if (p === "opacity") { let o = 1; for (let e = el; e && e !== cell; e = e.parentElement) o *= parseFloat(getComputedStyle(e).opacity); out.opacity = o.toFixed(2); }
-    else if (p === "textAlign") { const t = el.textContent.trim(); const range = document.createRange(); range.selectNodeContents(el); const tr = range.getBoundingClientRect(); out.textAlign = Math.abs(tr.right - (r.right - parseFloat(s.paddingRight))) < 2 ? "右" : "左"; }
+    else if (p === "textAlign") { const range = document.createRange(); range.selectNodeContents(el); const tr = range.getBoundingClientRect(); out.textAlign = Math.abs(tr.right - (r.right - parseFloat(s.paddingRight))) < 2 ? "右" : "左"; }
     else if (p === "numeric") out.numeric = s.fontVariantNumeric.includes("tabular") ? "等宽" : "比例";
     else if (p === "rowLine") { const cells = [...el.children]; const c = getComputedStyle(cells[0] ?? el); const w = Math.max(parseFloat(s.borderBottomWidth) || 0, parseFloat(c.borderBottomWidth) || 0, parseFloat(s.borderTopWidth) || 0, parseFloat(c.borderTopWidth) || 0); out.rowLine = w > 0 ? "有" : "无"; }
     else if (p === "edge") {

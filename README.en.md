@@ -122,6 +122,10 @@ xxd-ui help         # every command
 
 Or search the [showcase](https://ui.xiaoxiaodong.ai/en/).
 
+## For designers
+
+You can design with it without opening the code: [For designers](https://ui.xiaoxiaodong.ai/en/designers) covers what to read first, how to name tokens in a spec, which widths to design at and what to hand over. Common component pages have a Spec section (sizes, padding and type, each named by its token and measured from the real CSS), and all icons can be downloaded as SVG. There is no Figma library; the site is the source.
+
 ## Contributing
 
 Start with [CONTRIBUTING](CONTRIBUTING.en.md): what's welcome, where to change things, how to run the tests.

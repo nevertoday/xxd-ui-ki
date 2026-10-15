@@ -9,11 +9,11 @@ const lang = en ? "en" : "zh";
 const tr = (zh: string, en2: string) => (en ? en2 : zh);
 const T = en
   ? {
-      caption: "Tools", title: "HTML and React side by side", impl: ["Native HTML", "React"],
+      caption: "Tools", title: "HTML and React side by side", impl: ["Native HTML", "React"], component: "Component",
       lead: "The same component in both implementations. HTML (@xxd/css) is the reference; React (@xxd/react, Kumo reskinned) follows it. The audit compares each pair's size, type, colour, edge, corners and background, and fails on any difference — so a design spec fits both.",
     }
   : {
-      caption: "工具", title: "两种实现对照", impl: ["原生 HTML", "React"],
+      caption: "工具", title: "两种实现对照", impl: ["原生 HTML", "React"], component: "组件",
       lead: "同一个组件的两种实现并排。以原生 HTML（@xxd/css）为准，React（@xxd/react，Kumo 换皮）向它看齐。audit 会逐对比较尺寸、字号、字重、颜色、边、圆角和底色，有一项不一样就失败 —— 所以一份设计稿对两种实现都成立。",
     };
 const PAIRS: [string, string, string][] = [
@@ -49,7 +49,7 @@ const PAIRS: [string, string, string][] = [
   </header>
   <div class="site-parity" role="table" aria-label={T.title}>
     <div class="site-parity__row site-parity__head" role="row">
-      <span role="columnheader"></span>
+      <span role="columnheader"><span class="xxd-sr-only">{T.component}</span></span>
       <span role="columnheader">{T.impl[0]}</span>
       <span role="columnheader">{T.impl[1]}</span>
     </div>

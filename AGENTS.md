@@ -4,7 +4,7 @@
 
 ## 开工前必读
 
-1. `docs/maintainers/REVIEW-PLAN.md` —— 当前这一轮（R1–R6）的任务和验收标准；之前的轮次在同目录的 `PLAN.md`、`OPTIMIZATION-PLAN.md`。做完在「进度」里打勾写日期。
+1. `docs/maintainers/DESIGNER-REVIEW-PLAN.md` —— 最近一轮（设计师评审 V1–V6）的任务和验收标准；之前的轮次在同目录的 `REVIEW-PLAN.md`、`PLAN.md`、`OPTIMIZATION-PLAN.md`。做完在「进度」里打勾写日期。
 2. `docs/DESIGN-PRINCIPLES.md` —— 审美宪法。任何视觉决定都要能对应到其中一条；对应不上就先问。
 3. 改 Kumo 组件前读 `docs/upstream/KUMO-AGENTS.md` 和 `packages/kumo/AGENTS.md`（上游的工程约定仍然有效）。
 
@@ -19,4 +19,4 @@
 - 不手改生成文件（`theme-kumo.css`、`ai/*`、`src/primitives/*`、`xxd-react/src/kumo-exports.ts`、`xxd-icons/src/{names.d.ts,each.js,each.d.ts}`），改源配置再 codegen / 构建。
 - 展示站有中英两版：改 `packages/xxd-css/registry.json` / `patterns.json` 时同步改旁边的 `registry.en.js` / `patterns.en.js`；加展示站页面时 `src/pages/en/` 也加一个（正文写在 `src/views/`）。测试会检查。
 - 字体只用系统无衬线（不用宋体 / 衬线），不加载网络字体。
-- 修改后跑 `pnpm --filter @cloudflare/kumo test`；基线是 64 文件 / 1450 测试全绿。
+- 修改后跑 `pnpm --filter @cloudflare/kumo test`；基线是 65 文件 / 1456 测试全绿。改了组件样式还要跑展示站的 audit（`--only=parity` 两种实现对照、`--only=polish` 细节、`--only=spec` 规格）。

@@ -1302,7 +1302,10 @@
       "markup": "<div class=\"xxd-empty\" data-size=\"sm\"><i data-xxd-icon=\"FileText\"></i><p class=\"xxd-empty__title\">还没有记录</p></div>\n<div class=\"xxd-empty\"><i data-xxd-icon=\"Package\"></i><p class=\"xxd-empty__title\">还没有插件</p><p class=\"xxd-empty__text\">用一行命令新建一个。</p><div class=\"xxd-clipboard\" data-size=\"sm\"><code>pnpm xxd new ./today</code><button class=\"xxd-btn\" data-variant=\"ghost\" data-icon-only data-size=\"xs\" aria-label=\"复制\" data-copy=\"pnpm xxd new ./today\"><i data-xxd-icon=\"Copy\" data-size=\"14\"></i></button></div></div>",
       "react": "Empty",
       "rules": [
-        "说明 + 一个明确的下一步"
+        "说明 + 一个明确的下一步",
+        "缺省只用一个图标（24 网格、1.5 线宽，和别的图标同一种画法），不用彩色插图",
+        "只有第一次使用、需要讲清楚这个功能做什么时才配插图：线稿、单色（墨色或主色的淡层）、和图标同样的线宽，不用渐变和人物",
+        "标题说状态（还没有记录），说明说原因或做法，按钮说下一步（导入第一篇）"
       ],
       "attributes": {
         "data-size": "sm | lg"
@@ -1312,7 +1315,14 @@
         "图标是装饰（aria-hidden）；标题写事实，正文写下一步",
         "下一步是按钮或链接，键盘可达"
       ],
-      "block": true
+      "block": true,
+      "use": [
+        "列表、搜索、记录还没有内容时：告诉用户为什么空、下一步做什么"
+      ],
+      "avoid": [
+        "加载中：用 Progress 或 Loading",
+        "出错：用 Banner 写清楚错在哪、怎么重试"
+      ]
     },
     {
       "name": "Progress",
@@ -1618,7 +1628,13 @@
         "图表旁边要有一句话结论或一张表；颜色之外，线宽也区分重点线。"
       ],
       "js": "chart.setOption(Xxd.chartOptions(option))\nXxd.watchChartTheme(chart, () => Xxd.chartOptions(option))\n// React：<Chart echarts={echarts} options={Xxd.chartOptions(option)} />",
-      "react": "Chart"
+      "react": "Chart",
+      "rules": [
+        "系列配色固定：第 1 条是主色，第 2–5 条是墨色按 78% / 64% / 54% / 46% 往纸色混（最浅的一档对纸也有 3:1）",
+        "颜色只差深浅，所以折线从第 3 条起换线型：实线、实线、虚线、点线、点划线（WCAG 1.4.1：不只靠颜色区分）；第 1 条线宽 2px，其余 1.5px",
+        "超过 5 条就该拆图或只高亮一条，其余画成 --muted-2 的背景线",
+        "图表旁边写一句结论或附数据表，读屏和不看图的人也拿得到信息"
+      ]
     }
   ]
 }

@@ -163,7 +163,7 @@ globalThis.xxdPolish = function xxdPolish(root = document.body, { orphans = true
     if (![...el.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim())) continue;
     const owner = el.closest("[class]");
     const cls = owner && typeof owner.className === "string" ? owner.className : "";
-    if (!/(^|\s)xxd-/.test(cls) || /(^|\s)site-/.test(cls) || !shown(el)) continue;
+    if (!/(^|\s)xxd-/.test(cls) || /(^|\s)site-/.test(cls) || !shown(el) || el.closest('[data-kind="dont"]')) continue;
     const cs = getComputedStyle(el);
     if (cs.display === "inline") continue; // 行内的字跟着所在的段落走，看段落本身
     const lh = parseFloat(cs.lineHeight);
@@ -176,7 +176,7 @@ globalThis.xxdPolish = function xxdPolish(root = document.body, { orphans = true
   //    基线是真量出来的：在第一段字前面临时放一个 0 × 0、按基线对齐的行内块，它的底边就是这一行的基线（等宽字、不同字号都准）。
   //    只看组件的表格（.xxd-table）；展示站自己的属性表另算
   for (const tr of root.querySelectorAll(".xxd-table tr")) {
-    if (!shown(tr)) continue;
+    if (!shown(tr) || tr.closest('[data-kind="dont"]')) continue;
     const marks = [];
     for (const cell of tr.cells) {
       const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
@@ -203,7 +203,7 @@ globalThis.xxdPolish = function xxdPolish(root = document.body, { orphans = true
   const FIELD = ".xxd-btn:not([data-icon-only]), .xxd-input, .xxd-select, .xxd-input-wrap, .xxd-input-group, .xxd-chip, .xxd-segmented, .xxd-picker__trigger, .xxd-search";
   for (const box of root.querySelectorAll("*")) {
     const cs = getComputedStyle(box);
-    if (!cs.display.includes("flex") || cs.flexDirection.startsWith("column") || !shown(box)) continue;
+    if (!cs.display.includes("flex") || cs.flexDirection.startsWith("column") || !shown(box) || box.closest('[data-kind="dont"]')) continue;
     const items = [...box.children].filter((c) => c.matches(FIELD) && shown(c));
     if (items.length < 2) continue;
     const rows = groupLines(items.map((c) => c.getBoundingClientRect()));

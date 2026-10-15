@@ -5,6 +5,12 @@ import { Badge, Button, Checkbox, Input, Radio, Select, Switch, Table, Tabs, Xxd
 
 type Tr = (zh: string, en: string) => string;
 
+// Kumo 的 Checkbox 只认受控的 checked
+function CheckOn({ label, disabled }: { label: string; disabled?: boolean }) {
+  const [on, setOn] = useState(true);
+  return <Checkbox label={label} checked={on} onCheckedChange={setOn} disabled={disabled} />;
+}
+
 // Kumo 的 Switch 只认受控的 checked
 function SwitchOn({ label, disabled }: { label: string; disabled?: boolean }) {
   const [on, setOn] = useState(true);
@@ -23,9 +29,9 @@ export const REACT_PAIRS: Record<string, (tr: Tr) => JSX.Element> = {
   input: (tr) => <Input aria-label={tr("标题", "Title")} placeholder={tr("给这篇文章起个名字", "Name this post")} className="w-60" />,
   "input-disabled": (tr) => <Input aria-label={tr("标题", "Title")} defaultValue={tr("已发布", "Published")} className="w-60" disabled />,
   select: (tr) => <Select aria-label={tr("图片质量", "Image quality")} className="w-40" defaultValue="high" items={{ high: tr("高", "High"), standard: tr("标准", "Standard") }} />,
-  checkbox: (tr) => <Checkbox label={tr("智能标点", "Smart punctuation")} defaultChecked />,
+  checkbox: (tr) => <CheckOn label={tr("智能标点", "Smart punctuation")} />,
   "checkbox-off": (tr) => <Checkbox label={tr("写入标题", "Write title")} />,
-  "checkbox-disabled": (tr) => <Checkbox label={tr("智能标点", "Smart punctuation")} defaultChecked disabled />,
+  "checkbox-disabled": (tr) => <CheckOn label={tr("智能标点", "Smart punctuation")} disabled />,
   "switch-disabled": (tr) => <SwitchOn label={tr("完成音效", "Done sound")} disabled />,
   switch: (tr) => <SwitchOn label={tr("完成音效", "Done sound")} />,
   "switch-off": (tr) => <Switch label={tr("自动保存", "Autosave")} />,

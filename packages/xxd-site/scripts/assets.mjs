@@ -159,6 +159,10 @@ export async function iconsZip() {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   writeFileSync(join(out, "xxd-icons-svg.zip"), await iconsZip());
+  // 算好的令牌值（设计师从这里开始页可以下载）
+  const resolvedTokens = join(pkgs, "xxd-tokens/dist/tokens.resolved.json");
+  need(resolvedTokens, "@xxd/tokens");
+  copyFileSync(resolvedTokens, join(out, "tokens.resolved.json"));
   const components = readFileSync(join(cssDist, "components.css"), "utf8");
   writeFileSync(join(out, "forced-states.css"), forceStates(components));
   console.log("xxd-site assets → public/xxd/");

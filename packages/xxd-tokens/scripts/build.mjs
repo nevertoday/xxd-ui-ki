@@ -28,7 +28,12 @@ function shadowSelectors(selector) {
   if (isHost(out[0])) out.push([...out[0], { type: "combinator", value: "child" }, { type: "universal" }]);
   // `[data-finish=material] .xxd-btn`、光秃秃的 `[data-finish=material]`：属性写在 host 上时也生效
   const [head, rest] = firstCompound(selector);
-  if (head.length === 1 && isRootAttr(head[0])) out.push([{ type: "pseudo-class", kind: "host", selectors: head }, ...rest]);
+  if (head.length === 1 && isRootAttr(head[0])) {
+    const host = { type: "pseudo-class", kind: "host", selectors: head };
+    out.push([host, ...rest]);
+    // 光秃秃的属性块（[data-finish=material]）：上面那条「内部顶层元素再声明一次」会把 host 上的值盖掉，这里也要再声明一次
+    if (!rest.length) out.push([host, { type: "combinator", value: "child" }, { type: "universal" }]);
+  }
   return out;
 }
 
