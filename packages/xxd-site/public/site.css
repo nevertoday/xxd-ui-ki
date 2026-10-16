@@ -36,16 +36,23 @@
     white-space: nowrap;
   }
 
+  /* 品牌标志：墨色方块中间一个「东」。字是用直线画的（和图标同一种画法：方头、斜接角），
+     不用字体——苹方、雅黑、思源的「东」长得不一样。和 public/favicon.svg 是同一个图形。 */
   .site-mark {
+    position: relative;
     width: 18px;
     height: 18px;
     border-radius: var(--r-xs);
-    background:
-      linear-gradient(var(--on-ink), var(--on-ink)) 4px 4px / 4px 4px no-repeat,
-      linear-gradient(color-mix(in srgb, var(--on-ink) 70%, transparent), color-mix(in srgb, var(--on-ink) 70%, transparent)) 10px 4px / 4px 4px no-repeat,
-      linear-gradient(color-mix(in srgb, var(--on-ink) 45%, transparent), color-mix(in srgb, var(--on-ink) 45%, transparent)) 4px 10px / 4px 4px no-repeat,
-      linear-gradient(color-mix(in srgb, var(--on-ink) 22%, transparent), color-mix(in srgb, var(--on-ink) 22%, transparent)) 10px 10px / 4px 4px no-repeat,
-      var(--ink);
+    background: var(--ink);
+  }
+
+  .site-mark::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--on-ink);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.5 7.5H18.5M11.5 3.5 8 12.5H17M12.5 10V19.5L10.5 18M8.5 15 6 19M15.5 15 18.5 19' fill='none' stroke='black' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.5 7.5H18.5M11.5 3.5 8 12.5H17M12.5 10V19.5L10.5 18M8.5 15 6 19M15.5 15 18.5 19' fill='none' stroke='black' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") center / contain no-repeat;
   }
 
   .site-search {
