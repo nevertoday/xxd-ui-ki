@@ -36,7 +36,7 @@
     white-space: nowrap;
   }
 
-  /* 品牌标志：墨色方块中间一个「东」。字是用直线画的（和图标同一种画法：方头、斜接角），
+  /* 品牌标志：墨色方块中间一个「东」。字是用直线画的（和图标同一种画法：圆头、斜接角），四周留出一圈白，
      不用字体——苹方、雅黑、思源的「东」长得不一样。和 public/favicon.svg 是同一个图形。 */
   .site-mark {
     position: relative;
@@ -51,8 +51,8 @@
     position: absolute;
     inset: 0;
     background: var(--on-ink);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.5 7.5H18.5M11.5 3.5 8 12.5H17M12.5 10V19.5L10.5 18M8.5 15 6 19M15.5 15 18.5 19' fill='none' stroke='black' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") center / contain no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.5 7.5H18.5M11.5 3.5 8 12.5H17M12.5 10V19.5L10.5 18M8.5 15 6 19M15.5 15 18.5 19' fill='none' stroke='black' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E") center / contain no-repeat;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.5 8H17.5M11.5 5 8.5 12H16.5M12.5 10V18.5L11 17.5M9.5 14.5 7.5 17.5M14.5 14.5 16.5 17.5' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='miter'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.5 8H17.5M11.5 5 8.5 12H16.5M12.5 10V18.5L11 17.5M9.5 14.5 7.5 17.5M14.5 14.5 16.5 17.5' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='miter'/%3E%3C/svg%3E") center / contain no-repeat;
   }
 
   .site-search {
