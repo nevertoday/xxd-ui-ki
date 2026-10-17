@@ -6,6 +6,8 @@ import { embed } from "../lib/markup.js";
 import { langOf, t, withLang } from "../i18n/index.js";
 import { WALL, WALL_FULL, WALL_HIDE, WALL_WIDE } from "../data/wall.js";
 import { WALL as WALL_EN } from "../data/wall.en.js";
+import { richWall, WALL_MINW } from "../data/wall-rich.js";
+import { templatesFor } from "../data/templates.js";
 const lang = langOf(Astro.url.pathname);
 const L = t(lang);
 const T = {
@@ -15,6 +17,9 @@ const T = {
     principles: "设计原则",
     cli: "命令行",
     wall: "全部组件",
+    showcase: "拼成一个产品",
+    showcaseLead: "下面几块都是真组件拼的整页（和模板页同一份），跟着右上角的外观一起变。",
+    open: "打开模板",
   },
   en: {
     lead: "A Chinese-first, framework-free UI kit — one CSS file and one JS file, built with Chrome extensions in mind. Black, white and gray, square corners by default, ink for emphasis. Switch the theme, corners, accent, density and button style in the top right — every cell below follows.",
@@ -22,11 +27,23 @@ const T = {
     principles: "Design principles",
     cli: "CLI",
     wall: "All components",
+    showcase: "Put together as a product",
+    showcaseLead: "The screens below are whole pages built from the real components (the same markup as the template pages); they follow the appearance switches in the top right.",
+    open: "Open the template",
   },
 }[lang];
-const staticForms = lang === "en" ? WALL_EN : WALL;
-// 墙上的格子一样高：示例里写死的高度（侧栏 420px）缩到格子放得下
-const fitWall = (markup) => markup.replace(/height:\s*4\d\dpx/g, "height:230px");
+// 墙上的样子：浮层画成静态展开的（WALL），稀疏的换成几种变体放在一格（richWall）
+const staticForms = { ...(lang === "en" ? WALL_EN : WALL), ...richWall(lang) };
+// 「拼成一个产品」：直接用模板页的整页（去掉页面级的脚本；h1 降成 h2，首页只有一个 h1；外观组在墙上有）
+const tpl = Object.fromEntries(templatesFor(lang).map((x) => [x.slug, x]));
+// 分页导航改个名字：墙上还有一个「分页」，同名的导航区读屏分不开
+const asShowcase = (m) => embed(m.replace(/aria-label="(分页|Pagination)"/g, (_, x) => `aria-label="${x === "分页" ? "资源列表的分页" : "Resource list pagination"}"`).replace(/<script[\s\S]*?<\/script>/g, "").replace(/<div id="tpl-appearance"><\/div>/, "").replace(/<(\/?)h1\b/g, "<$1h2"));
+const showcase = [
+  [["extension-sidepanel", 560], ["resource-list", 560]],
+  [["settings", 560], ["delete-confirm", 560]],
+];
+// 示例里写死的高度（侧栏 420px）缩到 320px：墙上不用那么高，但子菜单要露出来
+const fitWall = (markup) => markup.replace(/height:\s*4\d\dpx/g, "height:320px");
 const wall = componentsFor(lang).filter((c) => c.wall !== false && !WALL_HIDE.has(c.name));
 ---
 
@@ -40,10 +57,27 @@ const wall = componentsFor(lang).filter((c) => c.wall !== false && !WALL_HIDE.ha
       <a class="xxd-btn" data-variant="ghost" href={withLang("/tools", lang)}>{T.cli}</a>
     </div>
   </header>
-  <section class="site-wall" aria-label={T.wall}>
+  <section class="site-showcase" aria-labelledby="showcase-title">
+    <h2 class="site-h2" id="showcase-title">{T.showcase}</h2>
+    <p class="site-p">{T.showcaseLead}</p>
+    {showcase.map((row, r) => (
+      <div class="site-showcase__row" data-row={r}>
+        {row.map(([slug, height]) => (
+          <figure class="site-showcase__item" data-slug={slug}>
+            <div class="site-showcase__frame" style={`height:${height}px${tpl[slug].width ? `;max-width:${tpl[slug].width}px` : ""}`}>
+              <div class="xxd-page" style="height:100%;position:relative" set:html={asShowcase(tpl[slug].markup)} />
+            </div>
+            <figcaption><a class="xxd-link" data-variant="plain" href={withLang(`/templates/${slug}`, lang)}>{tpl[slug].label}</a>{tpl[slug].width && <span> · {tpl[slug].width}px</span>}</figcaption>
+          </figure>
+        ))}
+      </div>
+    ))}
+  </section>
+  <h2 class="site-h2" id="wall-title">{T.wall}</h2>
+  <section class="site-wall" aria-labelledby="wall-title">
     {
       wall.map((c) => (
-        <div class="site-wall__cell" data-wide={WALL_WIDE.has(c.name) ? "" : undefined} data-full={WALL_FULL.has(c.name) ? "" : undefined}>
+        <div class="site-wall__cell" data-wide={WALL_WIDE.has(c.name) ? "" : undefined} data-full={WALL_FULL.has(c.name) ? "" : undefined} data-minw={WALL_MINW[c.name]}>
           <a class="site-wall__name" href={withLang(`/components/${c.slug}`, lang)}>
             {c.label}
             {lang !== "en" && <span>{c.name}</span>}
@@ -164,6 +198,9 @@ const wall = componentsFor(lang).filter((c) => c.wall !== false && !WALL_HIDE.ha
             const need = measure(stage);
             while (span < cols && span * colW - padX - 1 < need) span += 1;
           }
+          // 大组件写了至少要多宽（WALL_MINW）：表格、侧栏、页面头不被挤窄
+          const minw = Number(cell.dataset.minw) || 0;
+          while (span < cols && span * colW - padX - 1 < minw) span += 1;
           span = Math.min(span, cols);
           const inner = span * colW - padX - 1;
           const name = cell.querySelector(".site-wall__name");

@@ -708,6 +708,69 @@
     min-width: 14em;
   }
 
+  /* 首页「拼成一个产品」：模板页的整页缩在框里，两行：插件侧边栏 | 资源列表；设置页 | 删除确认 */
+  .site-showcase {
+    margin: 0 0 var(--space-8);
+  }
+
+  .site-showcase__row {
+    display: grid;
+    grid-template-columns: 380px minmax(0, 1fr);
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+  }
+
+  .site-showcase__row[data-row="1"] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+  }
+
+  .site-showcase__item {
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+    margin: 0;
+  }
+
+  .site-showcase__frame {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+  }
+
+  /* 设置页比框高：底部淡出，看得出下面还有 */
+  .site-showcase__item[data-slug="settings"] .site-showcase__frame::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: var(--space-8);
+    background: linear-gradient(to bottom, transparent, var(--bg));
+    pointer-events: none;
+  }
+
+  .site-showcase__item figcaption {
+    color: var(--muted);
+    font-size: var(--text-xs);
+  }
+
+  @media (max-width: 1024px) {
+    .site-showcase__row,
+    .site-showcase__row[data-row="1"] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* 手机上四块竖着排太长：只留第一行（插件侧边栏、资源列表），其余点进模板页看 */
+  @media (max-width: 640px) {
+    .site-showcase__row[data-row="1"] {
+      display: none;
+    }
+  }
+
   /* 首页组件墙：名字在格子左上角（属于这一格，不像下一格的标题）。
    * 格子按组件自己的大小占几列、几行（Home.astro 里的脚本量出来，写成 grid-column / grid-row 的 span）：
    * 小组件不在大格子里飘，大组件不被挤窄或截掉。行高 40px 一档；没量之前（没有脚本）每格至少 200px、按内容长高。 */
